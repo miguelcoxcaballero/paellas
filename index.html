@@ -92,6 +92,209 @@
     .item { border-radius: 18px; padding: 16px; display: grid; gap: 8px; }
     .item:hover, .btn:hover, .crumb:hover, .tab:hover { transform: translateY(-1px); }
     .title { font-size: 1.04rem; line-height: 1.12; word-break: break-word; }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      padding: 18px 12px;
+      background: rgba(64, 36, 5, 0.32);
+    }
+    .modal-card {
+      width: min(680px, 100%);
+      max-height: min(84vh, 820px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      overflow: hidden;
+    }
+    .modal-copy { display: grid; gap: 8px; }
+    .picker-shell {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .picker-list {
+      min-height: 220px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-right: 4px;
+    }
+    .picker-item {
+      width: 100%;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 223, 0.96);
+      color: var(--ink);
+      box-shadow: 0 10px 28px rgba(104, 70, 5, 0.08);
+    }
+    .picker-item:hover { transform: translateY(-1px); }
+    .picker-main { min-width: 0; display: grid; gap: 4px; }
+    .picker-title { font-size: 1rem; line-height: 1.12; word-break: break-word; }
+    .picker-arrow { color: var(--accent2); font-size: 1.25rem; line-height: 1; }
+    .modal-form { display: grid; gap: 12px; }
+    .modal-actions { justify-content: flex-end; }
+    .modal-actions .btn { min-width: 120px; }
+    .editor-card {
+      display: grid;
+      gap: 16px;
+      overflow: visible !important;
+    }
+    .editor-head {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+    .editor-head-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      min-width: 0;
+    }
+    .editor-title-side {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .editor-doc {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+    .doc-title {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      max-width: min(520px, 100%);
+      min-height: 40px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: clamp(1.18rem, 2.6vw, 1.55rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.1;
+      color: var(--ink);
+      outline: none;
+      cursor: text;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .doc-title[contenteditable="true"]:focus {
+      background: rgba(255, 242, 192, 0.92);
+      box-shadow: inset 0 0 0 1px rgba(141, 67, 0, 0.16);
+    }
+    .editor-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .save-stack {
+      display: grid;
+      gap: 3px;
+      justify-items: end;
+      min-width: 138px;
+    }
+    .save-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 22px;
+    }
+    .save-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 0 2px rgba(72, 42, 4, 0.08);
+      flex: 0 0 auto;
+    }
+    .save-indicator.paused { background: #a38a5a; }
+    .save-indicator.dirty { background: var(--warn); }
+    .save-indicator.saving { background: var(--accent); }
+    .save-indicator.saved { background: var(--good); }
+    .save-indicator.error { background: var(--bad); }
+    .save-status-text {
+      font-size: .92rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .save-time {
+      font-size: .76rem;
+      color: var(--muted);
+      opacity: .78;
+      min-height: 16px;
+    }
+    .mode-toggle-btn {
+      display: inline-grid;
+      grid-template-columns: auto 38px;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+    }
+    .mode-toggle-text {
+      min-width: 38px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .mode-toggle-pill {
+      position: relative;
+      width: 38px;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(72, 42, 4, 0.18);
+      transition: background .2s ease;
+    }
+    .mode-toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+      transition: transform .2s ease;
+    }
+    .mode-toggle-btn.is-editing .mode-toggle-pill {
+      background: var(--accent);
+    }
+    .mode-toggle-btn.is-editing .mode-toggle-knob {
+      transform: translateX(18px);
+    }
+    .editor-tabs {
+      min-height: 0;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 2px;
+    }
+    #editorView.read-only .doc-title {
+      cursor: default;
+      background: transparent;
+    }
+    #editorView.read-only .cell {
+      cursor: default;
+      color: rgba(64, 36, 5, 0.88);
+      background: rgba(255, 252, 233, 0.45);
+    }
     .sheet-wrap {
       width: 100%;
       height: 100%;
@@ -142,6 +345,20 @@
     @media (max-width: 860px) {
       .app { width: 100vw; padding: 12px 8px; }
       .topbar, .row, .head { display: grid; grid-template-columns: 1fr; }
+      .modal-card { padding: 16px; }
+      .editor-head-top,
+      .editor-title-side,
+      .editor-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      .save-stack {
+        justify-items: start;
+        min-width: 0;
+      }
+      .doc-title {
+        max-width: 100%;
+      }
       table { width: max(100%, 760px); min-width: 760px; }
     }
   </style>
@@ -194,22 +411,33 @@
     </main>
 
     <main id="editorView" class="view hidden">
-      <section id="editorShell" class="card">
-        <div class="head">
-          <div>
-            <div id="editorTitle" class="title">Hoja</div>
-            <div id="editorSubtitle" class="meta">Editor simple embebido</div>
+      <section id="editorShell" class="card editor-card">
+        <div class="editor-head">
+          <div class="editor-head-top">
+            <div class="editor-title-side">
+              <button id="backBtn" class="btn small" type="button">Volver</button>
+              <div class="editor-doc">
+                <div id="editorTitle" class="doc-title" role="textbox" aria-label="Nombre del archivo" contenteditable="true" spellcheck="false">Hoja</div>
+                <div id="editorSubtitle" class="meta">Editor simple embebido</div>
+              </div>
+            </div>
+            <div class="editor-actions">
+              <div id="sheetMeta" class="pill">Sin datos</div>
+              <div class="save-stack">
+                <div class="save-line">
+                  <span id="saveIndicator" class="save-indicator paused" aria-hidden="true"></span>
+                  <span id="editorStatus" class="save-status-text">Modo lectura</span>
+                </div>
+                <div id="saveTimestamp" class="save-time"></div>
+              </div>
+              <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edicion">
+                <span id="modeToggleLabel" class="mode-toggle-text">Edit</span>
+                <span class="mode-toggle-pill" aria-hidden="true"><span class="mode-toggle-knob"></span></span>
+              </button>
+            </div>
           </div>
-          <div class="row">
-            <button id="backBtn" class="btn small" type="button">Volver</button>
-            <button id="saveBtn" class="btn primary small" type="button">Guardar</button>
-          </div>
+          <div id="sheetTabs" class="tabs editor-tabs"></div>
         </div>
-        <div class="row">
-          <div id="sheetMeta" class="pill">Sin datos</div>
-          <div id="editorStatus" class="status">Sin cambios</div>
-        </div>
-        <div id="sheetTabs" class="tabs"></div>
       </section>
       <section class="card">
         <div class="sheet-wrap">
@@ -217,6 +445,32 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div id="newSheetModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="newSheetModalTitle">
+    <section id="newSheetModalCard" class="card modal-card">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="newSheetModalTitle" class="title">Nueva hoja</div>
+          <div class="meta">Elige una carpeta de Drive y el nombre del spreadsheet.</div>
+        </div>
+        <button id="newSheetCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="picker-shell">
+        <div id="newSheetPickerStatus" class="status">Cargando carpetas...</div>
+        <div id="newSheetTargetMeta" class="pill">Destino: Mi unidad</div>
+        <div id="newSheetPickerBreadcrumbs" class="crumbs"></div>
+        <div id="newSheetPickerList" class="picker-list"></div>
+        <p id="newSheetPickerEmpty" class="meta hidden">No hay subcarpetas en esta ubicacion.</p>
+      </div>
+      <div class="modal-form">
+        <input id="newSheetNameInput" class="search" type="text" placeholder="Nueva hoja" autocomplete="off" spellcheck="false">
+        <div class="row modal-actions">
+          <button id="newSheetCancelBtn" class="btn small" type="button">Cancelar</button>
+          <button id="newSheetCreateBtn" class="btn primary small" type="button">Crear hoja</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -235,10 +489,19 @@
       currentItems: [],
       spreadsheetId: "",
       spreadsheetTitle: "",
+      savedSpreadsheetTitle: "",
       spreadsheetSheets: [],
       currentSheetTitle: "",
       sheetDrafts: {},
-      sheetDirty: {}
+      sheetDirty: {},
+      titleDirty: false,
+      editorMode: "edit",
+      saveTimer: 0,
+      saveInFlight: false,
+      saveQueued: false,
+      lastSavedAt: 0,
+      pickerFolderStack: [{ id: "root", name: "Mi unidad" }],
+      pickerFolders: []
     };
 
     const els = {
@@ -254,6 +517,17 @@
       driveStatus: document.getElementById("driveStatus"),
       searchInput: document.getElementById("searchInput"),
       newSheetBtn: document.getElementById("newSheetBtn"),
+      newSheetModal: document.getElementById("newSheetModal"),
+      newSheetModalCard: document.getElementById("newSheetModalCard"),
+      newSheetCloseBtn: document.getElementById("newSheetCloseBtn"),
+      newSheetPickerStatus: document.getElementById("newSheetPickerStatus"),
+      newSheetTargetMeta: document.getElementById("newSheetTargetMeta"),
+      newSheetPickerBreadcrumbs: document.getElementById("newSheetPickerBreadcrumbs"),
+      newSheetPickerList: document.getElementById("newSheetPickerList"),
+      newSheetPickerEmpty: document.getElementById("newSheetPickerEmpty"),
+      newSheetNameInput: document.getElementById("newSheetNameInput"),
+      newSheetCancelBtn: document.getElementById("newSheetCancelBtn"),
+      newSheetCreateBtn: document.getElementById("newSheetCreateBtn"),
       folderCount: document.getElementById("folderCount"),
       breadcrumbs: document.getElementById("breadcrumbs"),
       folderMeta: document.getElementById("folderMeta"),
@@ -265,20 +539,127 @@
       editorSubtitle: document.getElementById("editorSubtitle"),
       sheetMeta: document.getElementById("sheetMeta"),
       editorStatus: document.getElementById("editorStatus"),
+      saveIndicator: document.getElementById("saveIndicator"),
+      saveTimestamp: document.getElementById("saveTimestamp"),
+      modeToggleBtn: document.getElementById("modeToggleBtn"),
+      modeToggleLabel: document.getElementById("modeToggleLabel"),
       sheetTabs: document.getElementById("sheetTabs"),
       sheetGrid: document.getElementById("sheetGrid"),
-      backBtn: document.getElementById("backBtn"),
-      saveBtn: document.getElementById("saveBtn")
+      backBtn: document.getElementById("backBtn")
     };
 
     function setLoginStatus(text) { els.loginStatus.textContent = text || ""; }
     function setDriveStatus(text) { els.driveStatus.textContent = text || ""; }
     function setEditorStatus(text, tone) {
       els.editorStatus.textContent = text || "";
-      els.editorStatus.className = "status" + (tone ? " " + tone : "");
+      els.editorStatus.className = "save-status-text" + (tone ? " " + tone : "");
+    }
+    function formatSavedTime(timestamp) {
+      if (!timestamp) return "";
+      try {
+        return new Date(timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+      } catch (err) {
+        return "";
+      }
+    }
+    function setSaveState(stateName, text) {
+      els.saveIndicator.className = "save-indicator " + (stateName || "paused");
+      setEditorStatus(text || "", stateName === "error" ? "error" : (stateName === "dirty" || stateName === "saving" ? "warn" : ""));
+      if (stateName === "saved" && state.lastSavedAt) {
+        els.saveTimestamp.textContent = "Ult. guardado " + formatSavedTime(state.lastSavedAt);
+      } else if (stateName === "saving") {
+        els.saveTimestamp.textContent = "Autosave activo";
+      } else if (stateName === "dirty") {
+        els.saveTimestamp.textContent = "Guardado automatico pendiente";
+      } else if (stateName === "error") {
+        els.saveTimestamp.textContent = "Reintentando al siguiente cambio";
+      } else {
+        els.saveTimestamp.textContent = "";
+      }
+    }
+    function setPickerStatus(text, tone) {
+      els.newSheetPickerStatus.textContent = text || "";
+      els.newSheetPickerStatus.className = "status" + (tone ? " " + tone : "");
     }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
     function currentFolderId() { return state.folderStack[state.folderStack.length - 1].id; }
+    function normalizeTitle(value) {
+      return String(value || "").replace(/\s+/g, " ").trim() || "Hoja";
+    }
+    function currentTitle() {
+      return normalizeTitle(state.spreadsheetTitle || els.editorTitle.textContent || "Hoja");
+    }
+    function syncEditorTitle() {
+      const title = currentTitle();
+      if (els.editorTitle.textContent !== title) {
+        els.editorTitle.textContent = title;
+      }
+    }
+    function hasPendingSheetChanges() {
+      return Object.keys(state.sheetDirty).some(function (key) { return !!state.sheetDirty[key]; });
+    }
+    function hasPendingChanges() {
+      return !!state.titleDirty || hasPendingSheetChanges();
+    }
+    function refreshDirtyState() {
+      if (state.saveInFlight) return;
+      if (hasPendingChanges()) {
+        setSaveState("dirty", "Cambios sin guardar");
+      } else if (state.editorMode === "read") {
+        setSaveState("saved", state.lastSavedAt ? "Modo lectura" : "Sin cambios");
+      } else {
+        setSaveState("saved", state.lastSavedAt ? "Todo guardado" : "Listo para editar");
+      }
+    }
+    function updateDriveItemTitle(title) {
+      state.currentItems = state.currentItems.map(function (item) {
+        if (item.id === state.spreadsheetId) {
+          return Object.assign({}, item, { name: title });
+        }
+        return item;
+      });
+      renderItems();
+    }
+    function applyEditorMode() {
+      const editing = state.editorMode === "edit";
+      els.editorView.classList.toggle("read-only", !editing);
+      els.modeToggleBtn.classList.toggle("is-editing", editing);
+      els.modeToggleBtn.setAttribute("aria-pressed", editing ? "true" : "false");
+      els.modeToggleLabel.textContent = editing ? "Edit" : "Read";
+      els.editorTitle.setAttribute("contenteditable", editing ? "true" : "false");
+      els.editorTitle.setAttribute("tabindex", editing ? "0" : "-1");
+      Array.prototype.forEach.call(els.sheetGrid.querySelectorAll(".cell"), function (cell) {
+        cell.readOnly = !editing;
+      });
+      refreshDirtyState();
+    }
+    function queueAutosave(delay) {
+      clearTimeout(state.saveTimer);
+      if (state.editorMode !== "edit" || !hasPendingChanges()) {
+        refreshDirtyState();
+        return;
+      }
+      setSaveState("dirty", "Cambios sin guardar");
+      state.saveTimer = setTimeout(function () {
+        flushPendingChanges();
+      }, typeof delay === "number" ? delay : 900);
+    }
+    function cloneFolderStack(stack) {
+      const source = Array.isArray(stack) && stack.length ? stack : [{ id: "root", name: "Mi unidad" }];
+      return source.map(function (entry) {
+        return {
+          id: entry && entry.id ? entry.id : "root",
+          name: entry && entry.name ? entry.name : "Mi unidad"
+        };
+      });
+    }
+    function pickerCurrentFolder() {
+      return state.pickerFolderStack[state.pickerFolderStack.length - 1] || { id: "root", name: "Mi unidad" };
+    }
+    function pickerCurrentFolderId() { return pickerCurrentFolder().id; }
+    function pickerPathLabel() {
+      return cloneFolderStack(state.pickerFolderStack).map(function (entry) { return entry.name; }).join(" / ");
+    }
     function parseApiErrorText(text) {
       if (!text) return "";
       try {
@@ -390,6 +771,43 @@
         els.breadcrumbs.appendChild(btn);
       });
     }
+    function renderPickerBreadcrumbs() {
+      els.newSheetPickerBreadcrumbs.innerHTML = "";
+      state.pickerFolderStack.forEach(function (crumb, index) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "crumb" + (index === state.pickerFolderStack.length - 1 ? " current" : "");
+        btn.textContent = crumb.name;
+        if (index !== state.pickerFolderStack.length - 1) {
+          btn.addEventListener("click", function () {
+            state.pickerFolderStack = state.pickerFolderStack.slice(0, index + 1);
+            loadPickerFolders(pickerCurrentFolderId());
+          });
+        }
+        els.newSheetPickerBreadcrumbs.appendChild(btn);
+      });
+      els.newSheetTargetMeta.textContent = "Destino: " + pickerPathLabel();
+    }
+    function renderPickerFolders() {
+      els.newSheetPickerList.innerHTML = "";
+      els.newSheetPickerEmpty.classList.toggle("hidden", state.pickerFolders.length !== 0);
+      state.pickerFolders.forEach(function (item) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "picker-item";
+        btn.innerHTML =
+          "<div class='picker-main'>" +
+            "<div class='picker-title'>" + escapeHtml(item.name || "Carpeta sin nombre") + "</div>" +
+            "<div class='meta'>Abrir carpeta</div>" +
+          "</div>" +
+          "<div class='picker-arrow' aria-hidden='true'>&rsaquo;</div>";
+        btn.addEventListener("click", function () {
+          state.pickerFolderStack.push({ id: item.id, name: item.name || "Carpeta" });
+          loadPickerFolders(item.id);
+        });
+        els.newSheetPickerList.appendChild(btn);
+      });
+    }
     function renderItems() {
       const query = (els.searchInput.value || "").trim().toLowerCase();
       const filtered = state.currentItems.filter(function (item) {
@@ -451,12 +869,9 @@
       html.push("</tbody>");
       els.sheetGrid.innerHTML = html.join("");
       els.sheetMeta.textContent = info.title + " - vista simple " + rows + "x" + cols;
-      els.editorTitle.textContent = state.spreadsheetTitle || "Hoja";
+      syncEditorTitle();
       els.editorSubtitle.textContent = "Sheet activa: " + info.title;
-    }
-    function refreshDirtyState() {
-      if (state.sheetDirty[state.currentSheetTitle]) setEditorStatus("Cambios sin guardar", "warn");
-      else setEditorStatus("Sin cambios", "");
+      applyEditorMode();
     }
     function loadProfile() {
       return fetchJson("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress)").then(function (data) {
@@ -492,6 +907,60 @@
           setBusy(els.driveShell, false);
         });
     }
+    function loadPickerFolders(folderId) {
+      renderPickerBreadcrumbs();
+      setBusy(els.newSheetModalCard, true);
+      setPickerStatus("Cargando carpetas...", "warn");
+      els.newSheetPickerList.innerHTML = "";
+      els.newSheetPickerEmpty.classList.add("hidden");
+      const query = encodeURIComponent(
+        "'" + folderId + "' in parents and trashed=false and mimeType='application/vnd.google-apps.folder'"
+      );
+      const fields = encodeURIComponent("files(id,name,mimeType)");
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query +
+        "&pageSize=200&orderBy=name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
+      )
+        .then(function (data) {
+          state.pickerFolders = data.files || [];
+          renderPickerFolders();
+          setPickerStatus("Selecciona la carpeta de destino.", "");
+        })
+        .catch(function (err) {
+          console.error(err);
+          state.pickerFolders = [];
+          renderPickerFolders();
+          setPickerStatus(messageFromError(err, "No se han podido cargar las carpetas"), "error");
+        })
+        .finally(function () {
+          setBusy(els.newSheetModalCard, false);
+        });
+    }
+    function closeNewSheetModal() {
+      els.newSheetModal.classList.add("hidden");
+      setBusy(els.newSheetModalCard, false);
+    }
+    function openNewSheetModal() {
+      state.pickerFolderStack = cloneFolderStack(state.folderStack);
+      state.pickerFolders = [];
+      els.newSheetNameInput.value = "Nueva hoja";
+      renderPickerBreadcrumbs();
+      renderPickerFolders();
+      setPickerStatus("Cargando carpetas...", "warn");
+      els.newSheetModal.classList.remove("hidden");
+      return loadPickerFolders(pickerCurrentFolderId()).finally(function () {
+        els.newSheetNameInput.focus();
+        els.newSheetNameInput.select();
+      });
+    }
+    function submitNewSheetModal() {
+      const trimmedName = (els.newSheetNameInput.value || "").trim() || "Nueva hoja";
+      return createSpreadsheet({
+        name: trimmedName,
+        folderId: pickerCurrentFolderId(),
+        folderStack: cloneFolderStack(state.pickerFolderStack)
+      });
+    }
     function loadSheet(title) {
       const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === title; });
       if (!info) return Promise.resolve();
@@ -522,12 +991,15 @@
     function loadSpreadsheetMeta(id) {
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) +
-        "?supportsAllDrives=true&fields=id,name,mimeType,capabilities(canEdit)"
+        "?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,capabilities(canEdit)"
       ).then(function (file) {
         if (!file || file.mimeType !== "application/vnd.google-apps.spreadsheet") {
           throw new Error("El archivo seleccionado no es un Google Sheets valido.");
         }
         state.spreadsheetTitle = file.name || state.spreadsheetTitle;
+        state.savedSpreadsheetTitle = state.spreadsheetTitle;
+        state.titleDirty = false;
+        state.lastSavedAt = file.modifiedTime ? Date.parse(file.modifiedTime) || 0 : 0;
         return fetchJson(
           "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(id) +
           "?includeGridData=false&fields=properties(title),sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))"
@@ -543,13 +1015,24 @@
       els.sheetGrid.innerHTML = "";
       state.spreadsheetId = item.id;
       state.spreadsheetTitle = item.name || "Google Sheets";
+      state.savedSpreadsheetTitle = state.spreadsheetTitle;
       state.spreadsheetSheets = [];
       state.currentSheetTitle = "";
       state.sheetDrafts = {};
       state.sheetDirty = {};
+      state.titleDirty = false;
+      state.editorMode = "edit";
+      clearTimeout(state.saveTimer);
+      state.saveQueued = false;
+      state.saveInFlight = false;
+      state.lastSavedAt = 0;
+      syncEditorTitle();
+      applyEditorMode();
       return loadSpreadsheetMeta(item.id)
         .then(function (meta) {
           state.spreadsheetTitle = (meta.properties && meta.properties.title) || state.spreadsheetTitle;
+          state.savedSpreadsheetTitle = state.spreadsheetTitle;
+          syncEditorTitle();
           state.spreadsheetSheets = (meta.sheets || []).map(function (sheet) {
             const props = sheet.properties || {};
             return {
@@ -562,30 +1045,34 @@
             setEditorStatus("El archivo no tiene sheets visibles", "error");
             return;
           }
+          refreshDirtyState();
           return loadSheet(state.spreadsheetSheets[0].title);
         })
         .catch(function (err) {
           console.error(err);
           els.sheetMeta.textContent = "Error de apertura";
-          setEditorStatus(messageFromError(err, "No se ha podido abrir el spreadsheet"), "error");
+          setSaveState("error", messageFromError(err, "No se ha podido abrir el spreadsheet"));
         })
         .finally(function () {
           setBusy(els.editorShell, false);
         });
     }
-    function createSpreadsheet() {
-      const suggestedName = "Nueva hoja";
-      const name = window.prompt("Nombre del spreadsheet nuevo:", suggestedName);
-      if (name === null) return Promise.resolve();
-      const trimmedName = name.trim() || suggestedName;
+    function createSpreadsheet(options) {
+      if (!options || !options.name) {
+        return openNewSheetModal();
+      }
+      const targetFolderId = options.folderId || "root";
+      const targetFolderStack = cloneFolderStack(options.folderStack);
       setBusy(els.driveShell, true);
+      setBusy(els.newSheetModalCard, true);
       setDriveStatus("Creando spreadsheet...");
+      setPickerStatus("Creando hoja...", "warn");
       const body = {
-        name: trimmedName,
+        name: options.name,
         mimeType: "application/vnd.google-apps.spreadsheet"
       };
-      if (currentFolderId() !== "root") {
-        body.parents = [currentFolderId()];
+      if (targetFolderId !== "root") {
+        body.parents = [targetFolderId];
       }
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name,mimeType",
@@ -595,22 +1082,46 @@
           body: JSON.stringify(body)
         }
       ).then(function (file) {
-        return loadFolder(currentFolderId()).then(function () {
+        closeNewSheetModal();
+        state.folderStack = targetFolderStack;
+        return loadFolder(targetFolderId).then(function () {
           return openSpreadsheet(file);
         });
       }).catch(function (err) {
         console.error(err);
-        setDriveStatus(messageFromError(err, "No se ha podido crear el spreadsheet"));
+        const message = messageFromError(err, "No se ha podido crear el spreadsheet");
+        setDriveStatus(message);
+        setPickerStatus(message, "error");
       }).finally(function () {
         setBusy(els.driveShell, false);
+        setBusy(els.newSheetModalCard, false);
       });
     }
-    function saveSheet() {
-      const info = currentSheetInfo();
-      if (!info || !state.sheetDrafts[info.title]) return Promise.resolve();
-      setBusy(els.editorShell, true);
-      setEditorStatus("Guardando...", "warn");
-      const range = sheetRange(info);
+    function persistSpreadsheetTitle() {
+      const nextTitle = currentTitle();
+      if (!state.titleDirty || !state.spreadsheetId) return Promise.resolve(false);
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) +
+        "?supportsAllDrives=true&fields=id,name",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: nextTitle })
+        }
+      ).then(function (file) {
+        state.spreadsheetTitle = file.name || nextTitle;
+        state.savedSpreadsheetTitle = state.spreadsheetTitle;
+        state.titleDirty = false;
+        syncEditorTitle();
+        updateDriveItemTitle(state.spreadsheetTitle);
+        return true;
+      });
+    }
+    function saveSheetDrafts() {
+      const dirtySheets = state.spreadsheetSheets.filter(function (sheet) {
+        return !!state.sheetDirty[sheet.title];
+      });
+      if (!dirtySheets.length) return Promise.resolve(false);
       return fetchJson(
         "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values:batchUpdate",
         {
@@ -618,28 +1129,69 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             valueInputOption: "USER_ENTERED",
-            data: [
-              {
-                range: range,
+            data: dirtySheets.map(function (sheet) {
+              return {
+                range: sheetRange(sheet),
                 majorDimension: "ROWS",
-                values: state.sheetDrafts[info.title]
-              }
-            ]
+                values: state.sheetDrafts[sheet.title] || createGrid(maxRows(sheet), maxCols(sheet))
+              };
+            })
           })
         }
       ).then(function () {
-        state.sheetDirty[info.title] = false;
-        setEditorStatus("Guardado", "good");
-      }).catch(function (err) {
-        console.error(err);
-        setEditorStatus(messageFromError(err, "Error al guardar"), "error");
-      }).finally(function () {
-        setBusy(els.editorShell, false);
+        dirtySheets.forEach(function (sheet) {
+          state.sheetDirty[sheet.title] = false;
+        });
+        return true;
       });
+    }
+    function flushPendingChanges(options) {
+      const config = options || {};
+      clearTimeout(state.saveTimer);
+      if (state.saveInFlight) {
+        state.saveQueued = true;
+        return Promise.resolve(false);
+      }
+      if (!hasPendingChanges()) {
+        refreshDirtyState();
+        return Promise.resolve(true);
+      }
+      if (state.editorMode !== "edit" && !config.force) {
+        refreshDirtyState();
+        return Promise.resolve(false);
+      }
+      state.saveInFlight = true;
+      setBusy(els.editorShell, true);
+      setSaveState("saving", config.message || "Guardando...");
+      return Promise.resolve()
+        .then(function () { return persistSpreadsheetTitle(); })
+        .then(function () { return saveSheetDrafts(); })
+        .then(function () {
+          state.lastSavedAt = Date.now();
+          setSaveState("saved", "Todo guardado");
+          return true;
+        })
+        .catch(function (err) {
+          console.error(err);
+          setSaveState("error", messageFromError(err, "Error al guardar"));
+          return false;
+        })
+        .finally(function () {
+          state.saveInFlight = false;
+          setBusy(els.editorShell, false);
+          if (state.saveQueued) {
+            state.saveQueued = false;
+            queueAutosave(220);
+          }
+        });
+    }
+    function saveSheet() {
+      return flushPendingChanges({ force: true, message: "Guardando..." });
     }
     function handleGridInput(event) {
       const target = event.target;
       if (!target || !target.classList.contains("cell")) return;
+      if (state.editorMode !== "edit") return;
       const info = currentSheetInfo();
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
@@ -647,7 +1199,40 @@
       if (!state.sheetDrafts[info.title]) state.sheetDrafts[info.title] = createGrid(maxRows(info), maxCols(info));
       state.sheetDrafts[info.title][row][col] = target.value;
       state.sheetDirty[info.title] = true;
-      refreshDirtyState();
+      queueAutosave();
+    }
+    function handleTitleInput() {
+      if (state.editorMode !== "edit") {
+        syncEditorTitle();
+        return;
+      }
+      state.spreadsheetTitle = normalizeTitle(els.editorTitle.textContent);
+      state.titleDirty = state.spreadsheetTitle !== state.savedSpreadsheetTitle;
+      queueAutosave();
+    }
+    function handleTitleBlur() {
+      state.spreadsheetTitle = normalizeTitle(els.editorTitle.textContent);
+      state.titleDirty = state.spreadsheetTitle !== state.savedSpreadsheetTitle;
+      syncEditorTitle();
+      if (state.titleDirty) queueAutosave(250);
+      else refreshDirtyState();
+    }
+    function toggleEditorMode() {
+      if (state.editorMode === "edit") {
+        return flushPendingChanges({ force: true, message: "Guardando antes de pasar a lectura..." }).then(function (ok) {
+          if (!ok && hasPendingChanges()) return;
+          state.editorMode = "read";
+          applyEditorMode();
+        });
+      }
+      state.editorMode = "edit";
+      applyEditorMode();
+      return Promise.resolve();
+    }
+    function returnToDrive() {
+      return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).finally(function () {
+        showView("drive");
+      });
     }
     function initGoogle() {
       if (!window.google || !google.accounts || !google.accounts.oauth2) {
@@ -691,29 +1276,73 @@
       state.currentItems = [];
       state.spreadsheetId = "";
       state.spreadsheetTitle = "";
+      state.savedSpreadsheetTitle = "";
       state.spreadsheetSheets = [];
       state.currentSheetTitle = "";
       state.sheetDrafts = {};
       state.sheetDirty = {};
+      state.titleDirty = false;
+      state.editorMode = "edit";
+      clearTimeout(state.saveTimer);
+      state.saveQueued = false;
+      state.saveInFlight = false;
+      state.lastSavedAt = 0;
+      state.pickerFolderStack = [{ id: "root", name: "Mi unidad" }];
+      state.pickerFolders = [];
       els.searchInput.value = "";
       els.itemsGrid.innerHTML = "";
       els.sheetTabs.innerHTML = "";
       els.sheetGrid.innerHTML = "";
+      closeNewSheetModal();
       renderBreadcrumbs();
       showView("login");
       setLoginStatus("");
     });
     els.searchInput.addEventListener("input", renderItems);
     els.newSheetBtn.addEventListener("click", createSpreadsheet);
+    els.newSheetCloseBtn.addEventListener("click", closeNewSheetModal);
+    els.newSheetCancelBtn.addEventListener("click", closeNewSheetModal);
+    els.newSheetCreateBtn.addEventListener("click", submitNewSheetModal);
+    els.newSheetNameInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submitNewSheetModal();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeNewSheetModal();
+      }
+    });
+    els.newSheetModal.addEventListener("click", function (event) {
+      if (event.target === els.newSheetModal) closeNewSheetModal();
+    });
     els.homeBtn.addEventListener("click", function () {
       if (!state.accessToken) {
         showView("login");
         return;
       }
+      if (!els.editorView.classList.contains("hidden")) {
+        returnToDrive();
+        return;
+      }
       showView("drive");
     });
-    els.backBtn.addEventListener("click", function () { showView("drive"); });
-    els.saveBtn.addEventListener("click", saveSheet);
+    els.backBtn.addEventListener("click", returnToDrive);
+    els.modeToggleBtn.addEventListener("click", toggleEditorMode);
+    els.editorTitle.addEventListener("input", handleTitleInput);
+    els.editorTitle.addEventListener("blur", handleTitleBlur);
+    els.editorTitle.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        els.editorTitle.blur();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        state.spreadsheetTitle = state.savedSpreadsheetTitle || state.spreadsheetTitle || "Hoja";
+        state.titleDirty = false;
+        syncEditorTitle();
+        refreshDirtyState();
+        els.editorTitle.blur();
+      }
+    });
     els.sheetGrid.addEventListener("input", handleGridInput);
 
     renderBreadcrumbs();
