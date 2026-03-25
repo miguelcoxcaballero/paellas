@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>paellas.net</title>
+  <style>
+    :root {
+      --bg: #ffd84a;
+      --bg-2: #ffef9a;
+      --ink: #3a2209;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 20%),
+        radial-gradient(circle at 80% 30%, rgba(255, 179, 0, 0.16), transparent 22%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -0.05em;
+    }
+
+    .emoji {
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+  <main class="brand" aria-label="paellas.net">
+    <span class="emoji">🥘</span>
+    <span>paellas.net</span>
+  </main>
+</body>
+</html>
