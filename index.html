@@ -329,8 +329,8 @@
     }
 
     .file-card {
-      cursor: not-allowed;
-      opacity: 0.92;
+      cursor: pointer;
+      opacity: 0.96;
     }
 
     .icon {
@@ -423,7 +423,7 @@
           <div id="folderCounter" class="pill">0 elementos</div>
         </div>
         <div>
-          <span class="crumb-trail meta">Solo puedes navegar por carpetas. Los archivos no se abren.</span>
+          <span class="crumb-trail meta">Solo se muestran carpetas y archivos de Google Sheets. Las hojas se abren en una pestana nueva.</span>
           <div id="breadcrumbs" class="crumbs"></div>
         </div>
       </section>
@@ -549,6 +549,7 @@
       const type = item.mimeType || "";
       if (type.startsWith("image/")) return "Imagen";
       if (type === "application/pdf") return "PDF";
+      if (type === "application/vnd.google-apps.spreadsheet") return "Google Sheets";
       if (type.includes("spreadsheet")) return "Hoja";
       if (type.includes("document")) return "Documento";
       if (type.includes("presentation")) return "Presentacion";
@@ -585,18 +586,23 @@
       filtered.forEach(function (item) {
         const el = document.createElement("article");
         const isFolder = item.mimeType === "application/vnd.google-apps.folder";
+        const isSheet = item.mimeType === "application/vnd.google-apps.spreadsheet";
         el.className = isFolder ? "folder-card" : "file-card";
         el.innerHTML =
           iconForItem(item) +
           "<div>" +
           "<strong class='item-title'>" + escapeHtml(item.name || "Sin nombre") + "</strong>" +
           "<span class='meta'>" + escapeHtml(itemMeta(item)) + "</span>" +
-          (!isFolder ? "<span class='file-note'>Solo visible, no se puede abrir.</span>" : "") +
+          (isSheet ? "<span class='file-note'>Click para abrir en Google Sheets.</span>" : "") +
           "</div>";
 
         if (isFolder) {
           el.addEventListener("click", function () {
             enterFolder(item);
+          });
+        } else if (isSheet) {
+          el.addEventListener("click", function () {
+            window.open("https://docs.google.com/spreadsheets/d/" + encodeURIComponent(item.id) + "/edit", "_blank", "noopener");
           });
         }
 
@@ -637,7 +643,10 @@
       state.currentFolderId = folderId;
       setLoading(true, "Cargando Drive...");
       try {
-        const query = encodeURIComponent("'" + folderId + "' in parents and trashed=false");
+        const query = encodeURIComponent(
+          "'" + folderId + "' in parents and trashed=false and " +
+          "(mimeType='application/vnd.google-apps.folder' or mimeType='application/vnd.google-apps.spreadsheet')"
+        );
         const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,iconLink)");
         const data = await driveFetch(
           "https://www.googleapis.com/drive/v3/files?q=" +
