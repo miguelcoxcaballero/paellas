@@ -111,13 +111,13 @@
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="brand"><span>&#129379;</span><span>paellas.net</span></div>
+      <div class="brand"><span>&#129368;</span><span>paellas.net</span></div>
       <button id="signoutBtn" class="btn small hidden" type="button">Salir</button>
     </header>
 
     <main id="loginView" class="login">
       <section class="hero">
-        <h1>&#129379; paellas.net</h1>
+        <h1>&#129368; paellas.net</h1>
         <p>Login con Google para entrar a la intranet.</p>
         <p><button id="loginBtn" class="btn primary" type="button">Entrar con Google</button></p>
         <p id="loginStatus" class="status"></p>
@@ -420,10 +420,15 @@
       if (!info) return Promise.resolve();
       setBusy(els.editorShell, true);
       setEditorStatus("Cargando hoja...", "warn");
-      return fetchJson("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values/" + encodeURIComponent(sheetRange(info)))
+      return fetchJson(
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) +
+        "/values:batchGet?ranges=" + encodeURIComponent(sheetRange(info))
+      )
         .then(function (data) {
+          const valueRanges = Array.isArray(data.valueRanges) ? data.valueRanges : [];
+          const firstRange = valueRanges[0] || {};
           state.currentSheetTitle = title;
-          state.sheetDrafts[title] = padGrid(data.values || [], maxRows(info), maxCols(info));
+          state.sheetDrafts[title] = padGrid(firstRange.values || [], maxRows(info), maxCols(info));
           state.sheetDirty[title] = false;
           renderTabs();
           renderGrid();
@@ -447,7 +452,7 @@
       state.currentSheetTitle = "";
       state.sheetDrafts = {};
       state.sheetDirty = {};
-      return fetchJson("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(item.id) + "?fields=properties(title),sheets(properties(title,gridProperties(rowCount,columnCount)))")
+      return fetchJson("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(item.id))
         .then(function (meta) {
           state.spreadsheetTitle = (meta.properties && meta.properties.title) || state.spreadsheetTitle;
           state.spreadsheetSheets = (meta.sheets || []).map(function (sheet) {
@@ -479,11 +484,20 @@
       setEditorStatus("Guardando...", "warn");
       const range = sheetRange(info);
       return fetchJson(
-        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values/" + encodeURIComponent(range) + "?valueInputOption=USER_ENTERED",
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values:batchUpdate",
         {
-          method: "PUT",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ range: range, majorDimension: "ROWS", values: state.sheetDrafts[info.title] })
+          body: JSON.stringify({
+            valueInputOption: "USER_ENTERED",
+            data: [
+              {
+                range: range,
+                majorDimension: "ROWS",
+                values: state.sheetDrafts[info.title]
+              }
+            ]
+          })
         }
       ).then(function () {
         state.sheetDirty[info.title] = false;
