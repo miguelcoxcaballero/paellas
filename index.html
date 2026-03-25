@@ -20,7 +20,19 @@
       --bad: #9c1e1e;
       --shadow: 0 16px 50px rgba(104, 70, 5, 0.12);
     }
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(141, 67, 0, 0.34) rgba(255, 248, 214, 0.55);
+    }
+    *::-webkit-scrollbar { width: 12px; height: 12px; }
+    *::-webkit-scrollbar-track { background: rgba(255, 248, 214, 0.55); border-radius: 999px; }
+    *::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(185, 90, 0, 0.68), rgba(141, 67, 0, 0.9));
+      border-radius: 999px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
     html, body {
       height: 100%;
       overflow: hidden;
@@ -50,15 +62,16 @@
     }
     .topbar, .row, .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-width: 0; }
     .topbar > *, .row > *, .head > * { min-width: 0; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
     .brand { display: flex; align-items: center; gap: 10px; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; letter-spacing: -.04em; }
     .brand.brand-button { cursor: pointer; }
-    .card, .btn, .pill, .item, .tab {
+    .card, .btn, .pill, .item, .tab, .profile-menu, .sheet-tool-btn {
       border: 1px solid var(--line);
       background: var(--paper);
       box-shadow: var(--shadow);
       backdrop-filter: blur(8px);
     }
-    .btn {
+    .btn, .sheet-tool-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -67,7 +80,8 @@
       border-radius: 999px;
     }
     .btn.primary { color: #fff8eb; background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%); border-color: transparent; }
-    .btn.small { padding: 10px 14px; border-radius: 14px; }
+    .btn.small, .sheet-tool-btn { padding: 10px 14px; border-radius: 14px; }
+    .btn:disabled, .sheet-tool-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
     .login { min-height: 0; height: 100%; display: grid; place-items: center; text-align: center; overflow: auto; }
     .hero h1 { margin: 0; font-size: clamp(3.1rem, 11vw, 6.8rem); line-height: .92; letter-spacing: -.08em; }
     .hero p, .meta, .status, .note { color: var(--muted); }
@@ -92,6 +106,45 @@
     .item { border-radius: 18px; padding: 16px; display: grid; gap: 8px; }
     .item:hover, .btn:hover, .crumb:hover, .tab:hover { transform: translateY(-1px); }
     .title { font-size: 1.04rem; line-height: 1.12; word-break: break-word; }
+    .profile-box { position: relative; display: flex; align-items: center; }
+    .profile-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,252,233,.98);
+      box-shadow: var(--shadow);
+      padding: 0;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-fallback { font-size: 1rem; font-weight: 700; color: var(--accent2); }
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 60;
+      min-width: 260px;
+      padding: 14px;
+      border-radius: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    .profile-head { display: flex; align-items: center; gap: 12px; }
+    .profile-head img, .profile-head .profile-fallback {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,240,191,.98);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .profile-actions { display: flex; gap: 8px; }
+    .profile-actions .btn { flex: 1 1 auto; }
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -286,6 +339,8 @@
       flex-wrap: nowrap;
       padding-bottom: 2px;
     }
+    .sheet-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+    .sheet-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     #editorView.read-only .doc-title {
       cursor: default;
       background: transparent;
@@ -335,6 +390,12 @@
       align-content: start;
       padding-right: 4px;
     }
+    #sharedGrid {
+      min-height: 0;
+      overflow: auto;
+      align-content: start;
+      padding-right: 4px;
+    }
     #editorView { grid-template-rows: auto minmax(0, 1fr); }
     #editorShell { overflow: hidden; }
     #editorView > .card:last-child {
@@ -344,7 +405,7 @@
     }
     @media (max-width: 860px) {
       .app { width: 100vw; padding: 12px 8px; }
-      .topbar, .row, .head { display: grid; grid-template-columns: 1fr; }
+      .topbar, .row, .head, .sheet-bar { display: grid; grid-template-columns: 1fr; }
       .modal-card { padding: 16px; }
       .editor-head-top,
       .editor-title-side,
@@ -359,6 +420,8 @@
       .doc-title {
         max-width: 100%;
       }
+      .sheet-tools { justify-content: flex-start; }
+      .profile-menu { left: 0; right: auto; }
       table { width: max(100%, 760px); min-width: 760px; }
     }
   </style>
@@ -367,7 +430,28 @@
   <div class="app">
     <header class="topbar">
       <button id="homeBtn" class="brand brand-button" type="button" aria-label="Volver al gestor de archivos"><span>&#129368;</span><span>paellas.net</span></button>
-      <button id="signoutBtn" class="btn small hidden" type="button">Salir</button>
+      <div class="topbar-actions">
+        <div id="profileBox" class="profile-box hidden">
+          <button id="profileBtn" class="profile-btn" type="button" aria-label="Menu de cuenta" aria-haspopup="menu" aria-expanded="false">
+            <img id="profileAvatar" alt="Perfil" class="hidden">
+            <span id="profileAvatarFallback" class="profile-fallback">P</span>
+          </button>
+          <div id="profileMenu" class="profile-menu hidden" role="menu">
+            <div class="profile-head">
+              <img id="profileMenuAvatar" alt="Perfil" class="hidden">
+              <span id="profileMenuAvatarFallback" class="profile-fallback">P</span>
+              <div>
+                <div id="profileName" class="title">Cuenta</div>
+                <div id="profileEmail" class="meta"></div>
+              </div>
+            </div>
+            <div class="profile-actions">
+              <button id="profileRefreshBtn" class="btn small" type="button">Actualizar</button>
+              <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <main id="loginView" class="login">
@@ -383,8 +467,8 @@
       <section id="driveShell" class="card">
         <div class="head">
           <div>
-            <div id="profileName" class="title">Cuenta</div>
-            <div id="profileEmail" class="meta"></div>
+            <div class="title">Drive y Sheets</div>
+            <div class="meta">Gestiona carpetas, hojas y documentos colaborativos.</div>
           </div>
           <div id="driveStatus" class="pill">Drive y Sheets</div>
         </div>
@@ -395,7 +479,7 @@
             <div id="folderCount" class="pill">0 elementos</div>
           </div>
         </div>
-        <p class="note">Solo se muestran carpetas y archivos de Google Sheets. Las hojas se editan dentro de esta intranet.</p>
+        <p class="note">Se muestran carpetas, spreadsheets propios y documentos compartidos. Los spreadsheets se editan dentro de esta intranet.</p>
         <div id="breadcrumbs" class="crumbs"></div>
       </section>
       <section class="card">
@@ -407,6 +491,16 @@
         </div>
         <div id="itemsGrid" class="grid"></div>
         <p id="emptyState" class="meta hidden">No hay resultados en esta carpeta.</p>
+      </section>
+      <section class="card">
+        <div class="head">
+          <div>
+            <div class="title">Documentos colaborativos</div>
+            <div class="meta">Spreadsheets compartidos contigo o con varios editores.</div>
+          </div>
+        </div>
+        <div id="sharedGrid" class="grid"></div>
+        <p id="sharedEmptyState" class="meta hidden">No hay documentos colaborativos visibles.</p>
       </section>
     </main>
 
@@ -423,6 +517,7 @@
             </div>
             <div class="editor-actions">
               <div id="sheetMeta" class="pill">Sin datos</div>
+              <button id="shareDocBtn" class="btn small" type="button">Compartir</button>
               <div class="save-stack">
                 <div class="save-line">
                   <span id="saveIndicator" class="save-indicator paused" aria-hidden="true"></span>
@@ -436,11 +531,17 @@
               </button>
             </div>
           </div>
-          <div id="sheetTabs" class="tabs editor-tabs"></div>
+          <div class="sheet-bar">
+            <div id="sheetTabs" class="tabs editor-tabs"></div>
+            <div class="sheet-tools">
+              <button id="addSheetTabBtn" class="sheet-tool-btn" type="button">Nueva sheet</button>
+              <button id="renameSheetTabBtn" class="sheet-tool-btn" type="button">Renombrar sheet</button>
+            </div>
+          </div>
         </div>
       </section>
       <section class="card">
-        <div class="sheet-wrap">
+        <div id="sheetWrap" class="sheet-wrap">
           <table id="sheetGrid"></table>
         </div>
       </section>
@@ -473,35 +574,93 @@
     </section>
   </div>
 
+  <div id="nameModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+    <section id="nameModalCard" class="card modal-card">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="nameModalTitle" class="title">Renombrar</div>
+          <div id="nameModalSubtitle" class="meta">Introduce el nombre.</div>
+        </div>
+        <button id="nameModalCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="modal-form">
+        <input id="nameModalInput" class="search" type="text" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="row modal-actions">
+        <button id="nameModalCancelBtn" class="btn small" type="button">Cancelar</button>
+        <button id="nameModalConfirmBtn" class="btn primary small" type="button">Guardar</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="shareModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <section id="shareModalCard" class="card modal-card">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="shareModalTitle" class="title">Compartir documento</div>
+          <div class="meta">Invita a otro usuario por email con proteccion frente a conflictos.</div>
+        </div>
+        <button id="shareModalCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="modal-form">
+        <input id="shareEmailInput" class="search" type="email" placeholder="usuario@correo.com" autocomplete="off" spellcheck="false">
+        <select id="shareRoleSelect" class="search">
+          <option value="writer">Puede editar</option>
+          <option value="reader">Solo lectura</option>
+        </select>
+        <div id="shareStatus" class="status"></div>
+      </div>
+      <div class="row modal-actions">
+        <button id="shareCancelBtn" class="btn small" type="button">Cancelar</button>
+        <button id="shareConfirmBtn" class="btn primary small" type="button">Compartir</button>
+      </div>
+    </section>
+  </div>
+
   <script>
     const GOOGLE_CLIENT_ID = "435784295430-cmug30o42f1vu4ijgor9sjb0ro4oo37o.apps.googleusercontent.com";
     const GOOGLE_SCOPE = [
       "https://www.googleapis.com/auth/drive",
       "https://www.googleapis.com/auth/spreadsheets"
     ].join(" ");
-    const VIEW_ROWS = 40;
-    const VIEW_COLS = 18;
+    const CELL_WIDTH = 140;
+    const CELL_HEIGHT = 42;
+    const HEADER_WIDTH = 56;
+    const HEADER_HEIGHT = 42;
+    const VIEW_BUFFER_ROWS = 10;
+    const VIEW_BUFFER_COLS = 4;
+    const LOAD_BUFFER_ROWS = 16;
+    const LOAD_BUFFER_COLS = 6;
 
     const state = {
       tokenClient: null,
       accessToken: "",
+      currentUser: null,
       folderStack: [{ id: "root", name: "Mi unidad" }],
       currentItems: [],
+      sharedItems: [],
       spreadsheetId: "",
       spreadsheetTitle: "",
       savedSpreadsheetTitle: "",
       spreadsheetSheets: [],
       currentSheetTitle: "",
-      sheetDrafts: {},
-      sheetDirty: {},
+      sheetData: {},
+      sheetWindow: {},
+      sheetDirtyCells: {},
+      nameModalAction: null,
       titleDirty: false,
       editorMode: "edit",
+      canEdit: true,
       saveTimer: 0,
       saveInFlight: false,
       saveQueued: false,
       lastSavedAt: 0,
+      lastKnownRevisionId: "",
+      lastKnownModifiedTime: 0,
+      lastKnownFileName: "",
       pickerFolderStack: [{ id: "root", name: "Mi unidad" }],
-      pickerFolders: []
+      pickerFolders: [],
+      profileMenuOpen: false
     };
 
     const els = {
@@ -510,8 +669,16 @@
       editorView: document.getElementById("editorView"),
       loginBtn: document.getElementById("loginBtn"),
       homeBtn: document.getElementById("homeBtn"),
-      signoutBtn: document.getElementById("signoutBtn"),
       loginStatus: document.getElementById("loginStatus"),
+      profileBox: document.getElementById("profileBox"),
+      profileBtn: document.getElementById("profileBtn"),
+      profileAvatar: document.getElementById("profileAvatar"),
+      profileAvatarFallback: document.getElementById("profileAvatarFallback"),
+      profileMenu: document.getElementById("profileMenu"),
+      profileMenuAvatar: document.getElementById("profileMenuAvatar"),
+      profileMenuAvatarFallback: document.getElementById("profileMenuAvatarFallback"),
+      profileRefreshBtn: document.getElementById("profileRefreshBtn"),
+      profileLogoutBtn: document.getElementById("profileLogoutBtn"),
       profileName: document.getElementById("profileName"),
       profileEmail: document.getElementById("profileEmail"),
       driveStatus: document.getElementById("driveStatus"),
@@ -533,6 +700,8 @@
       folderMeta: document.getElementById("folderMeta"),
       itemsGrid: document.getElementById("itemsGrid"),
       emptyState: document.getElementById("emptyState"),
+      sharedGrid: document.getElementById("sharedGrid"),
+      sharedEmptyState: document.getElementById("sharedEmptyState"),
       driveShell: document.getElementById("driveShell"),
       editorShell: document.getElementById("editorShell"),
       editorTitle: document.getElementById("editorTitle"),
@@ -543,9 +712,29 @@
       saveTimestamp: document.getElementById("saveTimestamp"),
       modeToggleBtn: document.getElementById("modeToggleBtn"),
       modeToggleLabel: document.getElementById("modeToggleLabel"),
+      shareDocBtn: document.getElementById("shareDocBtn"),
       sheetTabs: document.getElementById("sheetTabs"),
+      addSheetTabBtn: document.getElementById("addSheetTabBtn"),
+      renameSheetTabBtn: document.getElementById("renameSheetTabBtn"),
+      sheetWrap: document.getElementById("sheetWrap"),
       sheetGrid: document.getElementById("sheetGrid"),
-      backBtn: document.getElementById("backBtn")
+      backBtn: document.getElementById("backBtn"),
+      nameModal: document.getElementById("nameModal"),
+      nameModalCard: document.getElementById("nameModalCard"),
+      nameModalTitle: document.getElementById("nameModalTitle"),
+      nameModalSubtitle: document.getElementById("nameModalSubtitle"),
+      nameModalInput: document.getElementById("nameModalInput"),
+      nameModalCloseBtn: document.getElementById("nameModalCloseBtn"),
+      nameModalCancelBtn: document.getElementById("nameModalCancelBtn"),
+      nameModalConfirmBtn: document.getElementById("nameModalConfirmBtn"),
+      shareModal: document.getElementById("shareModal"),
+      shareModalCard: document.getElementById("shareModalCard"),
+      shareEmailInput: document.getElementById("shareEmailInput"),
+      shareRoleSelect: document.getElementById("shareRoleSelect"),
+      shareStatus: document.getElementById("shareStatus"),
+      shareModalCloseBtn: document.getElementById("shareModalCloseBtn"),
+      shareCancelBtn: document.getElementById("shareCancelBtn"),
+      shareConfirmBtn: document.getElementById("shareConfirmBtn")
     };
 
     function setLoginStatus(text) { els.loginStatus.textContent = text || ""; }
@@ -581,8 +770,17 @@
       els.newSheetPickerStatus.textContent = text || "";
       els.newSheetPickerStatus.className = "status" + (tone ? " " + tone : "");
     }
+    function setShareStatus(text, tone) {
+      els.shareStatus.textContent = text || "";
+      els.shareStatus.className = "status" + (tone ? " " + tone : "");
+    }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
     function currentFolderId() { return state.folderStack[state.folderStack.length - 1].id; }
+    function cellKey(row, col) { return row + ":" + col; }
+    function parseCellKey(key) {
+      const parts = String(key).split(":");
+      return { row: Number(parts[0]), col: Number(parts[1]) };
+    }
     function normalizeTitle(value) {
       return String(value || "").replace(/\s+/g, " ").trim() || "Hoja";
     }
@@ -596,7 +794,10 @@
       }
     }
     function hasPendingSheetChanges() {
-      return Object.keys(state.sheetDirty).some(function (key) { return !!state.sheetDirty[key]; });
+      return Object.keys(state.sheetDirtyCells).some(function (key) {
+        const dirty = state.sheetDirtyCells[key];
+        return dirty && dirty.size;
+      });
     }
     function hasPendingChanges() {
       return !!state.titleDirty || hasPendingSheetChanges();
@@ -618,16 +819,127 @@
         }
         return item;
       });
+      state.sharedItems = state.sharedItems.map(function (item) {
+        if (item.id === state.spreadsheetId) {
+          return Object.assign({}, item, { name: title });
+        }
+        return item;
+      });
       renderItems();
+      renderSharedItems();
+    }
+    function ensureSheetState(title) {
+      if (!state.sheetData[title]) state.sheetData[title] = {};
+      if (!state.sheetWindow[title]) state.sheetWindow[title] = { startRow: 0, startCol: 0, rows: 0, cols: 0 };
+      if (!state.sheetDirtyCells[title]) state.sheetDirtyCells[title] = new Set();
+      return state.sheetData[title];
+    }
+    function currentSheetData() {
+      return ensureSheetState(state.currentSheetTitle || "");
+    }
+    function setCellValue(sheetTitle, row, col, value) {
+      const data = ensureSheetState(sheetTitle);
+      const key = cellKey(row, col);
+      if (value === "" || value === null || value === undefined) delete data[key];
+      else data[key] = String(value);
+    }
+    function getCellValue(sheetTitle, row, col) {
+      const data = ensureSheetState(sheetTitle);
+      const key = cellKey(row, col);
+      return data[key] !== undefined ? String(data[key]) : "";
+    }
+    function isCellDirty(sheetTitle, row, col) {
+      return !!(state.sheetDirtyCells[sheetTitle] && state.sheetDirtyCells[sheetTitle].has(cellKey(row, col)));
+    }
+    function setUserAvatar(imgEl, fallbackEl, photoUrl, label) {
+      if (photoUrl) {
+        imgEl.src = photoUrl;
+        imgEl.alt = label || "Perfil";
+        imgEl.classList.remove("hidden");
+        fallbackEl.classList.add("hidden");
+        imgEl.onerror = function () {
+          imgEl.classList.add("hidden");
+          fallbackEl.classList.remove("hidden");
+        };
+      } else {
+        imgEl.removeAttribute("src");
+        imgEl.classList.add("hidden");
+        fallbackEl.classList.remove("hidden");
+      }
+    }
+    function renderProfileMenu() {
+      const user = state.currentUser;
+      if (!user || !state.accessToken) {
+        els.profileBox.classList.add("hidden");
+        return;
+      }
+      const initial = ((user.displayName || user.emailAddress || "P").trim().charAt(0) || "P").toUpperCase();
+      els.profileAvatarFallback.textContent = initial;
+      els.profileMenuAvatarFallback.textContent = initial;
+      els.profileName.textContent = user.displayName || "Cuenta";
+      els.profileEmail.textContent = user.emailAddress || "";
+      setUserAvatar(els.profileAvatar, els.profileAvatarFallback, user.photoLink || "", user.displayName || "Perfil");
+      setUserAvatar(els.profileMenuAvatar, els.profileMenuAvatarFallback, user.photoLink || "", user.displayName || "Perfil");
+      els.profileBox.classList.remove("hidden");
+    }
+    function closeProfileMenu() {
+      state.profileMenuOpen = false;
+      els.profileMenu.classList.add("hidden");
+      els.profileBtn.setAttribute("aria-expanded", "false");
+    }
+    function toggleProfileMenu() {
+      state.profileMenuOpen = !state.profileMenuOpen;
+      els.profileMenu.classList.toggle("hidden", !state.profileMenuOpen);
+      els.profileBtn.setAttribute("aria-expanded", state.profileMenuOpen ? "true" : "false");
+    }
+    function openNameModal(config) {
+      state.nameModalAction = config || null;
+      els.nameModalTitle.textContent = (config && config.title) || "Renombrar";
+      els.nameModalSubtitle.textContent = (config && config.subtitle) || "Introduce el nombre.";
+      els.nameModalConfirmBtn.textContent = (config && config.confirmText) || "Guardar";
+      els.nameModalInput.value = (config && config.value) || "";
+      els.nameModal.classList.remove("hidden");
+      requestAnimationFrame(function () {
+        els.nameModalInput.focus();
+        els.nameModalInput.select();
+      });
+    }
+    function closeNameModal() {
+      state.nameModalAction = null;
+      els.nameModal.classList.add("hidden");
+    }
+    function submitNameModal() {
+      const action = state.nameModalAction;
+      if (!action || typeof action.onSubmit !== "function") return;
+      Promise.resolve(action.onSubmit(normalizeTitle(els.nameModalInput.value || action.value || "Sheet")))
+        .then(closeNameModal)
+        .catch(function (err) {
+          console.error(err);
+          els.nameModalSubtitle.textContent = messageFromError(err, "No se ha podido completar la accion");
+        });
+    }
+    function openShareModal() {
+      els.shareEmailInput.value = "";
+      els.shareRoleSelect.value = "writer";
+      setShareStatus("", "");
+      els.shareModal.classList.remove("hidden");
+      requestAnimationFrame(function () { els.shareEmailInput.focus(); });
+    }
+    function closeShareModal() {
+      els.shareModal.classList.add("hidden");
+      setBusy(els.shareModalCard, false);
     }
     function applyEditorMode() {
-      const editing = state.editorMode === "edit";
+      const editing = state.editorMode === "edit" && state.canEdit;
       els.editorView.classList.toggle("read-only", !editing);
       els.modeToggleBtn.classList.toggle("is-editing", editing);
       els.modeToggleBtn.setAttribute("aria-pressed", editing ? "true" : "false");
+      els.modeToggleBtn.disabled = !state.canEdit;
       els.modeToggleLabel.textContent = editing ? "Edit" : "Read";
       els.editorTitle.setAttribute("contenteditable", editing ? "true" : "false");
       els.editorTitle.setAttribute("tabindex", editing ? "0" : "-1");
+      els.addSheetTabBtn.disabled = !state.canEdit;
+      els.renameSheetTabBtn.disabled = !state.canEdit || !currentSheetInfo();
       Array.prototype.forEach.call(els.sheetGrid.querySelectorAll(".cell"), function (cell) {
         cell.readOnly = !editing;
       });
@@ -697,7 +1009,8 @@
       els.loginView.classList.toggle("hidden", name !== "login");
       els.driveView.classList.toggle("hidden", name !== "drive");
       els.editorView.classList.toggle("hidden", name !== "editor");
-      els.signoutBtn.classList.toggle("hidden", name === "login");
+      els.profileBox.classList.toggle("hidden", name === "login" || !state.accessToken);
+      if (name !== "drive") closeProfileMenu();
     }
     function escapeHtml(value) {
       return String(value || "")
@@ -729,28 +1042,87 @@
       return out;
     }
     function quoteSheetTitle(title) { return "'" + String(title || "").replace(/'/g, "''") + "'"; }
-    function maxRows(info) { return Math.max(10, Math.min(VIEW_ROWS, Number(info && info.rowCount) || VIEW_ROWS)); }
-    function maxCols(info) { return Math.max(6, Math.min(VIEW_COLS, Number(info && info.columnCount) || VIEW_COLS)); }
-    function sheetRange(info) { return quoteSheetTitle(info.title) + "!A1:" + columnLabel(maxCols(info) - 1) + maxRows(info); }
-    function createGrid(rows, cols) {
-      const out = [];
-      let r, c;
-      for (r = 0; r < rows; r += 1) {
-        const row = [];
-        for (c = 0; c < cols; c += 1) row.push("");
-        out.push(row);
-      }
-      return out;
+    function windowRange(title, startRow, startCol, rows, cols) {
+      const endRow = startRow + rows - 1;
+      const endCol = startCol + cols - 1;
+      return quoteSheetTitle(title) + "!" + columnLabel(startCol) + (startRow + 1) + ":" + columnLabel(endCol) + (endRow + 1);
     }
-    function padGrid(values, rows, cols) {
-      const out = createGrid(rows, cols);
-      let r, c;
-      for (r = 0; r < rows; r += 1) {
-        for (c = 0; c < cols; c += 1) {
-          if (values[r] && values[r][c] !== undefined) out[r][c] = values[r][c];
-        }
-      }
-      return out;
+    function clampWindow(info, windowState) {
+      const safe = windowState || {};
+      const maxRow = Math.max(0, (Number(info && info.rowCount) || 1) - 1);
+      const maxCol = Math.max(0, (Number(info && info.columnCount) || 1) - 1);
+      const rows = Math.max(1, safe.rows || 1);
+      const cols = Math.max(1, safe.cols || 1);
+      return {
+        startRow: Math.max(0, Math.min(safe.startRow || 0, maxRow)),
+        startCol: Math.max(0, Math.min(safe.startCol || 0, maxCol)),
+        rows: Math.min(rows, maxRow + 1),
+        cols: Math.min(cols, maxCol + 1)
+      };
+    }
+    function windowContains(outer, inner) {
+      if (!outer || !inner) return false;
+      return outer.startRow <= inner.startRow &&
+        outer.startCol <= inner.startCol &&
+        (outer.startRow + outer.rows) >= (inner.startRow + inner.rows) &&
+        (outer.startCol + outer.cols) >= (inner.startCol + inner.cols);
+    }
+    function computeWindow(info, includeLoadBuffer) {
+      const wrap = els.sheetWrap;
+      const width = Math.max(320, wrap ? wrap.clientWidth : 960);
+      const height = Math.max(240, wrap ? wrap.clientHeight : 520);
+      const startRow = Math.max(0, Math.floor((wrap ? wrap.scrollTop : 0) / CELL_HEIGHT) - (includeLoadBuffer ? LOAD_BUFFER_ROWS : VIEW_BUFFER_ROWS));
+      const startCol = Math.max(0, Math.floor((wrap ? wrap.scrollLeft : 0) / CELL_WIDTH) - (includeLoadBuffer ? LOAD_BUFFER_COLS : VIEW_BUFFER_COLS));
+      const rows = Math.max(4, Math.ceil(height / CELL_HEIGHT) + 1 + (includeLoadBuffer ? LOAD_BUFFER_ROWS * 2 : VIEW_BUFFER_ROWS * 2));
+      const cols = Math.max(4, Math.ceil(width / CELL_WIDTH) + 1 + (includeLoadBuffer ? LOAD_BUFFER_COLS * 2 : VIEW_BUFFER_COLS * 2));
+      return clampWindow(info, { startRow: startRow, startCol: startCol, rows: rows, cols: cols });
+    }
+    function renderItems() {
+      const query = (els.searchInput.value || "").trim().toLowerCase();
+      const filtered = state.currentItems.filter(function (item) {
+        return !query || (item.name || "").toLowerCase().includes(query);
+      });
+      els.itemsGrid.innerHTML = "";
+      els.emptyState.classList.toggle("hidden", filtered.length !== 0);
+      els.folderCount.textContent = filtered.length + " elementos";
+      filtered.forEach(function (item) {
+        const isFolder = item.mimeType === "application/vnd.google-apps.folder";
+        const el = document.createElement("article");
+        el.className = "item";
+        el.innerHTML =
+          "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+          "<div class='meta'>" + escapeHtml(isFolder ? "Carpeta" : "Google Sheets") + "</div>" +
+          (!isFolder ? "<div class='note'>Click para editar dentro de la intranet.</div>" : "");
+        el.addEventListener("click", function () {
+          if (isFolder) {
+            state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
+            loadFolder(item.id);
+          } else {
+            openSpreadsheet(item);
+          }
+        });
+        els.itemsGrid.appendChild(el);
+      });
+    }
+    function renderSharedItems() {
+      const query = (els.searchInput.value || "").trim().toLowerCase();
+      const filtered = state.sharedItems.filter(function (item) {
+        return !query || (item.name || "").toLowerCase().includes(query);
+      });
+      els.sharedGrid.innerHTML = "";
+      els.sharedEmptyState.classList.toggle("hidden", filtered.length !== 0);
+      filtered.forEach(function (item) {
+        const el = document.createElement("article");
+        el.className = "item";
+        el.innerHTML =
+          "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+          "<div class='meta'>Google Sheets compartido</div>" +
+          "<div class='note'>Click para abrirlo dentro de la intranet.</div>";
+        el.addEventListener("click", function () {
+          openSpreadsheet(item);
+        });
+        els.sharedGrid.appendChild(el);
+      });
     }
     function currentSheetInfo() {
       return state.spreadsheetSheets.find(function (sheet) { return sheet.title === state.currentSheetTitle; }) || null;
@@ -808,33 +1180,6 @@
         els.newSheetPickerList.appendChild(btn);
       });
     }
-    function renderItems() {
-      const query = (els.searchInput.value || "").trim().toLowerCase();
-      const filtered = state.currentItems.filter(function (item) {
-        return !query || (item.name || "").toLowerCase().includes(query);
-      });
-      els.itemsGrid.innerHTML = "";
-      els.emptyState.classList.toggle("hidden", filtered.length !== 0);
-      els.folderCount.textContent = filtered.length + " elementos";
-      filtered.forEach(function (item) {
-        const isFolder = item.mimeType === "application/vnd.google-apps.folder";
-        const el = document.createElement("article");
-        el.className = "item";
-        el.innerHTML =
-          "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
-          "<div class='meta'>" + escapeHtml(isFolder ? "Carpeta" : "Google Sheets") + "</div>" +
-          (!isFolder ? "<div class='note'>Click para editar dentro de la intranet.</div>" : "");
-        el.addEventListener("click", function () {
-          if (isFolder) {
-            state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
-            loadFolder(item.id);
-          } else {
-            openSpreadsheet(item);
-          }
-        });
-        els.itemsGrid.appendChild(el);
-      });
-    }
     function renderTabs() {
       els.sheetTabs.innerHTML = "";
       state.spreadsheetSheets.forEach(function (sheet) {
@@ -845,39 +1190,71 @@
         if (sheet.title !== state.currentSheetTitle) {
           btn.addEventListener("click", function () { loadSheet(sheet.title); });
         }
+        if (state.canEdit) {
+          btn.title = "Doble click para renombrar";
+          btn.addEventListener("dblclick", function (event) {
+            event.preventDefault();
+            renameCurrentSheet(sheet.title);
+          });
+        }
         els.sheetTabs.appendChild(btn);
       });
     }
     function renderGrid() {
       const info = currentSheetInfo();
       if (!info) { els.sheetGrid.innerHTML = ""; return; }
-      const rows = maxRows(info);
-      const cols = maxCols(info);
-      const values = padGrid(state.sheetDrafts[info.title] || [], rows, cols);
+      const view = clampWindow(info, state.sheetWindow[info.title] || computeWindow(info, false));
+      state.sheetWindow[info.title] = view;
+      const totalWidth = HEADER_WIDTH + (info.columnCount * CELL_WIDTH);
+      const totalHeight = HEADER_HEIGHT + (info.rowCount * CELL_HEIGHT);
+      const data = currentSheetData();
       const html = [];
       let r, c;
+      const rightCols = Math.max(0, info.columnCount - (view.startCol + view.cols));
+      const bottomRows = Math.max(0, info.rowCount - (view.startRow + view.rows));
+      els.sheetGrid.style.position = "relative";
+      els.sheetGrid.style.left = "0";
+      els.sheetGrid.style.top = "0";
+      els.sheetGrid.style.width = ((view.cols * CELL_WIDTH) + HEADER_WIDTH) + "px";
+      els.sheetGrid.style.minWidth = ((view.cols * CELL_WIDTH) + HEADER_WIDTH) + "px";
+      els.sheetGrid.style.marginLeft = (view.startCol * CELL_WIDTH) + "px";
+      els.sheetGrid.style.marginTop = (view.startRow * CELL_HEIGHT) + "px";
+      els.sheetGrid.style.marginRight = (rightCols * CELL_WIDTH) + "px";
+      els.sheetGrid.style.marginBottom = (bottomRows * CELL_HEIGHT) + "px";
+      els.sheetWrap.style.position = "relative";
+      els.sheetWrap.style.minWidth = "0";
+      els.sheetWrap.style.minHeight = "0";
+      els.sheetWrap.style.overflow = "auto";
+      els.sheetWrap.style.backgroundImage =
+        "linear-gradient(rgba(72,42,4,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(72,42,4,.08) 1px, transparent 1px)";
+      els.sheetWrap.style.backgroundPosition = HEADER_WIDTH + "px " + HEADER_HEIGHT + "px";
+      els.sheetWrap.style.backgroundSize = CELL_WIDTH + "px " + CELL_HEIGHT + "px";
+      els.sheetWrap.style.paddingRight = "0";
+      els.sheetWrap.style.paddingBottom = "0";
       html.push("<thead><tr><th class='corner'></th>");
-      for (c = 0; c < cols; c += 1) html.push("<th>" + columnLabel(c) + "</th>");
+      for (c = 0; c < view.cols; c += 1) html.push("<th>" + columnLabel(view.startCol + c) + "</th>");
       html.push("</tr></thead><tbody>");
-      for (r = 0; r < rows; r += 1) {
-        html.push("<tr><th class='rowh'>" + (r + 1) + "</th>");
-        for (c = 0; c < cols; c += 1) {
-          html.push("<td><input class='cell' data-row='" + r + "' data-col='" + c + "' value='" + escapeHtml(values[r][c]) + "'></td>");
+      for (r = 0; r < view.rows; r += 1) {
+        html.push("<tr><th class='rowh'>" + (view.startRow + r + 1) + "</th>");
+        for (c = 0; c < view.cols; c += 1) {
+          const rowIndex = view.startRow + r;
+          const colIndex = view.startCol + c;
+          const dirtyClass = isCellDirty(info.title, rowIndex, colIndex) ? " is-dirty" : "";
+          html.push("<td><input class='cell" + dirtyClass + "' data-row='" + rowIndex + "' data-col='" + colIndex + "' value='" + escapeHtml(data[cellKey(rowIndex, colIndex)] || "") + "'></td>");
         }
         html.push("</tr>");
       }
       html.push("</tbody>");
       els.sheetGrid.innerHTML = html.join("");
-      els.sheetMeta.textContent = info.title + " - vista simple " + rows + "x" + cols;
+      els.sheetMeta.textContent = info.title + " - ventana " + view.rows + "x" + view.cols + " de " + info.rowCount + "x" + info.columnCount;
       syncEditorTitle();
       els.editorSubtitle.textContent = "Sheet activa: " + info.title;
       applyEditorMode();
     }
     function loadProfile() {
-      return fetchJson("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress)").then(function (data) {
-        const user = data.user || {};
-        els.profileName.textContent = user.displayName || "Cuenta";
-        els.profileEmail.textContent = user.emailAddress || "";
+      return fetchJson("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress,photoLink)").then(function (data) {
+        state.currentUser = data.user || null;
+        renderProfileMenu();
       });
     }
     function loadFolder(folderId) {
@@ -895,6 +1272,7 @@
           renderItems();
           els.folderMeta.textContent = state.folderStack[state.folderStack.length - 1].name;
           setDriveStatus("Drive y Sheets");
+          renderSharedItems();
         })
         .catch(function (err) {
           console.error(err);
@@ -906,6 +1284,21 @@
         .finally(function () {
           setBusy(els.driveShell, false);
         });
+    }
+    function loadSharedDocs() {
+      const query = encodeURIComponent("trashed=false and mimeType='application/vnd.google-apps.spreadsheet' and sharedWithMe=true");
+      const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,shared)");
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query +
+        "&pageSize=100&orderBy=modifiedTime desc&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
+      ).then(function (data) {
+        state.sharedItems = data.files || [];
+        renderSharedItems();
+      }).catch(function (err) {
+        console.error(err);
+        state.sharedItems = [];
+        renderSharedItems();
+      });
     }
     function loadPickerFolders(folderId) {
       renderPickerBreadcrumbs();
@@ -966,16 +1359,31 @@
       if (!info) return Promise.resolve();
       setBusy(els.editorShell, true);
       setEditorStatus("Cargando hoja...", "warn");
+      state.currentSheetTitle = title;
+      ensureSheetState(title);
+      const loadWindow = computeWindow(info, true);
+      state.sheetWindow[title] = clampWindow(info, {
+        startRow: loadWindow.startRow,
+        startCol: loadWindow.startCol,
+        rows: Math.max(4, loadWindow.rows - (LOAD_BUFFER_ROWS * 2)),
+        cols: Math.max(4, loadWindow.cols - (LOAD_BUFFER_COLS * 2))
+      });
       return fetchJson(
         "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) +
-        "/values:batchGet?ranges=" + encodeURIComponent(sheetRange(info))
+        "/values:batchGet?ranges=" + encodeURIComponent(windowRange(title, loadWindow.startRow, loadWindow.startCol, loadWindow.rows, loadWindow.cols))
       )
         .then(function (data) {
           const valueRanges = Array.isArray(data.valueRanges) ? data.valueRanges : [];
           const firstRange = valueRanges[0] || {};
-          state.currentSheetTitle = title;
-          state.sheetDrafts[title] = padGrid(firstRange.values || [], maxRows(info), maxCols(info));
-          state.sheetDirty[title] = false;
+          const rows = firstRange.values || [];
+          const rowCount = rows.length;
+          let r;
+          let c;
+          for (r = 0; r < rowCount; r += 1) {
+            for (c = 0; c < (rows[r] || []).length; c += 1) {
+              setCellValue(title, loadWindow.startRow + r, loadWindow.startCol + c, rows[r][c]);
+            }
+          }
           renderTabs();
           renderGrid();
           refreshDirtyState();
@@ -991,15 +1399,19 @@
     function loadSpreadsheetMeta(id) {
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) +
-        "?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,capabilities(canEdit)"
+        "?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,headRevisionId,capabilities(canEdit)"
       ).then(function (file) {
         if (!file || file.mimeType !== "application/vnd.google-apps.spreadsheet") {
           throw new Error("El archivo seleccionado no es un Google Sheets valido.");
         }
         state.spreadsheetTitle = file.name || state.spreadsheetTitle;
         state.savedSpreadsheetTitle = state.spreadsheetTitle;
+        state.lastKnownFileName = state.spreadsheetTitle;
         state.titleDirty = false;
         state.lastSavedAt = file.modifiedTime ? Date.parse(file.modifiedTime) || 0 : 0;
+        state.lastKnownModifiedTime = state.lastSavedAt;
+        state.lastKnownRevisionId = file.headRevisionId || "";
+        state.canEdit = !!(file.capabilities && file.capabilities.canEdit);
         return fetchJson(
           "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(id) +
           "?includeGridData=false&fields=properties(title),sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))"
@@ -1018,14 +1430,19 @@
       state.savedSpreadsheetTitle = state.spreadsheetTitle;
       state.spreadsheetSheets = [];
       state.currentSheetTitle = "";
-      state.sheetDrafts = {};
-      state.sheetDirty = {};
+      state.sheetData = {};
+      state.sheetWindow = {};
+      state.sheetDirtyCells = {};
       state.titleDirty = false;
       state.editorMode = "edit";
+      state.canEdit = true;
       clearTimeout(state.saveTimer);
       state.saveQueued = false;
       state.saveInFlight = false;
       state.lastSavedAt = 0;
+      state.lastKnownRevisionId = "";
+      state.lastKnownModifiedTime = 0;
+      state.lastKnownFileName = "";
       syncEditorTitle();
       applyEditorMode();
       return loadSpreadsheetMeta(item.id)
@@ -1036,15 +1453,18 @@
           state.spreadsheetSheets = (meta.sheets || []).map(function (sheet) {
             const props = sheet.properties || {};
             return {
+              sheetId: props.sheetId,
               title: props.title || "Sheet",
-              rowCount: props.gridProperties ? props.gridProperties.rowCount : VIEW_ROWS,
-              columnCount: props.gridProperties ? props.gridProperties.columnCount : VIEW_COLS
+              rowCount: props.gridProperties ? props.gridProperties.rowCount : 1000,
+              columnCount: props.gridProperties ? props.gridProperties.columnCount : 26
             };
           });
           if (!state.spreadsheetSheets.length) {
             setEditorStatus("El archivo no tiene sheets visibles", "error");
             return;
           }
+          if (!state.canEdit) state.editorMode = "read";
+          applyEditorMode();
           refreshDirtyState();
           return loadSheet(state.spreadsheetSheets[0].title);
         })
@@ -1084,7 +1504,7 @@
       ).then(function (file) {
         closeNewSheetModal();
         state.folderStack = targetFolderStack;
-        return loadFolder(targetFolderId).then(function () {
+        return Promise.all([loadFolder(targetFolderId), loadSharedDocs()]).then(function () {
           return openSpreadsheet(file);
         });
       }).catch(function (err) {
@@ -1111,17 +1531,79 @@
       ).then(function (file) {
         state.spreadsheetTitle = file.name || nextTitle;
         state.savedSpreadsheetTitle = state.spreadsheetTitle;
+        state.lastKnownFileName = state.spreadsheetTitle;
         state.titleDirty = false;
         syncEditorTitle();
         updateDriveItemTitle(state.spreadsheetTitle);
         return true;
       });
     }
-    function saveSheetDrafts() {
-      const dirtySheets = state.spreadsheetSheets.filter(function (sheet) {
-        return !!state.sheetDirty[sheet.title];
+    function fileMetaUrl() {
+      return "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) +
+        "?supportsAllDrives=true&fields=id,name,modifiedTime,headRevisionId";
+    }
+    function refreshRemoteMeta() {
+      return fetchJson(fileMetaUrl()).then(function (meta) {
+        state.lastKnownModifiedTime = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
+        state.lastKnownRevisionId = meta.headRevisionId || "";
+        state.lastKnownFileName = meta.name || state.lastKnownFileName;
+        return meta;
       });
-      if (!dirtySheets.length) return Promise.resolve(false);
+    }
+    function remoteMetaChanged(meta) {
+      const modified = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
+      return modified !== state.lastKnownModifiedTime || (meta.headRevisionId || "") !== state.lastKnownRevisionId;
+    }
+    function buildDirtyCellPayloads() {
+      const payloads = [];
+      Object.keys(state.sheetDirtyCells).forEach(function (sheetTitle) {
+        const dirtySet = state.sheetDirtyCells[sheetTitle];
+        if (!dirtySet || !dirtySet.size) return;
+        const byRow = {};
+        dirtySet.forEach(function (key) {
+          const coords = parseCellKey(key);
+          if (!byRow[coords.row]) byRow[coords.row] = [];
+          byRow[coords.row].push(coords.col);
+        });
+        Object.keys(byRow).sort(function (a, b) { return Number(a) - Number(b); }).forEach(function (rowKey) {
+          const row = Number(rowKey);
+          const cols = byRow[row].sort(function (a, b) { return a - b; });
+          let start = cols[0];
+          let prev = cols[0];
+          let keys = [cellKey(row, cols[0])];
+          function flush() {
+            const values = [];
+            let col;
+            for (col = start; col <= prev; col += 1) values.push(getCellValue(sheetTitle, row, col));
+            payloads.push({
+              sheetTitle: sheetTitle,
+              row: row,
+              startCol: start,
+              endCol: prev,
+              keys: keys.slice(),
+              range: quoteSheetTitle(sheetTitle) + "!" + columnLabel(start) + (row + 1) + ":" + columnLabel(prev) + (row + 1),
+              values: [values]
+            });
+          }
+          cols.slice(1).forEach(function (col) {
+            if (col === prev + 1) {
+              prev = col;
+              keys.push(cellKey(row, col));
+            } else {
+              flush();
+              start = col;
+              prev = col;
+              keys = [cellKey(row, col)];
+            }
+          });
+          flush();
+        });
+      });
+      return payloads;
+    }
+    function saveSheetDrafts() {
+      const payloads = buildDirtyCellPayloads();
+      if (!payloads.length) return Promise.resolve(false);
       return fetchJson(
         "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values:batchUpdate",
         {
@@ -1129,18 +1611,20 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             valueInputOption: "USER_ENTERED",
-            data: dirtySheets.map(function (sheet) {
+            data: payloads.map(function (payload) {
               return {
-                range: sheetRange(sheet),
+                range: payload.range,
                 majorDimension: "ROWS",
-                values: state.sheetDrafts[sheet.title] || createGrid(maxRows(sheet), maxCols(sheet))
+                values: payload.values
               };
             })
           })
         }
       ).then(function () {
-        dirtySheets.forEach(function (sheet) {
-          state.sheetDirty[sheet.title] = false;
+        payloads.forEach(function (payload) {
+          payload.keys.forEach(function (key) {
+            state.sheetDirtyCells[payload.sheetTitle].delete(key);
+          });
         });
         return true;
       });
@@ -1164,10 +1648,21 @@
       setBusy(els.editorShell, true);
       setSaveState("saving", config.message || "Guardando...");
       return Promise.resolve()
-        .then(function () { return persistSpreadsheetTitle(); })
-        .then(function () { return saveSheetDrafts(); })
+        .then(function () { return fetchJson(fileMetaUrl()); })
+        .then(function (meta) {
+          if (remoteMetaChanged(meta) && hasPendingSheetChanges()) {
+            setSaveState("error", "Hay cambios remotos. No se sobreescriben versiones ajenas.");
+            return false;
+          }
+          return persistSpreadsheetTitle().then(function () {
+            return saveSheetDrafts();
+          });
+        })
         .then(function () {
           state.lastSavedAt = Date.now();
+          return refreshRemoteMeta();
+        })
+        .then(function () {
           setSaveState("saved", "Todo guardado");
           return true;
         })
@@ -1196,9 +1691,10 @@
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
       if (!info || !Number.isFinite(row) || !Number.isFinite(col)) return;
-      if (!state.sheetDrafts[info.title]) state.sheetDrafts[info.title] = createGrid(maxRows(info), maxCols(info));
-      state.sheetDrafts[info.title][row][col] = target.value;
-      state.sheetDirty[info.title] = true;
+      ensureSheetState(info.title);
+      setCellValue(info.title, row, col, target.value);
+      state.sheetDirtyCells[info.title].add(cellKey(row, col));
+      target.classList.add("is-dirty");
       queueAutosave();
     }
     function handleTitleInput() {
@@ -1218,6 +1714,11 @@
       else refreshDirtyState();
     }
     function toggleEditorMode() {
+      if (!state.canEdit) {
+        state.editorMode = "read";
+        applyEditorMode();
+        return Promise.resolve();
+      }
       if (state.editorMode === "edit") {
         return flushPendingChanges({ force: true, message: "Guardando antes de pasar a lectura..." }).then(function (ok) {
           if (!ok && hasPendingChanges()) return;
@@ -1228,6 +1729,55 @@
       state.editorMode = "edit";
       applyEditorMode();
       return Promise.resolve();
+    }
+    function renameCurrentSheet(sheetTitle) {
+      const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === sheetTitle; });
+      if (!info || !state.canEdit) return;
+      openNameModal({
+        title: "Renombrar sheet",
+        subtitle: "Cambia el nombre de esta pestaña dentro del spreadsheet.",
+        confirmText: "Renombrar",
+        value: info.title,
+        onSubmit: function (nextName) {
+          return fetchJson(
+            "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + ":batchUpdate",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                requests: [{
+                  updateSheetProperties: {
+                    properties: { sheetId: info.sheetId, title: nextName },
+                    fields: "title"
+                  }
+                }]
+              })
+            }
+          ).then(function () {
+            const prevData = state.sheetData[info.title];
+            const prevDirty = state.sheetDirtyCells[info.title];
+            const prevWindow = state.sheetWindow[info.title];
+            state.spreadsheetSheets = state.spreadsheetSheets.map(function (sheet) {
+              return sheet.title === info.title ? Object.assign({}, sheet, { title: nextName }) : sheet;
+            });
+            if (prevData) {
+              state.sheetData[nextName] = prevData;
+              delete state.sheetData[info.title];
+            }
+            if (prevDirty) {
+              state.sheetDirtyCells[nextName] = prevDirty;
+              delete state.sheetDirtyCells[info.title];
+            }
+            if (prevWindow) {
+              state.sheetWindow[nextName] = prevWindow;
+              delete state.sheetWindow[info.title];
+            }
+            if (state.currentSheetTitle === info.title) state.currentSheetTitle = nextName;
+            renderTabs();
+            renderGrid();
+          });
+        }
+      });
     }
     function returnToDrive() {
       return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).finally(function () {
@@ -1250,7 +1800,7 @@
           state.accessToken = response.access_token;
           loadProfile().then(function () {
             showView("drive");
-            return loadFolder("root");
+            return Promise.all([loadFolder("root"), loadSharedDocs()]);
           }).catch(function (err) {
             console.error(err);
             setLoginStatus("La autenticacion ha funcionado, pero Google no ha respondido.");
@@ -1267,37 +1817,49 @@
       setLoginStatus("Abriendo Google...");
       state.tokenClient.requestAccessToken({ prompt: "consent" });
     });
-    els.signoutBtn.addEventListener("click", function () {
+    function resetSession() {
       if (state.accessToken && window.google && google.accounts && google.accounts.oauth2) {
         google.accounts.oauth2.revoke(state.accessToken, function () {});
       }
       state.accessToken = "";
+      state.currentUser = null;
       state.folderStack = [{ id: "root", name: "Mi unidad" }];
       state.currentItems = [];
+      state.sharedItems = [];
       state.spreadsheetId = "";
       state.spreadsheetTitle = "";
       state.savedSpreadsheetTitle = "";
       state.spreadsheetSheets = [];
       state.currentSheetTitle = "";
-      state.sheetDrafts = {};
-      state.sheetDirty = {};
+      state.sheetData = {};
+      state.sheetWindow = {};
+      state.sheetDirtyCells = {};
       state.titleDirty = false;
       state.editorMode = "edit";
+      state.canEdit = true;
       clearTimeout(state.saveTimer);
       state.saveQueued = false;
       state.saveInFlight = false;
       state.lastSavedAt = 0;
+      state.lastKnownRevisionId = "";
+      state.lastKnownModifiedTime = 0;
+      state.lastKnownFileName = "";
       state.pickerFolderStack = [{ id: "root", name: "Mi unidad" }];
       state.pickerFolders = [];
       els.searchInput.value = "";
       els.itemsGrid.innerHTML = "";
+      els.sharedGrid.innerHTML = "";
       els.sheetTabs.innerHTML = "";
       els.sheetGrid.innerHTML = "";
       closeNewSheetModal();
+      closeNameModal();
+      closeShareModal();
+      closeProfileMenu();
       renderBreadcrumbs();
       showView("login");
       setLoginStatus("");
-    });
+    }
+    els.profileLogoutBtn.addEventListener("click", resetSession);
     els.searchInput.addEventListener("input", renderItems);
     els.newSheetBtn.addEventListener("click", createSpreadsheet);
     els.newSheetCloseBtn.addEventListener("click", closeNewSheetModal);
@@ -1315,6 +1877,15 @@
     els.newSheetModal.addEventListener("click", function (event) {
       if (event.target === els.newSheetModal) closeNewSheetModal();
     });
+    els.profileBtn.addEventListener("click", function () {
+      toggleProfileMenu();
+    });
+    els.profileRefreshBtn.addEventListener("click", function () {
+      closeProfileMenu();
+      Promise.all([loadProfile(), loadFolder(currentFolderId()), loadSharedDocs()]).catch(function (err) {
+        console.error(err);
+      });
+    });
     els.homeBtn.addEventListener("click", function () {
       if (!state.accessToken) {
         showView("login");
@@ -1328,6 +1899,39 @@
     });
     els.backBtn.addEventListener("click", returnToDrive);
     els.modeToggleBtn.addEventListener("click", toggleEditorMode);
+    els.shareDocBtn.addEventListener("click", openShareModal);
+    els.addSheetTabBtn.addEventListener("click", function () {
+      openNameModal({
+        title: "Nueva sheet",
+        subtitle: "Crea una nueva pestaña dentro del spreadsheet actual.",
+        confirmText: "Crear",
+        value: "Sheet nueva",
+        onSubmit: function (name) {
+          return fetchJson(
+            "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + ":batchUpdate",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                requests: [{
+                  addSheet: {
+                    properties: {
+                      title: name,
+                      gridProperties: { rowCount: 1000, columnCount: 26 }
+                    }
+                  }
+                }]
+              })
+            }
+          ).then(function () {
+            return openSpreadsheet({ id: state.spreadsheetId, name: currentTitle() });
+          });
+        }
+      });
+    });
+    els.renameSheetTabBtn.addEventListener("click", function () {
+      renameCurrentSheet(state.currentSheetTitle);
+    });
     els.editorTitle.addEventListener("input", handleTitleInput);
     els.editorTitle.addEventListener("blur", handleTitleBlur);
     els.editorTitle.addEventListener("keydown", function (event) {
@@ -1344,6 +1948,74 @@
       }
     });
     els.sheetGrid.addEventListener("input", handleGridInput);
+    els.sheetWrap.addEventListener("scroll", function () {
+      const info = currentSheetInfo();
+      if (!info) return;
+      const nextView = computeWindow(info, false);
+      const currentView = state.sheetWindow[info.title] || {};
+      const movedFar =
+        Math.abs((currentView.startRow || 0) - nextView.startRow) > VIEW_BUFFER_ROWS / 2 ||
+        Math.abs((currentView.startCol || 0) - nextView.startCol) > VIEW_BUFFER_COLS / 2;
+      if (movedFar) {
+        state.sheetWindow[info.title] = nextView;
+        renderGrid();
+        loadSheet(info.title);
+      }
+    });
+    els.nameModalCloseBtn.addEventListener("click", closeNameModal);
+    els.nameModalCancelBtn.addEventListener("click", closeNameModal);
+    els.nameModalConfirmBtn.addEventListener("click", submitNameModal);
+    els.nameModalInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submitNameModal();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeNameModal();
+      }
+    });
+    els.nameModal.addEventListener("click", function (event) {
+      if (event.target === els.nameModal) closeNameModal();
+    });
+    els.shareModalCloseBtn.addEventListener("click", closeShareModal);
+    els.shareCancelBtn.addEventListener("click", closeShareModal);
+    els.shareConfirmBtn.addEventListener("click", function () {
+      const email = String(els.shareEmailInput.value || "").trim();
+      if (!email) {
+        setShareStatus("Introduce un email valido.", "error");
+        return;
+      }
+      setBusy(els.shareModalCard, true);
+      setShareStatus("Compartiendo documento...", "warn");
+      fetchJson(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "/permissions?supportsAllDrives=true&sendNotificationEmail=true",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "user",
+            role: els.shareRoleSelect.value || "writer",
+            emailAddress: email
+          })
+        }
+      ).then(function () {
+        setShareStatus("Permiso enviado.", "good");
+        return loadSharedDocs();
+      }).then(function () {
+        setTimeout(closeShareModal, 500);
+      }).catch(function (err) {
+        console.error(err);
+        setShareStatus(messageFromError(err, "No se ha podido compartir"), "error");
+      }).finally(function () {
+        setBusy(els.shareModalCard, false);
+      });
+    });
+    els.shareModal.addEventListener("click", function (event) {
+      if (event.target === els.shareModal) closeShareModal();
+    });
+    document.addEventListener("click", function (event) {
+      if (state.profileMenuOpen && !els.profileBox.contains(event.target)) closeProfileMenu();
+    });
 
     renderBreadcrumbs();
     showView("login");
