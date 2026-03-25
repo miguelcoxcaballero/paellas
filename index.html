@@ -4,48 +4,744 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>paellas.net</title>
+  <script src="https://accounts.google.com/gsi/client" async defer data-auto_prompt="false"></script>
   <style>
     :root {
       --bg: #ffd84a;
       --bg-2: #ffef9a;
-      --ink: #3a2209;
+      --bg-3: #f7c900;
+      --paper: rgba(255, 248, 214, 0.82);
+      --paper-strong: rgba(255, 248, 214, 0.95);
+      --line: rgba(72, 42, 4, 0.14);
+      --ink: #402405;
+      --muted: #775524;
+      --accent: #b95a00;
+      --accent-2: #8d4300;
+      --shadow: 0 16px 50px rgba(104, 70, 5, 0.12);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
       font-family: Georgia, "Times New Roman", serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 20%),
-        radial-gradient(circle at 80% 30%, rgba(255, 179, 0, 0.16), transparent 22%),
-        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.35), transparent 18%),
+        radial-gradient(circle at 88% 14%, rgba(255, 183, 0, 0.24), transparent 22%),
+        radial-gradient(circle at 72% 82%, rgba(255, 121, 0, 0.14), transparent 18%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 48%, var(--bg-3) 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 20px 0 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0 18px;
     }
 
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      font-size: clamp(2.4rem, 6vw, 5rem);
+      gap: 10px;
+      font-size: clamp(1.5rem, 4vw, 2rem);
       font-weight: 700;
       letter-spacing: -0.05em;
     }
 
-    .emoji {
+    .brand-mark {
       line-height: 1;
+      font-size: 1.05em;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill,
+    .login-btn,
+    .signout-btn,
+    .crumb,
+    .folder-card,
+    .file-card {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .login-shell {
+      min-height: calc(100vh - 120px);
+      display: grid;
+      place-items: center;
+      padding: 24px 0 8px;
+    }
+
+    .hero {
+      width: min(760px, 100%);
+      text-align: center;
+    }
+
+    .hero h1,
+    .hero p,
+    .status,
+    .section-title,
+    .meta,
+    .file-note {
+      margin: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(3.2rem, 11vw, 7rem);
+      line-height: 0.92;
+      letter-spacing: -0.08em;
+    }
+
+    .hero p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+    }
+
+    .login-btn,
+    .signout-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .login-btn {
+      margin-top: 26px;
+      color: #fff8eb;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
+      border-color: transparent;
+    }
+
+    .signout-btn {
+      padding: 10px 14px;
+      border-radius: 14px;
+      color: var(--ink);
+    }
+
+    .login-btn:hover,
+    .signout-btn:hover,
+    .crumb:hover,
+    .folder-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .status {
+      margin-top: 16px;
+      min-height: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .drive {
+      display: grid;
+      gap: 18px;
+    }
+
+    .toolbar,
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--paper-strong);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .toolbar-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .profile strong,
+    .profile span,
+    .section-title,
+    .item-title,
+    .crumb-trail {
+      display: block;
+    }
+
+    .profile strong {
+      font-size: 0.98rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile span,
+    .meta,
+    .file-note,
+    .empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .toolbar-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search {
+      width: 100%;
+      min-width: 0;
+      padding: 13px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(255, 252, 233, 0.84);
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: rgba(185, 90, 0, 0.4);
+      box-shadow: 0 0 0 4px rgba(185, 90, 0, 0.1);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      white-space: nowrap;
+    }
+
+    .section {
+      padding: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.28rem;
+      letter-spacing: -0.04em;
+    }
+
+    .crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .crumb {
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .crumb.current {
+      background: rgba(255, 240, 191, 0.96);
+      cursor: default;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .folder-card,
+    .file-card {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      border-radius: 18px;
+    }
+
+    .folder-card {
+      cursor: pointer;
+    }
+
+    .file-card {
+      cursor: not-allowed;
+      opacity: 0.92;
+    }
+
+    .icon {
+      width: 38px;
+      height: 38px;
+      color: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .item-title {
+      font-size: 1.02rem;
+      line-height: 1.12;
+      word-break: break-word;
+    }
+
+    .meta {
+      line-height: 1.45;
+    }
+
+    .empty {
+      padding: 10px 0 2px;
+    }
+
+    .file-note {
+      color: var(--accent-2);
+      font-style: italic;
+    }
+
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        width: min(100% - 20px, 1180px);
+      }
+
+      .topbar,
+      .toolbar-head,
+      .toolbar-row,
+      .section-head {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .top-actions {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="brand" aria-label="paellas.net">
-    <span class="emoji">🥘</span>
-    <span>paellas.net</span>
-  </main>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand" aria-label="paellas.net">
+        <span class="brand-mark">🥘</span>
+        <span>paellas.net</span>
+      </div>
+      <div class="top-actions">
+        <button id="signoutBtn" class="signout-btn hidden" type="button">Salir</button>
+      </div>
+    </header>
+
+    <main id="loginView" class="login-shell">
+      <section class="hero">
+        <h1>🥘 paellas.net</h1>
+        <p>Login con Google para entrar a la intranet.</p>
+        <button id="loginBtn" class="login-btn" type="button">
+          <span>Entrar con Google</span>
+        </button>
+        <p id="loginStatus" class="status"></p>
+      </section>
+    </main>
+
+    <main id="driveView" class="drive hidden">
+      <section id="driveShell" class="toolbar">
+        <div class="toolbar-head">
+          <div class="profile">
+            <img id="profileAvatar" class="avatar" alt="Perfil">
+            <div>
+              <strong id="profileName">Cuenta</strong>
+              <span id="profileEmail"></span>
+            </div>
+          </div>
+          <div id="driveStatusPill" class="pill">Drive solo lectura</div>
+        </div>
+        <div class="toolbar-row">
+          <input id="searchInput" class="search" type="search" placeholder="Buscar archivos o carpetas">
+          <div id="folderCounter" class="pill">0 elementos</div>
+        </div>
+        <div>
+          <span class="crumb-trail meta">Solo puedes navegar por carpetas. Los archivos no se abren.</span>
+          <div id="breadcrumbs" class="crumbs"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Contenido</h2>
+            <p id="folderMeta" class="meta">Mi unidad</p>
+          </div>
+        </div>
+        <div id="itemsGrid" class="grid"></div>
+        <p id="emptyState" class="empty hidden">No hay resultados en esta carpeta.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const GOOGLE_CLIENT_ID = "435784295430-cmug30o42f1vu4ijgor9sjb0ro4oo37o.apps.googleusercontent.com";
+    const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
+    const AVATAR_FALLBACK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+      "<circle cx='32' cy='32' r='32' fill='#f7dd8a'/>" +
+      "<circle cx='32' cy='25' r='11' fill='#b87d2a'/>" +
+      "<path d='M15 53c4-9 11-14 17-14s13 5 17 14' fill='#b87d2a'/>" +
+      "</svg>"
+    );
+
+    const state = {
+      tokenClient: null,
+      accessToken: "",
+      profile: null,
+      currentFolderId: "root",
+      folderStack: [{ id: "root", name: "Mi unidad" }],
+      currentItems: [],
+      loading: false
+    };
+
+    const els = {
+      loginView: document.getElementById("loginView"),
+      driveView: document.getElementById("driveView"),
+      loginBtn: document.getElementById("loginBtn"),
+      signoutBtn: document.getElementById("signoutBtn"),
+      loginStatus: document.getElementById("loginStatus"),
+      searchInput: document.getElementById("searchInput"),
+      profileAvatar: document.getElementById("profileAvatar"),
+      profileName: document.getElementById("profileName"),
+      profileEmail: document.getElementById("profileEmail"),
+      driveStatusPill: document.getElementById("driveStatusPill"),
+      folderCounter: document.getElementById("folderCounter"),
+      breadcrumbs: document.getElementById("breadcrumbs"),
+      itemsGrid: document.getElementById("itemsGrid"),
+      emptyState: document.getElementById("emptyState"),
+      folderMeta: document.getElementById("folderMeta"),
+      driveShell: document.getElementById("driveShell")
+    };
+
+    function setStatus(text) {
+      els.loginStatus.textContent = text || "";
+    }
+
+    function setDriveStatus(text) {
+      els.driveStatusPill.textContent = text;
+    }
+
+    function setLoading(isLoading, text) {
+      state.loading = isLoading;
+      els.driveShell.classList.toggle("loading", isLoading);
+      els.searchInput.disabled = isLoading;
+      if (text) {
+        setDriveStatus(text);
+      }
+    }
+
+    function showLogin() {
+      els.loginView.classList.remove("hidden");
+      els.driveView.classList.add("hidden");
+      els.signoutBtn.classList.add("hidden");
+    }
+
+    function showDrive() {
+      els.loginView.classList.add("hidden");
+      els.driveView.classList.remove("hidden");
+      els.signoutBtn.classList.remove("hidden");
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function iconForItem(item) {
+      if (item.mimeType === "application/vnd.google-apps.folder") {
+        return (
+          "<svg class='icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'>" +
+          "<path d='M3 6a2 2 0 0 1 2-2h5l2 2h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>" +
+          "</svg>"
+        );
+      }
+      return (
+        "<svg class='icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'>" +
+        "<path d='M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/>" +
+        "<path d='M14 2v6h6'/>" +
+        "</svg>"
+      );
+    }
+
+    function itemMeta(item) {
+      const date = item.modifiedTime
+        ? new Date(item.modifiedTime).toLocaleDateString("es-ES")
+        : "";
+      if (item.mimeType === "application/vnd.google-apps.folder") {
+        return date ? "Carpeta · " + date : "Carpeta";
+      }
+      return date ? (item.mimeTypeLabel + " · " + date) : item.mimeTypeLabel;
+    }
+
+    function mimeTypeLabel(item) {
+      const type = item.mimeType || "";
+      if (type.startsWith("image/")) return "Imagen";
+      if (type === "application/pdf") return "PDF";
+      if (type.includes("spreadsheet")) return "Hoja";
+      if (type.includes("document")) return "Documento";
+      if (type.includes("presentation")) return "Presentacion";
+      if (type.includes("folder")) return "Carpeta";
+      return "Archivo";
+    }
+
+    function renderBreadcrumbs() {
+      els.breadcrumbs.innerHTML = "";
+      state.folderStack.forEach(function (crumb, index) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "crumb" + (index === state.folderStack.length - 1 ? " current" : "");
+        btn.textContent = crumb.name;
+        if (index !== state.folderStack.length - 1) {
+          btn.addEventListener("click", function () {
+            navigateToBreadcrumb(index);
+          });
+        }
+        els.breadcrumbs.appendChild(btn);
+      });
+    }
+
+    function renderItems() {
+      const query = (els.searchInput.value || "").trim().toLowerCase();
+      const filtered = state.currentItems.filter(function (item) {
+        return !query || (item.name || "").toLowerCase().includes(query);
+      });
+
+      els.itemsGrid.innerHTML = "";
+      els.emptyState.classList.toggle("hidden", filtered.length !== 0);
+      els.folderCounter.textContent = filtered.length + " elementos";
+
+      filtered.forEach(function (item) {
+        const el = document.createElement("article");
+        const isFolder = item.mimeType === "application/vnd.google-apps.folder";
+        el.className = isFolder ? "folder-card" : "file-card";
+        el.innerHTML =
+          iconForItem(item) +
+          "<div>" +
+          "<strong class='item-title'>" + escapeHtml(item.name || "Sin nombre") + "</strong>" +
+          "<span class='meta'>" + escapeHtml(itemMeta(item)) + "</span>" +
+          (!isFolder ? "<span class='file-note'>Solo visible, no se puede abrir.</span>" : "") +
+          "</div>";
+
+        if (isFolder) {
+          el.addEventListener("click", function () {
+            enterFolder(item);
+          });
+        }
+
+        els.itemsGrid.appendChild(el);
+      });
+    }
+
+    async function driveFetch(url) {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: "Bearer " + state.accessToken
+        }
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(function () { return ""; });
+        throw new Error("Drive API " + res.status + ": " + text);
+      }
+      return res.json();
+    }
+
+    async function loadProfile() {
+      const data = await driveFetch("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress,photoLink)");
+      const user = data.user || {};
+      state.profile = {
+        name: user.displayName || "Cuenta",
+        email: user.emailAddress || "",
+        photo: user.photoLink || AVATAR_FALLBACK
+      };
+      els.profileName.textContent = state.profile.name;
+      els.profileEmail.textContent = state.profile.email;
+      els.profileAvatar.src = state.profile.photo;
+      els.profileAvatar.onerror = function () {
+        els.profileAvatar.src = AVATAR_FALLBACK;
+      };
+    }
+
+    async function loadFolder(folderId) {
+      state.currentFolderId = folderId;
+      setLoading(true, "Cargando Drive...");
+      try {
+        const query = encodeURIComponent("'" + folderId + "' in parents and trashed=false");
+        const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,iconLink)");
+        const data = await driveFetch(
+          "https://www.googleapis.com/drive/v3/files?q=" +
+            query +
+            "&pageSize=200&orderBy=folder,name_natural&fields=" +
+            fields
+        );
+
+        state.currentItems = (data.files || []).map(function (item) {
+          return Object.assign({}, item, {
+            mimeTypeLabel: mimeTypeLabel(item)
+          });
+        });
+
+        renderBreadcrumbs();
+        renderItems();
+        els.folderMeta.textContent = state.folderStack[state.folderStack.length - 1].name;
+        setDriveStatus("Drive solo lectura");
+      } catch (err) {
+        console.error(err);
+        setDriveStatus("No se ha podido cargar Drive");
+        els.itemsGrid.innerHTML = "";
+        els.emptyState.textContent = "Error cargando el contenido.";
+        els.emptyState.classList.remove("hidden");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function enterFolder(item) {
+      state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
+      loadFolder(item.id);
+    }
+
+    function navigateToBreadcrumb(index) {
+      state.folderStack = state.folderStack.slice(0, index + 1);
+      loadFolder(state.folderStack[state.folderStack.length - 1].id);
+    }
+
+    function initGoogle() {
+      if (!window.google || !google.accounts || !google.accounts.oauth2) {
+        setTimeout(initGoogle, 200);
+        return;
+      }
+
+      state.tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: function (response) {
+          if (!response || response.error) {
+            setStatus("No se ha podido iniciar sesion.");
+            return;
+          }
+          state.accessToken = response.access_token || "";
+          if (!state.accessToken) {
+            setStatus("Token de Google invalido.");
+            return;
+          }
+          afterLogin();
+        }
+      });
+    }
+
+    function signIn() {
+      if (!state.tokenClient) {
+        setStatus("Google OAuth todavia no esta listo.");
+        return;
+      }
+      setStatus("Abriendo Google...");
+      state.tokenClient.requestAccessToken({ prompt: "consent" });
+    }
+
+    function signOut() {
+      state.accessToken = "";
+      state.profile = null;
+      state.currentFolderId = "root";
+      state.folderStack = [{ id: "root", name: "Mi unidad" }];
+      state.currentItems = [];
+      els.searchInput.value = "";
+      els.itemsGrid.innerHTML = "";
+      renderBreadcrumbs();
+      showLogin();
+      setStatus("");
+    }
+
+    async function afterLogin() {
+      try {
+        setStatus("");
+        await loadProfile();
+        showDrive();
+        await loadFolder("root");
+      } catch (err) {
+        console.error(err);
+        signOut();
+        setStatus("La autenticacion ha funcionado, pero Drive no ha respondido.");
+      }
+    }
+
+    els.loginBtn.addEventListener("click", signIn);
+    els.signoutBtn.addEventListener("click", signOut);
+    els.searchInput.addEventListener("input", renderItems);
+
+    renderBreadcrumbs();
+    initGoogle();
+  </script>
 </body>
 </html>
