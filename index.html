@@ -8,508 +8,239 @@
   <style>
     :root {
       --bg: #ffd84a;
-      --bg-2: #ffef9a;
-      --bg-3: #f7c900;
-      --paper: rgba(255, 248, 214, 0.82);
-      --paper-strong: rgba(255, 248, 214, 0.95);
+      --bg2: #ffef9a;
+      --paper: rgba(255, 248, 214, 0.92);
       --line: rgba(72, 42, 4, 0.14);
       --ink: #402405;
       --muted: #775524;
       --accent: #b95a00;
-      --accent-2: #8d4300;
+      --accent2: #8d4300;
+      --good: #2d7c2d;
+      --warn: #9d6200;
+      --bad: #9c1e1e;
       --shadow: 0 16px 50px rgba(104, 70, 5, 0.12);
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Georgia, "Times New Roman", serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.35), transparent 18%),
-        radial-gradient(circle at 88% 14%, rgba(255, 183, 0, 0.24), transparent 22%),
-        radial-gradient(circle at 72% 82%, rgba(255, 121, 0, 0.14), transparent 18%),
-        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 48%, var(--bg-3) 100%);
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,.35), transparent 18%),
+        radial-gradient(circle at 88% 14%, rgba(255,183,0,.24), transparent 22%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 48%, #f7c900 100%);
     }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      background: none;
-      color: inherit;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .app {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 20px 0 28px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 8px 0 18px;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      font-weight: 700;
-      letter-spacing: -0.05em;
-    }
-
-    .brand-mark {
-      line-height: 1;
-      font-size: 1.05em;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pill,
-    .login-btn,
-    .signout-btn,
-    .crumb,
-    .folder-card,
-    .file-card {
+    button, input { font: inherit; }
+    button { border: 0; background: none; color: inherit; cursor: pointer; }
+    .hidden { display: none !important; }
+    .app { width: min(1200px, calc(100% - 24px)); margin: 0 auto; padding: 18px 0 24px; }
+    .topbar, .row, .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; letter-spacing: -.04em; }
+    .card, .btn, .pill, .item, .tab {
       border: 1px solid var(--line);
       background: var(--paper);
-      backdrop-filter: blur(8px);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
     }
-
-    .login-shell {
-      min-height: calc(100vh - 120px);
-      display: grid;
-      place-items: center;
-      padding: 24px 0 8px;
-    }
-
-    .hero {
-      width: min(760px, 100%);
-      text-align: center;
-    }
-
-    .hero h1,
-    .hero p,
-    .status,
-    .section-title,
-    .meta,
-    .file-note {
-      margin: 0;
-    }
-
-    .hero h1 {
-      font-size: clamp(3.2rem, 11vw, 7rem);
-      line-height: 0.92;
-      letter-spacing: -0.08em;
-    }
-
-    .hero p {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: clamp(1rem, 2.5vw, 1.3rem);
-    }
-
-    .login-btn,
-    .signout-btn {
+    .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 14px 20px;
+      gap: 8px;
+      padding: 12px 16px;
       border-radius: 999px;
-      cursor: pointer;
-      transition: transform 0.18s ease, background 0.18s ease;
     }
-
-    .login-btn {
-      margin-top: 26px;
-      color: #fff8eb;
-      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
-      border-color: transparent;
-    }
-
-    .signout-btn {
-      padding: 10px 14px;
-      border-radius: 14px;
-      color: var(--ink);
-    }
-
-    .login-btn:hover,
-    .signout-btn:hover,
-    .crumb:hover,
-    .folder-card:hover {
-      transform: translateY(-1px);
-    }
-
-    .status {
-      margin-top: 16px;
-      min-height: 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .drive {
-      display: grid;
-      gap: 18px;
-    }
-
-    .toolbar,
-    .section {
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: var(--paper-strong);
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-    }
-
-    .toolbar {
-      display: grid;
-      gap: 14px;
-      padding: 18px;
-    }
-
-    .toolbar-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .avatar {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.8);
-    }
-
-    .profile strong,
-    .profile span,
-    .section-title,
-    .item-title,
-    .crumb-trail {
-      display: block;
-    }
-
-    .profile strong {
-      font-size: 0.98rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .profile span,
-    .meta,
-    .file-note,
-    .empty {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .toolbar-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 12px;
-      align-items: center;
-    }
-
+    .btn.primary { color: #fff8eb; background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%); border-color: transparent; }
+    .btn.small { padding: 10px 14px; border-radius: 14px; }
+    .login { min-height: calc(100vh - 120px); display: grid; place-items: center; text-align: center; }
+    .hero h1 { margin: 0; font-size: clamp(3.1rem, 11vw, 6.8rem); line-height: .92; letter-spacing: -.08em; }
+    .hero p, .meta, .status, .note { color: var(--muted); }
+    .status { min-height: 24px; }
+    .view { display: grid; gap: 16px; }
+    .card { border-radius: 22px; padding: 18px; }
     .search {
       width: 100%;
-      min-width: 0;
-      padding: 13px 16px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      color: var(--ink);
-      background: rgba(255, 252, 233, 0.84);
-      outline: none;
-    }
-
-    .search:focus {
-      border-color: rgba(185, 90, 0, 0.4);
-      box-shadow: 0 0 0 4px rgba(185, 90, 0, 0.1);
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       padding: 12px 14px;
       border-radius: 16px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      white-space: nowrap;
-    }
-
-    .section {
-      padding: 18px;
-    }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-size: 1.28rem;
-      letter-spacing: -0.04em;
-    }
-
-    .crumbs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .crumb {
-      padding: 8px 12px;
-      border-radius: 999px;
-      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255,252,233,.9);
       color: var(--ink);
+      outline: none;
     }
-
-    .crumb.current {
-      background: rgba(255, 240, 191, 0.96);
-      cursor: default;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 14px;
-    }
-
-    .folder-card,
-    .file-card {
-      display: grid;
-      gap: 10px;
-      padding: 16px;
+    .pill { padding: 10px 12px; border-radius: 16px; white-space: nowrap; }
+    .crumbs, .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .crumb, .tab { padding: 8px 12px; border-radius: 999px; }
+    .crumb.current, .tab.active { background: rgba(255,240,191,.98); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .item { border-radius: 18px; padding: 16px; display: grid; gap: 8px; }
+    .item:hover, .btn:hover, .crumb:hover, .tab:hover { transform: translateY(-1px); }
+    .title { font-size: 1.04rem; line-height: 1.12; word-break: break-word; }
+    .sheet-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
       border-radius: 18px;
+      background: rgba(255,252,233,.8);
+      max-height: min(68vh, 820px);
     }
-
-    .folder-card {
-      cursor: pointer;
+    table { width: 100%; min-width: 920px; border-collapse: separate; border-spacing: 0; }
+    th, td { border-right: 1px solid rgba(72,42,4,.08); border-bottom: 1px solid rgba(72,42,4,.08); min-width: 110px; padding: 0; }
+    th { position: sticky; top: 0; background: rgba(253,237,170,.98); color: var(--accent2); padding: 10px 8px; z-index: 2; }
+    .corner { left: 0; z-index: 3; min-width: 56px; }
+    .rowh { position: sticky; left: 0; z-index: 1; min-width: 56px; background: rgba(253,237,170,.98); color: var(--accent2); text-align: center; padding: 10px 6px; }
+    .cell {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px;
+      border: 0;
+      outline: none;
+      color: var(--ink);
+      background: transparent;
     }
-
-    .file-card {
-      cursor: pointer;
-      opacity: 0.96;
-    }
-
-    .icon {
-      width: 38px;
-      height: 38px;
-      color: var(--accent);
-      flex: 0 0 auto;
-    }
-
-    .item-title {
-      font-size: 1.02rem;
-      line-height: 1.12;
-      word-break: break-word;
-    }
-
-    .meta {
-      line-height: 1.45;
-    }
-
-    .empty {
-      padding: 10px 0 2px;
-    }
-
-    .file-note {
-      color: var(--accent-2);
-      font-style: italic;
-    }
-
-    .loading {
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    @media (max-width: 760px) {
-      .app {
-        width: min(100% - 20px, 1180px);
-      }
-
-      .topbar,
-      .toolbar-head,
-      .toolbar-row,
-      .section-head {
-        grid-template-columns: 1fr;
-        display: grid;
-      }
-
-      .top-actions {
-        justify-content: flex-start;
-      }
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+    .error { color: var(--bad); }
+    .loading { opacity: .7; pointer-events: none; }
+    @media (max-width: 860px) {
+      .app { width: min(100% - 16px, 1200px); }
+      .topbar, .row, .head { display: grid; grid-template-columns: 1fr; }
+      table { min-width: 760px; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="brand" aria-label="paellas.net">
-        <span class="brand-mark">🥘</span>
-        <span>paellas.net</span>
-      </div>
-      <div class="top-actions">
-        <button id="signoutBtn" class="signout-btn hidden" type="button">Salir</button>
-      </div>
+      <div class="brand"><span>&#129379;</span><span>paellas.net</span></div>
+      <button id="signoutBtn" class="btn small hidden" type="button">Salir</button>
     </header>
 
-    <main id="loginView" class="login-shell">
+    <main id="loginView" class="login">
       <section class="hero">
-        <h1>🥘 paellas.net</h1>
+        <h1>&#129379; paellas.net</h1>
         <p>Login con Google para entrar a la intranet.</p>
-        <button id="loginBtn" class="login-btn" type="button">
-          <span>Entrar con Google</span>
-        </button>
+        <p><button id="loginBtn" class="btn primary" type="button">Entrar con Google</button></p>
         <p id="loginStatus" class="status"></p>
       </section>
     </main>
 
-    <main id="driveView" class="drive hidden">
-      <section id="driveShell" class="toolbar">
-        <div class="toolbar-head">
-          <div class="profile">
-            <img id="profileAvatar" class="avatar" alt="Perfil">
-            <div>
-              <strong id="profileName">Cuenta</strong>
-              <span id="profileEmail"></span>
-            </div>
-          </div>
-          <div id="driveStatusPill" class="pill">Drive solo lectura</div>
-        </div>
-        <div class="toolbar-row">
-          <input id="searchInput" class="search" type="search" placeholder="Buscar archivos o carpetas">
-          <div id="folderCounter" class="pill">0 elementos</div>
-        </div>
-        <div>
-          <span class="crumb-trail meta">Solo se muestran carpetas y archivos de Google Sheets. Las hojas se abren en una pestana nueva.</span>
-          <div id="breadcrumbs" class="crumbs"></div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head">
+    <main id="driveView" class="view hidden">
+      <section id="driveShell" class="card">
+        <div class="head">
           <div>
-            <h2 class="section-title">Contenido</h2>
-            <p id="folderMeta" class="meta">Mi unidad</p>
+            <div id="profileName" class="title">Cuenta</div>
+            <div id="profileEmail" class="meta"></div>
+          </div>
+          <div id="driveStatus" class="pill">Drive y Sheets</div>
+        </div>
+        <div class="row">
+          <input id="searchInput" class="search" type="search" placeholder="Buscar carpetas o hojas">
+          <div id="folderCount" class="pill">0 elementos</div>
+        </div>
+        <p class="note">Solo se muestran carpetas y archivos de Google Sheets. Las hojas se editan dentro de esta intranet.</p>
+        <div id="breadcrumbs" class="crumbs"></div>
+      </section>
+      <section class="card">
+        <div class="head">
+          <div>
+            <div class="title">Contenido</div>
+            <div id="folderMeta" class="meta">Mi unidad</div>
           </div>
         </div>
         <div id="itemsGrid" class="grid"></div>
-        <p id="emptyState" class="empty hidden">No hay resultados en esta carpeta.</p>
+        <p id="emptyState" class="meta hidden">No hay resultados en esta carpeta.</p>
+      </section>
+    </main>
+
+    <main id="editorView" class="view hidden">
+      <section id="editorShell" class="card">
+        <div class="head">
+          <div>
+            <div id="editorTitle" class="title">Hoja</div>
+            <div id="editorSubtitle" class="meta">Editor simple embebido</div>
+          </div>
+          <div class="row">
+            <button id="backBtn" class="btn small" type="button">Volver</button>
+            <button id="saveBtn" class="btn primary small" type="button">Guardar</button>
+          </div>
+        </div>
+        <div class="row">
+          <div id="sheetMeta" class="pill">Sin datos</div>
+          <div id="editorStatus" class="status">Sin cambios</div>
+        </div>
+        <div id="sheetTabs" class="tabs"></div>
+      </section>
+      <section class="card">
+        <div class="sheet-wrap">
+          <table id="sheetGrid"></table>
+        </div>
       </section>
     </main>
   </div>
 
   <script>
     const GOOGLE_CLIENT_ID = "435784295430-cmug30o42f1vu4ijgor9sjb0ro4oo37o.apps.googleusercontent.com";
-    const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
-    const AVATAR_FALLBACK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
-      "<circle cx='32' cy='32' r='32' fill='#f7dd8a'/>" +
-      "<circle cx='32' cy='25' r='11' fill='#b87d2a'/>" +
-      "<path d='M15 53c4-9 11-14 17-14s13 5 17 14' fill='#b87d2a'/>" +
-      "</svg>"
-    );
+    const GOOGLE_SCOPE = [
+      "https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/spreadsheets"
+    ].join(" ");
+    const VIEW_ROWS = 40;
+    const VIEW_COLS = 18;
 
     const state = {
       tokenClient: null,
       accessToken: "",
-      profile: null,
-      currentFolderId: "root",
       folderStack: [{ id: "root", name: "Mi unidad" }],
       currentItems: [],
-      loading: false
+      spreadsheetId: "",
+      spreadsheetTitle: "",
+      spreadsheetSheets: [],
+      currentSheetTitle: "",
+      sheetDrafts: {},
+      sheetDirty: {}
     };
 
     const els = {
       loginView: document.getElementById("loginView"),
       driveView: document.getElementById("driveView"),
+      editorView: document.getElementById("editorView"),
       loginBtn: document.getElementById("loginBtn"),
       signoutBtn: document.getElementById("signoutBtn"),
       loginStatus: document.getElementById("loginStatus"),
-      searchInput: document.getElementById("searchInput"),
-      profileAvatar: document.getElementById("profileAvatar"),
       profileName: document.getElementById("profileName"),
       profileEmail: document.getElementById("profileEmail"),
-      driveStatusPill: document.getElementById("driveStatusPill"),
-      folderCounter: document.getElementById("folderCounter"),
+      driveStatus: document.getElementById("driveStatus"),
+      searchInput: document.getElementById("searchInput"),
+      folderCount: document.getElementById("folderCount"),
       breadcrumbs: document.getElementById("breadcrumbs"),
+      folderMeta: document.getElementById("folderMeta"),
       itemsGrid: document.getElementById("itemsGrid"),
       emptyState: document.getElementById("emptyState"),
-      folderMeta: document.getElementById("folderMeta"),
-      driveShell: document.getElementById("driveShell")
+      driveShell: document.getElementById("driveShell"),
+      editorShell: document.getElementById("editorShell"),
+      editorTitle: document.getElementById("editorTitle"),
+      editorSubtitle: document.getElementById("editorSubtitle"),
+      sheetMeta: document.getElementById("sheetMeta"),
+      editorStatus: document.getElementById("editorStatus"),
+      sheetTabs: document.getElementById("sheetTabs"),
+      sheetGrid: document.getElementById("sheetGrid"),
+      backBtn: document.getElementById("backBtn"),
+      saveBtn: document.getElementById("saveBtn")
     };
 
-    function setStatus(text) {
-      els.loginStatus.textContent = text || "";
+    function setLoginStatus(text) { els.loginStatus.textContent = text || ""; }
+    function setDriveStatus(text) { els.driveStatus.textContent = text || ""; }
+    function setEditorStatus(text, tone) {
+      els.editorStatus.textContent = text || "";
+      els.editorStatus.className = "status" + (tone ? " " + tone : "");
     }
-
-    function setDriveStatus(text) {
-      els.driveStatusPill.textContent = text;
+    function setBusy(el, on) { el.classList.toggle("loading", !!on); }
+    function showView(name) {
+      els.loginView.classList.toggle("hidden", name !== "login");
+      els.driveView.classList.toggle("hidden", name !== "drive");
+      els.editorView.classList.toggle("hidden", name !== "editor");
+      els.signoutBtn.classList.toggle("hidden", name === "login");
     }
-
-    function setLoading(isLoading, text) {
-      state.loading = isLoading;
-      els.driveShell.classList.toggle("loading", isLoading);
-      els.searchInput.disabled = isLoading;
-      if (text) {
-        setDriveStatus(text);
-      }
-    }
-
-    function showLogin() {
-      els.loginView.classList.remove("hidden");
-      els.driveView.classList.add("hidden");
-      els.signoutBtn.classList.add("hidden");
-    }
-
-    function showDrive() {
-      els.loginView.classList.add("hidden");
-      els.driveView.classList.remove("hidden");
-      els.signoutBtn.classList.remove("hidden");
-    }
-
     function escapeHtml(value) {
       return String(value || "")
         .replace(/&/g, "&amp;")
@@ -518,45 +249,54 @@
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
     }
-
-    function iconForItem(item) {
-      if (item.mimeType === "application/vnd.google-apps.folder") {
-        return (
-          "<svg class='icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'>" +
-          "<path d='M3 6a2 2 0 0 1 2-2h5l2 2h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>" +
-          "</svg>"
-        );
+    function authFetch(url, options) {
+      const init = Object.assign({}, options || {});
+      init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
+      return fetch(url, init).then(async function (res) {
+        if (!res.ok) {
+          const text = await res.text().catch(function () { return ""; });
+          throw new Error("Google API " + res.status + ": " + text);
+        }
+        return res;
+      });
+    }
+    function fetchJson(url, options) { return authFetch(url, options).then(function (res) { return res.json(); }); }
+    function columnLabel(index) {
+      let n = index + 1;
+      let out = "";
+      while (n > 0) {
+        out = String.fromCharCode(65 + ((n - 1) % 26)) + out;
+        n = Math.floor((n - 1) / 26);
       }
-      return (
-        "<svg class='icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8'>" +
-        "<path d='M6 2h8l4 4v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'/>" +
-        "<path d='M14 2v6h6'/>" +
-        "</svg>"
-      );
+      return out;
     }
-
-    function itemMeta(item) {
-      const date = item.modifiedTime
-        ? new Date(item.modifiedTime).toLocaleDateString("es-ES")
-        : "";
-      if (item.mimeType === "application/vnd.google-apps.folder") {
-        return date ? "Carpeta · " + date : "Carpeta";
+    function quoteSheetTitle(title) { return "'" + String(title || "").replace(/'/g, "''") + "'"; }
+    function maxRows(info) { return Math.max(10, Math.min(VIEW_ROWS, Number(info && info.rowCount) || VIEW_ROWS)); }
+    function maxCols(info) { return Math.max(6, Math.min(VIEW_COLS, Number(info && info.columnCount) || VIEW_COLS)); }
+    function sheetRange(info) { return quoteSheetTitle(info.title) + "!A1:" + columnLabel(maxCols(info) - 1) + maxRows(info); }
+    function createGrid(rows, cols) {
+      const out = [];
+      let r, c;
+      for (r = 0; r < rows; r += 1) {
+        const row = [];
+        for (c = 0; c < cols; c += 1) row.push("");
+        out.push(row);
       }
-      return date ? (item.mimeTypeLabel + " · " + date) : item.mimeTypeLabel;
+      return out;
     }
-
-    function mimeTypeLabel(item) {
-      const type = item.mimeType || "";
-      if (type.startsWith("image/")) return "Imagen";
-      if (type === "application/pdf") return "PDF";
-      if (type === "application/vnd.google-apps.spreadsheet") return "Google Sheets";
-      if (type.includes("spreadsheet")) return "Hoja";
-      if (type.includes("document")) return "Documento";
-      if (type.includes("presentation")) return "Presentacion";
-      if (type.includes("folder")) return "Carpeta";
-      return "Archivo";
+    function padGrid(values, rows, cols) {
+      const out = createGrid(rows, cols);
+      let r, c;
+      for (r = 0; r < rows; r += 1) {
+        for (c = 0; c < cols; c += 1) {
+          if (values[r] && values[r][c] !== undefined) out[r][c] = values[r][c];
+        }
+      }
+      return out;
     }
-
+    function currentSheetInfo() {
+      return state.spreadsheetSheets.find(function (sheet) { return sheet.title === state.currentSheetTitle; }) || null;
+    }
     function renderBreadcrumbs() {
       els.breadcrumbs.innerHTML = "";
       state.folderStack.forEach(function (crumb, index) {
@@ -566,190 +306,268 @@
         btn.textContent = crumb.name;
         if (index !== state.folderStack.length - 1) {
           btn.addEventListener("click", function () {
-            navigateToBreadcrumb(index);
+            state.folderStack = state.folderStack.slice(0, index + 1);
+            loadFolder(state.folderStack[state.folderStack.length - 1].id);
           });
         }
         els.breadcrumbs.appendChild(btn);
       });
     }
-
     function renderItems() {
       const query = (els.searchInput.value || "").trim().toLowerCase();
       const filtered = state.currentItems.filter(function (item) {
         return !query || (item.name || "").toLowerCase().includes(query);
       });
-
       els.itemsGrid.innerHTML = "";
       els.emptyState.classList.toggle("hidden", filtered.length !== 0);
-      els.folderCounter.textContent = filtered.length + " elementos";
-
+      els.folderCount.textContent = filtered.length + " elementos";
       filtered.forEach(function (item) {
-        const el = document.createElement("article");
         const isFolder = item.mimeType === "application/vnd.google-apps.folder";
-        const isSheet = item.mimeType === "application/vnd.google-apps.spreadsheet";
-        el.className = isFolder ? "folder-card" : "file-card";
+        const el = document.createElement("article");
+        el.className = "item";
         el.innerHTML =
-          iconForItem(item) +
-          "<div>" +
-          "<strong class='item-title'>" + escapeHtml(item.name || "Sin nombre") + "</strong>" +
-          "<span class='meta'>" + escapeHtml(itemMeta(item)) + "</span>" +
-          (isSheet ? "<span class='file-note'>Click para abrir en Google Sheets.</span>" : "") +
-          "</div>";
-
-        if (isFolder) {
-          el.addEventListener("click", function () {
-            enterFolder(item);
-          });
-        } else if (isSheet) {
-          el.addEventListener("click", function () {
-            window.open("https://docs.google.com/spreadsheets/d/" + encodeURIComponent(item.id) + "/edit", "_blank", "noopener");
-          });
-        }
-
+          "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+          "<div class='meta'>" + escapeHtml(isFolder ? "Carpeta" : "Google Sheets") + "</div>" +
+          (!isFolder ? "<div class='note'>Click para editar dentro de la intranet.</div>" : "");
+        el.addEventListener("click", function () {
+          if (isFolder) {
+            state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
+            loadFolder(item.id);
+          } else {
+            openSpreadsheet(item);
+          }
+        });
         els.itemsGrid.appendChild(el);
       });
     }
-
-    async function driveFetch(url) {
-      const res = await fetch(url, {
-        headers: {
-          Authorization: "Bearer " + state.accessToken
+    function renderTabs() {
+      els.sheetTabs.innerHTML = "";
+      state.spreadsheetSheets.forEach(function (sheet) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "tab" + (sheet.title === state.currentSheetTitle ? " active" : "");
+        btn.textContent = sheet.title;
+        if (sheet.title !== state.currentSheetTitle) {
+          btn.addEventListener("click", function () { loadSheet(sheet.title); });
         }
+        els.sheetTabs.appendChild(btn);
       });
-      if (!res.ok) {
-        const text = await res.text().catch(function () { return ""; });
-        throw new Error("Drive API " + res.status + ": " + text);
+    }
+    function renderGrid() {
+      const info = currentSheetInfo();
+      if (!info) { els.sheetGrid.innerHTML = ""; return; }
+      const rows = maxRows(info);
+      const cols = maxCols(info);
+      const values = padGrid(state.sheetDrafts[info.title] || [], rows, cols);
+      const html = [];
+      let r, c;
+      html.push("<thead><tr><th class='corner'></th>");
+      for (c = 0; c < cols; c += 1) html.push("<th>" + columnLabel(c) + "</th>");
+      html.push("</tr></thead><tbody>");
+      for (r = 0; r < rows; r += 1) {
+        html.push("<tr><th class='rowh'>" + (r + 1) + "</th>");
+        for (c = 0; c < cols; c += 1) {
+          html.push("<td><input class='cell' data-row='" + r + "' data-col='" + c + "' value='" + escapeHtml(values[r][c]) + "'></td>");
+        }
+        html.push("</tr>");
       }
-      return res.json();
+      html.push("</tbody>");
+      els.sheetGrid.innerHTML = html.join("");
+      els.sheetMeta.textContent = info.title + " - vista simple " + rows + "x" + cols;
+      els.editorTitle.textContent = state.spreadsheetTitle || "Hoja";
+      els.editorSubtitle.textContent = "Sheet activa: " + info.title;
     }
-
-    async function loadProfile() {
-      const data = await driveFetch("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress,photoLink)");
-      const user = data.user || {};
-      state.profile = {
-        name: user.displayName || "Cuenta",
-        email: user.emailAddress || "",
-        photo: user.photoLink || AVATAR_FALLBACK
-      };
-      els.profileName.textContent = state.profile.name;
-      els.profileEmail.textContent = state.profile.email;
-      els.profileAvatar.src = state.profile.photo;
-      els.profileAvatar.onerror = function () {
-        els.profileAvatar.src = AVATAR_FALLBACK;
-      };
+    function refreshDirtyState() {
+      if (state.sheetDirty[state.currentSheetTitle]) setEditorStatus("Cambios sin guardar", "warn");
+      else setEditorStatus("Sin cambios", "");
     }
-
-    async function loadFolder(folderId) {
-      state.currentFolderId = folderId;
-      setLoading(true, "Cargando Drive...");
-      try {
-        const query = encodeURIComponent(
-          "'" + folderId + "' in parents and trashed=false and " +
-          "(mimeType='application/vnd.google-apps.folder' or mimeType='application/vnd.google-apps.spreadsheet')"
-        );
-        const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,iconLink)");
-        const data = await driveFetch(
-          "https://www.googleapis.com/drive/v3/files?q=" +
-            query +
-            "&pageSize=200&orderBy=folder,name_natural&fields=" +
-            fields
-        );
-
-        state.currentItems = (data.files || []).map(function (item) {
-          return Object.assign({}, item, {
-            mimeTypeLabel: mimeTypeLabel(item)
-          });
+    function loadProfile() {
+      return fetchJson("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress)").then(function (data) {
+        const user = data.user || {};
+        els.profileName.textContent = user.displayName || "Cuenta";
+        els.profileEmail.textContent = user.emailAddress || "";
+      });
+    }
+    function loadFolder(folderId) {
+      setBusy(els.driveShell, true);
+      setDriveStatus("Cargando Drive...");
+      const query = encodeURIComponent(
+        "'" + folderId + "' in parents and trashed=false and " +
+        "(mimeType='application/vnd.google-apps.folder' or mimeType='application/vnd.google-apps.spreadsheet')"
+      );
+      const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime)");
+      return fetchJson("https://www.googleapis.com/drive/v3/files?q=" + query + "&pageSize=200&orderBy=folder,name_natural&fields=" + fields)
+        .then(function (data) {
+          state.currentItems = data.files || [];
+          renderBreadcrumbs();
+          renderItems();
+          els.folderMeta.textContent = state.folderStack[state.folderStack.length - 1].name;
+          setDriveStatus("Drive y Sheets");
+        })
+        .catch(function (err) {
+          console.error(err);
+          setDriveStatus("No se ha podido cargar Drive");
+          els.itemsGrid.innerHTML = "";
+          els.emptyState.textContent = "Error cargando el contenido.";
+          els.emptyState.classList.remove("hidden");
+        })
+        .finally(function () {
+          setBusy(els.driveShell, false);
         });
-
-        renderBreadcrumbs();
-        renderItems();
-        els.folderMeta.textContent = state.folderStack[state.folderStack.length - 1].name;
-        setDriveStatus("Drive solo lectura");
-      } catch (err) {
+    }
+    function loadSheet(title) {
+      const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === title; });
+      if (!info) return Promise.resolve();
+      setBusy(els.editorShell, true);
+      setEditorStatus("Cargando hoja...", "warn");
+      return fetchJson("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values/" + encodeURIComponent(sheetRange(info)))
+        .then(function (data) {
+          state.currentSheetTitle = title;
+          state.sheetDrafts[title] = padGrid(data.values || [], maxRows(info), maxCols(info));
+          state.sheetDirty[title] = false;
+          renderTabs();
+          renderGrid();
+          refreshDirtyState();
+        })
+        .catch(function (err) {
+          console.error(err);
+          setEditorStatus("No se ha podido cargar la hoja", "error");
+        })
+        .finally(function () {
+          setBusy(els.editorShell, false);
+        });
+    }
+    function openSpreadsheet(item) {
+      showView("editor");
+      setBusy(els.editorShell, true);
+      setEditorStatus("Cargando spreadsheet...", "warn");
+      state.spreadsheetId = item.id;
+      state.spreadsheetTitle = item.name || "Google Sheets";
+      state.spreadsheetSheets = [];
+      state.currentSheetTitle = "";
+      state.sheetDrafts = {};
+      state.sheetDirty = {};
+      return fetchJson("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(item.id) + "?fields=properties(title),sheets(properties(title,gridProperties(rowCount,columnCount)))")
+        .then(function (meta) {
+          state.spreadsheetTitle = (meta.properties && meta.properties.title) || state.spreadsheetTitle;
+          state.spreadsheetSheets = (meta.sheets || []).map(function (sheet) {
+            const props = sheet.properties || {};
+            return {
+              title: props.title || "Sheet",
+              rowCount: props.gridProperties ? props.gridProperties.rowCount : VIEW_ROWS,
+              columnCount: props.gridProperties ? props.gridProperties.columnCount : VIEW_COLS
+            };
+          });
+          if (!state.spreadsheetSheets.length) {
+            setEditorStatus("El archivo no tiene sheets visibles", "error");
+            return;
+          }
+          return loadSheet(state.spreadsheetSheets[0].title);
+        })
+        .catch(function (err) {
+          console.error(err);
+          setEditorStatus("No se ha podido abrir el spreadsheet", "error");
+        })
+        .finally(function () {
+          setBusy(els.editorShell, false);
+        });
+    }
+    function saveSheet() {
+      const info = currentSheetInfo();
+      if (!info || !state.sheetDrafts[info.title]) return Promise.resolve();
+      setBusy(els.editorShell, true);
+      setEditorStatus("Guardando...", "warn");
+      const range = sheetRange(info);
+      return fetchJson(
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + "/values/" + encodeURIComponent(range) + "?valueInputOption=USER_ENTERED",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ range: range, majorDimension: "ROWS", values: state.sheetDrafts[info.title] })
+        }
+      ).then(function () {
+        state.sheetDirty[info.title] = false;
+        setEditorStatus("Guardado", "good");
+      }).catch(function (err) {
         console.error(err);
-        setDriveStatus("No se ha podido cargar Drive");
-        els.itemsGrid.innerHTML = "";
-        els.emptyState.textContent = "Error cargando el contenido.";
-        els.emptyState.classList.remove("hidden");
-      } finally {
-        setLoading(false);
-      }
+        setEditorStatus("Error al guardar", "error");
+      }).finally(function () {
+        setBusy(els.editorShell, false);
+      });
     }
-
-    function enterFolder(item) {
-      state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
-      loadFolder(item.id);
+    function handleGridInput(event) {
+      const target = event.target;
+      if (!target || !target.classList.contains("cell")) return;
+      const info = currentSheetInfo();
+      const row = Number(target.dataset.row);
+      const col = Number(target.dataset.col);
+      if (!info || !Number.isFinite(row) || !Number.isFinite(col)) return;
+      if (!state.sheetDrafts[info.title]) state.sheetDrafts[info.title] = createGrid(maxRows(info), maxCols(info));
+      state.sheetDrafts[info.title][row][col] = target.value;
+      state.sheetDirty[info.title] = true;
+      refreshDirtyState();
     }
-
-    function navigateToBreadcrumb(index) {
-      state.folderStack = state.folderStack.slice(0, index + 1);
-      loadFolder(state.folderStack[state.folderStack.length - 1].id);
-    }
-
     function initGoogle() {
       if (!window.google || !google.accounts || !google.accounts.oauth2) {
         setTimeout(initGoogle, 200);
         return;
       }
-
       state.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
-        scope: DRIVE_SCOPE,
+        scope: GOOGLE_SCOPE,
         callback: function (response) {
-          if (!response || response.error) {
-            setStatus("No se ha podido iniciar sesion.");
+          if (!response || response.error || !response.access_token) {
+            setLoginStatus("No se ha podido iniciar sesion.");
             return;
           }
-          state.accessToken = response.access_token || "";
-          if (!state.accessToken) {
-            setStatus("Token de Google invalido.");
-            return;
-          }
-          afterLogin();
+          state.accessToken = response.access_token;
+          loadProfile().then(function () {
+            showView("drive");
+            return loadFolder("root");
+          }).catch(function (err) {
+            console.error(err);
+            setLoginStatus("La autenticacion ha funcionado, pero Google no ha respondido.");
+          });
         }
       });
     }
 
-    function signIn() {
+    els.loginBtn.addEventListener("click", function () {
       if (!state.tokenClient) {
-        setStatus("Google OAuth todavia no esta listo.");
+        setLoginStatus("Google OAuth todavia no esta listo.");
         return;
       }
-      setStatus("Abriendo Google...");
+      setLoginStatus("Abriendo Google...");
       state.tokenClient.requestAccessToken({ prompt: "consent" });
-    }
-
-    function signOut() {
+    });
+    els.signoutBtn.addEventListener("click", function () {
+      if (state.accessToken && window.google && google.accounts && google.accounts.oauth2) {
+        google.accounts.oauth2.revoke(state.accessToken, function () {});
+      }
       state.accessToken = "";
-      state.profile = null;
-      state.currentFolderId = "root";
       state.folderStack = [{ id: "root", name: "Mi unidad" }];
       state.currentItems = [];
+      state.spreadsheetId = "";
+      state.spreadsheetTitle = "";
+      state.spreadsheetSheets = [];
+      state.currentSheetTitle = "";
+      state.sheetDrafts = {};
+      state.sheetDirty = {};
       els.searchInput.value = "";
       els.itemsGrid.innerHTML = "";
+      els.sheetTabs.innerHTML = "";
+      els.sheetGrid.innerHTML = "";
       renderBreadcrumbs();
-      showLogin();
-      setStatus("");
-    }
-
-    async function afterLogin() {
-      try {
-        setStatus("");
-        await loadProfile();
-        showDrive();
-        await loadFolder("root");
-      } catch (err) {
-        console.error(err);
-        signOut();
-        setStatus("La autenticacion ha funcionado, pero Drive no ha respondido.");
-      }
-    }
-
-    els.loginBtn.addEventListener("click", signIn);
-    els.signoutBtn.addEventListener("click", signOut);
+      showView("login");
+      setLoginStatus("");
+    });
     els.searchInput.addEventListener("input", renderItems);
+    els.backBtn.addEventListener("click", function () { showView("drive"); });
+    els.saveBtn.addEventListener("click", saveSheet);
+    els.sheetGrid.addEventListener("input", handleGridInput);
 
     renderBreadcrumbs();
+    showView("login");
     initGoogle();
   </script>
 </body>
