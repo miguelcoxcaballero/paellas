@@ -69,6 +69,7 @@
       outline: none;
     }
     .pill { padding: 10px 12px; border-radius: 16px; white-space: nowrap; }
+    .toolbar-side { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .crumbs, .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
     .crumb, .tab { padding: 8px 12px; border-radius: 999px; }
     .crumb.current, .tab.active { background: rgba(255,240,191,.98); }
@@ -135,7 +136,10 @@
         </div>
         <div class="row">
           <input id="searchInput" class="search" type="search" placeholder="Buscar carpetas o hojas">
-          <div id="folderCount" class="pill">0 elementos</div>
+          <div class="toolbar-side">
+            <button id="newSheetBtn" class="btn small" type="button">Nueva hoja</button>
+            <div id="folderCount" class="pill">0 elementos</div>
+          </div>
         </div>
         <p class="note">Solo se muestran carpetas y archivos de Google Sheets. Las hojas se editan dentro de esta intranet.</p>
         <div id="breadcrumbs" class="crumbs"></div>
@@ -181,7 +185,7 @@
   <script>
     const GOOGLE_CLIENT_ID = "435784295430-cmug30o42f1vu4ijgor9sjb0ro4oo37o.apps.googleusercontent.com";
     const GOOGLE_SCOPE = [
-      "https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/drive",
       "https://www.googleapis.com/auth/spreadsheets"
     ].join(" ");
     const VIEW_ROWS = 40;
@@ -211,6 +215,7 @@
       profileEmail: document.getElementById("profileEmail"),
       driveStatus: document.getElementById("driveStatus"),
       searchInput: document.getElementById("searchInput"),
+      newSheetBtn: document.getElementById("newSheetBtn"),
       folderCount: document.getElementById("folderCount"),
       breadcrumbs: document.getElementById("breadcrumbs"),
       folderMeta: document.getElementById("folderMeta"),
@@ -235,6 +240,40 @@
       els.editorStatus.className = "status" + (tone ? " " + tone : "");
     }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
+    function currentFolderId() { return state.folderStack[state.folderStack.length - 1].id; }
+    function parseApiErrorText(text) {
+      if (!text) return "";
+      try {
+        const data = JSON.parse(text);
+        if (data && data.error) {
+          if (typeof data.error === "string") return data.error;
+          if (data.error.message) return data.error.message;
+          if (Array.isArray(data.error.errors) && data.error.errors[0] && data.error.errors[0].message) {
+            return data.error.errors[0].message;
+          }
+        }
+      } catch (err) {}
+      return String(text).replace(/\s+/g, " ").trim();
+    }
+    function messageFromError(err, fallback) {
+      const raw = err && err.message ? String(err.message) : "";
+      if (!raw) return fallback;
+      const clean = raw.replace(/^Google API \d+:\s*/i, "").trim();
+      if (!clean) return fallback;
+      if (/Google Sheets API has not been used/i.test(clean) || /API has not been used/i.test(clean)) {
+        return "La API de Google Sheets no esta habilitada en este proyecto de Google Cloud.";
+      }
+      if (/PERMISSION_DENIED|insufficient authentication scopes/i.test(clean)) {
+        return "Google ha rechazado permisos para abrir o editar esta hoja.";
+      }
+      if (/Requested entity was not found|not found/i.test(clean)) {
+        return "No se ha encontrado este spreadsheet en Google Drive.";
+      }
+      if (/The caller does not have permission/i.test(clean)) {
+        return "Tu cuenta no tiene permisos para abrir este spreadsheet.";
+      }
+      return clean;
+    }
     function showView(name) {
       els.loginView.classList.toggle("hidden", name !== "login");
       els.driveView.classList.toggle("hidden", name !== "drive");
@@ -255,7 +294,7 @@
       return fetch(url, init).then(async function (res) {
         if (!res.ok) {
           const text = await res.text().catch(function () { return ""; });
-          throw new Error("Google API " + res.status + ": " + text);
+          throw new Error("Google API " + res.status + ": " + parseApiErrorText(text));
         }
         return res;
       });
@@ -406,7 +445,7 @@
         })
         .catch(function (err) {
           console.error(err);
-          setDriveStatus("No se ha podido cargar Drive");
+          setDriveStatus(messageFromError(err, "No se ha podido cargar Drive"));
           els.itemsGrid.innerHTML = "";
           els.emptyState.textContent = "Error cargando el contenido.";
           els.emptyState.classList.remove("hidden");
@@ -436,23 +475,41 @@
         })
         .catch(function (err) {
           console.error(err);
-          setEditorStatus("No se ha podido cargar la hoja", "error");
+          setEditorStatus(messageFromError(err, "No se ha podido cargar la hoja"), "error");
         })
         .finally(function () {
           setBusy(els.editorShell, false);
         });
     }
+    function loadSpreadsheetMeta(id) {
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) +
+        "?supportsAllDrives=true&fields=id,name,mimeType,capabilities(canEdit)"
+      ).then(function (file) {
+        if (!file || file.mimeType !== "application/vnd.google-apps.spreadsheet") {
+          throw new Error("El archivo seleccionado no es un Google Sheets valido.");
+        }
+        state.spreadsheetTitle = file.name || state.spreadsheetTitle;
+        return fetchJson(
+          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(id) +
+          "?includeGridData=false&fields=properties(title),sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))"
+        );
+      });
+    }
     function openSpreadsheet(item) {
       showView("editor");
       setBusy(els.editorShell, true);
       setEditorStatus("Cargando spreadsheet...", "warn");
+      els.sheetMeta.textContent = "Cargando...";
+      els.sheetTabs.innerHTML = "";
+      els.sheetGrid.innerHTML = "";
       state.spreadsheetId = item.id;
       state.spreadsheetTitle = item.name || "Google Sheets";
       state.spreadsheetSheets = [];
       state.currentSheetTitle = "";
       state.sheetDrafts = {};
       state.sheetDirty = {};
-      return fetchJson("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(item.id))
+      return loadSpreadsheetMeta(item.id)
         .then(function (meta) {
           state.spreadsheetTitle = (meta.properties && meta.properties.title) || state.spreadsheetTitle;
           state.spreadsheetSheets = (meta.sheets || []).map(function (sheet) {
@@ -471,11 +528,44 @@
         })
         .catch(function (err) {
           console.error(err);
-          setEditorStatus("No se ha podido abrir el spreadsheet", "error");
+          els.sheetMeta.textContent = "Error de apertura";
+          setEditorStatus(messageFromError(err, "No se ha podido abrir el spreadsheet"), "error");
         })
         .finally(function () {
           setBusy(els.editorShell, false);
         });
+    }
+    function createSpreadsheet() {
+      const suggestedName = "Nueva hoja";
+      const name = window.prompt("Nombre del spreadsheet nuevo:", suggestedName);
+      if (name === null) return Promise.resolve();
+      const trimmedName = name.trim() || suggestedName;
+      setBusy(els.driveShell, true);
+      setDriveStatus("Creando spreadsheet...");
+      const body = {
+        name: trimmedName,
+        mimeType: "application/vnd.google-apps.spreadsheet"
+      };
+      if (currentFolderId() !== "root") {
+        body.parents = [currentFolderId()];
+      }
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name,mimeType",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        }
+      ).then(function (file) {
+        return loadFolder(currentFolderId()).then(function () {
+          return openSpreadsheet(file);
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setDriveStatus(messageFromError(err, "No se ha podido crear el spreadsheet"));
+      }).finally(function () {
+        setBusy(els.driveShell, false);
+      });
     }
     function saveSheet() {
       const info = currentSheetInfo();
@@ -504,7 +594,7 @@
         setEditorStatus("Guardado", "good");
       }).catch(function (err) {
         console.error(err);
-        setEditorStatus("Error al guardar", "error");
+        setEditorStatus(messageFromError(err, "Error al guardar"), "error");
       }).finally(function () {
         setBusy(els.editorShell, false);
       });
@@ -576,6 +666,7 @@
       setLoginStatus("");
     });
     els.searchInput.addEventListener("input", renderItems);
+    els.newSheetBtn.addEventListener("click", createSpreadsheet);
     els.backBtn.addEventListener("click", function () { showView("drive"); });
     els.saveBtn.addEventListener("click", saveSheet);
     els.sheetGrid.addEventListener("input", handleGridInput);
