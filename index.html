@@ -731,6 +731,11 @@
       justify-content: center;
       padding-right: 34px;
     }
+    .tab-label {
+      display: inline-block;
+      min-width: 0;
+      white-space: nowrap;
+    }
     .tab-dots {
       position: absolute;
       top: 50%;
@@ -762,6 +767,12 @@
       color: var(--ink);
       opacity: 1;
       outline: none;
+    }
+    .tab.is-renaming {
+      padding-right: 12px;
+    }
+    .tab.is-renaming .tab-dots {
+      display: none;
     }
     .tab-menu {
       position: fixed;
@@ -1518,8 +1529,15 @@
     }
     function shouldApplyRemoteMeta(meta) {
       if (!meta) return false;
+      const remoteName = normalizeTitle(meta.name || state.lastKnownFileName || "");
+      const localName = normalizeTitle(state.lastKnownFileName || "");
+      if (remoteName && remoteName !== localName) return true;
+      const remoteRevision = meta.headRevisionId || "";
+      if (remoteRevision) {
+        return remoteRevision !== (state.lastKnownRevisionId || "");
+      }
       const modified = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
-      return modified > state.lastKnownModifiedTime || (meta.headRevisionId || "") !== state.lastKnownRevisionId;
+      return modified > state.lastKnownModifiedTime;
     }
     async function flushDeferredRemotePull(options) {
       const config = options || {};
@@ -2388,40 +2406,48 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "tab" + (sheet.title === state.currentSheetTitle ? " active" : "");
-        btn.textContent = sheet.title;
+        var label = document.createElement("span");
+        label.className = "tab-label";
+        label.textContent = sheet.title;
+        btn.appendChild(label);
         if (sheet.title !== state.currentSheetTitle) {
           btn.addEventListener("click", function () { loadSheet(sheet.title); });
         }
         if (state.canEdit) {
           btn.addEventListener("dblclick", function (event) {
             event.preventDefault();
-            startInlineTabRename(btn, sheet);
+            startInlineTabRename(label, sheet, btn);
           });
-          var dots = document.createElement("button");
-          dots.type = "button";
+          var dots = document.createElement("span");
           dots.className = "tab-dots";
           dots.textContent = "\u2026";
+          dots.setAttribute("role", "button");
+          dots.setAttribute("tabindex", "0");
           dots.setAttribute("aria-label", "Opciones de " + sheet.title);
           dots.addEventListener("pointerdown", function (event) {
-            event.preventDefault();
             event.stopPropagation();
           });
           dots.addEventListener("click", function (event) {
+            event.preventDefault();
             event.stopPropagation();
-            openTabMenu(shell, sheet);
+            openTabMenu(btn, shell, sheet);
           });
-          shell.appendChild(btn);
-          shell.appendChild(dots);
-        } else {
-          shell.appendChild(btn);
+          dots.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            event.stopPropagation();
+            openTabMenu(btn, shell, sheet);
+          });
+          btn.appendChild(dots);
         }
+        shell.appendChild(btn);
         els.sheetTabs.appendChild(shell);
       });
     }
     var activeTabMenu = null;
-    function positionTabMenu(tabShell, menuEl) {
-      if (!tabShell || !menuEl) return;
-      var rect = tabShell.getBoundingClientRect();
+    function positionTabMenu(anchorEl, menuEl) {
+      if (!anchorEl || !menuEl) return;
+      var rect = anchorEl.getBoundingClientRect();
       var menuRect = menuEl.getBoundingClientRect();
       var left = rect.right - menuRect.width;
       var top = rect.bottom + 6;
@@ -2436,8 +2462,8 @@
       menuEl.style.left = Math.round(left) + "px";
       menuEl.style.top = Math.round(top) + "px";
     }
-    function openTabMenu(tabShell, sheet) {
-      if (!tabShell || state.spreadsheetSheets.length <= 1) return;
+    function openTabMenu(anchorEl, tabShell, sheet) {
+      if (!anchorEl || !tabShell || state.spreadsheetSheets.length <= 1) return;
       if (activeTabMenu && activeTabMenu.sheetId === sheet.sheetId && activeTabMenu.container === tabShell) {
         closeTabMenu();
         return;
@@ -2463,8 +2489,8 @@
       menu.appendChild(del);
       document.body.appendChild(menu);
       tabShell.classList.add("menu-open");
-      activeTabMenu = { el: menu, container: tabShell, sheetId: sheet.sheetId };
-      positionTabMenu(tabShell, menu);
+      activeTabMenu = { el: menu, anchor: anchorEl, container: tabShell, sheetId: sheet.sheetId };
+      positionTabMenu(anchorEl, menu);
       setTimeout(function () {
         document.addEventListener("pointerdown", closeTabMenuOnOutside);
         window.addEventListener("resize", closeTabMenu);
@@ -2513,33 +2539,36 @@
         setEditorStatus("Error al eliminar sheet", "error");
       });
     }
-    function startInlineTabRename(tabEl, sheet) {
-      if (tabEl.contentEditable === "true") return;
-      tabEl.contentEditable = "true";
-      tabEl.spellcheck = false;
-      tabEl.focus();
+    function startInlineTabRename(labelEl, sheet, tabEl) {
+      if (!labelEl || labelEl.contentEditable === "true") return;
+      closeTabMenu();
+      if (tabEl) tabEl.classList.add("is-renaming");
+      labelEl.contentEditable = "true";
+      labelEl.spellcheck = false;
+      labelEl.focus();
       var range = document.createRange();
-      range.selectNodeContents(tabEl);
+      range.selectNodeContents(labelEl);
       var sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
       function commit() {
-        tabEl.contentEditable = "false";
-        tabEl.removeEventListener("blur", commit);
-        tabEl.removeEventListener("keydown", onKey);
-        var nextName = (tabEl.textContent || "").trim();
+        labelEl.contentEditable = "false";
+        labelEl.removeEventListener("blur", commit);
+        labelEl.removeEventListener("keydown", onKey);
+        if (tabEl) tabEl.classList.remove("is-renaming");
+        var nextName = (labelEl.textContent || "").trim();
         if (!nextName || nextName === sheet.title) {
-          tabEl.textContent = sheet.title;
+          labelEl.textContent = sheet.title;
           return;
         }
         submitSheetRename(sheet, nextName);
       }
       function onKey(e) {
-        if (e.key === "Enter") { e.preventDefault(); tabEl.blur(); }
-        if (e.key === "Escape") { e.preventDefault(); tabEl.textContent = sheet.title; tabEl.blur(); }
+        if (e.key === "Enter") { e.preventDefault(); labelEl.blur(); }
+        if (e.key === "Escape") { e.preventDefault(); labelEl.textContent = sheet.title; labelEl.blur(); }
       }
-      tabEl.addEventListener("blur", commit);
-      tabEl.addEventListener("keydown", onKey);
+      labelEl.addEventListener("blur", commit);
+      labelEl.addEventListener("keydown", onKey);
     }
     function submitSheetRename(info, nextName) {
       return fetchJson(
@@ -2935,11 +2964,11 @@
           state.lastRemotePollAt = Date.now();
           if (meta.appProperties) updatePresenceFromProps(meta.appProperties);
           if (remoteMetaChanged(meta)) {
-            if ((state.editorMode === "edit" && state.canEdit) || hasUnsyncedLocalChanges()) {
+            if (hasUnsyncedLocalChanges()) {
               deferRemotePull(meta);
               return false;
             }
-            return pullRemoteChanges(meta);
+            return pullRemoteChanges(meta, { quiet: state.editorMode === "edit" });
           }
           return flushDeferredRemotePull();
         })
@@ -2951,7 +2980,8 @@
           state.collabPollInProgress = false;
         });
     }
-    function pullRemoteChanges(remoteMetaHint) {
+    function pullRemoteChanges(remoteMetaHint, options) {
+      const config = options || {};
       if (!state.spreadsheetId || !state.accessToken) return Promise.resolve(false);
       if (state.collabPullInProgress) return Promise.resolve(false);
       if (hasUnsyncedLocalChanges()) {
@@ -2959,7 +2989,9 @@
         return Promise.resolve(false);
       }
       state.collabPullInProgress = true;
-      setSaveState("syncing", "Sincronizando...");
+      if (!config.quiet) {
+        setSaveState("syncing", "Sincronizando...");
+      }
       return loadSpreadsheetMeta(state.spreadsheetId, {
         preserveDirtyTitle: true,
         skipApplyMode: true
