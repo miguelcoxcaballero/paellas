@@ -174,6 +174,13 @@
     }
     .toolbar-side { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .crumbs, .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tab-shell {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex: 0 0 auto;
+    }
     .crumb, .tab {
       padding: 6px 12px;
       border-radius: var(--radius-sm);
@@ -435,8 +442,6 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-    .save-stack { display: grid; gap: 2px; justify-items: end; min-width: 130px; }
-    .save-line { display: inline-flex; align-items: center; gap: 8px; min-height: 20px; }
     .save-indicator {
       width: 8px; height: 8px;
       border-radius: 50%;
@@ -451,8 +456,6 @@
     .save-indicator.saved { background: var(--good); }
     .save-indicator.syncing { background: #4a90d9; }
     .save-indicator.error { background: var(--bad); }
-    .save-status-text { font-size: .84rem; color: var(--muted); white-space: nowrap; }
-    .save-time { font-size: .72rem; color: var(--muted); opacity: .68; min-height: 14px; }
     .presence-avatars {
       display: flex;
       align-items: center;
@@ -641,11 +644,18 @@
     }
     .mode-toggle-btn {
       display: inline-grid;
-      grid-template-columns: auto 38px;
+      grid-template-columns: 12px auto 38px;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       padding: 8px 12px;
       border-radius: var(--radius-md);
+    }
+    .mode-toggle-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      min-width: 12px;
     }
     .mode-toggle-text { min-width: 34px; text-align: left; font-weight: 600; font-size: 0.85rem; color: var(--ink); }
     .mode-toggle-pill {
@@ -682,31 +692,48 @@
     }
     .add-sheet-btn:hover { background: rgba(0,0,0,0.06); color: var(--ink); }
     .add-sheet-btn:disabled { opacity: .35; cursor: not-allowed; }
-    .tab { position: relative; }
-    .tab .tab-dots {
-      display: none;
-      position: absolute;
-      top: 2px; right: 2px;
-      width: 20px; height: 20px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+    .tab {
+      position: relative;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tab-dots {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
       line-height: 1;
       color: var(--muted);
-      background: none;
-      place-items: center;
+      background: transparent;
       cursor: pointer;
       padding: 0;
       border: none;
+      opacity: 0.78;
+      transition: background .15s ease, color .15s ease, opacity .15s ease;
     }
-    .tab:hover .tab-dots { display: grid; }
-    .tab .tab-dots:hover { background: rgba(0,0,0,0.08); color: var(--ink); }
+    .tab-shell:hover .tab-dots,
+    .tab-shell.menu-open .tab-dots {
+      opacity: 1;
+    }
+    .tab-dots:hover,
+    .tab-dots:focus-visible {
+      background: rgba(0,0,0,0.08);
+      color: var(--ink);
+      opacity: 1;
+      outline: none;
+    }
     .tab-menu {
       position: absolute;
-      top: 100%;
+      top: calc(100% + 6px);
       right: 0;
-      z-index: 200;
-      min-width: 120px;
-      padding: 4px;
+      z-index: 1200;
+      min-width: 144px;
+      padding: 6px;
       border-radius: 8px;
       border: 1px solid var(--line);
       background: var(--paper);
@@ -715,7 +742,7 @@
     .tab-menu-item {
       display: block;
       width: 100%;
-      padding: 6px 10px;
+      padding: 8px 10px;
       border-radius: 6px;
       font-size: 0.82rem;
       text-align: left;
@@ -874,21 +901,27 @@
       border-top: none;
       border-bottom: 1px solid var(--line);
       padding: 10px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      gap: 10px;
       flex-shrink: 0;
     }
     .drive-top-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex: 1 1 auto;
+      width: 100%;
       min-width: 0;
     }
     .drive-top-row .search { flex: 1 1 auto; }
     .drive-top-row .btn { flex-shrink: 0; margin-left: auto; }
+    #breadcrumbs {
+      width: 100%;
+      justify-content: flex-start;
+      align-items: center;
+      min-width: 0;
+    }
     .drive-scroll {
       flex: 1 1 0;
       overflow: auto;
@@ -916,7 +949,6 @@
       .row, .head, .sheet-bar { display: grid; grid-template-columns: 1fr; gap: 10px; }
       .modal-card { padding: 16px; }
       .editor-head-top, .editor-title-side, .editor-actions { display: grid; grid-template-columns: 1fr; }
-      .save-stack { justify-items: start; min-width: 0; }
       .doc-title { max-width: 100%; }
       .profile-menu { left: auto; right: 0; max-width: min(92vw, 280px); }
       table { width: max(100%, 760px); min-width: 760px; }
@@ -1001,14 +1033,10 @@
             <div class="editor-actions">
               <div id="presenceAvatars" class="presence-avatars" aria-label="Dispositivos conectados"></div>
               <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg></button>
-              <div class="save-stack">
-                <div class="save-line">
-                  <span id="saveIndicator" class="save-indicator paused" aria-hidden="true"></span>
-                  <span id="editorStatus" class="save-status-text">Modo lectura</span>
-                </div>
-                <div id="saveTimestamp" class="save-time"></div>
-              </div>
               <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edicion">
+                <span class="mode-toggle-status">
+                  <span id="saveIndicator" class="save-indicator paused" aria-hidden="true" title="Modo lectura"></span>
+                </span>
                 <span id="modeToggleLabel" class="mode-toggle-text">Edit</span>
                 <span class="mode-toggle-pill" aria-hidden="true"><span class="mode-toggle-knob"></span></span>
               </button>
@@ -1166,6 +1194,7 @@
       remotePullDeferred: false,
       remotePullMeta: null,
       lastRemotePollAt: 0,
+      lastPresenceWriteAt: 0,
       presenceUsers: [],
       sheetLoadToken: 0,
       pickerFolderStack: [{ id: "root", name: "Mi unidad" }],
@@ -1214,9 +1243,7 @@
       driveShell: document.getElementById("driveShell"),
       editorShell: document.getElementById("editorShell"),
       editorTitle: document.getElementById("editorTitle"),
-      editorStatus: document.getElementById("editorStatus"),
       saveIndicator: document.getElementById("saveIndicator"),
-      saveTimestamp: document.getElementById("saveTimestamp"),
       presenceAvatars: document.getElementById("presenceAvatars"),
       presencePopup: document.getElementById("presencePopup"),
       presencePopupList: document.getElementById("presencePopupList"),
@@ -1252,9 +1279,8 @@
       els.driveStatus.textContent = text || "";
       els.driveStatus.classList.toggle("hidden", !text);
     }
-    function setEditorStatus(text, tone) {
-      els.editorStatus.textContent = text || "";
-      els.editorStatus.className = "save-status-text" + (tone ? " " + tone : "");
+    function setEditorStatus(text) {
+      els.modeToggleBtn.title = text || (els.saveIndicator ? (els.saveIndicator.title || "") : "");
     }
     function formatSavedTime(timestamp) {
       if (!timestamp) return "";
@@ -1265,26 +1291,27 @@
       }
     }
     function setSaveState(stateName, text) {
-      els.saveIndicator.className = "save-indicator " + (stateName || "paused");
-      setEditorStatus(
-        text || "",
-        stateName === "error"
-          ? "error"
-          : (stateName === "dirty" || stateName === "saving" || stateName === "syncing" ? "warn" : "")
-      );
-      if (stateName === "saved" && state.lastSavedAt) {
-        els.saveTimestamp.textContent = "Ult. guardado " + formatSavedTime(state.lastSavedAt);
-      } else if (stateName === "saving") {
-        els.saveTimestamp.textContent = "Autosave activo";
-      } else if (stateName === "syncing") {
-        els.saveTimestamp.textContent = "Sincronizando cambios remotos";
-      } else if (stateName === "dirty") {
-        els.saveTimestamp.textContent = "Guardado automatico pendiente";
-      } else if (stateName === "error") {
-        els.saveTimestamp.textContent = "Reintentando al siguiente cambio";
-      } else {
-        els.saveTimestamp.textContent = "";
+      const nextState = stateName || "paused";
+      let statusLabel = text || "";
+      els.saveIndicator.className = "save-indicator " + nextState;
+      if (!statusLabel) {
+        if (nextState === "saved" && state.lastSavedAt) {
+          statusLabel = "Guardado a las " + formatSavedTime(state.lastSavedAt);
+        } else if (nextState === "dirty") {
+          statusLabel = "Cambios sin guardar";
+        } else if (nextState === "saving") {
+          statusLabel = "Guardando";
+        } else if (nextState === "syncing") {
+          statusLabel = "Sincronizando";
+        } else if (nextState === "error") {
+          statusLabel = "Error al guardar";
+        } else {
+          statusLabel = "Listo";
+        }
       }
+      els.saveIndicator.title = statusLabel;
+      els.saveIndicator.setAttribute("aria-label", statusLabel);
+      els.modeToggleBtn.title = statusLabel;
     }
     function setPickerStatus(text, tone) {
       els.newSheetPickerStatus.textContent = text || "";
@@ -1364,6 +1391,22 @@
       return "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) +
         "?supportsAllDrives=true&fields=" + encodeURIComponent(fields.join(","));
     }
+    function updateKnownDriveMeta(meta, options) {
+      const config = options || {};
+      if (!meta) return;
+      if (meta.modifiedTime) {
+        state.lastKnownModifiedTime = Date.parse(meta.modifiedTime) || state.lastKnownModifiedTime || 0;
+      }
+      if (meta.headRevisionId !== undefined) {
+        state.lastKnownRevisionId = meta.headRevisionId || "";
+      }
+      if (meta.name) {
+        state.lastKnownFileName = meta.name;
+      }
+      if (config.markPresenceWrite) {
+        state.lastPresenceWriteAt = state.lastKnownModifiedTime || Date.now();
+      }
+    }
     function fetchSpreadsheetDocumentMeta(id) {
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) +
@@ -1395,10 +1438,9 @@
         state.savedSpreadsheetTitle = remoteTitle;
         state.titleDirty = false;
       }
-      state.lastKnownFileName = remoteTitle;
       state.lastSavedAt = file.modifiedTime ? Date.parse(file.modifiedTime) || state.lastSavedAt || 0 : state.lastSavedAt;
-      state.lastKnownModifiedTime = file.modifiedTime ? Date.parse(file.modifiedTime) || 0 : state.lastKnownModifiedTime;
-      state.lastKnownRevisionId = file.headRevisionId || state.lastKnownRevisionId || "";
+      updateKnownDriveMeta(file);
+      state.lastKnownFileName = remoteTitle;
       state.canEdit = !!(file.capabilities && file.capabilities.canEdit);
       state.spreadsheetSheets = (sheet.sheets || []).map(function (entry) {
         const props = entry.properties || {};
@@ -1445,8 +1487,10 @@
       const modified = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
       return modified > state.lastKnownModifiedTime || (meta.headRevisionId || "") !== state.lastKnownRevisionId;
     }
-    async function flushDeferredRemotePull() {
+    async function flushDeferredRemotePull(options) {
+      const config = options || {};
       if (!state.remotePullDeferred || hasUnsyncedLocalChanges() || state.collabPullInProgress || !state.spreadsheetId) return false;
+      if (!config.force && state.editorMode === "edit" && state.canEdit) return false;
       const meta = state.remotePullMeta;
       clearDeferredRemotePull();
       await pullRemoteChanges(meta || null);
@@ -2086,13 +2130,15 @@
       patch.appProperties[getPresenceFieldKey(prefix, "c")] = clampPresenceValue(getPresenceClientId(), 24);
       patch.appProperties[getPresenceFieldKey(prefix, "h")] = String(now);
       return fetchJson(
-        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id",
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id,name,modifiedTime,headRevisionId",
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(patch)
         }
-      ).catch(function (err) {
+      ).then(function (meta) {
+        updateKnownDriveMeta(meta, { markPresenceWrite: true });
+      }).catch(function (err) {
         console.warn("Presence ping failed:", err);
       });
     }
@@ -2105,13 +2151,15 @@
       };
       patch.appProperties[getPresenceFieldKey(prefix, "h")] = String(Date.now());
       fetchJson(
-        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id",
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id,name,modifiedTime,headRevisionId",
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(patch)
         }
-      ).catch(function () {
+      ).then(function (meta) {
+        updateKnownDriveMeta(meta, { markPresenceWrite: true });
+      }).catch(function () {
       }).finally(function () {
         presenceHeartbeatInFlight = false;
       });
@@ -2301,6 +2349,8 @@
       els.sheetTabs.innerHTML = "";
       closeTabMenu();
       state.spreadsheetSheets.forEach(function (sheet) {
+        const shell = document.createElement("div");
+        shell.className = "tab-shell";
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "tab" + (sheet.title === state.currentSheetTitle ? " active" : "");
@@ -2313,24 +2363,43 @@
             event.preventDefault();
             startInlineTabRename(btn, sheet);
           });
-          var dots = document.createElement("span");
+          var dots = document.createElement("button");
+          dots.type = "button";
           dots.className = "tab-dots";
           dots.textContent = "\u2026";
+          dots.setAttribute("aria-label", "Opciones de " + sheet.title);
+          dots.addEventListener("pointerdown", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          });
           dots.addEventListener("click", function (event) {
             event.stopPropagation();
-            openTabMenu(btn, sheet);
+            openTabMenu(shell, sheet);
           });
-          btn.appendChild(dots);
+          shell.appendChild(btn);
+          shell.appendChild(dots);
+        } else {
+          shell.appendChild(btn);
         }
-        els.sheetTabs.appendChild(btn);
+        els.sheetTabs.appendChild(shell);
       });
     }
     var activeTabMenu = null;
-    function openTabMenu(tabEl, sheet) {
+    function openTabMenu(tabShell, sheet) {
+      if (!tabShell || state.spreadsheetSheets.length <= 1) return;
+      if (activeTabMenu && activeTabMenu.sheetId === sheet.sheetId && activeTabMenu.container === tabShell) {
+        closeTabMenu();
+        return;
+      }
       closeTabMenu();
-      if (state.spreadsheetSheets.length <= 1) return;
       var menu = document.createElement("div");
       menu.className = "tab-menu";
+      menu.addEventListener("pointerdown", function (event) {
+        event.stopPropagation();
+      });
+      menu.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
       var del = document.createElement("button");
       del.className = "tab-menu-item";
       del.type = "button";
@@ -2341,21 +2410,23 @@
         deleteSheet(sheet);
       });
       menu.appendChild(del);
-      tabEl.appendChild(menu);
-      activeTabMenu = { el: menu, tab: tabEl };
+      tabShell.appendChild(menu);
+      tabShell.classList.add("menu-open");
+      activeTabMenu = { el: menu, container: tabShell, sheetId: sheet.sheetId };
       setTimeout(function () {
-        document.addEventListener("click", closeTabMenuOnOutside);
+        document.addEventListener("pointerdown", closeTabMenuOnOutside);
       }, 0);
     }
     function closeTabMenu() {
       if (activeTabMenu) {
+        activeTabMenu.container.classList.remove("menu-open");
         activeTabMenu.el.remove();
         activeTabMenu = null;
       }
-      document.removeEventListener("click", closeTabMenuOnOutside);
+      document.removeEventListener("pointerdown", closeTabMenuOnOutside);
     }
     function closeTabMenuOnOutside(event) {
-      if (activeTabMenu && !activeTabMenu.tab.contains(event.target)) {
+      if (activeTabMenu && !activeTabMenu.container.contains(event.target)) {
         closeTabMenu();
       }
     }
@@ -2679,6 +2750,7 @@
       state.collabPollInProgress = false;
       state.collabPullInProgress = false;
       state.lastRemotePollAt = 0;
+      state.lastPresenceWriteAt = 0;
       state.presenceUsers = [];
       state.sheetLoadToken = 0;
       renderPresenceAvatars([]);
@@ -2768,9 +2840,7 @@
     }
     function refreshRemoteMeta() {
       return fetchJson(spreadsheetFileMetaUrl()).then(function (meta) {
-        state.lastKnownModifiedTime = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
-        state.lastKnownRevisionId = meta.headRevisionId || "";
-        state.lastKnownFileName = meta.name || state.lastKnownFileName;
+        updateKnownDriveMeta(meta);
         if (meta.appProperties) updatePresenceFromProps(meta.appProperties);
         return meta;
       });
@@ -2807,7 +2877,7 @@
           state.lastRemotePollAt = Date.now();
           if (meta.appProperties) updatePresenceFromProps(meta.appProperties);
           if (remoteMetaChanged(meta)) {
-            if (hasUnsyncedLocalChanges()) {
+            if ((state.editorMode === "edit" && state.canEdit) || hasUnsyncedLocalChanges()) {
               deferRemotePull(meta);
               return false;
             }
@@ -3027,6 +3097,7 @@
           if (!ok && hasPendingChanges()) return;
           state.editorMode = "read";
           applyEditorMode();
+          return flushDeferredRemotePull({ force: true });
         });
       }
       state.editorMode = "edit";
@@ -3116,6 +3187,7 @@
         state.remotePullDeferred = false;
         state.remotePullMeta = null;
         state.lastRemotePollAt = 0;
+        state.lastPresenceWriteAt = 0;
         state.presenceUsers = [];
         state.sheetLoadToken = 0;
         state.pickerFolderStack = [{ id: "root", name: "Mi unidad" }];
