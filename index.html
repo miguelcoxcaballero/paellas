@@ -479,8 +479,21 @@
     .mode-toggle-btn.is-editing .mode-toggle-pill { background: var(--accent); }
     .mode-toggle-btn.is-editing .mode-toggle-knob { transform: translateX(18px); }
     .editor-tabs { min-height: 0; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
-    .sheet-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
-    .sheet-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .sheet-bar { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .add-sheet-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      line-height: 1;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      transition: background .15s ease, color .15s ease;
+    }
+    .add-sheet-btn:hover { background: rgba(0,0,0,0.06); color: var(--ink); }
+    .add-sheet-btn:disabled { opacity: .35; cursor: not-allowed; }
     #editorView.read-only .doc-title { cursor: default; background: transparent; }
     #editorView.read-only .cell { cursor: default; color: var(--muted); background: rgba(0,0,0,0.02); }
     .sheet-wrap {
@@ -604,7 +617,6 @@
       .editor-head-top, .editor-title-side, .editor-actions { display: grid; grid-template-columns: 1fr; }
       .save-stack { justify-items: start; min-width: 0; }
       .doc-title { max-width: 100%; }
-      .sheet-tools { justify-content: flex-start; }
       .profile-menu { left: auto; right: 0; max-width: min(92vw, 280px); }
       table { width: max(100%, 760px); min-width: 760px; }
       .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
@@ -684,14 +696,12 @@
         <div class="editor-head">
           <div class="editor-head-top">
             <div class="editor-title-side">
-              <button id="backBtn" class="btn small" type="button">Volver</button>
               <div class="editor-doc">
                 <div id="editorTitle" class="doc-title" role="textbox" aria-label="Nombre del archivo" contenteditable="true" spellcheck="false">Hoja</div>
-                <div id="editorSubtitle" class="meta">Editor simple embebido</div>
               </div>
             </div>
             <div class="editor-actions">
-              <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8'/><polyline points='16 6 12 2 8 6'/><line x1='12' y1='2' x2='12' y2='15'/></svg></button>
+              <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg></button>
               <div class="save-stack">
                 <div class="save-line">
                   <span id="saveIndicator" class="save-indicator paused" aria-hidden="true"></span>
@@ -707,9 +717,7 @@
           </div>
           <div class="sheet-bar">
             <div id="sheetTabs" class="tabs editor-tabs"></div>
-            <div class="sheet-tools">
-              <button id="addSheetTabBtn" class="sheet-tool-btn" type="button">Nueva sheet</button>
-            </div>
+            <button id="addSheetTabBtn" class="add-sheet-btn" type="button" aria-label="Nueva sheet">+</button>
           </div>
         </div>
       </section>
@@ -876,7 +884,6 @@
       driveShell: document.getElementById("driveShell"),
       editorShell: document.getElementById("editorShell"),
       editorTitle: document.getElementById("editorTitle"),
-      editorSubtitle: document.getElementById("editorSubtitle"),
       editorStatus: document.getElementById("editorStatus"),
       saveIndicator: document.getElementById("saveIndicator"),
       saveTimestamp: document.getElementById("saveTimestamp"),
@@ -888,7 +895,6 @@
       sheetWrap: document.getElementById("sheetWrap"),
       sheetSpacer: document.getElementById("sheetSpacer"),
       sheetGrid: document.getElementById("sheetGrid"),
-      backBtn: document.getElementById("backBtn"),
       nameModal: document.getElementById("nameModal"),
       nameModalCard: document.getElementById("nameModalCard"),
       nameModalTitle: document.getElementById("nameModalTitle"),
@@ -1460,7 +1466,6 @@
       html.push("</tbody>");
       els.sheetGrid.innerHTML = html.join("");
       syncEditorTitle();
-      els.editorSubtitle.textContent = info.title;
       applyEditorMode();
     }
     function loadProfile() {
@@ -2057,7 +2062,6 @@
       }
       showView("drive");
     });
-    els.backBtn.addEventListener("click", returnToDrive);
     els.modeToggleBtn.addEventListener("click", toggleEditorMode);
     els.shareDocBtn.addEventListener("click", openShareModal);
     els.addSheetTabBtn.addEventListener("click", function () {
