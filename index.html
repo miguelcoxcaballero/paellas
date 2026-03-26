@@ -211,9 +211,9 @@
     }
     .item:hover { box-shadow: 0 4px 16px rgba(104,70,5,0.10); transform: translateY(-1px); }
     .btn:hover { transform: translateY(-1px); }
-    .item-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .item-row { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; overflow: hidden; }
     .item-icon { width: 24px; height: 24px; flex: 0 0 24px; color: var(--accent); }
-    .shared-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); opacity: 0.6; }
+    .shared-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); opacity: 0.6; margin-left: auto; }
     .title { font-size: 0.92rem; font-weight: 600; line-height: 1.2; min-width: 0; }
     .item .title {
       overflow: hidden;
@@ -449,9 +449,196 @@
     .save-indicator.dirty { background: var(--warn); }
     .save-indicator.saving { background: var(--accent); }
     .save-indicator.saved { background: var(--good); }
+    .save-indicator.syncing { background: #4a90d9; }
     .save-indicator.error { background: var(--bad); }
     .save-status-text { font-size: .84rem; color: var(--muted); white-space: nowrap; }
     .save-time { font-size: .72rem; color: var(--muted); opacity: .68; min-height: 14px; }
+    .presence-avatars {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      padding-left: 4px;
+      cursor: pointer;
+    }
+    .presence-avatars:empty { display: none; }
+    .presence-avatar-wrapper {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-left: -8px;
+      flex-shrink: 0;
+      transition: transform .15s ease;
+    }
+    .presence-avatar-wrapper:first-child,
+    .presence-overflow:first-child { margin-left: 0; }
+    .presence-avatar-wrapper:hover { transform: scale(1.08); }
+    .presence-avatar-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--bg2);
+      background: var(--paper);
+      object-fit: cover;
+      display: block;
+    }
+    .presence-device-badge {
+      position: absolute;
+      right: 0;
+      bottom: -2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: 1.5px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .presence-device-badge svg {
+      width: 7px;
+      height: 7px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+    }
+    .presence-device-badge.live {
+      background: var(--good);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+    .presence-device-badge.live svg { stroke: #fff; }
+    .presence-overflow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: 2px solid var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: -8px;
+      flex-shrink: 0;
+    }
+    .presence-popup {
+      position: fixed;
+      width: min(420px, calc(100vw - 24px));
+      max-height: min(70vh, 560px);
+      background: var(--paper);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      z-index: 2200;
+      overflow: hidden;
+    }
+    .presence-popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    .presence-popup-close {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .presence-popup-close:hover { background: rgba(0, 0, 0, 0.1); }
+    .presence-popup-list {
+      max-height: min(62vh, 500px);
+      overflow: auto;
+      padding: 8px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .presence-popup-empty {
+      padding: 8px 4px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    .presence-account {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255, 248, 214, 0.56);
+    }
+    .presence-account-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .presence-account-photo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+    }
+    .presence-account-name {
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .presence-account-email {
+      font-size: .76rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .presence-device-list {
+      display: flex;
+      flex-direction: column;
+    }
+    .presence-device-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--line);
+    }
+    .presence-device-row:first-child { border-top: none; }
+    .presence-device-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+    .presence-device-icon svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+    }
+    .presence-device-main {
+      font-size: .8rem;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .presence-device-meta {
+      font-size: .74rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
     .mode-toggle-btn {
       display: inline-grid;
       grid-template-columns: auto 38px;
@@ -812,6 +999,7 @@
               </div>
             </div>
             <div class="editor-actions">
+              <div id="presenceAvatars" class="presence-avatars" aria-label="Dispositivos conectados"></div>
               <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg></button>
               <div class="save-stack">
                 <div class="save-line">
@@ -839,6 +1027,14 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div id="presencePopup" class="presence-popup hidden" role="dialog" aria-modal="false" aria-label="Actividad del documento">
+    <div class="presence-popup-header">
+      <span>Dispositivos conectados</span>
+      <button id="presencePopupCloseBtn" class="presence-popup-close" type="button" aria-label="Cerrar lista de actividad">&times;</button>
+    </div>
+    <div id="presencePopupList" class="presence-popup-list"></div>
   </div>
 
   <div id="newSheetModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="newSheetModalTitle">
@@ -924,6 +1120,18 @@
     const VIEW_BUFFER_COLS = 6;
     const LOAD_BUFFER_ROWS = 30;
     const LOAD_BUFFER_COLS = 10;
+    const COLLAB_POLL_INTERVAL = 1500;
+    const PRESENCE_PING_INTERVAL = 120000;
+    const PRESENCE_HEARTBEAT_INTERVAL = 4000;
+    const PRESENCE_STALE_MS = 45000;
+    const PRESENCE_ONLINE_MS = 12000;
+    const PRESENCE_FIELD_SUFFIXES = ["n", "e", "p", "t", "d", "v", "l", "c", "h"];
+    const PRESENCE_CLIENT_ID_KEY = "paellas-presence-client-id-v1";
+
+    let presencePingTimer = 0;
+    let presenceHeartbeatTimer = 0;
+    let presenceHeartbeatInFlight = false;
+    let presenceClientIdMemory = "";
 
     const state = {
       tokenClient: null,
@@ -951,6 +1159,15 @@
       lastKnownRevisionId: "",
       lastKnownModifiedTime: 0,
       lastKnownFileName: "",
+      collabEnabled: false,
+      collabPollInterval: 0,
+      collabPollInProgress: false,
+      collabPullInProgress: false,
+      remotePullDeferred: false,
+      remotePullMeta: null,
+      lastRemotePollAt: 0,
+      presenceUsers: [],
+      sheetLoadToken: 0,
       pickerFolderStack: [{ id: "root", name: "Mi unidad" }],
       pickerFolders: [],
       profileMenuOpen: false
@@ -1000,6 +1217,10 @@
       editorStatus: document.getElementById("editorStatus"),
       saveIndicator: document.getElementById("saveIndicator"),
       saveTimestamp: document.getElementById("saveTimestamp"),
+      presenceAvatars: document.getElementById("presenceAvatars"),
+      presencePopup: document.getElementById("presencePopup"),
+      presencePopupList: document.getElementById("presencePopupList"),
+      presencePopupCloseBtn: document.getElementById("presencePopupCloseBtn"),
       modeToggleBtn: document.getElementById("modeToggleBtn"),
       modeToggleLabel: document.getElementById("modeToggleLabel"),
       shareDocBtn: document.getElementById("shareDocBtn"),
@@ -1045,11 +1266,18 @@
     }
     function setSaveState(stateName, text) {
       els.saveIndicator.className = "save-indicator " + (stateName || "paused");
-      setEditorStatus(text || "", stateName === "error" ? "error" : (stateName === "dirty" || stateName === "saving" ? "warn" : ""));
+      setEditorStatus(
+        text || "",
+        stateName === "error"
+          ? "error"
+          : (stateName === "dirty" || stateName === "saving" || stateName === "syncing" ? "warn" : "")
+      );
       if (stateName === "saved" && state.lastSavedAt) {
         els.saveTimestamp.textContent = "Ult. guardado " + formatSavedTime(state.lastSavedAt);
       } else if (stateName === "saving") {
         els.saveTimestamp.textContent = "Autosave activo";
+      } else if (stateName === "syncing") {
+        els.saveTimestamp.textContent = "Sincronizando cambios remotos";
       } else if (stateName === "dirty") {
         els.saveTimestamp.textContent = "Guardado automatico pendiente";
       } else if (stateName === "error") {
@@ -1119,6 +1347,110 @@
       });
       renderItems();
       renderSharedItems();
+    }
+    function spreadsheetFileMetaUrl(extraFields) {
+      const fields = [
+        "id",
+        "name",
+        "mimeType",
+        "modifiedTime",
+        "headRevisionId",
+        "capabilities(canEdit)",
+        "appProperties"
+      ];
+      (extraFields || []).forEach(function (field) {
+        if (fields.indexOf(field) === -1) fields.push(field);
+      });
+      return "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) +
+        "?supportsAllDrives=true&fields=" + encodeURIComponent(fields.join(","));
+    }
+    function fetchSpreadsheetDocumentMeta(id) {
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) +
+        "?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,headRevisionId,capabilities(canEdit),appProperties"
+      ).then(function (file) {
+        if (!file || file.mimeType !== "application/vnd.google-apps.spreadsheet") {
+          throw new Error("El archivo seleccionado no es un Google Sheets valido.");
+        }
+        return fetchJson(
+          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(id) +
+          "?includeGridData=false&fields=properties(title),sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))"
+        ).then(function (sheet) {
+          return { file: file, sheet: sheet };
+        });
+      });
+    }
+    function applySpreadsheetDocumentMeta(meta, options) {
+      const config = options || {};
+      const file = meta && meta.file ? meta.file : {};
+      const sheet = meta && meta.sheet ? meta.sheet : {};
+      const remoteTitle = normalizeTitle(
+        file.name ||
+        (sheet.properties && sheet.properties.title) ||
+        state.spreadsheetTitle ||
+        "Hoja"
+      );
+      if (!config.preserveDirtyTitle || !state.titleDirty) {
+        state.spreadsheetTitle = remoteTitle;
+        state.savedSpreadsheetTitle = remoteTitle;
+        state.titleDirty = false;
+      }
+      state.lastKnownFileName = remoteTitle;
+      state.lastSavedAt = file.modifiedTime ? Date.parse(file.modifiedTime) || state.lastSavedAt || 0 : state.lastSavedAt;
+      state.lastKnownModifiedTime = file.modifiedTime ? Date.parse(file.modifiedTime) || 0 : state.lastKnownModifiedTime;
+      state.lastKnownRevisionId = file.headRevisionId || state.lastKnownRevisionId || "";
+      state.canEdit = !!(file.capabilities && file.capabilities.canEdit);
+      state.spreadsheetSheets = (sheet.sheets || []).map(function (entry) {
+        const props = entry.properties || {};
+        return {
+          sheetId: props.sheetId,
+          title: props.title || "Sheet",
+          rowCount: props.gridProperties ? props.gridProperties.rowCount : 1000,
+          columnCount: props.gridProperties ? props.gridProperties.columnCount : 26
+        };
+      });
+      if (!state.spreadsheetSheets.length) {
+        state.currentSheetTitle = "";
+      } else if (!state.currentSheetTitle || !state.spreadsheetSheets.some(function (sheetInfo) { return sheetInfo.title === state.currentSheetTitle; })) {
+        state.currentSheetTitle = state.spreadsheetSheets[0].title;
+      }
+      syncEditorTitle();
+      renderTabs();
+      if (!config.skipApplyMode) applyEditorMode();
+      if (file.appProperties) updatePresenceFromProps(file.appProperties);
+      return meta;
+    }
+    function hasUnsyncedLocalChanges() {
+      return !!(state.saveInFlight || state.saveQueued || hasPendingChanges());
+    }
+    function deferRemotePull(meta) {
+      state.remotePullDeferred = true;
+      if (!meta) return;
+      if (!state.remotePullMeta) {
+        state.remotePullMeta = meta;
+        return;
+      }
+      const currentModified = state.remotePullMeta.modifiedTime ? Date.parse(state.remotePullMeta.modifiedTime) || 0 : 0;
+      const nextModified = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
+      if (nextModified >= currentModified) {
+        state.remotePullMeta = meta;
+      }
+    }
+    function clearDeferredRemotePull() {
+      state.remotePullDeferred = false;
+      state.remotePullMeta = null;
+    }
+    function shouldApplyRemoteMeta(meta) {
+      if (!meta) return false;
+      const modified = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
+      return modified > state.lastKnownModifiedTime || (meta.headRevisionId || "") !== state.lastKnownRevisionId;
+    }
+    async function flushDeferredRemotePull() {
+      if (!state.remotePullDeferred || hasUnsyncedLocalChanges() || state.collabPullInProgress || !state.spreadsheetId) return false;
+      const meta = state.remotePullMeta;
+      clearDeferredRemotePull();
+      await pullRemoteChanges(meta || null);
+      return true;
     }
     function ensureSheetState(title) {
       if (!state.sheetData[title]) state.sheetData[title] = {};
@@ -1392,6 +1724,7 @@
       els.editorView.classList.toggle("hidden", name !== "editor");
       els.profileBox.classList.toggle("hidden", name === "login" || !state.accessToken);
       if (name !== "drive") closeProfileMenu();
+      if (name !== "editor") closePresencePopup();
     }
     function escapeHtml(value) {
       return String(value || "")
@@ -1413,6 +1746,411 @@
       });
     }
     function fetchJson(url, options) { return authFetch(url, options).then(function (res) { return res.json(); }); }
+    function simpleHash(value) {
+      let hash = 0;
+      const input = String(value || "");
+      for (let i = 0; i < input.length; i += 1) {
+        hash = ((hash << 5) - hash + input.charCodeAt(i)) | 0;
+      }
+      return Math.abs(hash).toString(36).slice(0, 8);
+    }
+    function clampPresenceValue(value, maxLen) {
+      const text = String(value || "").trim();
+      const limit = Number(maxLen) || 120;
+      if (!text) return "";
+      return text.length > limit ? text.slice(0, limit) : text;
+    }
+    function normalizePresenceDeviceType(value) {
+      const device = String(value || "").trim().toLowerCase();
+      if (device === "mobile" || device === "tablet" || device === "pc") return device;
+      return "pc";
+    }
+    function detectDeviceType() {
+      const ua = navigator.userAgent || "";
+      if (/iPad|tablet|PlayBook/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua) && screen.width >= 768)) return "tablet";
+      if (/Mobi|Android.*Mobile|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return "mobile";
+      return "pc";
+    }
+    function detectDeviceLabel() {
+      const ua = navigator.userAgent || "";
+      const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+      if (/iPhone/i.test(ua)) return "iPhone";
+      if (/iPad/i.test(ua)) return "iPad";
+      if (/Android/i.test(ua)) return "Android";
+      if (/Windows/i.test(platform)) return "Windows PC";
+      if (/Mac/i.test(platform)) return "Mac";
+      if (/Linux/i.test(platform)) return "Linux PC";
+      return platform || "PC";
+    }
+    function detectPresenceLocationLabel() {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      let region = "";
+      try {
+        const locale = new Intl.Locale(navigator.language || "");
+        region = locale.region || "";
+      } catch (err) {}
+      if (region && tz) return region + " · " + tz;
+      return tz || region || "Desconocida";
+    }
+    function getPresenceClientId() {
+      if (presenceClientIdMemory) return presenceClientIdMemory;
+      let existing = "";
+      try {
+        existing = localStorage.getItem(PRESENCE_CLIENT_ID_KEY) || "";
+      } catch (err) {}
+      if (!existing) {
+        existing = "c" + Math.random().toString(36).slice(2, 10);
+        try {
+          localStorage.setItem(PRESENCE_CLIENT_ID_KEY, existing);
+        } catch (err) {}
+      }
+      presenceClientIdMemory = existing;
+      return existing;
+    }
+    function getPresenceKey() {
+      const email = ((state.currentUser && state.currentUser.emailAddress) || "anon").toLowerCase().trim();
+      return "p_" + simpleHash(email + ":" + getPresenceClientId());
+    }
+    function getPresenceFieldKey(prefix, suffix) {
+      return prefix + "_" + suffix;
+    }
+    function parsePresenceChunkKey(key) {
+      const match = /^((?:p_[a-z0-9]+))_([nedtvlchp])$/i.exec(key || "");
+      if (!match) return null;
+      return { prefix: match[1], field: match[2].toLowerCase() };
+    }
+    function getPresenceFreshnessTs(chunk) {
+      const heartbeat = Number(chunk && chunk.h);
+      const updated = Number(chunk && chunk.t);
+      if (Number.isFinite(heartbeat) && Number.isFinite(updated)) return Math.max(heartbeat, updated);
+      if (Number.isFinite(heartbeat)) return heartbeat;
+      if (Number.isFinite(updated)) return updated;
+      return 0;
+    }
+    function buildPresenceRecordFromChunk(chunk, now) {
+      const freshness = getPresenceFreshnessTs(chunk);
+      if (!freshness || now - freshness > PRESENCE_STALE_MS) return null;
+      const email = clampPresenceValue(chunk.e || "", 120);
+      const name = clampPresenceValue(chunk.n || "", 80);
+      const clientId = clampPresenceValue(chunk.c || "", 24);
+      if (!email && !name) return null;
+      if (clientId && clientId === getPresenceClientId()) return null;
+      return {
+        n: name,
+        e: email,
+        p: clampPresenceValue(chunk.p || "", 180),
+        d: normalizePresenceDeviceType(chunk.d),
+        v: clampPresenceValue(chunk.v || "", 80),
+        l: clampPresenceValue(chunk.l || "", 80),
+        c: clientId,
+        t: Number(chunk.t) || freshness,
+        h: Number(chunk.h) || 0,
+        isOnline: freshness ? (now - freshness) <= PRESENCE_ONLINE_MS : false
+      };
+    }
+    function getPresenceDedupeKey(record) {
+      const email = String(record.e || "").trim().toLowerCase();
+      const name = String(record.n || "").trim().toLowerCase();
+      const deviceName = String(record.v || "").trim().toLowerCase();
+      return (email || name || "anon") + "|" + normalizePresenceDeviceType(record.d) + "|" + deviceName + "|" + String(record.c || "");
+    }
+    function dedupePresenceRecords(records) {
+      const grouped = new Map();
+      (records || []).forEach(function (record) {
+        if (!record) return;
+        const key = getPresenceDedupeKey(record);
+        const prev = grouped.get(key);
+        if (!prev || (Number(record.t) || 0) >= (Number(prev.t) || 0)) {
+          grouped.set(key, record);
+        }
+      });
+      return Array.from(grouped.values()).sort(function (a, b) {
+        if (Boolean(a.isOnline) !== Boolean(b.isOnline)) return a.isOnline ? -1 : 1;
+        return (Number(b.t) || 0) - (Number(a.t) || 0);
+      });
+    }
+    function getDeviceBadgeSvg(deviceType) {
+      if (deviceType === "mobile") {
+        return "<svg viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round'><rect x='7' y='2' width='10' height='20' rx='2'></rect><line x1='12' y1='18' x2='12' y2='18.01'></line></svg>";
+      }
+      if (deviceType === "tablet") {
+        return "<svg viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='2' width='16' height='20' rx='2'></rect><line x1='12' y1='18' x2='12' y2='18.01'></line></svg>";
+      }
+      return "<svg viewBox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='3' width='20' height='14' rx='2'></rect><line x1='8' y1='21' x2='16' y2='21'></line><line x1='12' y1='17' x2='12' y2='21'></line></svg>";
+    }
+    function formatPresenceLastActivity(timestamp) {
+      const time = Number(timestamp) || 0;
+      if (!time) return "desconocida";
+      const diffSeconds = Math.max(0, Math.floor((Date.now() - time) / 1000));
+      if (diffSeconds < 60) return "hace menos de 1 min";
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      if (diffMinutes < 60) return "hace " + diffMinutes + " min";
+      const diffHours = Math.floor(diffMinutes / 60);
+      if (diffHours < 24) return "hace " + diffHours + " h";
+      return "hace " + Math.floor(diffHours / 24) + " d";
+    }
+    function renderPresenceAvatars(users) {
+      if (!els.presenceAvatars) return;
+      const avatarFallback = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+      els.presenceAvatars.innerHTML = "";
+      if (!users || !users.length) {
+        els.presenceAvatars.classList.remove("popup-open");
+        return;
+      }
+      const maxShown = Math.min(3, users.length);
+      const overflow = users.length > 3 ? users.length - 3 : 0;
+      if (overflow > 0) {
+        const badge = document.createElement("div");
+        badge.className = "presence-overflow";
+        badge.textContent = "+" + overflow;
+        els.presenceAvatars.appendChild(badge);
+      }
+      const visibleUsers = users.slice(0, maxShown).reverse();
+      visibleUsers.forEach(function (user) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "presence-avatar-wrapper";
+        wrapper.title = (user.n || user.e || "Usuario") + (user.v ? " · " + user.v : "");
+        const img = document.createElement("img");
+        img.className = "presence-avatar-img";
+        img.src = user.p || avatarFallback;
+        img.alt = user.n || user.e || "Usuario";
+        img.onerror = function () { img.src = avatarFallback; };
+        const deviceBadge = document.createElement("div");
+        deviceBadge.className = "presence-device-badge" + (user.isOnline ? " live" : "");
+        deviceBadge.innerHTML = getDeviceBadgeSvg(user.d || "pc");
+        wrapper.appendChild(img);
+        wrapper.appendChild(deviceBadge);
+        wrapper.title = String(wrapper.title || "").replace("Â·", "-").replace("·", "-");
+        els.presenceAvatars.appendChild(wrapper);
+      });
+    }
+    function groupPresenceByAccount(users) {
+      const grouped = new Map();
+      (users || []).forEach(function (user, index) {
+        const email = String(user.e || "").trim();
+        const key = email ? ("e:" + email.toLowerCase()) : ("n:" + String(user.n || "usuario").trim().toLowerCase() + ":" + index);
+        if (!grouped.has(key)) {
+          grouped.set(key, {
+            name: user.n || email || "Usuario",
+            email: email,
+            photo: user.p || "",
+            lastActivity: Number(user.t) || 0,
+            hasOnline: Boolean(user.isOnline),
+            devices: []
+          });
+        }
+        const account = grouped.get(key);
+        account.lastActivity = Math.max(account.lastActivity, Number(user.t) || 0);
+        account.hasOnline = account.hasOnline || Boolean(user.isOnline);
+        if (!account.photo && user.p) account.photo = user.p;
+        account.devices.push({
+          type: normalizePresenceDeviceType(user.d),
+          deviceName: user.v || "",
+          location: user.l || "",
+          lastActivity: Number(user.t) || 0,
+          isOnline: Boolean(user.isOnline)
+        });
+      });
+      return Array.from(grouped.values()).sort(function (a, b) {
+        if (Boolean(a.hasOnline) !== Boolean(b.hasOnline)) return a.hasOnline ? -1 : 1;
+        return b.lastActivity - a.lastActivity;
+      });
+    }
+    function renderPresencePopup(users) {
+      if (!els.presencePopupList) return;
+      const avatarFallback = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+      els.presencePopupList.innerHTML = "";
+      const grouped = groupPresenceByAccount(users);
+      if (!grouped.length) {
+        const empty = document.createElement("div");
+        empty.className = "presence-popup-empty";
+        empty.textContent = "No hay actividad reciente.";
+        els.presencePopupList.appendChild(empty);
+        return;
+      }
+      grouped.forEach(function (account) {
+        const card = document.createElement("div");
+        card.className = "presence-account";
+        const head = document.createElement("div");
+        head.className = "presence-account-head";
+        const img = document.createElement("img");
+        img.className = "presence-account-photo";
+        img.src = account.photo || avatarFallback;
+        img.alt = account.name || "Usuario";
+        img.onerror = function () { img.src = avatarFallback; };
+        const info = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "presence-account-name";
+        name.textContent = account.name || account.email || "Usuario";
+        const email = document.createElement("div");
+        email.className = "presence-account-email";
+        email.textContent = account.email || "Sin email";
+        info.appendChild(name);
+        info.appendChild(email);
+        head.appendChild(img);
+        head.appendChild(info);
+        card.appendChild(head);
+        const deviceList = document.createElement("div");
+        deviceList.className = "presence-device-list";
+        account.devices.forEach(function (device) {
+          const row = document.createElement("div");
+          row.className = "presence-device-row";
+          const icon = document.createElement("div");
+          icon.className = "presence-device-icon";
+          icon.innerHTML = getDeviceBadgeSvg(device.type || "pc");
+          const content = document.createElement("div");
+          const main = document.createElement("div");
+          main.className = "presence-device-main";
+          main.textContent = device.deviceName || (device.type === "mobile" ? "Movil" : (device.type === "tablet" ? "Tablet" : "PC"));
+          const meta = document.createElement("div");
+          meta.className = "presence-device-meta";
+          meta.textContent = (device.location || "Ubicacion desconocida") + " · Ultima actividad " + formatPresenceLastActivity(device.lastActivity);
+          content.appendChild(main);
+          content.appendChild(meta);
+          const absolute = device.lastActivity ? new Date(device.lastActivity).toLocaleString() : "desconocida";
+          meta.textContent = (device.location || "Ubicacion desconocida") + " - Ultima actividad " + formatPresenceLastActivity(device.lastActivity) + " (" + absolute + ")";
+          row.appendChild(icon);
+          row.appendChild(content);
+          deviceList.appendChild(row);
+        });
+        card.appendChild(deviceList);
+        els.presencePopupList.appendChild(card);
+      });
+    }
+    function positionPresencePopup() {
+      if (!els.presencePopup || els.presencePopup.classList.contains("hidden") || !els.presenceAvatars) return;
+      const anchorRect = els.presenceAvatars.getBoundingClientRect();
+      const popupRect = els.presencePopup.getBoundingClientRect();
+      const margin = 12;
+      let left = anchorRect.left;
+      let top = anchorRect.bottom + 10;
+      if (left + popupRect.width > window.innerWidth - margin) {
+        left = window.innerWidth - popupRect.width - margin;
+      }
+      if (left < margin) left = margin;
+      if (top + popupRect.height > window.innerHeight - margin) {
+        top = Math.max(margin, anchorRect.top - popupRect.height - 10);
+      }
+      els.presencePopup.style.left = Math.round(left) + "px";
+      els.presencePopup.style.top = Math.round(top) + "px";
+    }
+    function openPresencePopup() {
+      if (!els.presencePopup) return;
+      renderPresencePopup(state.presenceUsers || []);
+      els.presencePopup.classList.remove("hidden");
+      els.presenceAvatars.classList.add("popup-open");
+      requestAnimationFrame(positionPresencePopup);
+    }
+    function closePresencePopup() {
+      if (!els.presencePopup) return;
+      els.presencePopup.classList.add("hidden");
+      if (els.presenceAvatars) els.presenceAvatars.classList.remove("popup-open");
+    }
+    function updatePresenceFromProps(appProperties) {
+      const props = appProperties || {};
+      const chunks = new Map();
+      const now = Date.now();
+      Object.keys(props).forEach(function (key) {
+        if (!/^p_/i.test(key)) return;
+        const parsed = parsePresenceChunkKey(key);
+        if (!parsed) return;
+        if (!chunks.has(parsed.prefix)) chunks.set(parsed.prefix, {});
+        chunks.get(parsed.prefix)[parsed.field] = props[key];
+      });
+      const users = [];
+      chunks.forEach(function (chunk) {
+        const record = buildPresenceRecordFromChunk(chunk, now);
+        if (record) users.push(record);
+      });
+      state.presenceUsers = dedupePresenceRecords(users);
+      renderPresenceAvatars(state.presenceUsers);
+      if (els.presencePopup && !els.presencePopup.classList.contains("hidden")) {
+        renderPresencePopup(state.presenceUsers);
+        requestAnimationFrame(positionPresencePopup);
+      }
+    }
+    function pingPresence() {
+      if (!state.spreadsheetId || !state.accessToken || !state.currentUser) return Promise.resolve();
+      const prefix = getPresenceKey();
+      const now = Date.now();
+      const patch = {
+        appProperties: {}
+      };
+      patch.appProperties[getPresenceFieldKey(prefix, "n")] = clampPresenceValue(state.currentUser.displayName || "", 80);
+      patch.appProperties[getPresenceFieldKey(prefix, "e")] = clampPresenceValue(state.currentUser.emailAddress || "", 120);
+      patch.appProperties[getPresenceFieldKey(prefix, "p")] = clampPresenceValue(state.currentUser.photoLink || "", 180);
+      patch.appProperties[getPresenceFieldKey(prefix, "t")] = String(now);
+      patch.appProperties[getPresenceFieldKey(prefix, "d")] = clampPresenceValue(detectDeviceType(), 12);
+      patch.appProperties[getPresenceFieldKey(prefix, "v")] = clampPresenceValue(detectDeviceLabel(), 80);
+      patch.appProperties[getPresenceFieldKey(prefix, "l")] = clampPresenceValue(detectPresenceLocationLabel(), 80);
+      patch.appProperties[getPresenceFieldKey(prefix, "c")] = clampPresenceValue(getPresenceClientId(), 24);
+      patch.appProperties[getPresenceFieldKey(prefix, "h")] = String(now);
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patch)
+        }
+      ).catch(function (err) {
+        console.warn("Presence ping failed:", err);
+      });
+    }
+    function pulsePresenceHeartbeat() {
+      if (!state.spreadsheetId || !state.accessToken || !state.currentUser || presenceHeartbeatInFlight) return;
+      presenceHeartbeatInFlight = true;
+      const prefix = getPresenceKey();
+      const patch = {
+        appProperties: {}
+      };
+      patch.appProperties[getPresenceFieldKey(prefix, "h")] = String(Date.now());
+      fetchJson(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patch)
+        }
+      ).catch(function () {
+      }).finally(function () {
+        presenceHeartbeatInFlight = false;
+      });
+    }
+    function startPresencePing() {
+      if (presencePingTimer || presenceHeartbeatTimer) return;
+      pingPresence();
+      presencePingTimer = setInterval(pingPresence, PRESENCE_PING_INTERVAL);
+      presenceHeartbeatTimer = setInterval(pulsePresenceHeartbeat, PRESENCE_HEARTBEAT_INTERVAL);
+    }
+    function stopPresencePing() {
+      if (presencePingTimer) {
+        clearInterval(presencePingTimer);
+        presencePingTimer = 0;
+      }
+      if (presenceHeartbeatTimer) {
+        clearInterval(presenceHeartbeatTimer);
+        presenceHeartbeatTimer = 0;
+      }
+      presenceHeartbeatInFlight = false;
+    }
+    function clearPresence() {
+      if (!state.spreadsheetId || !state.accessToken || !state.currentUser) return Promise.resolve();
+      const prefix = getPresenceKey();
+      const patch = { appProperties: {} };
+      PRESENCE_FIELD_SUFFIXES.forEach(function (suffix) {
+        patch.appProperties[getPresenceFieldKey(prefix, suffix)] = null;
+      });
+      return authFetch(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) + "?supportsAllDrives=true&fields=id",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patch),
+          keepalive: true
+        }
+      ).catch(function () {
+      });
+    }
     function columnLabel(index) {
       let n = index + 1;
       let out = "";
@@ -1845,14 +2583,31 @@
         folderStack: cloneFolderStack(state.pickerFolderStack)
       });
     }
-    function loadSheet(title) {
+    function applyFetchedWindowData(title, loadWindow, rows, options) {
+      const config = options || {};
+      for (let r = 0; r < loadWindow.rows; r += 1) {
+        for (let c = 0; c < loadWindow.cols; c += 1) {
+          const rowIndex = loadWindow.startRow + r;
+          const colIndex = loadWindow.startCol + c;
+          if (config.preserveDirty && isCellDirty(title, rowIndex, colIndex)) continue;
+          const rowValues = rows[r] || [];
+          const value = c < rowValues.length ? rowValues[c] : "";
+          setCellValue(title, rowIndex, colIndex, value);
+        }
+      }
+    }
+    function loadSheet(title, options) {
+      const config = options || {};
       const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === title; });
       if (!info) return Promise.resolve();
-      setBusy(els.editorShell, true);
-      setEditorStatus("");
+      const requestId = ++state.sheetLoadToken;
+      if (!config.quiet) {
+        setBusy(els.editorShell, true);
+        setEditorStatus("");
+      }
       state.currentSheetTitle = title;
       ensureSheetState(title);
-      const loadWindow = computeWindow(info, true);
+      const loadWindow = clampWindow(info, config.loadWindow || computeWindow(info, true));
       state.sheetWindow[title] = clampWindow(info, {
         startRow: loadWindow.startRow,
         startCol: loadWindow.startCol,
@@ -1864,52 +2619,40 @@
         "/values:batchGet?ranges=" + encodeURIComponent(windowRange(title, loadWindow.startRow, loadWindow.startCol, loadWindow.rows, loadWindow.cols))
       )
         .then(function (data) {
+          if (requestId !== state.sheetLoadToken) return false;
           const valueRanges = Array.isArray(data.valueRanges) ? data.valueRanges : [];
           const firstRange = valueRanges[0] || {};
           const rows = firstRange.values || [];
-          const rowCount = rows.length;
-          let r;
-          let c;
-          for (r = 0; r < rowCount; r += 1) {
-            for (c = 0; c < (rows[r] || []).length; c += 1) {
-              setCellValue(title, loadWindow.startRow + r, loadWindow.startCol + c, rows[r][c]);
-            }
-          }
+          applyFetchedWindowData(title, loadWindow, rows, {
+            preserveDirty: config.preserveDirty !== false
+          });
           renderTabs();
           renderGrid();
-          refreshDirtyState();
+          if (!config.skipDirtyState) refreshDirtyState();
+          return true;
         })
         .catch(function (err) {
           console.error(err);
           setEditorStatus(messageFromError(err, "No se ha podido cargar la hoja"), "error");
+          return false;
         })
         .finally(function () {
-          setBusy(els.editorShell, false);
+          if (!config.quiet) {
+            setBusy(els.editorShell, false);
+          }
         });
     }
-    function loadSpreadsheetMeta(id) {
-      return fetchJson(
-        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) +
-        "?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,headRevisionId,capabilities(canEdit)"
-      ).then(function (file) {
-        if (!file || file.mimeType !== "application/vnd.google-apps.spreadsheet") {
-          throw new Error("El archivo seleccionado no es un Google Sheets valido.");
-        }
-        state.spreadsheetTitle = file.name || state.spreadsheetTitle;
-        state.savedSpreadsheetTitle = state.spreadsheetTitle;
-        state.lastKnownFileName = state.spreadsheetTitle;
-        state.titleDirty = false;
-        state.lastSavedAt = file.modifiedTime ? Date.parse(file.modifiedTime) || 0 : 0;
-        state.lastKnownModifiedTime = state.lastSavedAt;
-        state.lastKnownRevisionId = file.headRevisionId || "";
-        state.canEdit = !!(file.capabilities && file.capabilities.canEdit);
-        return fetchJson(
-          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(id) +
-          "?includeGridData=false&fields=properties(title),sheets(properties(sheetId,title,gridProperties(rowCount,columnCount)))"
-        );
+    function loadSpreadsheetMeta(id, options) {
+      return fetchSpreadsheetDocumentMeta(id).then(function (meta) {
+        applySpreadsheetDocumentMeta(meta, options);
+        return meta;
       });
     }
     function openSpreadsheet(item) {
+      stopCollabPolling();
+      stopPresencePing();
+      closePresencePopup();
+      clearDeferredRemotePull();
       showView("editor");
       setBusy(els.editorShell, true);
       setEditorStatus("");
@@ -1933,22 +2676,16 @@
       state.lastKnownRevisionId = "";
       state.lastKnownModifiedTime = 0;
       state.lastKnownFileName = "";
+      state.collabPollInProgress = false;
+      state.collabPullInProgress = false;
+      state.lastRemotePollAt = 0;
+      state.presenceUsers = [];
+      state.sheetLoadToken = 0;
+      renderPresenceAvatars([]);
       syncEditorTitle();
       applyEditorMode();
       return loadSpreadsheetMeta(item.id)
         .then(function (meta) {
-          state.spreadsheetTitle = (meta.properties && meta.properties.title) || state.spreadsheetTitle;
-          state.savedSpreadsheetTitle = state.spreadsheetTitle;
-          syncEditorTitle();
-          state.spreadsheetSheets = (meta.sheets || []).map(function (sheet) {
-            const props = sheet.properties || {};
-            return {
-              sheetId: props.sheetId,
-              title: props.title || "Sheet",
-              rowCount: props.gridProperties ? props.gridProperties.rowCount : 1000,
-              columnCount: props.gridProperties ? props.gridProperties.columnCount : 26
-            };
-          });
           if (!state.spreadsheetSheets.length) {
             setEditorStatus("El archivo no tiene sheets visibles", "error");
             return;
@@ -1956,7 +2693,9 @@
           if (!state.canEdit) state.editorMode = "read";
           applyEditorMode();
           refreshDirtyState();
-          return loadSheet(state.spreadsheetSheets[0].title);
+          return loadSheet(state.currentSheetTitle || state.spreadsheetSheets[0].title).then(function () {
+            startCollabPolling();
+          });
         })
         .catch(function (err) {
           console.error(err);
@@ -2027,21 +2766,99 @@
         return true;
       });
     }
-    function fileMetaUrl() {
-      return "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.spreadsheetId) +
-        "?supportsAllDrives=true&fields=id,name,modifiedTime,headRevisionId";
-    }
     function refreshRemoteMeta() {
-      return fetchJson(fileMetaUrl()).then(function (meta) {
+      return fetchJson(spreadsheetFileMetaUrl()).then(function (meta) {
         state.lastKnownModifiedTime = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
         state.lastKnownRevisionId = meta.headRevisionId || "";
         state.lastKnownFileName = meta.name || state.lastKnownFileName;
+        if (meta.appProperties) updatePresenceFromProps(meta.appProperties);
         return meta;
       });
     }
     function remoteMetaChanged(meta) {
-      const modified = meta.modifiedTime ? Date.parse(meta.modifiedTime) || 0 : 0;
-      return modified !== state.lastKnownModifiedTime || (meta.headRevisionId || "") !== state.lastKnownRevisionId;
+      return shouldApplyRemoteMeta(meta);
+    }
+    function stopCollabPolling() {
+      if (state.collabPollInterval) {
+        clearInterval(state.collabPollInterval);
+        state.collabPollInterval = 0;
+      }
+      state.collabEnabled = false;
+      state.collabPollInProgress = false;
+      state.collabPullInProgress = false;
+      stopPresencePing();
+    }
+    function startCollabPolling() {
+      if (!state.spreadsheetId || !state.accessToken || state.collabPollInterval) return;
+      state.collabEnabled = true;
+      startPresencePing();
+      state.collabPollInterval = setInterval(function () {
+        pollRemoteChanges();
+      }, COLLAB_POLL_INTERVAL);
+      pollRemoteChanges();
+    }
+    function pollRemoteChanges() {
+      if (!state.spreadsheetId || !state.accessToken || state.collabPollInProgress || state.collabPullInProgress) {
+        return Promise.resolve(false);
+      }
+      state.collabPollInProgress = true;
+      return fetchJson(spreadsheetFileMetaUrl())
+        .then(function (meta) {
+          state.lastRemotePollAt = Date.now();
+          if (meta.appProperties) updatePresenceFromProps(meta.appProperties);
+          if (remoteMetaChanged(meta)) {
+            if (hasUnsyncedLocalChanges()) {
+              deferRemotePull(meta);
+              return false;
+            }
+            return pullRemoteChanges(meta);
+          }
+          return flushDeferredRemotePull();
+        })
+        .catch(function (err) {
+          console.warn("No se ha podido comprobar cambios remotos:", err);
+          return false;
+        })
+        .finally(function () {
+          state.collabPollInProgress = false;
+        });
+    }
+    function pullRemoteChanges(remoteMetaHint) {
+      if (!state.spreadsheetId || !state.accessToken) return Promise.resolve(false);
+      if (state.collabPullInProgress) return Promise.resolve(false);
+      if (hasUnsyncedLocalChanges()) {
+        deferRemotePull(remoteMetaHint || null);
+        return Promise.resolve(false);
+      }
+      state.collabPullInProgress = true;
+      setSaveState("syncing", "Sincronizando...");
+      return loadSpreadsheetMeta(state.spreadsheetId, {
+        preserveDirtyTitle: true,
+        skipApplyMode: true
+      })
+        .then(function () {
+          if (!state.spreadsheetSheets.length) return false;
+          if (!state.canEdit) state.editorMode = "read";
+          applyEditorMode();
+          return loadSheet(state.currentSheetTitle || state.spreadsheetSheets[0].title, {
+            quiet: true,
+            preserveDirty: true,
+            skipDirtyState: true
+          });
+        })
+        .then(function () {
+          clearDeferredRemotePull();
+          refreshDirtyState();
+          return true;
+        })
+        .catch(function (err) {
+          console.error(err);
+          setSaveState("error", messageFromError(err, "No se han podido sincronizar cambios remotos"));
+          return false;
+        })
+        .finally(function () {
+          state.collabPullInProgress = false;
+        });
     }
     function buildDirtyCellPayloads() {
       const payloads = [];
@@ -2137,12 +2954,7 @@
       setBusy(els.editorShell, true);
       setSaveState("saving", config.message || "Guardando...");
       return Promise.resolve()
-        .then(function () { return fetchJson(fileMetaUrl()); })
-        .then(function (meta) {
-          if (remoteMetaChanged(meta) && hasPendingSheetChanges()) {
-            setSaveState("error", "Hay cambios remotos. No se sobreescriben versiones ajenas.");
-            return false;
-          }
+        .then(function () {
           return persistSpreadsheetTitle().then(function () {
             return saveSheetDrafts();
           });
@@ -2153,6 +2965,9 @@
         })
         .then(function () {
           setSaveState("saved", "Todo guardado");
+          return flushDeferredRemotePull();
+        })
+        .then(function () {
           return true;
         })
         .catch(function (err) {
@@ -2219,8 +3034,19 @@
       return Promise.resolve();
     }
     function returnToDrive() {
-      return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).finally(function () {
-        showView("drive");
+      return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).then(function (ok) {
+        if (!ok && hasPendingChanges()) return false;
+        stopCollabPolling();
+        closePresencePopup();
+        return clearPresence().catch(function () {
+        }).finally(function () {
+          state.presenceUsers = [];
+          renderPresenceAvatars([]);
+          clearDeferredRemotePull();
+          showView("drive");
+        }).then(function () {
+          return true;
+        });
       });
     }
     function initGoogle() {
@@ -2257,46 +3083,57 @@
       state.tokenClient.requestAccessToken({ prompt: "consent" });
     });
     function resetSession() {
-      if (state.accessToken && window.google && google.accounts && google.accounts.oauth2) {
-        google.accounts.oauth2.revoke(state.accessToken, function () {});
-      }
-      state.accessToken = "";
-      state.currentUser = null;
-      state.folderStack = [{ id: "root", name: "Mi unidad" }];
-      state.currentItems = [];
-      state.sharedItems = [];
-      state.spreadsheetId = "";
-      state.spreadsheetTitle = "";
-      state.savedSpreadsheetTitle = "";
-      state.spreadsheetSheets = [];
-      state.currentSheetTitle = "";
-      state.sheetData = {};
-      state.sheetWindow = {};
-      state.sheetDirtyCells = {};
-      state.titleDirty = false;
-      state.editorMode = "edit";
-      state.canEdit = true;
-      clearTimeout(state.saveTimer);
-      state.saveQueued = false;
-      state.saveInFlight = false;
-      state.lastSavedAt = 0;
-      state.lastKnownRevisionId = "";
-      state.lastKnownModifiedTime = 0;
-      state.lastKnownFileName = "";
-      state.pickerFolderStack = [{ id: "root", name: "Mi unidad" }];
-      state.pickerFolders = [];
-      els.searchInput.value = "";
-      els.itemsGrid.innerHTML = "";
-      els.sharedGrid.innerHTML = "";
-      els.sheetTabs.innerHTML = "";
-      els.sheetGrid.innerHTML = "";
-      closeNewSheetModal();
-      closeNameModal();
-      closeShareModal();
-      closeProfileMenu();
-      renderBreadcrumbs();
-      showView("login");
-      setLoginStatus("");
+      stopCollabPolling();
+      closePresencePopup();
+      return clearPresence().catch(function () {
+      }).finally(function () {
+        if (state.accessToken && window.google && google.accounts && google.accounts.oauth2) {
+          google.accounts.oauth2.revoke(state.accessToken, function () {});
+        }
+        state.accessToken = "";
+        state.currentUser = null;
+        state.folderStack = [{ id: "root", name: "Mi unidad" }];
+        state.currentItems = [];
+        state.sharedItems = [];
+        state.spreadsheetId = "";
+        state.spreadsheetTitle = "";
+        state.savedSpreadsheetTitle = "";
+        state.spreadsheetSheets = [];
+        state.currentSheetTitle = "";
+        state.sheetData = {};
+        state.sheetWindow = {};
+        state.sheetDirtyCells = {};
+        state.titleDirty = false;
+        state.editorMode = "edit";
+        state.canEdit = true;
+        clearTimeout(state.saveTimer);
+        state.saveQueued = false;
+        state.saveInFlight = false;
+        state.lastSavedAt = 0;
+        state.lastKnownRevisionId = "";
+        state.lastKnownModifiedTime = 0;
+        state.lastKnownFileName = "";
+        state.remotePullDeferred = false;
+        state.remotePullMeta = null;
+        state.lastRemotePollAt = 0;
+        state.presenceUsers = [];
+        state.sheetLoadToken = 0;
+        state.pickerFolderStack = [{ id: "root", name: "Mi unidad" }];
+        state.pickerFolders = [];
+        els.searchInput.value = "";
+        els.itemsGrid.innerHTML = "";
+        els.sharedGrid.innerHTML = "";
+        els.sheetTabs.innerHTML = "";
+        els.sheetGrid.innerHTML = "";
+        renderPresenceAvatars([]);
+        closeNewSheetModal();
+        closeNameModal();
+        closeShareModal();
+        closeProfileMenu();
+        renderBreadcrumbs();
+        showView("login");
+        setLoginStatus("");
+      });
     }
     els.profileLogoutBtn.addEventListener("click", resetSession);
     els.searchInput.addEventListener("input", function() { renderItems(); renderSharedItems(); });
@@ -2461,9 +3298,43 @@
     els.shareModal.addEventListener("click", function (event) {
       if (event.target === els.shareModal) closeShareModal();
     });
+    els.presenceAvatars.addEventListener("click", function (event) {
+      event.stopPropagation();
+      if (!state.presenceUsers || !state.presenceUsers.length) {
+        closePresencePopup();
+        return;
+      }
+      if (els.presencePopup.classList.contains("hidden")) openPresencePopup();
+      else closePresencePopup();
+    });
+    els.presencePopupCloseBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      closePresencePopup();
+    });
     document.addEventListener("click", function (event) {
       if (state.profileMenuOpen && !els.profileBox.contains(event.target)) closeProfileMenu();
+      if (
+        !els.presencePopup.classList.contains("hidden") &&
+        !els.presencePopup.contains(event.target) &&
+        !els.presenceAvatars.contains(event.target)
+      ) {
+        closePresencePopup();
+      }
     });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closePresencePopup();
+    });
+    window.addEventListener("resize", function () {
+      if (!els.presencePopup.classList.contains("hidden")) positionPresencePopup();
+    });
+    function handleSessionPageExit() {
+      stopCollabPolling();
+      closePresencePopup();
+      clearPresence();
+    }
+    window.addEventListener("pagehide", handleSessionPageExit);
+    window.addEventListener("beforeunload", handleSessionPageExit);
 
     renderBreadcrumbs();
     showView("login");
