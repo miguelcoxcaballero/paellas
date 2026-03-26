@@ -178,7 +178,6 @@
       position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
       flex: 0 0 auto;
     }
     .crumb, .tab {
@@ -443,19 +442,51 @@
       flex-wrap: wrap;
     }
     .save-indicator {
-      width: 8px; height: 8px;
+      width: 10px; height: 10px;
       border-radius: 50%;
-      background: var(--good);
-      box-shadow: 0 0 0 1.5px rgba(0,0,0,0.06);
+      background: #4fbe73;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 10px rgba(79, 190, 115, 0.22);
       flex: 0 0 auto;
-      transition: background .25s ease;
+      transition: background .25s ease, box-shadow .25s ease;
     }
-    .save-indicator.paused { background: #aaa; }
-    .save-indicator.dirty { background: var(--warn); }
-    .save-indicator.saving { background: var(--accent); }
-    .save-indicator.saved { background: var(--good); }
-    .save-indicator.syncing { background: #4a90d9; }
-    .save-indicator.error { background: var(--bad); }
+    .save-indicator.paused {
+      background: #b9b2a3;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 8px rgba(185, 178, 163, 0.18);
+    }
+    .save-indicator.dirty {
+      background: #f0b63f;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 10px rgba(240, 182, 63, 0.24);
+    }
+    .save-indicator.saving {
+      background: #ff9752;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 10px rgba(255, 151, 82, 0.24);
+    }
+    .save-indicator.saved {
+      background: #4fbe73;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 10px rgba(79, 190, 115, 0.22);
+    }
+    .save-indicator.syncing {
+      background: #68b7ff;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 10px rgba(104, 183, 255, 0.26);
+    }
+    .save-indicator.error {
+      background: #ef6868;
+      box-shadow:
+        0 0 0 2px rgba(255, 250, 229, 0.96),
+        0 0 10px rgba(239, 104, 104, 0.24);
+    }
     .presence-avatars {
       display: flex;
       align-items: center;
@@ -698,22 +729,27 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      padding-right: 34px;
     }
     .tab-dots {
-      display: inline-grid;
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      transform: translateY(-50%);
+      display: grid;
       place-items: center;
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border-radius: 6px;
+      font-size: 0.85rem;
       line-height: 1;
       color: var(--muted);
       background: transparent;
       cursor: pointer;
       padding: 0;
       border: none;
-      opacity: 0.78;
+      opacity: 0;
       transition: background .15s ease, color .15s ease, opacity .15s ease;
     }
     .tab-shell:hover .tab-dots,
@@ -728,10 +764,8 @@
       outline: none;
     }
     .tab-menu {
-      position: absolute;
-      top: calc(100% + 6px);
-      right: 0;
-      z-index: 1200;
+      position: fixed;
+      z-index: 3000;
       min-width: 144px;
       padding: 6px;
       border-radius: 8px;
@@ -2385,6 +2419,23 @@
       });
     }
     var activeTabMenu = null;
+    function positionTabMenu(tabShell, menuEl) {
+      if (!tabShell || !menuEl) return;
+      var rect = tabShell.getBoundingClientRect();
+      var menuRect = menuEl.getBoundingClientRect();
+      var left = rect.right - menuRect.width;
+      var top = rect.bottom + 6;
+      var margin = 10;
+      if (left < margin) left = margin;
+      if (left + menuRect.width > window.innerWidth - margin) {
+        left = window.innerWidth - menuRect.width - margin;
+      }
+      if (top + menuRect.height > window.innerHeight - margin) {
+        top = Math.max(margin, rect.top - menuRect.height - 6);
+      }
+      menuEl.style.left = Math.round(left) + "px";
+      menuEl.style.top = Math.round(top) + "px";
+    }
     function openTabMenu(tabShell, sheet) {
       if (!tabShell || state.spreadsheetSheets.length <= 1) return;
       if (activeTabMenu && activeTabMenu.sheetId === sheet.sheetId && activeTabMenu.container === tabShell) {
@@ -2410,23 +2461,30 @@
         deleteSheet(sheet);
       });
       menu.appendChild(del);
-      tabShell.appendChild(menu);
+      document.body.appendChild(menu);
       tabShell.classList.add("menu-open");
       activeTabMenu = { el: menu, container: tabShell, sheetId: sheet.sheetId };
+      positionTabMenu(tabShell, menu);
       setTimeout(function () {
         document.addEventListener("pointerdown", closeTabMenuOnOutside);
+        window.addEventListener("resize", closeTabMenu);
+        window.addEventListener("scroll", closeTabMenu, true);
       }, 0);
     }
     function closeTabMenu() {
       if (activeTabMenu) {
         activeTabMenu.container.classList.remove("menu-open");
-        activeTabMenu.el.remove();
+        if (activeTabMenu.el && activeTabMenu.el.parentNode) {
+          activeTabMenu.el.parentNode.removeChild(activeTabMenu.el);
+        }
         activeTabMenu = null;
       }
       document.removeEventListener("pointerdown", closeTabMenuOnOutside);
+      window.removeEventListener("resize", closeTabMenu);
+      window.removeEventListener("scroll", closeTabMenu, true);
     }
     function closeTabMenuOnOutside(event) {
-      if (activeTabMenu && !activeTabMenu.container.contains(event.target)) {
+      if (activeTabMenu && !activeTabMenu.container.contains(event.target) && !activeTabMenu.el.contains(event.target)) {
         closeTabMenu();
       }
     }
