@@ -25,21 +25,6 @@
       --radius-md: 12px;
       --radius-lg: 16px;
     }
-    [data-theme="dark"] {
-      --bg: #1a1608;
-      --bg2: #2a2210;
-      --paper: rgba(42, 34, 16, 0.95);
-      --line: rgba(255,220,120,0.14);
-      --ink: #f5e8c8;
-      --muted: #b8a070;
-      --accent: #e88a20;
-      --accent2: #c07018;
-      --good: #5cb85c;
-      --warn: #d4a017;
-      --bad: #d44;
-      --shadow: 0 4px 24px rgba(0,0,0,0.4);
-      --shadow-md: 0 8px 36px rgba(0,0,0,0.5);
-    }
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -54,8 +39,6 @@
       border: 2px solid transparent;
       background-clip: padding-box;
     }
-    [data-theme="dark"] *::-webkit-scrollbar-track { background: rgba(42, 34, 16, 0.55); }
-    [data-theme="dark"] *::-webkit-scrollbar-thumb { background: rgba(232, 138, 32, 0.5); border-radius: 999px; }
     html, body { height: 100%; overflow: hidden; }
     body {
       margin: 0;
@@ -67,12 +50,6 @@
         radial-gradient(circle at 88% 14%, rgba(255,183,0,.24), transparent 22%),
         linear-gradient(180deg, var(--bg2) 0%, var(--bg) 48%, #f7c900 100%);
       transition: background .25s ease, color .25s ease;
-    }
-    [data-theme="dark"] body {
-      background:
-        radial-gradient(circle at 15% 20%, rgba(80,60,10,.25), transparent 18%),
-        radial-gradient(circle at 88% 14%, rgba(120,80,0,.15), transparent 22%),
-        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
     }
     button, input, select { font: inherit; }
     button { border: 0; background: none; color: inherit; cursor: pointer; }
@@ -141,10 +118,6 @@
       border-color: transparent;
       box-shadow: none;
     }
-    [data-theme="dark"] .btn.primary {
-      background: linear-gradient(180deg, #e88a20, #c07018);
-      color: #fff8eb;
-    }
     .btn.primary:hover { opacity: 0.88; }
     .btn.small, .sheet-tool-btn { padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.82rem; }
     .btn:disabled, .sheet-tool-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
@@ -199,15 +172,6 @@
       box-shadow: 0 0 0 3px rgba(185, 90, 0, 0.15);
       background: rgba(255,252,233,.95);
     }
-    [data-theme="dark"] .search {
-      background: rgba(255,220,120,0.06);
-      border-color: rgba(255,220,120,0.12);
-    }
-    [data-theme="dark"] .search:focus {
-      background: rgba(42, 34, 16, 0.8);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(232, 138, 32, 0.2);
-    }
     .toolbar-side { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .crumbs, .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
     .crumb, .tab {
@@ -217,12 +181,10 @@
       transition: background .15s ease;
     }
     .crumb:hover, .tab:hover { background: rgba(255,240,191,.5); }
-    [data-theme="dark"] .crumb:hover, [data-theme="dark"] .tab:hover { background: rgba(255,220,120,0.08); }
     .crumb.current, .tab.active {
       background: rgba(255,240,191,.98);
       font-weight: 600;
     }
-    [data-theme="dark"] .crumb.current, [data-theme="dark"] .tab.active { background: rgba(255,220,120,0.12); }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -231,17 +193,16 @@
     .item {
       border: 1px solid var(--line);
       background: var(--bg2);
-      border-radius: 14px;
-      padding: 14px;
-      display: grid;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
       gap: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
       cursor: pointer;
       transition: box-shadow .18s ease, transform .15s ease;
     }
-    .item:hover { box-shadow: 0 6px 20px rgba(104,70,5,0.12); transform: translateY(-2px); }
-    [data-theme="dark"] .item { background: var(--bg2); border-color: var(--line); }
-    [data-theme="dark"] .item:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .item:hover { box-shadow: 0 4px 16px rgba(104,70,5,0.10); transform: translateY(-1px); }
     .btn:hover { transform: translateY(-1px); }
     .item-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .item-icon { width: 24px; height: 24px; flex: 0 0 24px; color: var(--accent); }
@@ -278,7 +239,6 @@
       display: grid;
       gap: 12px;
     }
-    [data-theme="dark"] .profile-menu { background: var(--bg2); border-color: var(--line); }
     .profile-head { display: flex; align-items: center; gap: 12px; }
     .profile-head img, .profile-head .profile-fallback {
       width: 44px; height: 44px;
@@ -291,37 +251,6 @@
     }
     .profile-actions { display: flex; gap: 8px; }
     .profile-actions .btn { flex: 1 1 auto; }
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 0.85rem;
-      color: var(--ink);
-      cursor: pointer;
-    }
-    .theme-toggle input {
-      appearance: none;
-      width: 38px; height: 20px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.15);
-      position: relative;
-      outline: none;
-      cursor: pointer;
-      transition: background .2s ease;
-    }
-    .theme-toggle input::after {
-      content: '';
-      position: absolute;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: white;
-      top: 3px; left: 3px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: transform .2s ease;
-    }
-    .theme-toggle input:checked { background: var(--accent); }
-    .theme-toggle input:checked::after { transform: translateX(18px); }
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -433,7 +362,6 @@
       outline: 2px solid rgba(185, 90, 0, 0.2);
       outline-offset: 2px;
     }
-    [data-theme="dark"] .doc-title[contenteditable="true"]:focus { background: rgba(255,220,120,0.08); }
     .editor-actions {
       display: flex;
       align-items: center;
@@ -499,74 +427,103 @@
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       background: var(--bg2);
+      position: relative;
     }
-    table { width: max(100%, 920px); min-width: 920px; border-collapse: separate; border-spacing: 0; }
-    th, td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); min-width: 110px; padding: 0; }
-    th {
-      position: sticky;
+    .sheet-spacer {
+      position: absolute;
       top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    table {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-collapse: separate;
+      border-spacing: 0;
+      will-change: transform;
+    }
+    th, td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 0; }
+    th {
       background: var(--bg);
       color: var(--muted);
       padding: 8px;
-      z-index: 2;
       font-size: 0.78rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      width: 140px;
+      min-width: 140px;
+      max-width: 140px;
     }
-    [data-theme="dark"] th { background: var(--bg2); }
-    .corner { left: 0; z-index: 3; min-width: 56px; }
+    .corner { width: 56px; min-width: 56px; max-width: 56px; }
     .rowh {
-      position: sticky;
-      left: 0;
-      z-index: 1;
-      min-width: 56px;
       background: var(--bg);
       color: var(--muted);
       text-align: center;
       padding: 8px 6px;
       font-size: 0.78rem;
       font-weight: 500;
+      width: 56px;
+      min-width: 56px;
+      max-width: 56px;
     }
-    [data-theme="dark"] .rowh { background: var(--bg2); }
+    td { width: 140px; min-width: 140px; max-width: 140px; }
     .cell {
       width: 100%;
-      min-height: 38px;
+      height: 42px;
       padding: 8px 10px;
       border: 0;
       outline: none;
       color: var(--ink);
       background: transparent;
       font-size: 0.88rem;
-      transition: background .15s ease;
     }
     .cell:focus { background: rgba(185,90,0,0.06); }
     .good { color: var(--good); }
     .warn { color: var(--warn); }
     .error { color: var(--bad); }
     .loading { opacity: .7; pointer-events: none; }
-    #driveView { grid-template-rows: auto auto minmax(0, 1fr); }
+    #driveView { grid-template-rows: auto minmax(0, 1fr) auto; }
     #driveView > .card {
       border-radius: 0;
       border-left: none;
       border-right: none;
     }
-    #driveView > .card:first-child {
+    .drive-header {
       border-top: none;
+      padding: 12px 20px;
+      display: grid;
+      gap: 8px;
+    }
+    .drive-top-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .drive-top-row .search { max-width: 320px; }
+    .drive-content {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      overflow: hidden;
+      padding: 16px 20px;
+    }
+    .drive-shared {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
       padding: 14px 20px;
-    }
-    #driveView > .card:nth-child(2) {
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      overflow: hidden;
-      padding: 16px 20px;
-    }
-    #driveView > .card:last-child {
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      overflow: hidden;
-      padding: 16px 20px;
       border-bottom: none;
+      max-height: 240px;
+    }
+    .drive-shared:empty, .drive-shared:has(#sharedGrid:empty) { display: none; }
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding-bottom: 8px;
     }
     #itemsGrid { min-height: 0; overflow: auto; align-content: start; padding: 4px 4px 4px 0; }
     #sharedGrid { min-height: 0; overflow: auto; align-content: start; padding: 4px 4px 4px 0; }
@@ -586,7 +543,9 @@
       table { width: max(100%, 760px); min-width: 760px; }
       .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
       .item { padding: 12px; border-radius: 12px; }
-      #driveView > .card:first-child, #driveView > .card:nth-child(2), #driveView > .card:last-child { padding: 12px 14px; }
+      .drive-header, .drive-content, .drive-shared { padding: 12px 14px; }
+      .drive-top-row { flex-wrap: wrap; }
+      .drive-top-row .search { max-width: none; }
       #editorShell { padding: 12px 14px; }
       #editorView > .card:last-child { padding: 0 14px 14px; }
       .brand-name { display: none; }
@@ -612,10 +571,6 @@
                 <div id="profileEmail" class="meta"></div>
               </div>
             </div>
-            <label class="theme-toggle" for="themeToggle">
-              <span>Modo oscuro</span>
-              <input type="checkbox" id="themeToggle" aria-label="Modo oscuro">
-            </label>
             <div class="profile-actions">
               <button id="profileRefreshBtn" class="btn small" type="button">Actualizar</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
@@ -635,43 +590,26 @@
     </main>
 
     <main id="driveView" class="view hidden">
-      <section id="driveShell" class="card">
-        <div class="head">
-          <div>
-            <div class="title"><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-2px'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke-linejoin='round'/></svg> <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-2px'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> Drive</div>
-            <div class="meta">Gestiona carpetas, hojas y documentos.</div>
-          </div>
-          <div id="driveStatus" class="pill"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-1px'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke-linejoin='round'/></svg> <svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-1px'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> Drive</div>
-        </div>
-        <div class="row">
+      <section id="driveShell" class="card drive-header">
+        <div class="drive-top-row">
           <input id="searchInput" class="search" type="search" placeholder="Buscar...">
           <div class="toolbar-side">
-            <button id="newSheetBtn" class="btn small" type="button"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> Nueva</button>
-            <div id="folderCount" class="pill">0 elementos</div>
+            <div id="folderCount" class="pill">0</div>
+            <button id="newSheetBtn" class="btn small primary" type="button"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg> Nueva</button>
+            <div id="driveStatus" class="pill"></div>
           </div>
         </div>
-        <p class="note">Se muestran <svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-1px'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke-linejoin='round'/></svg> y <svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-1px'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> propios y compartidos. Las hojas se editan dentro de esta intranet.</p>
         <div id="breadcrumbs" class="crumbs"></div>
       </section>
-      <section class="card">
-        <div class="head">
-          <div>
-            <div class="title">Contenido</div>
-            <div id="folderMeta" class="meta">Mi unidad</div>
-          </div>
-        </div>
+      <section class="card drive-content">
         <div id="itemsGrid" class="grid"></div>
-        <p id="emptyState" class="meta hidden">No hay resultados en esta carpeta.</p>
+        <p id="emptyState" class="meta hidden">Sin resultados.</p>
+        <div id="folderMeta" class="hidden">Mi unidad</div>
       </section>
-      <section class="card">
-        <div class="head">
-          <div>
-            <div class="title">Documentos colaborativos</div>
-            <div class="meta">Spreadsheets compartidos contigo o con varios editores.</div>
-          </div>
-        </div>
+      <section class="card drive-shared">
+        <div class="section-label">Compartidos</div>
         <div id="sharedGrid" class="grid"></div>
-        <p id="sharedEmptyState" class="meta hidden">No hay documentos colaborativos visibles.</p>
+        <p id="sharedEmptyState" class="meta hidden"></p>
       </section>
     </main>
 
@@ -713,6 +651,7 @@
       </section>
       <section class="card">
         <div id="sheetWrap" class="sheet-wrap">
+          <div id="sheetSpacer" class="sheet-spacer"></div>
           <table id="sheetGrid"></table>
         </div>
       </section>
@@ -724,7 +663,7 @@
       <div class="head">
         <div class="modal-copy">
           <div id="newSheetModalTitle" class="title">Nueva hoja</div>
-          <div class="meta">Elige una <svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='vertical-align:-1px'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke-linejoin='round'/></svg> de destino y el nombre.</div>
+          <div class="meta">Elige destino y nombre.</div>
         </div>
         <button id="newSheetCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
       </div>
@@ -739,7 +678,7 @@
         <input id="newSheetNameInput" class="search" type="text" placeholder="Nueva hoja" autocomplete="off" spellcheck="false">
         <div class="row modal-actions">
           <button id="newSheetCancelBtn" class="btn small" type="button">Cancelar</button>
-          <button id="newSheetCreateBtn" class="btn primary small" type="button"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> Crear</button>
+          <button id="newSheetCreateBtn" class="btn primary small" type="button">Crear</button>
         </div>
       </div>
     </section>
@@ -798,10 +737,10 @@
     const CELL_HEIGHT = 42;
     const HEADER_WIDTH = 56;
     const HEADER_HEIGHT = 42;
-    const VIEW_BUFFER_ROWS = 10;
-    const VIEW_BUFFER_COLS = 4;
-    const LOAD_BUFFER_ROWS = 16;
-    const LOAD_BUFFER_COLS = 6;
+    const VIEW_BUFFER_ROWS = 20;
+    const VIEW_BUFFER_COLS = 6;
+    const LOAD_BUFFER_ROWS = 30;
+    const LOAD_BUFFER_COLS = 10;
 
     const state = {
       tokenClient: null,
@@ -888,6 +827,7 @@
       addSheetTabBtn: document.getElementById("addSheetTabBtn"),
       renameSheetTabBtn: document.getElementById("renameSheetTabBtn"),
       sheetWrap: document.getElementById("sheetWrap"),
+      sheetSpacer: document.getElementById("sheetSpacer"),
       sheetGrid: document.getElementById("sheetGrid"),
       backBtn: document.getElementById("backBtn"),
       nameModal: document.getElementById("nameModal"),
@@ -1255,7 +1195,7 @@
       });
       els.itemsGrid.innerHTML = "";
       els.emptyState.classList.toggle("hidden", filtered.length !== 0);
-      els.folderCount.textContent = filtered.length + " elementos";
+      els.folderCount.textContent = filtered.length;
       filtered.forEach(function (item) {
         const isFolder = item.mimeType === "application/vnd.google-apps.folder";
         const el = document.createElement("article");
@@ -1264,8 +1204,7 @@
           ? "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round' fill='rgba(185,90,0,.12)'/></svg>"
           : "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg>";
         el.innerHTML =
-          "<div class='item-row'>" + icon + "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div></div>" +
-          (!isFolder ? "<div class='note'><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> Editar</div>" : "");
+          "<div class='item-row'>" + icon + "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div></div>";
         el.addEventListener("click", function () {
           if (isFolder) {
             state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
@@ -1288,9 +1227,7 @@
         const el = document.createElement("article");
         el.className = "item";
         el.innerHTML =
-          "<div class='item-row'><svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg><div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div></div>" +
-          "<div class='meta'><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg> Compartido</div>" +
-          "<div class='note'><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/><line x1='3' y1='9' x2='21' y2='9' stroke-width='1.5'/><line x1='3' y1='15' x2='21' y2='15' stroke-width='1.5'/><line x1='9' y1='3' x2='9' y2='21' stroke-width='1.5'/></svg> Abrir</div>";
+          "<div class='item-row'><svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg><div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div></div>";
         el.addEventListener("click", function () {
           openSpreadsheet(item);
         });
@@ -1342,8 +1279,7 @@
         btn.className = "picker-item";
         btn.innerHTML =
           "<div class='picker-main'>" +
-            "<div class='picker-title'>" + escapeHtml(item.name || "Carpeta sin nombre") + "</div>" +
-            "<div class='meta'><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke-linejoin='round'/></svg> Abrir</div>" +
+            "<div class='picker-title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
           "</div>" +
           "<div class='picker-arrow' aria-hidden='true'>&rsaquo;</div>";
         btn.addEventListener("click", function () {
@@ -1383,27 +1319,13 @@
       const data = currentSheetData();
       const html = [];
       let r, c;
-      const rightCols = Math.max(0, info.columnCount - (view.startCol + view.cols));
-      const bottomRows = Math.max(0, info.rowCount - (view.startRow + view.rows));
-      els.sheetGrid.style.position = "relative";
-      els.sheetGrid.style.left = "0";
-      els.sheetGrid.style.top = "0";
-      els.sheetGrid.style.width = ((view.cols * CELL_WIDTH) + HEADER_WIDTH) + "px";
-      els.sheetGrid.style.minWidth = ((view.cols * CELL_WIDTH) + HEADER_WIDTH) + "px";
-      els.sheetGrid.style.marginLeft = (view.startCol * CELL_WIDTH) + "px";
-      els.sheetGrid.style.marginTop = (view.startRow * CELL_HEIGHT) + "px";
-      els.sheetGrid.style.marginRight = (rightCols * CELL_WIDTH) + "px";
-      els.sheetGrid.style.marginBottom = (bottomRows * CELL_HEIGHT) + "px";
-      els.sheetWrap.style.position = "relative";
-      els.sheetWrap.style.minWidth = "0";
-      els.sheetWrap.style.minHeight = "0";
-      els.sheetWrap.style.overflow = "auto";
-      els.sheetWrap.style.backgroundImage =
-        "linear-gradient(rgba(72,42,4,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(72,42,4,.08) 1px, transparent 1px)";
-      els.sheetWrap.style.backgroundPosition = HEADER_WIDTH + "px " + HEADER_HEIGHT + "px";
-      els.sheetWrap.style.backgroundSize = CELL_WIDTH + "px " + CELL_HEIGHT + "px";
-      els.sheetWrap.style.paddingRight = "0";
-      els.sheetWrap.style.paddingBottom = "0";
+      // Spacer keeps scroll dimensions constant so scroll position never jumps
+      els.sheetSpacer.style.width = totalWidth + "px";
+      els.sheetSpacer.style.height = totalHeight + "px";
+      // Position table at the window offset using transform (no margin shifts)
+      var tx = view.startCol * CELL_WIDTH;
+      var ty = view.startRow * CELL_HEIGHT;
+      els.sheetGrid.style.transform = "translate(" + tx + "px," + ty + "px)";
       html.push("<thead><tr><th class='corner'></th>");
       for (c = 0; c < view.cols; c += 1) html.push("<th>" + columnLabel(view.startCol + c) + "</th>");
       html.push("</tr></thead><tbody>");
@@ -1419,9 +1341,9 @@
       }
       html.push("</tbody>");
       els.sheetGrid.innerHTML = html.join("");
-      els.sheetMeta.textContent = info.title + " - ventana " + view.rows + "x" + view.cols + " de " + info.rowCount + "x" + info.columnCount;
+      els.sheetMeta.textContent = info.title + " " + info.rowCount + "x" + info.columnCount;
       syncEditorTitle();
-      els.editorSubtitle.textContent = "Sheet activa: " + info.title;
+      els.editorSubtitle.textContent = info.title;
       applyEditorMode();
     }
     function loadProfile() {
@@ -1444,7 +1366,7 @@
           renderBreadcrumbs();
           renderItems();
           els.folderMeta.textContent = state.folderStack[state.folderStack.length - 1].name;
-          setDriveStatus("Drive y Sheets");
+          setDriveStatus("");
           renderSharedItems();
         })
         .catch(function (err) {
@@ -2121,23 +2043,33 @@
       }
     });
     els.sheetGrid.addEventListener("input", handleGridInput);
-    let scrollDebounceTimer = 0;
+    var scrollRafPending = false;
+    var scrollFetchTimer = 0;
     els.sheetWrap.addEventListener("scroll", function () {
-      clearTimeout(scrollDebounceTimer);
-      scrollDebounceTimer = setTimeout(function() {
-        const info = currentSheetInfo();
+      if (scrollRafPending) return;
+      scrollRafPending = true;
+      requestAnimationFrame(function () {
+        scrollRafPending = false;
+        var info = currentSheetInfo();
         if (!info) return;
-        const nextView = computeWindow(info, false);
-        const currentView = state.sheetWindow[info.title] || {};
-        const movedFar =
-          Math.abs((currentView.startRow || 0) - nextView.startRow) > VIEW_BUFFER_ROWS / 2 ||
-          Math.abs((currentView.startCol || 0) - nextView.startCol) > VIEW_BUFFER_COLS / 2;
-        if (movedFar) {
+        var nextView = computeWindow(info, false);
+        var currentView = state.sheetWindow[info.title] || {};
+        // Check if we've scrolled beyond the buffered area
+        var needsRender =
+          nextView.startRow < currentView.startRow ||
+          nextView.startCol < currentView.startCol ||
+          (nextView.startRow + nextView.rows) > (currentView.startRow + currentView.rows) ||
+          (nextView.startCol + nextView.cols) > (currentView.startCol + currentView.cols);
+        if (needsRender) {
           state.sheetWindow[info.title] = nextView;
           renderGrid();
-          loadSheet(info.title);
+          // Debounce the API fetch to avoid hammering the server
+          clearTimeout(scrollFetchTimer);
+          scrollFetchTimer = setTimeout(function () {
+            loadSheet(info.title);
+          }, 300);
         }
-      }, 120);
+      });
     });
     els.nameModalCloseBtn.addEventListener("click", closeNameModal);
     els.nameModalCancelBtn.addEventListener("click", closeNameModal);
@@ -2198,24 +2130,6 @@
     showView("login");
     initGoogle();
 
-    // Dark mode toggle
-    const THEME_KEY = 'paellas-theme';
-    const themeToggleEl = document.getElementById('themeToggle');
-    function applyTheme(dark) {
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      if (themeToggleEl) themeToggleEl.checked = dark;
-    }
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    if (savedTheme === 'dark') applyTheme(true);
-    else if (savedTheme === 'light') applyTheme(false);
-    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme(true);
-    if (themeToggleEl) {
-      themeToggleEl.addEventListener('change', function() {
-        const dark = themeToggleEl.checked;
-        applyTheme(dark);
-        localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
-      });
-    }
   </script>
 </body>
 </html>
