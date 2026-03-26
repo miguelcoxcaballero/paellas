@@ -563,7 +563,7 @@
     .error { color: var(--bad); }
     .loading { pointer-events: none; }
     .modal-card.loading, .drive-header.loading { opacity: .7; }
-    #driveView { grid-template-rows: auto minmax(0, auto) minmax(0, auto); overflow: auto; }
+    #driveView { display: flex; flex-direction: column; overflow: auto; }
     #driveView > .card {
       border-radius: 0;
       border-left: none;
@@ -582,14 +582,9 @@
     }
     .drive-top-row .search { max-width: 320px; }
     .drive-content {
-      display: grid;
-      grid-template-rows: auto minmax(0, auto) auto;
-      gap: 10px;
       padding: 16px 20px;
     }
     .drive-shared {
-      display: grid;
-      grid-template-rows: auto minmax(0, auto) auto;
       padding: 14px 20px;
       border-bottom: none;
     }
@@ -602,8 +597,8 @@
       color: var(--muted);
       padding-bottom: 8px;
     }
-    #itemsGrid { min-height: 0; overflow: auto; align-content: start; padding: 4px 4px 4px 0; }
-    #sharedGrid { min-height: 0; overflow: auto; align-content: start; padding: 4px 4px 4px 0; }
+    #itemsGrid { align-content: start; padding: 4px 0; }
+    #sharedGrid { align-content: start; padding: 4px 0; }
     #editorView { grid-template-rows: auto minmax(0, 1fr); }
     #editorShell { overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 14px 20px; }
     #editorView > .card:last-child { display: grid; min-height: 0; overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-bottom: none; padding: 0 20px 20px; }
@@ -675,9 +670,9 @@
             <div id="driveStatus" class="pill"></div>
           </div>
         </div>
+        <div id="breadcrumbs" class="crumbs"></div>
       </section>
       <section class="card drive-content">
-        <div id="breadcrumbs" class="crumbs"></div>
         <div id="itemsGrid" class="grid"></div>
         <p id="emptyState" class="meta hidden">Sin resultados.</p>
         <div id="folderMeta" class="hidden">Mi unidad</div>
