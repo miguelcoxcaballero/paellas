@@ -219,8 +219,10 @@
     .btn:hover { transform: translateY(-1px); }
     .item-row { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; overflow: hidden; }
     .item-icon { width: 24px; height: 24px; flex: 0 0 24px; color: var(--accent); }
-    .shared-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); opacity: 0.6; margin-left: auto; }
+    .shared-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); opacity: 0.6; }
     .title { font-size: 0.92rem; font-weight: 600; line-height: 1.2; min-width: 0; }
+    .title-with-share { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .item .title {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -228,6 +230,104 @@
     }
     .item .meta { font-size: 0.78rem; display: flex; align-items: center; gap: 4px; }
     .item .note { font-size: 0.75rem; opacity: 0.7; }
+    .paella-panel {
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top right, rgba(255, 209, 102, 0.35), transparent 42%),
+        linear-gradient(180deg, rgba(255, 248, 227, 0.96) 0%, rgba(255, 252, 243, 0.92) 100%);
+    }
+    .paella-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .paella-panel-copy {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 56ch;
+    }
+    .paella-create-btn {
+      width: 100%;
+      min-height: 64px;
+      justify-content: center;
+      border-radius: 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .paella-grid {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      align-content: start;
+    }
+    .paella-card {
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      background: rgba(255, 255, 255, 0.74);
+      border-radius: 16px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 4px 18px rgba(145, 88, 8, 0.08);
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .paella-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(145, 88, 8, 0.12);
+      border-color: rgba(185, 90, 0, 0.24);
+    }
+    .paella-card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .paella-card-icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: var(--accent2);
+      background: rgba(185, 90, 0, 0.1);
+    }
+    .paella-card-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .paella-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.2;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .paella-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .paella-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(185, 90, 0, 0.08);
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .paella-empty {
+      margin: 0;
+    }
     .profile-box { position: relative; display: flex; align-items: center; }
     .profile-btn {
       width: 38px; height: 38px;
@@ -1053,10 +1153,21 @@
         <div id="breadcrumbs" class="crumbs"></div>
       </section>
       <div class="drive-scroll">
+        <section class="card paella-panel">
+          <div class="paella-panel-head">
+            <div>
+              <div class="section-label">Paellas</div>
+              <div class="paella-panel-copy">Crea carpetas-paella y tenlas a mano antes de entrar en tu unidad.</div>
+            </div>
+          </div>
+          <button id="createPaellaBtn" class="btn primary paella-create-btn" type="button">Crear paella</button>
+          <div id="paellasGrid" class="grid paella-grid"></div>
+          <p id="paellasEmpty" class="meta paella-empty hidden">No hay paellas todavia.</p>
+        </section>
         <div>
+          <div id="folderMeta" class="section-label">Mi unidad</div>
           <div id="itemsGrid" class="grid"></div>
           <p id="emptyState" class="meta hidden">Sin resultados.</p>
-          <div id="folderMeta" class="hidden">Mi unidad</div>
         </div>
         <div id="sharedSection">
           <div class="section-label">Compartidos</div>
@@ -1112,13 +1223,13 @@
 
   <div id="newSheetModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="newSheetModalTitle">
     <section id="newSheetModalCard" class="card modal-card">
-      <div class="head">
-        <div class="modal-copy">
-          <div id="newSheetModalTitle" class="title">Nueva hoja</div>
-          <div class="meta">Elige destino y nombre.</div>
+        <div class="head">
+          <div class="modal-copy">
+            <div id="newSheetModalTitle" class="title">Nueva hoja</div>
+            <div id="newSheetModalSubtitle" class="meta">Elige destino y nombre.</div>
+          </div>
+          <button id="newSheetCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
         </div>
-        <button id="newSheetCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
-      </div>
       <div class="picker-shell">
         <div id="newSheetPickerStatus" class="status">Cargando carpetas...</div>
         <div id="newSheetTargetMeta" class="pill">Destino: Mi unidad</div>
@@ -1200,6 +1311,16 @@
     const PRESENCE_ONLINE_MS = 12000;
     const PRESENCE_FIELD_SUFFIXES = ["n", "e", "p", "t", "d", "v", "l", "c", "h"];
     const PRESENCE_CLIENT_ID_KEY = "paellas-presence-client-id-v1";
+    const DRIVE_FOLDER_MIME = "application/vnd.google-apps.folder";
+    const DRIVE_SPREADSHEET_MIME = "application/vnd.google-apps.spreadsheet";
+    const PAELLA_APP_PROPERTIES = Object.freeze({
+      paellasType: "paella",
+      paellasApp: "paellas.net",
+      paellasVersion: "1"
+    });
+    const AUTH_SESSION_KEY = "paellas-auth-session-v1";
+    const AUTH_REFRESH_MARGIN_MS = 120000;
+    const AUTH_REFRESH_RETRY_MS = 15000;
 
     let presencePingTimer = 0;
     let presenceHeartbeatTimer = 0;
@@ -1209,9 +1330,12 @@
     const state = {
       tokenClient: null,
       accessToken: "",
+      accessTokenExpiresAt: 0,
       currentUser: null,
       folderStack: [{ id: "root", name: "Mi unidad" }],
       currentItems: [],
+      paellaItems: [],
+      paellaLoadError: "",
       sharedItems: [],
       spreadsheetId: "",
       spreadsheetTitle: "",
@@ -1244,7 +1368,11 @@
       sheetLoadToken: 0,
       pickerFolderStack: [{ id: "root", name: "Mi unidad" }],
       pickerFolders: [],
-      profileMenuOpen: false
+      pickerMode: "sheet",
+      profileMenuOpen: false,
+      tokenRefreshTimer: 0,
+      tokenRequestInFlight: null,
+      sessionRestoreInFlight: null
     };
 
     const els = {
@@ -1268,9 +1396,14 @@
       driveStatus: document.getElementById("driveStatus"),
       searchInput: document.getElementById("searchInput"),
       newSheetBtn: document.getElementById("newSheetBtn"),
+      createPaellaBtn: document.getElementById("createPaellaBtn"),
+      paellasGrid: document.getElementById("paellasGrid"),
+      paellasEmpty: document.getElementById("paellasEmpty"),
       newSheetModal: document.getElementById("newSheetModal"),
       newSheetModalCard: document.getElementById("newSheetModalCard"),
       newSheetCloseBtn: document.getElementById("newSheetCloseBtn"),
+      newSheetModalTitle: document.getElementById("newSheetModalTitle"),
+      newSheetModalSubtitle: document.getElementById("newSheetModalSubtitle"),
       newSheetPickerStatus: document.getElementById("newSheetPickerStatus"),
       newSheetTargetMeta: document.getElementById("newSheetTargetMeta"),
       newSheetPickerBreadcrumbs: document.getElementById("newSheetPickerBreadcrumbs"),
@@ -1327,6 +1460,206 @@
     function setEditorStatus(text) {
       els.modeToggleBtn.title = text || (els.saveIndicator ? (els.saveIndicator.title || "") : "");
     }
+    function readStoredAuthSession() {
+      try {
+        const raw = localStorage.getItem(AUTH_SESSION_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== "object") return null;
+        return {
+          accessToken: data.accessToken ? String(data.accessToken) : "",
+          expiresAt: Number(data.expiresAt) || 0,
+          user: data.user && typeof data.user === "object" ? {
+            displayName: data.user.displayName ? String(data.user.displayName) : "",
+            emailAddress: data.user.emailAddress ? String(data.user.emailAddress) : "",
+            photoLink: data.user.photoLink ? String(data.user.photoLink) : ""
+          } : null
+        };
+      } catch (err) {
+        console.warn("No se ha podido leer la sesion guardada:", err);
+        return null;
+      }
+    }
+    function clearStoredAuthSession() {
+      try {
+        localStorage.removeItem(AUTH_SESSION_KEY);
+      } catch (err) {
+        console.warn("No se ha podido borrar la sesion guardada:", err);
+      }
+    }
+    function saveStoredAuthSession() {
+      if (!state.accessToken) {
+        clearStoredAuthSession();
+        return;
+      }
+      try {
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
+          accessToken: state.accessToken,
+          expiresAt: state.accessTokenExpiresAt || 0,
+          user: state.currentUser ? {
+            displayName: state.currentUser.displayName || "",
+            emailAddress: state.currentUser.emailAddress || "",
+            photoLink: state.currentUser.photoLink || ""
+          } : null
+        }));
+      } catch (err) {
+        console.warn("No se ha podido guardar la sesion:", err);
+      }
+    }
+    function clearTokenRefreshTimer() {
+      clearTimeout(state.tokenRefreshTimer);
+      state.tokenRefreshTimer = 0;
+    }
+    function hasUsableAccessToken(bufferMs) {
+      const buffer = Math.max(0, Number(bufferMs) || 0);
+      return !!(state.accessToken && state.accessTokenExpiresAt && (Date.now() + buffer) < state.accessTokenExpiresAt);
+    }
+    function clearAccessTokenState(options) {
+      const config = options || {};
+      clearTokenRefreshTimer();
+      state.tokenRequestInFlight = null;
+      state.accessToken = "";
+      state.accessTokenExpiresAt = 0;
+      if (!config.keepUser) {
+        state.currentUser = null;
+      }
+      if (!config.keepStoredSession) {
+        clearStoredAuthSession();
+      }
+    }
+    function applyAccessTokenResponse(response) {
+      const expiresInSeconds = Math.max(60, Number(response && response.expires_in) || 3600);
+      state.accessToken = response && response.access_token ? String(response.access_token) : "";
+      state.accessTokenExpiresAt = state.accessToken ? (Date.now() + expiresInSeconds * 1000) : 0;
+      saveStoredAuthSession();
+      scheduleTokenRefresh();
+    }
+    function scheduleTokenRefresh(retryDelayMs) {
+      clearTokenRefreshTimer();
+      if (!state.accessToken || !state.accessTokenExpiresAt) return;
+      const retryDelay = Math.max(1000, Number(retryDelayMs) || 0);
+      const refreshIn = retryDelay || Math.max(1000, state.accessTokenExpiresAt - Date.now() - AUTH_REFRESH_MARGIN_MS);
+      state.tokenRefreshTimer = window.setTimeout(function () {
+        refreshAccessTokenSilently().catch(function (err) {
+          console.warn("No se ha podido renovar el token en segundo plano:", err);
+          if (hasUsableAccessToken(0)) {
+            scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
+            return;
+          }
+          clearAccessTokenState();
+          renderProfileMenu();
+          if (els.editorView.classList.contains("hidden")) {
+            showView("login");
+            setLoginStatus("La sesion ha caducado. Inicia sesion de nuevo.");
+          }
+        });
+      }, refreshIn);
+    }
+    function requestGoogleAccessToken(config) {
+      if (!state.tokenClient) {
+        return Promise.reject(new Error("Google Auth aun no esta listo."));
+      }
+      if (state.tokenRequestInFlight) {
+        return state.tokenRequestInFlight;
+      }
+      const requestConfig = Object.assign({}, config || {});
+      state.tokenRequestInFlight = new Promise(function (resolve, reject) {
+        let settled = false;
+        function cleanup() {
+          state.tokenRequestInFlight = null;
+          state.tokenClient.callback = function () {};
+          state.tokenClient.error_callback = function () {};
+        }
+        state.tokenClient.callback = function (response) {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          if (!response || response.error || !response.access_token) {
+            reject(new Error((response && response.error) || "Error de autenticacion"));
+            return;
+          }
+          resolve(response);
+        };
+        state.tokenClient.error_callback = function (err) {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          reject(new Error((err && (err.message || err.type)) || "Error de autenticacion"));
+        };
+        try {
+          state.tokenClient.requestAccessToken(requestConfig);
+        } catch (err) {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          reject(err);
+        }
+      });
+      return state.tokenRequestInFlight;
+    }
+    function refreshAccessTokenSilently() {
+      return requestGoogleAccessToken({ prompt: "none" }).then(function (response) {
+        applyAccessTokenResponse(response);
+        return state.accessToken;
+      });
+    }
+    function ensureValidAccessToken() {
+      if (hasUsableAccessToken(AUTH_REFRESH_MARGIN_MS)) {
+        return Promise.resolve(state.accessToken);
+      }
+      if (!state.tokenClient) {
+        return state.accessToken ? Promise.resolve(state.accessToken) : Promise.reject(new Error("Sin sesion activa."));
+      }
+      return refreshAccessTokenSilently().catch(function (err) {
+        if (hasUsableAccessToken(0)) {
+          scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
+          return state.accessToken;
+        }
+        clearAccessTokenState();
+        throw err;
+      });
+    }
+    function openAuthenticatedDrive() {
+      return ensureValidAccessToken().then(function () {
+        return loadProfile();
+      }).then(function () {
+        setLoginStatus("");
+        showView("drive");
+        return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas()]);
+      });
+    }
+    function restoreStoredSession() {
+      if (state.sessionRestoreInFlight) {
+        return state.sessionRestoreInFlight;
+      }
+      const stored = readStoredAuthSession();
+      if (!stored || !stored.accessToken) {
+        return Promise.resolve(false);
+      }
+      state.accessToken = stored.accessToken;
+      state.accessTokenExpiresAt = stored.expiresAt;
+      state.currentUser = stored.user || null;
+      renderProfileMenu();
+      scheduleTokenRefresh();
+      setLoginStatus("Recuperando sesion...");
+      state.sessionRestoreInFlight = openAuthenticatedDrive().then(function () {
+        return true;
+      }).catch(function (err) {
+        console.warn("No se ha podido restaurar la sesion guardada:", err);
+        if (!hasUsableAccessToken(0)) {
+          clearAccessTokenState();
+        } else {
+          scheduleTokenRefresh();
+        }
+        renderProfileMenu();
+        showView("login");
+        setLoginStatus(hasUsableAccessToken(0) ? "No se ha podido restaurar la sesion ahora." : "");
+        return false;
+      }).finally(function () {
+        state.sessionRestoreInFlight = null;
+      });
+      return state.sessionRestoreInFlight;
+    }
     function formatSavedTime(timestamp) {
       if (!timestamp) return "";
       try {
@@ -1367,6 +1700,19 @@
       els.shareStatus.className = "status" + (tone ? " " + tone : "");
     }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
+    function pickerDefaultName() {
+      return state.pickerMode === "paella" ? "Nueva paella" : "Nueva hoja";
+    }
+    function configurePickerMode(mode) {
+      const nextMode = mode === "paella" ? "paella" : "sheet";
+      state.pickerMode = nextMode;
+      els.newSheetModalTitle.textContent = nextMode === "paella" ? "Crear paella" : "Nueva hoja";
+      els.newSheetModalSubtitle.textContent = nextMode === "paella"
+        ? "Elige la carpeta de Drive donde guardar la paella."
+        : "Elige destino y nombre.";
+      els.newSheetNameInput.placeholder = pickerDefaultName();
+      els.newSheetCreateBtn.textContent = nextMode === "paella" ? "Crear paella" : "Crear";
+    }
     function currentFolderId() { return state.folderStack[state.folderStack.length - 1].id; }
     function cellKey(row, col) { return row + ":" + col; }
     function parseCellKey(key) {
@@ -1830,16 +2176,65 @@
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
     }
-    function authFetch(url, options) {
+    function isPaellaFolder(item) {
+      return !!(item && item.mimeType === DRIVE_FOLDER_MIME && item.appProperties && item.appProperties.paellasType === "paella");
+    }
+    function driveFolderIconMarkup(isPaella) {
+      if (isPaella) {
+        return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><path d='M4 10h16a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round' fill='rgba(185,90,0,.08)'/><path d='M6 10l1.5-4h9L18 10' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/><path d='M7 16h10' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg>";
+      }
+      return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round' fill='rgba(185,90,0,.12)'/></svg>";
+    }
+    function paellaCardIconMarkup() {
+      return "<svg viewBox='0 0 24 24' fill='none'><path d='M4 10h16a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'/><path d='M6 10l1.5-4h9L18 10' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/><path d='M7 16h10' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path d='M9 7.2c0-.9.7-1.6 1.6-1.6M12 6c0-1 .8-1.8 1.8-1.8' stroke='currentColor' stroke-width='1.4' stroke-linecap='round'/></svg>";
+    }
+    function sharedIconMarkup() {
+      return "<svg class='shared-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/></svg>";
+    }
+    function itemTitleMarkup(name, showSharedIcon) {
+      return "<div class='title title-with-share'>" +
+        (showSharedIcon ? sharedIconMarkup() : "") +
+        "<span class='title-text'>" + escapeHtml(name || "Sin nombre") + "</span>" +
+      "</div>";
+    }
+    function formatDriveDate(value) {
+      if (!value) return "";
+      try {
+        return new Date(value).toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        });
+      } catch (err) {
+        return "";
+      }
+    }
+    async function authFetch(url, options) {
       const init = Object.assign({}, options || {});
+      const skipAuthRefresh = !!init._skipAuthRefresh;
+      delete init._skipAuthRefresh;
+      if (!skipAuthRefresh) {
+        await ensureValidAccessToken();
+      }
       init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
-      return fetch(url, init).then(async function (res) {
-        if (!res.ok) {
-          const text = await res.text().catch(function () { return ""; });
-          throw new Error("Google API " + res.status + ": " + parseApiErrorText(text));
+      let res = await fetch(url, init);
+      if (!res.ok && !skipAuthRefresh && (res.status === 401 || res.status === 403)) {
+        try {
+          await refreshAccessTokenSilently();
+          init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
+          res = await fetch(url, init);
+        } catch (err) {
+          if (!hasUsableAccessToken(0)) {
+            clearAccessTokenState();
+            renderProfileMenu();
+          }
         }
-        return res;
-      });
+      }
+      if (!res.ok) {
+        const text = await res.text().catch(function () { return ""; });
+        throw new Error("Google API " + res.status + ": " + parseApiErrorText(text));
+      }
+      return res;
     }
     function fetchJson(url, options) { return authFetch(url, options).then(function (res) { return res.json(); }); }
     function simpleHash(value) {
@@ -2304,15 +2699,15 @@
       els.itemsGrid.innerHTML = "";
       els.emptyState.classList.toggle("hidden", filtered.length !== 0);
       filtered.forEach(function (item) {
-        const isFolder = item.mimeType === "application/vnd.google-apps.folder";
+        const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
+        const isPaella = isPaellaFolder(item);
         const el = document.createElement("article");
         el.className = "item";
         var icon = isFolder
-          ? "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round' fill='rgba(185,90,0,.12)'/></svg>"
+          ? driveFolderIconMarkup(isPaella)
           : "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg>";
-        var shared = item.shared ? "<svg class='shared-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/></svg>" : "";
         el.innerHTML =
-          "<div class='item-row'>" + icon + "<div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" + shared + "</div>";
+          "<div class='item-row'>" + icon + itemTitleMarkup(item.name, !!item.shared) + "</div>";
         el.addEventListener("click", function () {
           if (isFolder) {
             state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
@@ -2322,6 +2717,33 @@
           }
         });
         els.itemsGrid.appendChild(el);
+      });
+    }
+    function renderPaellas() {
+      const query = (els.searchInput.value || "").trim().toLowerCase();
+      const filtered = state.paellaItems.filter(function (item) {
+        return !query || (item.name || "").toLowerCase().includes(query);
+      });
+      els.paellasGrid.innerHTML = "";
+      els.paellasEmpty.textContent = state.paellaLoadError || (query ? "No hay paellas que coincidan con la busqueda." : "No hay paellas todavia.");
+      els.paellasEmpty.classList.toggle("hidden", filtered.length !== 0);
+      filtered.forEach(function (item) {
+        const el = document.createElement("article");
+        const updatedLabel = formatDriveDate(item.modifiedTime);
+        el.className = "paella-card";
+        el.innerHTML =
+          "<div class='paella-card-head'>" +
+            "<div class='paella-card-icon' aria-hidden='true'>" + paellaCardIconMarkup() + "</div>" +
+            "<div class='paella-card-title'>" + escapeHtml(item.name || "Paella sin nombre") + "</div>" +
+          "</div>" +
+          "<div class='paella-card-meta'>" +
+            "<span class='paella-card-tag'>Carpeta Drive</span>" +
+            "<span>" + escapeHtml(updatedLabel || "Abrir") + "</span>" +
+          "</div>";
+        el.addEventListener("click", function () {
+          openPaellaFolder(item);
+        });
+        els.paellasGrid.appendChild(el);
       });
     }
     function renderSharedItems() {
@@ -2335,7 +2757,7 @@
         const el = document.createElement("article");
         el.className = "item";
         el.innerHTML =
-          "<div class='item-row'><svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg><div class='title'>" + escapeHtml(item.name || "Sin nombre") + "</div></div>";
+          "<div class='item-row'><svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg>" + itemTitleMarkup(item.name, true) + "</div>";
         el.addEventListener("click", function () {
           openSpreadsheet(item);
         });
@@ -2395,6 +2817,19 @@
           loadPickerFolders(item.id);
         });
         els.newSheetPickerList.appendChild(btn);
+      });
+    }
+    function openPaellaFolder(item) {
+      if (!item || !item.id) return;
+      state.folderStack = [
+        { id: "root", name: "Mi unidad" },
+        { id: item.id, name: item.name || "Paella" }
+      ];
+      showView("drive");
+      loadFolder(item.id).then(function () {
+        if (els.folderMeta && typeof els.folderMeta.scrollIntoView === "function") {
+          els.folderMeta.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       });
     }
     function renderTabs() {
@@ -2642,6 +3077,7 @@
       return fetchJson("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress,photoLink)").then(function (data) {
         state.currentUser = data.user || null;
         renderProfileMenu();
+        saveStoredAuthSession();
       });
     }
     function loadFolder(folderId) {
@@ -2649,9 +3085,9 @@
       setDriveStatus("");
       const query = encodeURIComponent(
         "'" + folderId + "' in parents and trashed=false and " +
-        "(mimeType='application/vnd.google-apps.folder' or mimeType='application/vnd.google-apps.spreadsheet')"
+        "(mimeType='" + DRIVE_FOLDER_MIME + "' or mimeType='" + DRIVE_SPREADSHEET_MIME + "')"
       );
-      const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,shared)");
+      const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,shared,appProperties)");
       return fetchJson("https://www.googleapis.com/drive/v3/files?q=" + query + "&pageSize=200&orderBy=folder,name_natural&fields=" + fields)
         .then(function (data) {
           state.currentItems = data.files || [];
@@ -2672,8 +3108,35 @@
           setBusy(els.driveShell, false);
         });
     }
+    function loadPaellas() {
+      if (!state.accessToken) {
+        state.paellaItems = [];
+        state.paellaLoadError = "";
+        renderPaellas();
+        return Promise.resolve([]);
+      }
+      const query = encodeURIComponent(
+        "trashed=false and mimeType='" + DRIVE_FOLDER_MIME + "' and appProperties has { key='paellasType' and value='paella' }"
+      );
+      const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,appProperties)");
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query +
+        "&pageSize=200&orderBy=modifiedTime desc,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
+      ).then(function (data) {
+        state.paellaItems = data.files || [];
+        state.paellaLoadError = "";
+        renderPaellas();
+        return state.paellaItems;
+      }).catch(function (err) {
+        console.error(err);
+        state.paellaItems = [];
+        state.paellaLoadError = messageFromError(err, "No se han podido cargar las paellas");
+        renderPaellas();
+        return [];
+      });
+    }
     function loadSharedDocs() {
-      const query = encodeURIComponent("trashed=false and mimeType='application/vnd.google-apps.spreadsheet' and sharedWithMe=true");
+      const query = encodeURIComponent("trashed=false and mimeType='" + DRIVE_SPREADSHEET_MIME + "' and sharedWithMe=true");
       const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,shared)");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
@@ -2720,10 +3183,11 @@
       els.newSheetModal.classList.remove("visible");
       setBusy(els.newSheetModalCard, false);
     }
-    function openNewSheetModal() {
+    function openNewSheetModal(mode) {
+      configurePickerMode(mode);
       state.pickerFolderStack = cloneFolderStack(state.folderStack);
       state.pickerFolders = [];
-      els.newSheetNameInput.value = "Nueva hoja";
+      els.newSheetNameInput.value = pickerDefaultName();
       renderPickerBreadcrumbs();
       renderPickerFolders();
       setPickerStatus("");
@@ -2734,12 +3198,16 @@
       });
     }
     function submitNewSheetModal() {
-      const trimmedName = (els.newSheetNameInput.value || "").trim() || "Nueva hoja";
-      return createSpreadsheet({
+      const trimmedName = (els.newSheetNameInput.value || "").trim() || pickerDefaultName();
+      const payload = {
         name: trimmedName,
         folderId: pickerCurrentFolderId(),
         folderStack: cloneFolderStack(state.pickerFolderStack)
-      });
+      };
+      if (state.pickerMode === "paella") {
+        return createPaellaFolder(payload);
+      }
+      return createSpreadsheet(payload);
     }
     function applyFetchedWindowData(title, loadWindow, rows, options) {
       const config = options || {};
@@ -2866,7 +3334,7 @@
     }
     function createSpreadsheet(options) {
       if (!options || !options.name) {
-        return openNewSheetModal();
+        return openNewSheetModal("sheet");
       }
       const targetFolderId = options.folderId || "root";
       const targetFolderStack = cloneFolderStack(options.folderStack);
@@ -2876,7 +3344,7 @@
       setPickerStatus("");
       const body = {
         name: options.name,
-        mimeType: "application/vnd.google-apps.spreadsheet"
+        mimeType: DRIVE_SPREADSHEET_MIME
       };
       if (targetFolderId !== "root") {
         body.parents = [targetFolderId];
@@ -2897,6 +3365,50 @@
       }).catch(function (err) {
         console.error(err);
         const message = messageFromError(err, "No se ha podido crear el spreadsheet");
+        setDriveStatus(message);
+        setPickerStatus(message, "error");
+      }).finally(function () {
+        setBusy(els.driveShell, false);
+        setBusy(els.newSheetModalCard, false);
+      });
+    }
+    function createPaellaFolder(options) {
+      if (!options || !options.name) {
+        return openNewSheetModal("paella");
+      }
+      const targetFolderId = options.folderId || "root";
+      const shouldRefreshCurrentFolder = currentFolderId() === targetFolderId;
+      setBusy(els.driveShell, true);
+      setBusy(els.newSheetModalCard, true);
+      setDriveStatus("");
+      setPickerStatus("");
+      const body = {
+        name: options.name,
+        mimeType: DRIVE_FOLDER_MIME,
+        appProperties: PAELLA_APP_PROPERTIES
+      };
+      if (targetFolderId !== "root") {
+        body.parents = [targetFolderId];
+      }
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,appProperties",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        }
+      ).then(function (folder) {
+        closeNewSheetModal();
+        return Promise.all([
+          loadPaellas(),
+          shouldRefreshCurrentFolder ? loadFolder(targetFolderId) : Promise.resolve()
+        ]).then(function () {
+          setDriveStatus("Paella creada");
+          return folder;
+        });
+      }).catch(function (err) {
+        console.error(err);
+        const message = messageFromError(err, "No se ha podido crear la paella");
         setDriveStatus(message);
         setPickerStatus(message, "error");
       }).finally(function () {
@@ -3218,21 +3730,10 @@
       state.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPE,
-        callback: function (response) {
-          if (!response || response.error || !response.access_token) {
-            setLoginStatus("Error de autenticacion.");
-            return;
-          }
-          state.accessToken = response.access_token;
-          loadProfile().then(function () {
-            showView("drive");
-            return Promise.all([loadFolder("root"), loadSharedDocs()]);
-          }).catch(function (err) {
-            console.error(err);
-            setLoginStatus("Sin respuesta de Google.");
-          });
-        }
+        callback: function () {},
+        error_callback: function () {}
       });
+      restoreStoredSession();
     }
 
     els.loginBtn.addEventListener("click", function () {
@@ -3241,7 +3742,13 @@
         return;
       }
       setLoginStatus("");
-      state.tokenClient.requestAccessToken({ prompt: "consent" });
+      requestGoogleAccessToken({ prompt: "consent" }).then(function (response) {
+        applyAccessTokenResponse(response);
+        return openAuthenticatedDrive();
+      }).catch(function (err) {
+        console.error(err);
+        setLoginStatus(messageFromError(err, "Sin respuesta de Google."));
+      });
     });
     function resetSession() {
       stopCollabPolling();
@@ -3251,10 +3758,12 @@
         if (state.accessToken && window.google && google.accounts && google.accounts.oauth2) {
           google.accounts.oauth2.revoke(state.accessToken, function () {});
         }
-        state.accessToken = "";
+        clearAccessTokenState();
         state.currentUser = null;
         state.folderStack = [{ id: "root", name: "Mi unidad" }];
         state.currentItems = [];
+        state.paellaItems = [];
+        state.paellaLoadError = "";
         state.sharedItems = [];
         state.spreadsheetId = "";
         state.spreadsheetTitle = "";
@@ -3282,8 +3791,11 @@
         state.sheetLoadToken = 0;
         state.pickerFolderStack = [{ id: "root", name: "Mi unidad" }];
         state.pickerFolders = [];
+        state.pickerMode = "sheet";
+        state.sessionRestoreInFlight = null;
         els.searchInput.value = "";
         els.itemsGrid.innerHTML = "";
+        els.paellasGrid.innerHTML = "";
         els.sharedGrid.innerHTML = "";
         els.sheetTabs.innerHTML = "";
         els.sheetGrid.innerHTML = "";
@@ -3292,14 +3804,17 @@
         closeNameModal();
         closeShareModal();
         closeProfileMenu();
+        configurePickerMode("sheet");
         renderBreadcrumbs();
+        renderPaellas();
         showView("login");
         setLoginStatus("");
       });
     }
     els.profileLogoutBtn.addEventListener("click", resetSession);
-    els.searchInput.addEventListener("input", function() { renderItems(); renderSharedItems(); });
+    els.searchInput.addEventListener("input", function() { renderItems(); renderPaellas(); renderSharedItems(); });
     els.newSheetBtn.addEventListener("click", createSpreadsheet);
+    els.createPaellaBtn.addEventListener("click", function () { openNewSheetModal("paella"); });
     els.newSheetCloseBtn.addEventListener("click", closeNewSheetModal);
     els.newSheetCancelBtn.addEventListener("click", closeNewSheetModal);
     els.newSheetCreateBtn.addEventListener("click", submitNewSheetModal);
@@ -3320,7 +3835,7 @@
     });
     els.profileRefreshBtn.addEventListener("click", function () {
       closeProfileMenu();
-      Promise.all([loadProfile(), loadFolder(currentFolderId()), loadSharedDocs()]).catch(function (err) {
+      Promise.all([loadProfile(), loadFolder(currentFolderId()), loadSharedDocs(), loadPaellas()]).catch(function (err) {
         console.error(err);
       });
     });
@@ -3498,7 +4013,9 @@
     window.addEventListener("pagehide", handleSessionPageExit);
     window.addEventListener("beforeunload", handleSessionPageExit);
 
+    configurePickerMode("sheet");
     renderBreadcrumbs();
+    renderPaellas();
     showView("login");
     initGoogle();
 
