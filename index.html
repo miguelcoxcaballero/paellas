@@ -480,6 +480,70 @@
       color: var(--paella-folder-color);
       font-weight: 600;
     }
+    .linked-pair-card {
+      border: 1px solid rgba(185, 90, 0, 0.18);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 251, 238, 0.96) 0%, rgba(255, 246, 215, 0.9) 100%);
+      box-shadow: 0 8px 24px rgba(145, 88, 8, 0.1);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .linked-pair-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .linked-pair-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #7a4605;
+    }
+    .linked-pair-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .linked-pair-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(185, 90, 0, 0.12);
+      color: #8a5211;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .linked-pair-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .item.paired-item {
+      min-height: 74px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .paired-item-kind {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #8a5211;
+      background: rgba(255, 231, 176, 0.7);
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
     .paella-empty {
       margin: 0;
     }
@@ -1563,6 +1627,187 @@
       background: var(--bg2);
       position: relative;
     }
+    .sheet-view-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 243, 199, 0.75);
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+    }
+    .sheet-view-toggle-btn {
+      min-width: 76px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, box-shadow .18s ease;
+    }
+    .sheet-view-toggle-btn.active {
+      background: #fff9e8;
+      color: var(--ink);
+      box-shadow: 0 3px 10px rgba(145, 88, 8, 0.12);
+    }
+    .sheet-view-toggle-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .sheet-groups-view {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(255, 252, 243, 0.98) 0%, rgba(255, 248, 227, 0.94) 100%);
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      padding: 14px;
+    }
+    .sheet-groups-list {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+    .sheet-group-card {
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.84);
+      box-shadow: 0 6px 20px rgba(145, 88, 8, 0.08);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .sheet-group-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sheet-group-title {
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .sheet-group-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.35;
+      margin-top: 4px;
+    }
+    .sheet-group-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .sheet-group-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 236, 190, 0.78);
+      color: #8a5211;
+      font-size: 0.74rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .sheet-group-columns {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.95fr) minmax(0, 1.35fr);
+      gap: 12px;
+    }
+    .sheet-group-block {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 251, 238, 0.85);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .sheet-group-block-title {
+      font-size: 0.76rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .sheet-group-detail-list {
+      display: grid;
+      gap: 8px;
+    }
+    .sheet-group-detail {
+      display: grid;
+      gap: 3px;
+    }
+    .sheet-group-detail-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .sheet-group-detail-value {
+      font-size: 0.9rem;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .sheet-assistants-list {
+      display: grid;
+      gap: 10px;
+    }
+    .sheet-assistant-card {
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.88);
+      padding: 10px 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .sheet-assistant-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .sheet-assistant-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .sheet-assistant-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: rgba(255, 236, 190, 0.78);
+      color: #8a5211;
+      font-size: 0.72rem;
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+    .sheet-assistant-meta {
+      display: grid;
+      gap: 4px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      word-break: break-word;
+    }
     .sheet-spacer {
       position: absolute;
       top: 0;
@@ -1729,6 +1974,9 @@
       table { width: max(100%, 760px); min-width: 760px; }
       .form-shell { grid-template-columns: 1fr; }
       .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+      .linked-pair-grid,
+      .sheet-group-columns { grid-template-columns: 1fr; }
+      .sheet-view-toggle { margin-left: 0; width: fit-content; }
       .item {
         min-height: 58px;
         height: auto;
@@ -1812,6 +2060,11 @@
         grid-template-columns: 1fr;
       }
       .item { min-height: 62px; }
+      .linked-pair-card { padding: 12px; }
+      .sheet-groups-view { padding: 12px; }
+      .sheet-group-card { padding: 12px; }
+      .sheet-view-toggle { width: 100%; justify-content: stretch; }
+      .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; }
       .item-more-btn {
         width: 32px;
         height: 32px;
@@ -1966,6 +2219,10 @@
           <div class="sheet-bar">
             <div id="sheetTabs" class="tabs editor-tabs"></div>
             <button id="addSheetTabBtn" class="add-sheet-btn" type="button" aria-label="Nueva sheet">+</button>
+            <div id="sheetViewToggle" class="sheet-view-toggle hidden-panel" role="tablist" aria-label="Vista del spreadsheet">
+              <button id="sheetViewTableBtn" class="sheet-view-toggle-btn active" type="button" aria-pressed="true">Tabla</button>
+              <button id="sheetViewGroupsBtn" class="sheet-view-toggle-btn" type="button" aria-pressed="false">Grupos</button>
+            </div>
           </div>
           <div id="formToolbar" class="form-toolbar hidden-panel">
             <div class="form-toolbar-group">
@@ -1990,6 +2247,11 @@
         <div id="sheetWrap" class="sheet-wrap">
           <div id="sheetSpacer" class="sheet-spacer"></div>
           <table id="sheetGrid"></table>
+        </div>
+        <div id="sheetGroupsView" class="sheet-groups-view hidden-panel">
+          <div id="sheetGroupsStatus" class="status"></div>
+          <div id="sheetGroupsList" class="sheet-groups-list"></div>
+          <div id="sheetGroupsEmpty" class="form-empty hidden">No hay grupos para mostrar en esta hoja.</div>
         </div>
         <div id="formEditor" class="form-shell hidden-panel">
           <div class="form-column">
@@ -2410,6 +2672,8 @@
       sheetData: {},
       sheetWindow: {},
       sheetDirtyCells: {},
+      spreadsheetViewMode: "table",
+      sheetGroupLoadToken: 0,
       formId: "",
       formTitle: "",
       savedFormTitle: "",
@@ -2535,6 +2799,9 @@
       shareDocBtn: document.getElementById("shareDocBtn"),
       sheetTabs: document.getElementById("sheetTabs"),
       addSheetTabBtn: document.getElementById("addSheetTabBtn"),
+      sheetViewToggle: document.getElementById("sheetViewToggle"),
+      sheetViewTableBtn: document.getElementById("sheetViewTableBtn"),
+      sheetViewGroupsBtn: document.getElementById("sheetViewGroupsBtn"),
       formToolbar: document.getElementById("formToolbar"),
       formToolbarMeta: document.getElementById("formToolbarMeta"),
       formTemplateSelect: document.getElementById("formTemplateSelect"),
@@ -2546,6 +2813,10 @@
       sheetWrap: document.getElementById("sheetWrap"),
       sheetSpacer: document.getElementById("sheetSpacer"),
       sheetGrid: document.getElementById("sheetGrid"),
+      sheetGroupsView: document.getElementById("sheetGroupsView"),
+      sheetGroupsStatus: document.getElementById("sheetGroupsStatus"),
+      sheetGroupsList: document.getElementById("sheetGroupsList"),
+      sheetGroupsEmpty: document.getElementById("sheetGroupsEmpty"),
       formEditor: document.getElementById("formEditor"),
       formDescriptionInput: document.getElementById("formDescriptionInput"),
       formQuestionsList: document.getElementById("formQuestionsList"),
@@ -3000,6 +3271,7 @@
     function setPaellaAccessStatus(text, tone) { setStatusOnElement(els.paellaAccessStatus, text, tone); }
     function setFormSyncStatus(text, tone) { setStatusOnElement(els.formSyncStatus, text, tone); }
     function setFormLinkStatus(text, tone) { setStatusOnElement(els.formLinkModalStatus, text, tone); }
+    function setSheetGroupsStatus(text, tone) { setStatusOnElement(els.sheetGroupsStatus, text, tone); }
     function setAppDialogStatus(text, tone) { setStatusOnElement(els.appDialogStatus, text, tone); }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
     function currentNewSheetType() {
@@ -3061,6 +3333,14 @@
     }
     function itemCanEdit(item) {
       return !item || !item.capabilities || item.capabilities.canEdit !== false;
+    }
+    function normalizeCompareText(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
     }
     function isFormDocumentActive() {
       return state.activeDocumentType === "form";
@@ -4160,6 +4440,204 @@
     function currentSheetData() {
       return ensureSheetState(state.currentSheetTitle || "");
     }
+    function getLoadedSheetHeaderValues(title, limit) {
+      const sheetTitle = title || state.currentSheetTitle || "";
+      const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === sheetTitle; }) || null;
+      const maxCols = Math.max(1, Math.min(Number(limit) || 24, info ? info.columnCount : 24));
+      const header = [];
+      for (let col = 0; col < maxCols; col += 1) {
+        header.push(getCellValue(sheetTitle, 0, col));
+      }
+      return header;
+    }
+    function isPaellaResponseHeader(headerValues) {
+      const normalized = (headerValues || []).map(normalizeCompareText);
+      const hasResponsibleName = normalized.indexOf("responsable - nombre completo") !== -1;
+      const hasResponsibleEmail = normalized.indexOf("responsable - email upv") !== -1 || normalized.indexOf("responsable - email") !== -1;
+      const hasAssistant = normalized.some(function (value) {
+        return /^asistente \d{2} - /.test(value);
+      });
+      return hasResponsibleName && (hasResponsibleEmail || hasAssistant);
+    }
+    function isCurrentSheetPaellaResponseSheet() {
+      if (!isSpreadsheetDocumentActive() || !state.currentSheetTitle) return false;
+      return isPaellaResponseHeader(getLoadedSheetHeaderValues(state.currentSheetTitle, 26));
+    }
+    function syncSheetViewToggle() {
+      const spreadsheetMode = isSpreadsheetDocumentActive();
+      const groupsAvailable = spreadsheetMode && isCurrentSheetPaellaResponseSheet();
+      if (!groupsAvailable && state.spreadsheetViewMode === "groups") {
+        state.spreadsheetViewMode = "table";
+      }
+      els.sheetViewToggle.classList.toggle("hidden-panel", !spreadsheetMode || !groupsAvailable);
+      els.sheetViewTableBtn.classList.toggle("active", state.spreadsheetViewMode !== "groups");
+      els.sheetViewGroupsBtn.classList.toggle("active", state.spreadsheetViewMode === "groups");
+      els.sheetViewTableBtn.setAttribute("aria-pressed", state.spreadsheetViewMode !== "groups" ? "true" : "false");
+      els.sheetViewGroupsBtn.setAttribute("aria-pressed", state.spreadsheetViewMode === "groups" ? "true" : "false");
+      els.sheetViewGroupsBtn.disabled = !groupsAvailable;
+    }
+    function setSpreadsheetViewMode(mode) {
+      const nextMode = mode === "groups" ? "groups" : "table";
+      if (nextMode === "groups" && !isCurrentSheetPaellaResponseSheet()) {
+        state.spreadsheetViewMode = "table";
+      } else {
+        state.spreadsheetViewMode = nextMode;
+      }
+      syncSheetViewToggle();
+      syncEditorSurface();
+      if (state.spreadsheetViewMode === "groups") {
+        renderSheetGroupsView();
+      }
+    }
+    function fetchCurrentSheetRows() {
+      const info = currentSheetInfo();
+      if (!info || !state.spreadsheetId || !state.currentSheetTitle) return Promise.resolve([]);
+      const rowCount = Math.max(1, Number(info.rowCount) || 1);
+      const columnCount = Math.max(1, Number(info.columnCount) || 1);
+      return fetchJson(
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) +
+        "/values:batchGet?ranges=" + encodeURIComponent(windowRange(state.currentSheetTitle, 0, 0, rowCount, columnCount))
+      ).then(function (data) {
+        const valueRanges = Array.isArray(data && data.valueRanges) ? data.valueRanges : [];
+        return valueRanges[0] && Array.isArray(valueRanges[0].values) ? valueRanges[0].values : [];
+      });
+    }
+    function buildPaellaGroupsFromSheetRows(rows) {
+      const sheetRows = Array.isArray(rows) ? rows : [];
+      if (sheetRows.length < 2) return [];
+      const header = sheetRows[0].map(function (value) { return String(value || "").trim(); });
+      if (!isPaellaResponseHeader(header)) return [];
+      function valueAt(values, index) {
+        return Number.isInteger(index) && index >= 0 ? (values[index] || "") : "";
+      }
+      const normalizedHeader = header.map(normalizeCompareText);
+      const headerIndex = {};
+      normalizedHeader.forEach(function (value, index) {
+        if (!(value in headerIndex)) headerIndex[value] = index;
+      });
+      const assistantColumnMap = new Map();
+      normalizedHeader.forEach(function (value, index) {
+        const match = /^asistente (\d{2}) - (nombre completo|dni|email upv)$/.exec(value);
+        if (!match) return;
+        if (!assistantColumnMap.has(match[1])) assistantColumnMap.set(match[1], {});
+        assistantColumnMap.get(match[1])[match[2]] = index;
+      });
+      return sheetRows.slice(1).map(function (row, rowIndex) {
+        const values = header.map(function (_, index) { return String(row[index] || "").trim(); });
+        if (!values.some(Boolean)) return null;
+        const responsible = {
+          name: valueAt(values, headerIndex["responsable - nombre completo"]),
+          email: valueAt(values, headerIndex["responsable - email upv"]) || valueAt(values, headerIndex["responsable - email"]) || valueAt(values, headerIndex["email"]),
+          dni: valueAt(values, headerIndex["responsable - dni"]),
+          phone: valueAt(values, headerIndex["responsable - telefono"])
+        };
+        const assistants = Array.from(assistantColumnMap.keys()).sort().map(function (assistantNumber) {
+          const assistantFields = assistantColumnMap.get(assistantNumber) || {};
+          const assistant = {
+            number: assistantNumber,
+            name: valueAt(values, assistantFields["nombre completo"]),
+            dni: valueAt(values, assistantFields["dni"]),
+            email: valueAt(values, assistantFields["email upv"])
+          };
+          return (assistant.name || assistant.dni || assistant.email) ? assistant : null;
+        }).filter(Boolean);
+        const submittedRaw = valueAt(values, headerIndex["submittedat"]);
+        let submittedAt = submittedRaw;
+        if (submittedRaw) {
+          const parsedDate = new Date(submittedRaw);
+          if (!Number.isNaN(parsedDate.getTime())) submittedAt = parsedDate.toLocaleString("es-ES");
+        }
+        return {
+          id: "group-" + rowIndex,
+          title: responsible.name || responsible.email || ("Grupo " + (rowIndex + 1)),
+          submittedAt: submittedAt,
+          responseId: valueAt(values, headerIndex["responseid"]),
+          responsible: responsible,
+          assistants: assistants,
+          attendeeCount: 1 + assistants.length,
+          firePoint: valueAt(values, headerIndex["paella - punto de fuego"]),
+          sharedLead: valueAt(values, headerIndex["paella - responsable del otro grupo"]),
+          contest: valueAt(values, headerIndex["paella - participa en concurso"])
+        };
+      }).filter(Boolean);
+    }
+    function renderSheetGroupsList(groups) {
+      els.sheetGroupsList.innerHTML = "";
+      els.sheetGroupsEmpty.classList.toggle("hidden", (groups || []).length !== 0);
+      (groups || []).forEach(function (group) {
+        const card = document.createElement("article");
+        card.className = "sheet-group-card";
+        const chips = [
+          "<span class='sheet-group-chip'>" + escapeHtml(String(group.attendeeCount)) + " personas</span>"
+        ];
+        if (group.contest) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.contest) + "</span>");
+        if (group.firePoint) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.firePoint) + "</span>");
+        card.innerHTML =
+          "<div class='sheet-group-head'>" +
+            "<div>" +
+              "<div class='sheet-group-title'>" + escapeHtml(group.title) + "</div>" +
+              "<div class='sheet-group-meta'>" + escapeHtml(group.submittedAt || "Sin fecha de envio") + (group.responseId ? (" · " + escapeHtml(group.responseId)) : "") + "</div>" +
+            "</div>" +
+            "<div class='sheet-group-chips'>" + chips.join("") + "</div>" +
+          "</div>" +
+          "<div class='sheet-group-columns'>" +
+            "<section class='sheet-group-block'>" +
+              "<div class='sheet-group-block-title'>Responsable</div>" +
+              "<div class='sheet-group-detail-list'>" +
+                "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Nombre</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.name || "Sin nombre") + "</div></div>" +
+                "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Email</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.email || "Sin email") + "</div></div>" +
+                "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>DNI</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.dni || "Sin DNI") + "</div></div>" +
+                "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Telefono</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.phone || "Sin telefono") + "</div></div>" +
+                (group.sharedLead && normalizeCompareText(group.sharedLead) !== "no"
+                  ? ("<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Grupo compartido</div><div class='sheet-group-detail-value'>" + escapeHtml(group.sharedLead) + "</div></div>")
+                  : "") +
+              "</div>" +
+            "</section>" +
+            "<section class='sheet-group-block'>" +
+              "<div class='sheet-group-block-title'>Asistentes</div>" +
+              "<div class='sheet-assistants-list'>" +
+                (group.assistants.length
+                  ? group.assistants.map(function (assistant) {
+                      return "<article class='sheet-assistant-card'>" +
+                        "<div class='sheet-assistant-head'>" +
+                          "<div class='sheet-assistant-name'>" + escapeHtml(assistant.name || "Sin nombre") + "</div>" +
+                          "<span class='sheet-assistant-badge'>#" + escapeHtml(String(Number(assistant.number) || assistant.number)) + "</span>" +
+                        "</div>" +
+                        "<div class='sheet-assistant-meta'>" +
+                          "<span>DNI: " + escapeHtml(assistant.dni || "Sin DNI") + "</span>" +
+                          "<span>Email: " + escapeHtml(assistant.email || "Sin email") + "</span>" +
+                        "</div>" +
+                      "</article>";
+                    }).join("")
+                  : "<div class='form-empty'>Sin asistentes registrados.</div>") +
+              "</div>" +
+            "</section>" +
+          "</div>";
+        els.sheetGroupsList.appendChild(card);
+      });
+    }
+    function renderSheetGroupsView() {
+      if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups") return Promise.resolve(false);
+      const titleAtStart = state.currentSheetTitle;
+      const requestId = ++state.sheetGroupLoadToken;
+      setSheetGroupsStatus("Cargando grupos...", "");
+      els.sheetGroupsList.innerHTML = "";
+      els.sheetGroupsEmpty.classList.add("hidden");
+      return fetchCurrentSheetRows().then(function (rows) {
+        if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
+        const groups = buildPaellaGroupsFromSheetRows(rows);
+        renderSheetGroupsList(groups);
+        setSheetGroupsStatus(groups.length ? "" : "Esta hoja no contiene respuestas agrupables.", groups.length ? "" : "error");
+        return true;
+      }).catch(function (err) {
+        console.error(err);
+        if (requestId !== state.sheetGroupLoadToken) return false;
+        els.sheetGroupsList.innerHTML = "";
+        els.sheetGroupsEmpty.classList.remove("hidden");
+        setSheetGroupsStatus(messageFromError(err, "No se han podido cargar los grupos"), "error");
+        return false;
+      });
+    }
     function setCellValue(sheetTitle, row, col, value) {
       const data = ensureSheetState(sheetTitle);
       const key = cellKey(row, col);
@@ -4536,6 +5014,7 @@
       els.formLinkSheetBtn.disabled = !editing;
       els.formCreateLinkedSheetBtn.disabled = !editing;
       els.formUnlinkSheetBtn.disabled = !editing || !state.formLinkedSheetId;
+      els.sheetViewTableBtn.disabled = !isSpreadsheetDocumentActive();
       Array.prototype.forEach.call(els.sheetGrid.querySelectorAll(".cell"), function (cell) {
         cell.readOnly = !editing;
       });
@@ -5812,6 +6291,73 @@
         els.itemsGrid.appendChild(el);
       });
     }
+    function createPaellaFileItemCard(item, extraClass) {
+      const isFolder = item && item.mimeType === DRIVE_FOLDER_MIME;
+      const el = document.createElement("article");
+      el.className = "item" + (extraClass ? " " + extraClass : "");
+      const kindLabel = isFolder
+        ? "Carpeta"
+        : item && item.mimeType === DRIVE_FORM_MIME
+          ? "Form"
+          : "Spreadsheet";
+      el.innerHTML =
+        "<div class='item-row'>" +
+          (isFolder ? driveFolderIconMarkup(isPaellaFolder(item), item.folderColorRgb) : driveFileIconMarkup(item.mimeType)) +
+          itemTitleMarkup(item.name, !!item.shared) +
+          "<span class='paired-item-kind'>" + escapeHtml(kindLabel) + "</span>" +
+        "</div>";
+      el.appendChild(createItemActionButton(item, "paella-file"));
+      el.addEventListener("click", function () {
+        if (isFolder) {
+          openPaellaChildFolder(item);
+          return;
+        }
+        openDriveDocument(item);
+      });
+      return el;
+    }
+    function getPaellaLinkedPairMap(items) {
+      const sourceItems = Array.isArray(items) ? items : [];
+      const byId = new Map();
+      const pairById = new Map();
+      sourceItems.forEach(function (item) {
+        if (item && item.id) byId.set(item.id, item);
+      });
+      sourceItems.forEach(function (item) {
+        if (!item || item.mimeType !== DRIVE_FORM_MIME) return;
+        const linkedSheetId = item.appProperties && item.appProperties[FORM_LINKED_SHEET_KEY]
+          ? String(item.appProperties[FORM_LINKED_SHEET_KEY])
+          : "";
+        const linkedSheet = linkedSheetId ? byId.get(linkedSheetId) : null;
+        if (!linkedSheet || linkedSheet.mimeType !== DRIVE_SPREADSHEET_MIME) return;
+        const pair = {
+          id: "pair:" + item.id + ":" + linkedSheet.id,
+          form: item,
+          spreadsheet: linkedSheet
+        };
+        pairById.set(item.id, pair);
+        pairById.set(linkedSheet.id, pair);
+      });
+      return pairById;
+    }
+    function createPaellaLinkedPairCard(pair) {
+      const wrapper = document.createElement("section");
+      wrapper.className = "linked-pair-card";
+      wrapper.innerHTML =
+        "<div class='linked-pair-head'>" +
+          "<div>" +
+            "<div class='linked-pair-title'>Form y spreadsheet vinculados</div>" +
+            "<div class='linked-pair-copy'>El formulario y su hoja de respuestas se muestran juntos.</div>" +
+          "</div>" +
+          "<span class='linked-pair-badge'>Vinculados</span>" +
+        "</div>";
+      const grid = document.createElement("div");
+      grid.className = "linked-pair-grid";
+      grid.appendChild(createPaellaFileItemCard(pair.form, "paired-item"));
+      grid.appendChild(createPaellaFileItemCard(pair.spreadsheet, "paired-item"));
+      wrapper.appendChild(grid);
+      return wrapper;
+    }
     function renderPaellas() {
       closeItemActionMenu();
       const activeFolder = state.activePaellaStack[state.activePaellaStack.length - 1] || null;
@@ -5835,25 +6381,27 @@
         : (state.paellaLoadError || (query ? "No hay paellas que coincidan con la busqueda." : "No hay paellas todavia."));
       els.paellasEmpty.classList.toggle("hidden", filtered.length !== 0);
       if (activeFolder) {
-        filtered.forEach(function (item) {
-          const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
-          const el = document.createElement("article");
-          el.className = "item";
-          el.innerHTML =
-            "<div class='item-row'>" +
-              (isFolder ? driveFolderIconMarkup(isPaellaFolder(item), item.folderColorRgb) : driveFileIconMarkup(item.mimeType)) +
-              itemTitleMarkup(item.name, !!item.shared) +
-            "</div>";
-          el.appendChild(createItemActionButton(item, "paella-file"));
-          el.addEventListener("click", function () {
-            if (isFolder) {
-              openPaellaChildFolder(item);
-              return;
-            }
-            openDriveDocument(item);
-          });
-          els.paellasGrid.appendChild(el);
+        const pairById = getPaellaLinkedPairMap(state.activePaellaItems);
+        const renderedPairIds = new Set();
+        let renderedCount = 0;
+        state.activePaellaItems.forEach(function (item) {
+          const pair = pairById.get(item.id);
+          if (pair) {
+            if (renderedPairIds.has(pair.id)) return;
+            const matchesPair = !query
+              || (pair.form.name || "").toLowerCase().includes(query)
+              || (pair.spreadsheet.name || "").toLowerCase().includes(query);
+            if (!matchesPair) return;
+            els.paellasGrid.appendChild(createPaellaLinkedPairCard(pair));
+            renderedPairIds.add(pair.id);
+            renderedCount += 1;
+            return;
+          }
+          if (query && !(item.name || "").toLowerCase().includes(query)) return;
+          els.paellasGrid.appendChild(createPaellaFileItemCard(item));
+          renderedCount += 1;
         });
+        els.paellasEmpty.classList.toggle("hidden", renderedCount !== 0);
         return;
       }
       filtered.forEach(function (item) {
@@ -6284,9 +6832,12 @@
     }
     function syncEditorSurface() {
       const formMode = isFormDocumentActive();
-      els.sheetWrap.classList.toggle("hidden-panel", formMode);
+      const showGroups = !formMode && state.spreadsheetViewMode === "groups";
+      els.sheetWrap.classList.toggle("hidden-panel", formMode || showGroups);
+      els.sheetGroupsView.classList.toggle("hidden-panel", formMode || !showGroups);
       els.sheetTabs.classList.toggle("hidden-panel", formMode);
       els.addSheetTabBtn.classList.toggle("hidden-panel", formMode);
+      els.sheetViewToggle.classList.toggle("hidden-panel", formMode || !isCurrentSheetPaellaResponseSheet());
       els.formToolbar.classList.toggle("hidden-panel", !formMode);
       els.formEditor.classList.toggle("hidden-panel", !formMode);
       if (formMode) {
@@ -6938,6 +7489,7 @@
       html.push("</tbody>");
       els.sheetGrid.innerHTML = html.join("");
       syncEditorTitle();
+      syncSheetViewToggle();
       applyEditorMode();
     }
     function loadProfile() {
@@ -7182,6 +7734,9 @@
           renderTabs();
           renderGrid();
           if (!config.skipDirtyState) refreshDirtyState();
+          if (state.spreadsheetViewMode === "groups" && isCurrentSheetPaellaResponseSheet()) {
+            return renderSheetGroupsView().then(function () { return true; });
+          }
           return true;
         })
         .catch(function (err) {
@@ -7236,6 +7791,8 @@
       state.sheetData = {};
       state.sheetWindow = {};
       state.sheetDirtyCells = {};
+      state.spreadsheetViewMode = "table";
+      state.sheetGroupLoadToken = 0;
       clearTimeout(state.saveTimer);
       state.saveQueued = false;
       state.saveInFlight = false;
@@ -7301,6 +7858,8 @@
       state.sheetData = {};
       state.sheetWindow = {};
       state.sheetDirtyCells = {};
+      state.spreadsheetViewMode = "table";
+      state.sheetGroupLoadToken = 0;
       state.titleDirty = false;
       state.editorMode = "read";
       state.canEdit = true;
@@ -7992,6 +8551,8 @@
           state.sheetData = {};
           state.sheetWindow = {};
           state.sheetDirtyCells = {};
+          state.spreadsheetViewMode = "table";
+          state.sheetGroupLoadToken = 0;
           state.formId = "";
           state.formTitle = "";
           state.savedFormTitle = "";
@@ -8116,6 +8677,12 @@
       showView("drive");
     });
     els.modeToggleBtn.addEventListener("click", toggleEditorMode);
+    els.sheetViewTableBtn.addEventListener("click", function () {
+      setSpreadsheetViewMode("table");
+    });
+    els.sheetViewGroupsBtn.addEventListener("click", function () {
+      setSpreadsheetViewMode("groups");
+    });
     els.shareDocBtn.addEventListener("click", openShareModal);
     els.addSheetTabBtn.addEventListener("click", function () {
       openNameModal({
