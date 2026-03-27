@@ -840,6 +840,9 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+    .form-template-select {
+      min-width: 220px;
+    }
     .form-shell {
       min-height: 0;
       overflow: auto;
@@ -1531,6 +1534,7 @@
       justify-content: flex-start;
       align-items: center;
       min-width: 0;
+      margin-bottom: 10px;
     }
     .drive-scroll {
       flex: 1 1 0;
@@ -1624,7 +1628,6 @@
           <div id="driveStatus" class="pill hidden"></div>
           <button id="newSheetBtn" class="btn small primary drive-primary-action" type="button"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg> Nueva</button>
         </div>
-        <div id="breadcrumbs" class="crumbs"></div>
       </section>
       <div class="drive-scroll">
         <section class="card paella-panel">
@@ -1644,6 +1647,7 @@
         </section>
         <div>
           <div id="folderMeta" class="section-label">Mi unidad</div>
+          <div id="breadcrumbs" class="crumbs"></div>
           <div id="itemsGrid" class="grid"></div>
           <p id="emptyState" class="meta hidden">Sin resultados.</p>
         </div>
@@ -1683,6 +1687,13 @@
           <div id="formToolbar" class="form-toolbar hidden-panel">
             <div id="formToolbarMeta" class="meta">Editor de formulario</div>
             <div class="form-toolbar-actions">
+              <select id="formTemplateSelect" class="search form-template-select" aria-label="Plantilla para formulario">
+                <option value="paella-16">Plantilla paella 16 personas</option>
+                <option value="paella-12">Plantilla paella 12 personas</option>
+                <option value="paella-8">Plantilla paella 8 personas</option>
+                <option value="asistentes-4">Añadir bloque de 4 asistentes</option>
+              </select>
+              <button id="formApplyTemplateBtn" class="btn small" type="button">Aplicar plantilla</button>
               <button id="formAddQuestionBtn" class="btn small" type="button">Añadir pregunta</button>
               <button id="formSyncSheetBtn" class="btn small" type="button">Sincronizar respuestas</button>
             </div>
@@ -2006,9 +2017,11 @@
       "#c2c2c2",
       "#cabdbf"
     ]);
-    const AUTH_SESSION_KEY = "paellas-auth-session-v1";
+    const AUTH_SESSION_KEY = "paellas-auth-session-v2";
+    const LEGACY_AUTH_SESSION_KEY = "paellas-auth-session-v1";
     const AUTH_REFRESH_MARGIN_MS = 120000;
     const AUTH_REFRESH_RETRY_MS = 15000;
+    const AUTH_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
     let presencePingTimer = 0;
     let presenceHeartbeatTimer = 0;
@@ -2160,6 +2173,8 @@
       addSheetTabBtn: document.getElementById("addSheetTabBtn"),
       formToolbar: document.getElementById("formToolbar"),
       formToolbarMeta: document.getElementById("formToolbarMeta"),
+      formTemplateSelect: document.getElementById("formTemplateSelect"),
+      formApplyTemplateBtn: document.getElementById("formApplyTemplateBtn"),
       formAddQuestionBtn: document.getElementById("formAddQuestionBtn"),
       formSyncSheetBtn: document.getElementById("formSyncSheetBtn"),
       sheetWrap: document.getElementById("sheetWrap"),
@@ -2247,21 +2262,47 @@
     function setEditorStatus(text) {
       els.modeToggleBtn.title = text || (els.saveIndicator ? (els.saveIndicator.title || "") : "");
     }
+    function normalizeStoredUser(user) {
+      if (!user || typeof user !== "object") return null;
+      const displayName = user.displayName ? String(user.displayName) : "";
+      const emailAddress = user.emailAddress ? String(user.emailAddress) : "";
+      const photoLink = user.photoLink ? String(user.photoLink) : "";
+      if (!displayName && !emailAddress && !photoLink) return null;
+      return { displayName, emailAddress, photoLink };
+    }
     function readStoredAuthSession() {
       try {
-        const raw = localStorage.getItem(AUTH_SESSION_KEY);
-        if (!raw) return null;
-        const data = JSON.parse(raw);
-        if (!data || typeof data !== "object") return null;
-        return {
-          accessToken: data.accessToken ? String(data.accessToken) : "",
-          expiresAt: Number(data.expiresAt) || 0,
-          user: data.user && typeof data.user === "object" ? {
-            displayName: data.user.displayName ? String(data.user.displayName) : "",
-            emailAddress: data.user.emailAddress ? String(data.user.emailAddress) : "",
-            photoLink: data.user.photoLink ? String(data.user.photoLink) : ""
-          } : null
-        };
+        const storageKeys = [AUTH_SESSION_KEY, LEGACY_AUTH_SESSION_KEY];
+        for (let index = 0; index < storageKeys.length; index += 1) {
+          const storageKey = storageKeys[index];
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) continue;
+          const data = JSON.parse(raw);
+          if (!data || typeof data !== "object") continue;
+          const storedUser = normalizeStoredUser(data.user);
+          const session = {
+            accessToken: data.accessToken ? String(data.accessToken) : "",
+            expiresAt: Number(data.expiresAt) || 0,
+            user: storedUser,
+            loginHint: data.loginHint ? String(data.loginHint) : (storedUser && storedUser.emailAddress ? storedUser.emailAddress : ""),
+            updatedAt: Number(data.updatedAt) || 0
+          };
+          const sessionAge = session.updatedAt ? (Date.now() - session.updatedAt) : 0;
+          if (!session.accessToken && !session.user) {
+            localStorage.removeItem(storageKey);
+            continue;
+          }
+          if (sessionAge > AUTH_SESSION_MAX_AGE_MS) {
+            localStorage.removeItem(storageKey);
+            continue;
+          }
+          if (storageKey !== AUTH_SESSION_KEY) {
+            localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+            localStorage.removeItem(storageKey);
+          }
+          return session;
+        }
+        return null;
       } catch (err) {
         console.warn("No se ha podido leer la sesion guardada:", err);
         return null;
@@ -2270,28 +2311,36 @@
     function clearStoredAuthSession() {
       try {
         localStorage.removeItem(AUTH_SESSION_KEY);
+        localStorage.removeItem(LEGACY_AUTH_SESSION_KEY);
       } catch (err) {
         console.warn("No se ha podido borrar la sesion guardada:", err);
       }
     }
     function saveStoredAuthSession() {
-      if (!state.accessToken) {
+      const normalizedUser = normalizeStoredUser(state.currentUser);
+      if (!state.accessToken && !normalizedUser) {
         clearStoredAuthSession();
         return;
       }
       try {
         localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
-          accessToken: state.accessToken,
+          accessToken: state.accessToken || "",
           expiresAt: state.accessTokenExpiresAt || 0,
-          user: state.currentUser ? {
-            displayName: state.currentUser.displayName || "",
-            emailAddress: state.currentUser.emailAddress || "",
-            photoLink: state.currentUser.photoLink || ""
-          } : null
+          user: normalizedUser,
+          loginHint: normalizedUser && normalizedUser.emailAddress ? normalizedUser.emailAddress : "",
+          updatedAt: Date.now()
         }));
       } catch (err) {
         console.warn("No se ha podido guardar la sesion:", err);
       }
+    }
+    function getAuthLoginHint() {
+      const currentUser = normalizeStoredUser(state.currentUser);
+      if (currentUser && currentUser.emailAddress) return currentUser.emailAddress;
+      const stored = readStoredAuthSession();
+      if (!stored) return "";
+      if (stored.loginHint) return stored.loginHint;
+      return stored.user && stored.user.emailAddress ? stored.user.emailAddress : "";
     }
     function clearTokenRefreshTimer() {
       clearTimeout(state.tokenRefreshTimer);
@@ -2303,14 +2352,18 @@
     }
     function clearAccessTokenState(options) {
       const config = options || {};
+      const storedSession = config.keepStoredSession ? readStoredAuthSession() : null;
+      const preservedUser = config.keepUser
+        ? (state.currentUser || (storedSession ? storedSession.user : null))
+        : (storedSession ? storedSession.user : null);
       clearTokenRefreshTimer();
       state.tokenRequestInFlight = null;
       state.accessToken = "";
       state.accessTokenExpiresAt = 0;
-      if (!config.keepUser) {
-        state.currentUser = null;
-      }
-      if (!config.keepStoredSession) {
+      state.currentUser = preservedUser || null;
+      if (config.keepStoredSession) {
+        saveStoredAuthSession();
+      } else {
         clearStoredAuthSession();
       }
     }
@@ -2323,8 +2376,19 @@
     }
     function scheduleTokenRefresh(retryDelayMs) {
       clearTokenRefreshTimer();
-      if (!state.accessToken || !state.accessTokenExpiresAt) return;
       const retryDelay = Math.max(1000, Number(retryDelayMs) || 0);
+      if (!state.accessToken || !state.accessTokenExpiresAt) {
+        if (!retryDelay || !getAuthLoginHint()) return;
+        state.tokenRefreshTimer = window.setTimeout(function () {
+          restoreGoogleSessionSilently().catch(function (err) {
+            console.warn("No se ha podido reactivar la sesion en segundo plano:", err);
+            clearAccessTokenState({ keepUser: true, keepStoredSession: true });
+            renderProfileMenu();
+            scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
+          });
+        }, retryDelay);
+        return;
+      }
       const refreshIn = retryDelay || Math.max(1000, state.accessTokenExpiresAt - Date.now() - AUTH_REFRESH_MARGIN_MS);
       state.tokenRefreshTimer = window.setTimeout(function () {
         refreshAccessTokenSilently().catch(function (err) {
@@ -2333,12 +2397,10 @@
             scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
             return;
           }
-          clearAccessTokenState();
+          clearAccessTokenState({ keepUser: true, keepStoredSession: true });
           renderProfileMenu();
-          if (els.editorView.classList.contains("hidden")) {
-            showView("login");
-            setLoginStatus("La sesion ha caducado. Inicia sesion de nuevo.");
-          }
+          scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
+          if (!els.loginView.classList.contains("hidden")) setLoginStatus("Reconectando con Google...");
         });
       }, refreshIn);
     }
@@ -2350,6 +2412,16 @@
         return state.tokenRequestInFlight;
       }
       const requestConfig = Object.assign({}, config || {});
+      if (!Object.prototype.hasOwnProperty.call(requestConfig, "scope")) {
+        requestConfig.scope = GOOGLE_SCOPE;
+      }
+      if (requestConfig.prompt === "") {
+        delete requestConfig.prompt;
+      }
+      if (!requestConfig.login_hint) {
+        const loginHint = getAuthLoginHint();
+        if (loginHint) requestConfig.login_hint = loginHint;
+      }
       state.tokenRequestInFlight = new Promise(function (resolve, reject) {
         let settled = false;
         function cleanup() {
@@ -2362,7 +2434,7 @@
           settled = true;
           cleanup();
           if (!response || response.error || !response.access_token) {
-            reject(new Error((response && response.error) || "Error de autenticacion"));
+            reject(new Error((response && (response.error_description || response.error || response.error_subtype)) || "Error de autenticacion"));
             return;
           }
           resolve(response);
@@ -2390,6 +2462,18 @@
         return state.accessToken;
       });
     }
+    function restoreGoogleSessionSilently() {
+      if (hasUsableAccessToken(AUTH_REFRESH_MARGIN_MS)) {
+        return Promise.resolve(state.accessToken);
+      }
+      if (!state.tokenClient) {
+        return Promise.reject(new Error("Google Auth aun no esta listo."));
+      }
+      return requestGoogleAccessToken({ prompt: "none" }).then(function (response) {
+        applyAccessTokenResponse(response);
+        return state.accessToken;
+      });
+    }
     function ensureValidAccessToken() {
       if (hasUsableAccessToken(AUTH_REFRESH_MARGIN_MS)) {
         return Promise.resolve(state.accessToken);
@@ -2397,12 +2481,14 @@
       if (!state.tokenClient) {
         return state.accessToken ? Promise.resolve(state.accessToken) : Promise.reject(new Error("Sin sesion activa."));
       }
-      return refreshAccessTokenSilently().catch(function (err) {
+      return restoreGoogleSessionSilently().catch(function (err) {
         if (hasUsableAccessToken(0)) {
           scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
           return state.accessToken;
         }
-        clearAccessTokenState();
+        clearAccessTokenState({ keepUser: true, keepStoredSession: true });
+        renderProfileMenu();
+        scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
         throw err;
       });
     }
@@ -2420,27 +2506,30 @@
         return state.sessionRestoreInFlight;
       }
       const stored = readStoredAuthSession();
-      if (!stored || !stored.accessToken) {
+      if (!stored) {
         return Promise.resolve(false);
       }
-      state.accessToken = stored.accessToken;
-      state.accessTokenExpiresAt = stored.expiresAt;
       state.currentUser = stored.user || null;
+      state.accessToken = stored.accessToken || "";
+      state.accessTokenExpiresAt = stored.expiresAt || 0;
       renderProfileMenu();
-      scheduleTokenRefresh();
       setLoginStatus("Recuperando sesion...");
-      state.sessionRestoreInFlight = openAuthenticatedDrive().then(function () {
+      if (state.accessToken) {
+        scheduleTokenRefresh();
+      }
+      const restoreWork = hasUsableAccessToken(0)
+        ? Promise.resolve()
+        : restoreGoogleSessionSilently();
+      state.sessionRestoreInFlight = restoreWork.then(function () {
+        return openAuthenticatedDrive();
+      }).then(function () {
         return true;
       }).catch(function (err) {
         console.warn("No se ha podido restaurar la sesion guardada:", err);
-        if (!hasUsableAccessToken(0)) {
-          clearAccessTokenState();
-        } else {
-          scheduleTokenRefresh();
-        }
+        clearAccessTokenState({ keepUser: true, keepStoredSession: true });
         renderProfileMenu();
         showView("login");
-        setLoginStatus(hasUsableAccessToken(0) ? "No se ha podido restaurar la sesion ahora." : "");
+        setLoginStatus("No se pudo restaurar la sesion automaticamente. Pulsa Iniciar sesion.");
         return false;
       }).finally(function () {
         state.sessionRestoreInFlight = null;
@@ -2593,6 +2682,158 @@
         required: false,
         options: safeType === "choice" || safeType === "checkbox" ? ["Opcion 1", "Opcion 2"] : []
       };
+    }
+    function createPaellaTemplateQuestion(config) {
+      const question = createLocalFormQuestion(config && config.type ? config.type : "short");
+      question.title = String(config && config.title || "Pregunta");
+      question.description = String(config && config.description || "");
+      question.required = !!(config && config.required);
+      question.options = Array.isArray(config && config.options) ? config.options.slice() : [];
+      return question;
+    }
+    function buildPaellaNumberOptions(maxAttendees) {
+      const safeMax = Math.max(2, Math.min(16, Number(maxAttendees) || 16));
+      const options = [];
+      for (let number = 1; number <= safeMax; number += 1) {
+        options.push(String(number));
+      }
+      return options;
+    }
+    function formatPaellaAssistantNumber(number) {
+      return String(Math.max(1, Number(number) || 1)).padStart(2, "0");
+    }
+    function buildPaellaAssistantQuestions(startAt, endAt) {
+      const questions = [];
+      const safeStart = Math.max(2, Number(startAt) || 2);
+      const safeEnd = Math.max(safeStart, Math.min(16, Number(endAt) || safeStart));
+      for (let attendeeNumber = safeStart; attendeeNumber <= safeEnd; attendeeNumber += 1) {
+        const label = formatPaellaAssistantNumber(attendeeNumber);
+        const hint = "Deja este bloque vacio si tu grupo no llega hasta este asistente.";
+        questions.push(createPaellaTemplateQuestion({
+          title: "Asistente " + label + " - nombre completo",
+          type: "short",
+          description: hint
+        }));
+        questions.push(createPaellaTemplateQuestion({
+          title: "Asistente " + label + " - DNI",
+          type: "short"
+        }));
+        questions.push(createPaellaTemplateQuestion({
+          title: "Asistente " + label + " - email UPV",
+          type: "short"
+        }));
+      }
+      return questions;
+    }
+    function buildPaellaTemplateQuestions(maxAttendees) {
+      const safeMax = Math.max(2, Math.min(16, Number(maxAttendees) || 16));
+      return [
+        createPaellaTemplateQuestion({
+          title: "Responsable - nombre completo",
+          type: "short",
+          required: true
+        }),
+        createPaellaTemplateQuestion({
+          title: "Responsable - email UPV",
+          type: "short",
+          required: true
+        }),
+        createPaellaTemplateQuestion({
+          title: "Responsable - DNI",
+          type: "short",
+          required: true
+        }),
+        createPaellaTemplateQuestion({
+          title: "Responsable - telefono",
+          type: "short",
+          required: true
+        }),
+        createPaellaTemplateQuestion({
+          title: "Paella - punto de fuego",
+          type: "choice",
+          required: true,
+          options: [
+            "Si, para paella",
+            "Comparto punto de fuego con otro grupo"
+          ]
+        }),
+        createPaellaTemplateQuestion({
+          title: "Paella - responsable del otro grupo",
+          type: "short",
+          required: true,
+          description: "Si no compartis fuego, escribe NO."
+        }),
+        createPaellaTemplateQuestion({
+          title: "Paella - participa en concurso",
+          type: "choice",
+          required: true,
+          options: ["Si", "No"]
+        }),
+        createPaellaTemplateQuestion({
+          title: "Grupo - numero de asistentes",
+          type: "choice",
+          required: true,
+          description: "Incluye tambien a la persona responsable.",
+          options: buildPaellaNumberOptions(safeMax)
+        })
+      ].concat(
+        buildPaellaAssistantQuestions(2, safeMax),
+        [
+          createPaellaTemplateQuestion({
+            title: "Grupo - declaracion de grupo completo",
+            type: "checkbox",
+            required: true,
+            description: "Marca esta casilla cuando hayas incluido a todas las personas del grupo.",
+            options: ["Acepta"]
+          }),
+          createPaellaTemplateQuestion({
+            title: "Normativa - aceptacion de convivencia",
+            type: "checkbox",
+            required: true,
+            description: "Marca esta casilla para confirmar que aceptais la normativa.",
+            options: ["Acepto"]
+          })
+        ]
+      );
+    }
+    function getPaellaTemplateDescription(maxAttendees) {
+      const safeMax = Math.max(2, Math.min(16, Number(maxAttendees) || 16));
+      return "Inscripcion estandar para paellas. Recoge responsable, punto de fuego, concurso y asistentes hasta " + safeMax + " personas con columnas ordenadas para la hoja vinculada.";
+    }
+    function getHighestPaellaAssistantNumber() {
+      let maxNumber = 1;
+      state.formItems.forEach(function (question) {
+        const match = String(question && question.title || "").match(/^Asistente\s+(\d{2})\s+-/i);
+        if (!match) return;
+        maxNumber = Math.max(maxNumber, Number(match[1]) || 1);
+      });
+      return maxNumber;
+    }
+    function applyPaellaTemplateSelection() {
+      const templateKey = els.formTemplateSelect ? els.formTemplateSelect.value : "paella-16";
+      if (!templateKey) return;
+      if (templateKey === "asistentes-4") {
+        const nextAssistant = getHighestPaellaAssistantNumber() + 1;
+        if (nextAssistant > 16) {
+          setFormSyncStatus("La plantilla de paella ya alcanza el maximo de 16 personas.", "error");
+          return;
+        }
+        const endAssistant = Math.min(16, nextAssistant + 3);
+        state.formItems = state.formItems.concat(buildPaellaAssistantQuestions(nextAssistant, endAssistant));
+        renderFormQuestions();
+        markFormDirty();
+        setFormSyncStatus("Bloque de asistentes " + formatPaellaAssistantNumber(nextAssistant) + "-" + formatPaellaAssistantNumber(endAssistant) + " anadido.", "good");
+        return;
+      }
+      const maxAttendees = Number(String(templateKey).split("-")[1]) || 16;
+      if (state.formItems.length && !window.confirm("Esta plantilla sustituira las preguntas actuales del formulario. Continuar?")) {
+        return;
+      }
+      state.formItems = buildPaellaTemplateQuestions(maxAttendees);
+      state.formDescription = getPaellaTemplateDescription(maxAttendees);
+      renderFormQuestions();
+      markFormDirty();
+      setFormSyncStatus("Plantilla de paella aplicada.", "good");
     }
     function cloneFormQuestion(question) {
       return {
@@ -3309,6 +3550,8 @@
       els.editorTitle.setAttribute("contenteditable", editing ? "true" : "false");
       els.editorTitle.setAttribute("tabindex", editing ? "0" : "-1");
       els.addSheetTabBtn.disabled = !state.canEdit || !isSpreadsheetDocumentActive();
+      els.formTemplateSelect.disabled = !editing;
+      els.formApplyTemplateBtn.disabled = !editing;
       els.formAddQuestionBtn.disabled = !editing;
       els.formDescriptionInput.disabled = !editing;
       els.formLinkSheetBtn.disabled = !editing;
@@ -3995,12 +4238,14 @@
       let res = await fetch(url, init);
       if (!res.ok && !skipAuthRefresh && (res.status === 401 || res.status === 403)) {
         try {
-          await refreshAccessTokenSilently();
+          clearAccessTokenState({ keepUser: true, keepStoredSession: true });
+          await restoreGoogleSessionSilently();
           init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
           res = await fetch(url, init);
         } catch (err) {
           if (!hasUsableAccessToken(0)) {
-            clearAccessTokenState();
+            clearAccessTokenState({ keepUser: true, keepStoredSession: true });
+            scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
             renderProfileMenu();
           }
         }
@@ -6205,6 +6450,7 @@
       state.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPE,
+        include_granted_scopes: true,
         callback: function () {},
         error_callback: function () {}
       });
@@ -6217,7 +6463,7 @@
         return;
       }
       setLoginStatus("");
-      requestGoogleAccessToken({ prompt: "consent" }).then(function (response) {
+      requestGoogleAccessToken({ prompt: "" }).then(function (response) {
         applyAccessTokenResponse(response);
         return openAuthenticatedDrive();
       }).catch(function (err) {
@@ -6532,6 +6778,9 @@
     els.formDescriptionInput.addEventListener("input", function () {
       state.formDescription = els.formDescriptionInput.value;
       markFormDirty();
+    });
+    els.formApplyTemplateBtn.addEventListener("click", function () {
+      applyPaellaTemplateSelection();
     });
     els.formAddQuestionBtn.addEventListener("click", function () {
       state.formItems.push(createLocalFormQuestion("short"));
