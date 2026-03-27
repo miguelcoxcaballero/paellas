@@ -2002,6 +2002,25 @@
       gap: 20px;
       align-content: start;
     }
+    .drive-scroll.paella-focus {
+      overflow: hidden;
+      align-content: stretch;
+      grid-template-rows: minmax(0, 1fr);
+    }
+    .drive-scroll.paella-focus .paella-panel {
+      min-height: 0;
+      height: 100%;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+    .drive-scroll.paella-focus .paella-panel-content {
+      min-height: 0;
+      height: 100%;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .drive-scroll.paella-focus .linked-pair-grid {
+      grid-template-columns: 1fr;
+    }
     .section-label {
       font-size: 0.72rem;
       font-weight: 600;
@@ -2073,6 +2092,19 @@
       }
       .drive-header { padding: 10px 14px; }
       .drive-scroll { padding: 12px 14px; gap: 14px; }
+      .drive-scroll.paella-focus {
+        overflow: auto;
+        align-content: start;
+        grid-template-rows: auto;
+      }
+      .drive-scroll.paella-focus .paella-panel {
+        height: auto;
+      }
+      .drive-scroll.paella-focus .paella-panel-content {
+        height: auto;
+        overflow: visible;
+        padding-right: 0;
+      }
       .drive-top-row {
         flex-wrap: wrap;
         align-items: stretch;
@@ -2882,6 +2914,9 @@
       emptyState: document.getElementById("emptyState"),
       sharedGrid: document.getElementById("sharedGrid"),
       sharedEmptyState: document.getElementById("sharedEmptyState"),
+      driveScroll: document.querySelector("#driveView .drive-scroll"),
+      folderSection: document.getElementById("folderSection"),
+      sharedSection: document.getElementById("sharedSection"),
       driveShell: document.getElementById("driveShell"),
       editorShell: document.getElementById("editorShell"),
       editorTitle: document.getElementById("editorTitle"),
@@ -6511,6 +6546,15 @@
       const filtered = (activeFolder ? state.activePaellaItems : state.paellaItems).filter(function (item) {
         return !query || (item.name || "").toLowerCase().includes(query);
       });
+      if (els.driveScroll) {
+        els.driveScroll.classList.toggle("paella-focus", !!activeFolder);
+      }
+      if (els.folderSection) {
+        els.folderSection.classList.toggle("hidden", !!activeFolder);
+      }
+      if (els.sharedSection) {
+        els.sharedSection.classList.toggle("hidden", !!activeFolder);
+      }
       if (els.paellaPanel) {
         els.paellaPanel.classList.toggle("is-folder-open", !!activeFolder);
       }
