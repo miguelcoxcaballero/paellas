@@ -485,9 +485,9 @@
       border-radius: 18px;
       background: linear-gradient(180deg, rgba(255, 251, 238, 0.96) 0%, rgba(255, 246, 215, 0.9) 100%);
       box-shadow: 0 8px 24px rgba(145, 88, 8, 0.1);
-      padding: 14px;
+      padding: 18px;
       display: grid;
-      gap: 12px;
+      gap: 16px;
     }
     .linked-pair-head {
       display: flex;
@@ -497,15 +497,17 @@
       flex-wrap: wrap;
     }
     .linked-pair-title {
-      font-size: 0.9rem;
+      font-size: 1.08rem;
       font-weight: 800;
       line-height: 1.2;
       color: #7a4605;
+      letter-spacing: -0.02em;
     }
     .linked-pair-copy {
-      font-size: 0.78rem;
+      font-size: 0.92rem;
       color: var(--muted);
       line-height: 1.35;
+      max-width: 42ch;
     }
     .linked-pair-badge {
       display: inline-flex;
@@ -523,26 +525,100 @@
     .linked-pair-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .paired-file-card {
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 4px 14px rgba(145, 88, 8, 0.08);
+      padding: 14px;
+      display: grid;
       gap: 12px;
+      min-height: 144px;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
-    .item.paired-item {
-      min-height: 74px;
-      background: rgba(255,255,255,0.9);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .paired-file-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(145, 88, 8, 0.12);
+      border-color: rgba(185, 90, 0, 0.2);
     }
-    .paired-item-kind {
+    .paired-file-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .paired-file-card-kind {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 700;
       letter-spacing: 0.02em;
       color: #8a5211;
-      background: rgba(255, 231, 176, 0.7);
+      background: rgba(255, 231, 176, 0.78);
       white-space: nowrap;
       flex: 0 0 auto;
+    }
+    .paired-file-card-main {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }
+    .paired-file-card-icon {
+      width: 52px;
+      height: 52px;
+      min-width: 52px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 246, 215, 0.9);
+      border: 1px solid rgba(185, 90, 0, 0.14);
+    }
+    .paired-file-card-icon .item-icon {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+    }
+    .paired-file-card-copy {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+    .paired-file-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--ink);
+      word-break: break-word;
+    }
+    .paired-file-card-meta {
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: var(--muted);
+      word-break: break-word;
+    }
+    .paired-file-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .paired-file-card-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #8a5211;
     }
     .paella-empty {
       margin: 0;
@@ -1977,6 +2053,7 @@
       .linked-pair-grid,
       .sheet-group-columns { grid-template-columns: 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
+      .paired-file-card { min-height: 128px; }
       .item {
         min-height: 58px;
         height: auto;
@@ -2061,10 +2138,26 @@
       }
       .item { min-height: 62px; }
       .linked-pair-card { padding: 12px; }
+      .linked-pair-title { font-size: 0.96rem; }
+      .linked-pair-copy { font-size: 0.84rem; }
       .sheet-groups-view { padding: 12px; }
       .sheet-group-card { padding: 12px; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
       .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; }
+      .paired-file-card {
+        padding: 12px;
+        min-height: 0;
+      }
+      .paired-file-card-main {
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 10px;
+      }
+      .paired-file-card-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+      }
+      .paired-file-card-title { font-size: 0.92rem; }
       .item-more-btn {
         width: 32px;
         height: 32px;
@@ -6316,6 +6409,34 @@
       });
       return el;
     }
+    function createPaellaLinkedFileCard(item) {
+      const isForm = item && item.mimeType === DRIVE_FORM_MIME;
+      const kindLabel = isForm ? "Form" : "Spreadsheet";
+      const metaLabel = isForm ? "Formulario principal" : "Hoja de respuestas";
+      const openLabel = isForm ? "Abrir form" : "Abrir spreadsheet";
+      const card = document.createElement("article");
+      card.className = "paired-file-card";
+      card.innerHTML =
+        "<div class='paired-file-card-head'>" +
+          "<span class='paired-file-card-kind'>" + escapeHtml(kindLabel) + "</span>" +
+        "</div>" +
+        "<div class='paired-file-card-main'>" +
+          "<div class='paired-file-card-icon'>" + driveFileIconMarkup(item.mimeType) + "</div>" +
+          "<div class='paired-file-card-copy'>" +
+            "<div class='paired-file-card-title'>" + escapeHtml(item && item.name ? item.name : kindLabel) + "</div>" +
+            "<div class='paired-file-card-meta'>" + escapeHtml(metaLabel) + (item && item.shared ? " · Compartido" : "") + "</div>" +
+          "</div>" +
+        "</div>" +
+        "<div class='paired-file-card-foot'>" +
+          "<span class='paired-file-card-open'>" + escapeHtml(openLabel) + "</span>" +
+        "</div>";
+      const head = card.querySelector(".paired-file-card-head");
+      if (head) head.appendChild(createItemActionButton(item, "paella-file"));
+      card.addEventListener("click", function () {
+        openDriveDocument(item);
+      });
+      return card;
+    }
     function getPaellaLinkedPairMap(items) {
       const sourceItems = Array.isArray(items) ? items : [];
       const byId = new Map();
@@ -6353,8 +6474,8 @@
         "</div>";
       const grid = document.createElement("div");
       grid.className = "linked-pair-grid";
-      grid.appendChild(createPaellaFileItemCard(pair.form, "paired-item"));
-      grid.appendChild(createPaellaFileItemCard(pair.spreadsheet, "paired-item"));
+      grid.appendChild(createPaellaLinkedFileCard(pair.form));
+      grid.appendChild(createPaellaLinkedFileCard(pair.spreadsheet));
       wrapper.appendChild(grid);
       return wrapper;
     }
