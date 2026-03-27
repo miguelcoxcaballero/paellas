@@ -524,7 +524,7 @@
     }
     .linked-pair-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 14px;
     }
     .paired-file-card {
@@ -535,7 +535,7 @@
       padding: 14px;
       display: grid;
       gap: 12px;
-      min-height: 144px;
+      min-height: 0;
       cursor: pointer;
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
@@ -565,10 +565,9 @@
       flex: 0 0 auto;
     }
     .paired-file-card-main {
-      display: grid;
-      grid-template-columns: 52px minmax(0, 1fr);
+      display: flex;
+      align-items: flex-start;
       gap: 12px;
-      align-items: start;
       min-width: 0;
     }
     .paired-file-card-icon {
@@ -597,7 +596,8 @@
       font-weight: 800;
       line-height: 1.25;
       color: var(--ink);
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: anywhere;
     }
     .paired-file-card-meta {
       font-size: 0.82rem;
@@ -2778,6 +2778,9 @@
       formLinkedSheetName: "",
       formResponderUri: "",
       formRevisionId: "",
+      formSupportsPublishing: false,
+      formIsPublished: true,
+      formIsAcceptingResponses: true,
       loadedFormTitle: "",
       loadedFormDescription: "",
       loadedFormItems: [],
@@ -4172,10 +4175,27 @@
         return next;
       });
     }
+    function extractFormPublishState(form) {
+      const publishSettings = form && form.publishSettings ? form.publishSettings : null;
+      const publishState = publishSettings && publishSettings.publishState ? publishSettings.publishState : null;
+      const supportsPublishing = !!publishSettings;
+      return {
+        supportsPublishing: supportsPublishing,
+        isPublished: supportsPublishing ? !!(publishState && publishState.isPublished) : true,
+        isAcceptingResponses: supportsPublishing ? !!(publishState && publishState.isAcceptingResponses) : true
+      };
+    }
+    function applyCurrentFormPublishState(snapshot) {
+      if (!snapshot) return;
+      state.formSupportsPublishing = !!snapshot.supportsPublishing;
+      state.formIsPublished = snapshot.isPublished !== false;
+      state.formIsAcceptingResponses = snapshot.isAcceptingResponses !== false;
+    }
     function extractRemoteFormSnapshot(meta) {
       const file = meta && meta.file ? meta.file : {};
       const form = meta && meta.form ? meta.form : {};
       const info = form.info || {};
+      const publishState = extractFormPublishState(form);
       const remoteItems = Array.isArray(form.items)
         ? form.items.map(parseLocalFormItem).filter(Boolean)
         : [];
@@ -4188,7 +4208,10 @@
         responses: Array.isArray(meta && meta.responses && meta.responses.responses) ? meta.responses.responses : [],
         linkedSheetId: form.linkedSheetId || (file.appProperties && file.appProperties[FORM_LINKED_SHEET_KEY]) || "",
         responderUri: form.responderUri || ("https://docs.google.com/forms/d/" + encodeURIComponent(state.formId) + "/viewform"),
-        revisionId: form.revisionId || ""
+        revisionId: form.revisionId || "",
+        supportsPublishing: publishState.supportsPublishing,
+        isPublished: publishState.isPublished,
+        isAcceptingResponses: publishState.isAcceptingResponses
       };
     }
     function mergeFormDraftWithRemote(baseItems, localItems, remoteItems) {
@@ -4268,6 +4291,7 @@
       state.formLinkedSheetId = snapshot.linkedSheetId;
       state.formResponderUri = snapshot.responderUri;
       state.formRevisionId = snapshot.revisionId;
+      applyCurrentFormPublishState(snapshot);
       state.lastSavedAt = snapshot.file.modifiedTime ? Date.parse(snapshot.file.modifiedTime) || state.lastSavedAt || 0 : state.lastSavedAt;
       state.canEdit = !!(snapshot.file.capabilities && snapshot.file.capabilities.canEdit);
       state.loadedFormTitle = snapshot.title;
@@ -4462,6 +4486,7 @@
       state.formLinkedSheetId = snapshot.linkedSheetId;
       state.formResponderUri = snapshot.responderUri;
       state.formRevisionId = snapshot.revisionId;
+      applyCurrentFormPublishState(snapshot);
       state.lastSavedAt = file.modifiedTime ? Date.parse(file.modifiedTime) || state.lastSavedAt || 0 : state.lastSavedAt;
       updateKnownDriveMeta(file);
       state.lastKnownFileName = remoteTitle;
@@ -6653,6 +6678,48 @@
       if (!state.formId) return "";
       return state.formResponderUri || ("https://docs.google.com/forms/d/" + encodeURIComponent(state.formId) + "/viewform");
     }
+    function ensureFormPublishedForResponses(formId) {
+      const targetFormId = String(formId || state.formId || "").trim();
+      if (!targetFormId) return Promise.resolve("");
+      const defaultShareUrl = "https://docs.google.com/forms/d/" + encodeURIComponent(targetFormId) + "/viewform";
+      return fetchJson("https://forms.googleapis.com/v1/forms/" + encodeURIComponent(targetFormId)).then(function (form) {
+        const publishState = extractFormPublishState(form);
+        const responderUri = form && form.responderUri ? form.responderUri : defaultShareUrl;
+        if (targetFormId === state.formId) {
+          state.formResponderUri = responderUri;
+          applyCurrentFormPublishState(publishState);
+        }
+        if (!publishState.supportsPublishing || (publishState.isPublished && publishState.isAcceptingResponses)) {
+          return responderUri;
+        }
+        return fetchJson(
+          "https://forms.googleapis.com/v1/forms/" + encodeURIComponent(targetFormId) + ":setPublishSettings",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              publishSettings: {
+                publishState: {
+                  isPublished: true,
+                  isAcceptingResponses: true
+                }
+              },
+              updateMask: "publishState"
+            })
+          }
+        ).then(function () {
+          return fetchJson("https://forms.googleapis.com/v1/forms/" + encodeURIComponent(targetFormId));
+        }).then(function (publishedForm) {
+          const nextPublishState = extractFormPublishState(publishedForm);
+          const nextResponderUri = publishedForm && publishedForm.responderUri ? publishedForm.responderUri : responderUri;
+          if (targetFormId === state.formId) {
+            state.formResponderUri = nextResponderUri;
+            applyCurrentFormPublishState(nextPublishState);
+          }
+          return nextResponderUri;
+        });
+      });
+    }
     function copyTextToClipboard(text) {
       const value = String(text || "");
       if (!value) return Promise.reject(new Error("No hay texto para copiar."));
@@ -6683,33 +6750,40 @@
       });
     }
     function copyFormShareLink() {
-      const shareUrl = getFormShareUrl();
-      if (!shareUrl) {
+      if (!state.formId) {
         setFormSyncStatus("No se ha podido obtener el enlace publico del formulario.", "error");
         return;
       }
-      copyTextToClipboard(shareUrl).then(function () {
-        setFormSyncStatus("Enlace del formulario copiado.", "good");
-      }).catch(function () {
-        openAppDialog({
-          title: "Enlace del formulario",
-          subtitle: "Copia el enlace desde este popup interno.",
-          readonlyValue: shareUrl,
-          readonlyLabel: "Enlace publico",
-          confirmText: "Cerrar",
-          showCancel: false,
-          secondaryText: "Copiar",
-          onSecondary: function (value) {
-            return copyTextToClipboard(value).then(function () {
-              setAppDialogStatus("Enlace copiado.", "good");
-              setFormSyncStatus("Enlace del formulario copiado.", "good");
-              return false;
-            }).catch(function () {
-              setAppDialogStatus("No se ha podido copiar automaticamente. Puedes copiarlo manualmente.", "error");
-              return false;
-            });
-          }
+      setFormSyncStatus("Preparando enlace del formulario...", "");
+      ensureFormPublishedForResponses(state.formId).then(function (shareUrl) {
+        if (!shareUrl) {
+          throw new Error("No se ha podido obtener el enlace publico del formulario.");
+        }
+        return copyTextToClipboard(shareUrl).then(function () {
+          setFormSyncStatus("Enlace del formulario copiado.", "good");
+        }).catch(function () {
+          openAppDialog({
+            title: "Enlace del formulario",
+            subtitle: "Copia el enlace desde este popup interno.",
+            readonlyValue: shareUrl,
+            readonlyLabel: "Enlace publico",
+            confirmText: "Cerrar",
+            showCancel: false,
+            secondaryText: "Copiar",
+            onSecondary: function (value) {
+              return copyTextToClipboard(value).then(function () {
+                setAppDialogStatus("Enlace copiado.", "good");
+                setFormSyncStatus("Enlace del formulario copiado.", "good");
+                return false;
+              }).catch(function () {
+                setAppDialogStatus("No se ha podido copiar automaticamente. Puedes copiarlo manualmente.", "error");
+                return false;
+              });
+            }
+          });
         });
+      }).catch(function (err) {
+        setFormSyncStatus(messageFromError(err, "No se ha podido preparar el enlace publico del formulario."), "error");
       });
     }
     function renderFormResponses() {
@@ -7898,6 +7972,9 @@
       state.formLinkedSheetId = "";
       state.formLinkedSheetName = "";
       state.formResponderUri = "";
+      state.formSupportsPublishing = false;
+      state.formIsPublished = true;
+      state.formIsAcceptingResponses = true;
       state.loadedFormTitle = "";
       state.loadedFormDescription = "";
       state.loadedFormItems = [];
@@ -7966,6 +8043,9 @@
       state.formLinkedSheetId = "";
       state.formLinkedSheetName = "";
       state.formResponderUri = "";
+      state.formSupportsPublishing = false;
+      state.formIsPublished = true;
+      state.formIsAcceptingResponses = true;
       state.loadedFormTitle = "";
       state.loadedFormDescription = "";
       state.loadedFormItems = [];
@@ -8097,12 +8177,17 @@
           })
         }
       ).then(function (form) {
+        return ensureFormPublishedForResponses(form.formId).catch(function (err) {
+          console.warn("No se ha podido publicar automaticamente el form:", err);
+          return "";
+        }).then(function () {
         const file = { id: form.formId, name: options.name, mimeType: DRIVE_FORM_MIME };
         if (targetFolderId === "root") return file;
         return fetchDriveFileMeta(form.formId).then(function (meta) {
           return moveDriveItem(meta, targetFolderId).then(function () {
             return file;
           });
+        });
         });
       }).then(function (file) {
         closeNewSheetModal();
@@ -8684,6 +8769,9 @@
           state.formLinkedSheetId = "";
           state.formLinkedSheetName = "";
           state.formResponderUri = "";
+          state.formSupportsPublishing = false;
+          state.formIsPublished = true;
+          state.formIsAcceptingResponses = true;
           state.loadedFormTitle = "";
           state.loadedFormDescription = "";
           state.loadedFormItems = [];
