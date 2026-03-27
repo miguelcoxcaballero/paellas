@@ -841,65 +841,78 @@
     .form-toolbar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      min-height: 40px;
+      min-height: 36px;
+    }
+    .form-toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,240,191,.5);
+      border: 1px solid rgba(185,90,0,.08);
     }
     .form-toolbar-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
+      margin-left: auto;
     }
     .form-template-select {
-      min-width: 220px;
+      min-width: 160px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
     }
     .form-template-people-input {
-      width: 112px;
-      min-width: 112px;
+      width: 56px;
+      min-width: 56px;
       text-align: center;
+      padding: 6px 8px;
+      font-size: 0.8rem;
     }
     .form-shell {
       min-height: 0;
       overflow: auto;
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.9fr);
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
       gap: 16px;
       align-content: start;
       padding: 2px;
     }
     .form-column {
       display: grid;
-      gap: 14px;
+      gap: 12px;
       align-content: start;
     }
     .form-card {
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 14px;
       background: var(--bg2);
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      padding: 16px;
+      padding: 14px;
       display: grid;
-      gap: 12px;
+      gap: 10px;
     }
     .form-card-head {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
     .form-card-title {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 700;
       line-height: 1.2;
     }
     .form-card-meta {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--muted);
     }
     .form-textarea {
-      min-height: 96px;
+      min-height: 64px;
       resize: vertical;
       font: inherit;
     }
@@ -909,97 +922,136 @@
     }
     .form-question {
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 12px;
       background: rgba(255,252,243,.95);
-      padding: 14px;
+      padding: 12px 14px;
       display: grid;
-      gap: 12px;
+      gap: 10px;
       position: relative;
       overflow: hidden;
     }
     .form-question.is-section {
-      background:
-        radial-gradient(circle at top right, rgba(255, 219, 152, 0.52), transparent 34%),
-        linear-gradient(135deg, rgba(255, 248, 232, 0.98), rgba(255, 255, 255, 0.96));
-      border-color: rgba(212, 122, 24, 0.32);
-      box-shadow: 0 12px 24px rgba(166, 95, 11, 0.08);
+      background: linear-gradient(135deg, rgba(255, 239, 166, 0.98), rgba(255, 228, 118, 0.92));
+      border-color: rgba(212, 122, 24, 0.3);
+      box-shadow: 0 2px 8px rgba(166, 95, 11, 0.08);
     }
     .form-question.is-section::after {
       content: "";
       position: absolute;
       inset: auto 0 0 0;
-      height: 4px;
+      height: 3px;
       background: linear-gradient(90deg, #d97b1d, #f2c35e);
+    }
+    .form-question.is-section.is-collapsed {
+      gap: 6px;
+    }
+    .form-question.is-section.is-collapsed .form-question-grid {
+      display: none;
+    }
+    .section-collapse-summary {
+      display: none;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .form-question.is-section.is-collapsed .section-collapse-summary {
+      display: block;
     }
     .form-question-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
-    .form-question-eyebrow {
+    .form-question-number {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff8eb;
       font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
+      flex: 0 0 22px;
     }
-    .form-question-eyebrow .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
+    .form-question-number.section-number {
+      background: #9a5b10;
+    }
+    .form-question-title-preview {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.84rem;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .form-question-section-label {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: #9a5b10;
       background: rgba(255, 233, 180, 0.72);
       border-radius: 999px;
-      padding: 5px 10px;
+      padding: 3px 8px;
       display: inline-flex;
       width: fit-content;
+      flex: 0 0 auto;
     }
     .form-question-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
+      gap: 4px;
+      flex: 0 0 auto;
     }
+    .form-icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      font-size: 0.85rem;
+      transition: background .15s ease, color .15s ease;
+    }
+    .form-icon-btn:hover { background: rgba(0,0,0,0.06); color: var(--ink); }
+    .form-icon-btn.danger:hover { color: var(--bad); }
+    .form-icon-btn:disabled { opacity: .35; cursor: not-allowed; }
     .form-question-grid {
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
     .form-question-row {
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
     .form-inline-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
     .form-options-list {
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
     .form-option-row {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
     .form-switch {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
+      gap: 6px;
+      font-size: 0.8rem;
       color: var(--muted);
+      cursor: pointer;
     }
     .form-responses-list {
       display: grid;
@@ -1046,15 +1098,17 @@
     .form-link-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
+    .form-link-actions .btn { font-size: 0.78rem; padding: 6px 10px; }
     .form-empty {
       border: 1px dashed var(--line);
-      border-radius: 14px;
-      padding: 18px;
+      border-radius: 10px;
+      padding: 14px;
       text-align: center;
       color: var(--muted);
+      font-size: 0.82rem;
       background: rgba(255,255,255,.48);
     }
     .save-indicator {
@@ -1878,17 +1932,24 @@
             <button id="addSheetTabBtn" class="add-sheet-btn" type="button" aria-label="Nueva sheet">+</button>
           </div>
           <div id="formToolbar" class="form-toolbar hidden-panel">
-            <div id="formToolbarMeta" class="meta">Editor de formulario</div>
-            <div class="form-toolbar-actions">
-              <select id="formTemplateSelect" class="search form-template-select" aria-label="Plantilla para formulario">
-                <option value="paella">Plantilla paella</option>
+            <div class="form-toolbar-group">
+              <select id="formTemplateSelect" class="search form-template-select" aria-label="Plantilla">
+                <option value="paella">Paella</option>
               </select>
-              <button id="formApplyTemplateBtn" class="btn small" type="button">Aplicar plantilla</button>
-              <input id="formTemplatePeopleInput" class="search form-template-people-input" type="number" min="2" max="40" step="1" value="8" aria-label="Numero de personas por defecto">
-              <button id="formResizeTemplateBtn" class="btn small" type="button">Actualizar personas</button>
-              <button id="formAddSectionBtn" class="btn small" type="button">Añadir seccion</button>
-              <button id="formAddQuestionBtn" class="btn small" type="button">Añadir pregunta</button>
-              <button id="formSyncSheetBtn" class="btn small" type="button">Sincronizar respuestas</button>
+              <button id="formApplyTemplateBtn" class="btn small" type="button">Aplicar</button>
+              <input id="formTemplatePeopleInput" class="search form-template-people-input" type="number" min="2" max="40" step="1" value="8" aria-label="Personas" title="Personas">
+              <button id="formResizeTemplateBtn" class="btn small" type="button" title="Actualizar personas">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </button>
+            </div>
+            <div class="form-toolbar-actions">
+              <span id="formToolbarMeta" class="meta" style="font-size:0.76rem;"></span>
+              <button id="formAddSectionBtn" class="btn small" type="button">+ Sección</button>
+              <button id="formAddQuestionBtn" class="btn small" type="button">+ Pregunta</button>
+              <button id="formSyncSheetBtn" class="btn small" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Sync
+              </button>
             </div>
           </div>
         </div>
@@ -1902,50 +1963,46 @@
           <div class="form-column">
             <section class="form-card">
               <div class="form-card-head">
-                <div>
-                  <div class="form-card-title">Descripción</div>
-                  <div class="form-card-meta">Texto visible debajo del título del formulario.</div>
-                </div>
+                <div class="form-card-title">Descripción</div>
               </div>
-              <textarea id="formDescriptionInput" class="search form-textarea" placeholder="Describe de qué va este formulario"></textarea>
+              <textarea id="formDescriptionInput" class="search form-textarea" placeholder="Descripción del formulario..."></textarea>
             </section>
             <section class="form-card">
               <div class="form-card-head">
-                <div>
-                  <div class="form-card-title">Preguntas</div>
-                  <div class="form-card-meta">Preguntas básicas editables desde la app.</div>
-                </div>
+                <div class="form-card-title">Preguntas</div>
               </div>
               <div id="formQuestionsList" class="form-question-list"></div>
-              <div id="formQuestionsEmpty" class="form-empty hidden">Todavía no hay preguntas.</div>
+              <div id="formQuestionsEmpty" class="form-empty hidden">Sin preguntas</div>
             </section>
           </div>
           <div class="form-column">
             <section class="form-card">
               <div class="form-card-head">
-                <div>
-                  <div class="form-card-title">Hoja vinculada</div>
-                  <div class="form-card-meta">Spreadsheet donde sincronizar las respuestas del formulario.</div>
-                </div>
+                <div class="form-card-title">Hoja vinculada</div>
               </div>
               <div id="formLinkedSheetMeta" class="form-link-meta"></div>
               <div class="form-link-actions">
-                <button id="formCopyLinkBtn" class="btn small" type="button">Copiar enlace del form</button>
-                <button id="formLinkSheetBtn" class="btn small" type="button">Vincular hoja</button>
-                <button id="formCreateLinkedSheetBtn" class="btn small" type="button">Crear hoja en la paella</button>
-                <button id="formUnlinkSheetBtn" class="btn small" type="button">Quitar vínculo</button>
+                <button id="formCopyLinkBtn" class="btn small" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Enlace
+                </button>
+                <button id="formLinkSheetBtn" class="btn small" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  Vincular
+                </button>
+                <button id="formCreateLinkedSheetBtn" class="btn small" type="button">+ Hoja</button>
+                <button id="formUnlinkSheetBtn" class="btn small" type="button">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
               </div>
               <div id="formSyncStatus" class="status"></div>
             </section>
             <section class="form-card">
               <div class="form-card-head">
-                <div>
-                  <div class="form-card-title">Respuestas</div>
-                  <div class="form-card-meta">Últimas respuestas detectadas por la API de Forms.</div>
-                </div>
+                <div class="form-card-title">Respuestas</div>
               </div>
               <div id="formResponsesList" class="form-responses-list"></div>
-              <div id="formResponsesEmpty" class="form-empty hidden">No hay respuestas todavía.</div>
+              <div id="formResponsesEmpty" class="form-empty hidden">Sin respuestas</div>
             </section>
           </div>
         </div>
@@ -2895,7 +2952,8 @@
         itemId: "",
         templateKey: "",
         title: "Nueva seccion",
-        description: ""
+        description: "",
+        collapsed: false
       };
     }
     function isFormSectionEntry(item) {
@@ -2956,21 +3014,19 @@
     }
     function buildPaellaAttendeeSectionItems(maxAttendees) {
       const safeMax = sanitizePaellaPeopleCount(maxAttendees);
-      const items = [];
-      for (let start = 2; start <= safeMax; start += 4) {
-        const end = Math.min(safeMax, start + 3);
-        items.push(createPaellaTemplateSection(
-          "Integrantes " + formatPaellaAssistantNumber(start) + " al " + formatPaellaAssistantNumber(end),
-          "Datos de las personas extra del grupo. La persona responsable ya esta recogida en la primera seccion.",
-          "section:attendees:" + formatPaellaAssistantNumber(start) + ":" + formatPaellaAssistantNumber(end)
-        ));
-        for (let attendeeNumber = start; attendeeNumber <= end; attendeeNumber += 1) {
-          items.push.apply(items, buildPaellaAssistantQuestionSet(attendeeNumber).map(function (question, questionIndex) {
-            const suffix = ["nombre", "dni", "email"][questionIndex] || "dato";
-            question.templateKey = "q:attendee:" + formatPaellaAssistantNumber(attendeeNumber) + ":" + suffix;
-            return question;
-          }));
-        }
+      const items = [
+        createPaellaTemplateSection(
+          "Integrantes",
+          "Datos de todas las personas extra del grupo. La persona responsable ya esta recogida en la primera seccion.",
+          "section:attendees"
+        )
+      ];
+      for (let attendeeNumber = 2; attendeeNumber <= safeMax; attendeeNumber += 1) {
+        items.push.apply(items, buildPaellaAssistantQuestionSet(attendeeNumber).map(function (question, questionIndex) {
+          const suffix = ["nombre", "dni", "email"][questionIndex] || "dato";
+          question.templateKey = "q:attendee:" + formatPaellaAssistantNumber(attendeeNumber) + ":" + suffix;
+          return question;
+        }));
       }
       return items;
     }
@@ -3034,14 +3090,6 @@
           type: "choice",
           required: true,
           options: ["Si", "No"]
-        }),
-        createPaellaTemplateQuestion({
-          templateKey: "q:grupo:personas",
-          title: "Grupo - numero de asistentes",
-          type: "choice",
-          required: true,
-          description: "Incluye tambien a la persona responsable.",
-          options: buildPaellaNumberOptions(safeMax)
         })
       ].concat(
         buildPaellaAttendeeSectionItems(safeMax),
@@ -3082,6 +3130,7 @@
         if (/^Responsable$/i.test(title)) return "section:responsable";
         if (/^Grupo y paella$/i.test(title)) return "section:grupo";
         if (/^Confirmacion final$/i.test(title)) return "section:confirmacion";
+        if (/^Integrantes$/i.test(title)) return "section:attendees";
         const attendeeSection = title.match(/^Integrantes\s+(\d{2})\s+al\s+(\d{2})$/i);
         if (attendeeSection) return "section:attendees:" + attendeeSection[1] + ":" + attendeeSection[2];
         return "";
@@ -3111,7 +3160,8 @@
           itemId: existingItem.itemId || "",
           templateKey: existingItem.templateKey || templateItem.templateKey || "",
           title: existingItem.title || templateItem.title,
-          description: existingItem.description || templateItem.description
+          description: existingItem.description || templateItem.description,
+          collapsed: !!existingItem.collapsed
         };
       }
       return {
@@ -3203,7 +3253,8 @@
           itemId: item.itemId || "",
           templateKey: item.templateKey || "",
           title: item.title || "",
-          description: item.description || ""
+          description: item.description || "",
+          collapsed: !!item.collapsed
         };
       }
       return {
@@ -3271,7 +3322,8 @@
           itemId: item.itemId || "",
           templateKey: "",
           title: item.title || "Seccion",
-          description: item.description || ""
+          description: item.description || "",
+          collapsed: false
         };
       }
       if (!item || !item.questionItem) return null;
@@ -4179,6 +4231,27 @@
           name: entry && entry.name ? entry.name : "Mi unidad"
         };
       });
+    }
+    function openDriveFolderItem(item) {
+      const targetId = item && item.id ? item.id : "root";
+      if (currentFolderId() === targetId) return Promise.resolve(false);
+      const nextStack = cloneFolderStack(state.folderStack);
+      if (!nextStack.length || nextStack[nextStack.length - 1].id !== targetId) {
+        nextStack.push({ id: targetId, name: item && item.name ? item.name : "Carpeta" });
+      }
+      state.folderStack = nextStack;
+      renderBreadcrumbs();
+      return loadFolder(targetId);
+    }
+    function openPaellaChildFolder(item) {
+      const targetId = item && item.id ? item.id : "";
+      const currentActive = state.activePaellaStack[state.activePaellaStack.length - 1] || null;
+      if (!targetId || (currentActive && currentActive.id === targetId)) return Promise.resolve(false);
+      const nextStack = cloneFolderStack(state.activePaellaStack);
+      if (!nextStack.length || nextStack[nextStack.length - 1].id !== targetId) {
+        nextStack.push({ id: targetId, name: item && item.name ? item.name : "Carpeta" });
+      }
+      return loadPaellaFolder(targetId, nextStack);
     }
     function pickerCurrentFolder() {
       return state.pickerFolderStack[state.pickerFolderStack.length - 1] || { id: "root", name: "Mi unidad" };
@@ -5331,8 +5404,7 @@
         el.appendChild(createItemActionButton(item, "drive"));
         el.addEventListener("click", function () {
           if (isFolder) {
-            state.folderStack.push({ id: item.id, name: item.name || "Carpeta" });
-            loadFolder(item.id);
+            openDriveFolderItem(item);
           } else {
             openDriveDocument(item);
           }
@@ -5376,9 +5448,7 @@
           el.appendChild(createItemActionButton(item, "paella-file"));
           el.addEventListener("click", function () {
             if (isFolder) {
-              const nextStack = cloneFolderStack(state.activePaellaStack);
-              nextStack.push({ id: item.id, name: item.name || "Carpeta" });
-              loadPaellaFolder(item.id, nextStack);
+              openPaellaChildFolder(item);
               return;
             }
             openDriveDocument(item);
@@ -5523,59 +5593,73 @@
       });
     }
     function updateFormToolbarMeta() {
-      const sectionCount = state.formItems.filter(isFormSectionEntry).length;
       const count = getFormQuestionItems().length;
       const responses = state.formResponses.length;
-      els.formToolbarMeta.textContent =
-        count + " pregunta" + (count === 1 ? "" : "s") +
-        " · " +
-        sectionCount + " seccion" + (sectionCount === 1 ? "" : "es") +
-        " · " +
-        responses + " respuesta" + (responses === 1 ? "" : "s");
+      els.formToolbarMeta.textContent = count + "P · " + responses + "R";
     }
     function renderFormQuestions() {
       els.formQuestionsList.innerHTML = "";
       els.formQuestionsEmpty.classList.toggle("hidden", state.formItems.length !== 0);
       let activeSectionTitle = "";
+      let activeSectionCollapsed = false;
       let questionNumber = 0;
+      let sectionNumber = 0;
       state.formItems.forEach(function (item, index) {
         const card = document.createElement("section");
         const editing = state.editorMode === "edit" && state.canEdit;
         if (isFormSectionEntry(item)) {
-          activeSectionTitle = item.title || "Seccion";
-          card.className = "form-question is-section";
+          sectionNumber += 1;
+          activeSectionTitle = item.title || "Sección";
+          activeSectionCollapsed = !!item.collapsed;
+          let hiddenQuestionCount = 0;
+          for (let pointer = index + 1; pointer < state.formItems.length; pointer += 1) {
+            if (isFormSectionEntry(state.formItems[pointer])) break;
+            hiddenQuestionCount += 1;
+          }
+          card.className = "form-question is-section" + (item.collapsed ? " is-collapsed" : "");
           card.innerHTML =
             "<div class='form-question-head'>" +
-              "<div>" +
-                "<div class='form-question-eyebrow'><span class='dot'></span>Seccion</div>" +
-                "<div class='form-card-title'>" + escapeHtml(item.title || "Seccion") + "</div>" +
-                "<div class='form-card-meta'>" + escapeHtml(item.itemId || "Salto de pagina en Google Forms") + "</div>" +
-              "</div>" +
+              "<span class='form-question-number section-number'>S" + sectionNumber + "</span>" +
+              "<span class='form-question-title-preview'>" + escapeHtml(item.title || "Sección") + "</span>" +
               "<div class='form-question-actions'>" +
-                "<button class='btn small section-delete-btn' type='button'>Eliminar seccion</button>" +
+                "<button class='form-icon-btn section-toggle-btn' type='button' title='" + (item.collapsed ? "Expandir" : "Minimizar") + "'>" +
+                  (item.collapsed ? "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>" : "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='18 15 12 9 6 15'/></svg>") +
+                "</button>" +
+                "<button class='form-icon-btn danger section-delete-btn' type='button' title='Eliminar sección'>" +
+                  "<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>" +
+                "</button>" +
               "</div>" +
             "</div>" +
+            "<div class='section-collapse-summary'>" + hiddenQuestionCount + " pregunta" + (hiddenQuestionCount === 1 ? "" : "s") + "</div>" +
             "<div class='form-question-grid'>" +
               "<div class='form-question-row'>" +
-                "<input class='search section-title-input' type='text' placeholder='Titulo de la seccion' value='" + escapeHtml(item.title || "") + "'>" +
+                "<input class='search section-title-input' type='text' placeholder='Título de la sección' value='" + escapeHtml(item.title || "") + "'>" +
               "</div>" +
               "<div class='form-question-row'>" +
-                "<textarea class='search form-textarea section-description-input' placeholder='Descripcion opcional de la seccion'>" + escapeHtml(item.description || "") + "</textarea>" +
+                "<textarea class='search form-textarea section-description-input' placeholder='Descripción (opcional)'>" + escapeHtml(item.description || "") + "</textarea>" +
               "</div>" +
             "</div>";
           const titleInput = card.querySelector(".section-title-input");
           const descriptionInput = card.querySelector(".section-description-input");
+          const toggleBtn = card.querySelector(".section-toggle-btn");
           const deleteBtn = card.querySelector(".section-delete-btn");
           titleInput.disabled = !editing;
           descriptionInput.disabled = !editing;
           deleteBtn.disabled = !editing;
+          toggleBtn.disabled = hiddenQuestionCount === 0;
+          var sectionPreview = card.querySelector(".form-question-title-preview");
           titleInput.addEventListener("input", function () {
             item.title = titleInput.value;
+            if (sectionPreview) sectionPreview.textContent = titleInput.value || "Sección";
             markFormDirty();
           });
           descriptionInput.addEventListener("input", function () {
             item.description = descriptionInput.value;
             markFormDirty();
+          });
+          toggleBtn.addEventListener("click", function () {
+            item.collapsed = !item.collapsed;
+            renderFormQuestions();
           });
           deleteBtn.addEventListener("click", function () {
             let deleteCount = 1;
@@ -5590,41 +5674,43 @@
           els.formQuestionsList.appendChild(card);
           return;
         }
+        if (activeSectionCollapsed) {
+          return;
+        }
         const question = item;
         questionNumber += 1;
         card.className = "form-question";
         const isChoice = question.type === "choice" || question.type === "checkbox";
         card.innerHTML =
           "<div class='form-question-head'>" +
-            "<div>" +
-              "<div class='form-question-eyebrow'><span class='dot'></span>Pregunta " + questionNumber + "</div>" +
-              (activeSectionTitle ? ("<div class='form-question-section-label'>" + escapeHtml(activeSectionTitle) + "</div>") : "") +
-              "<div class='form-card-meta' style='margin-top:8px;'>" + escapeHtml(question.questionId || "Nueva pregunta") + "</div>" +
-            "</div>" +
+            "<span class='form-question-number'>" + questionNumber + "</span>" +
+            "<span class='form-question-title-preview'>" + escapeHtml(question.title || "Sin título") + "</span>" +
+            (activeSectionTitle ? ("<span class='form-question-section-label'>" + escapeHtml(activeSectionTitle) + "</span>") : "") +
             "<div class='form-question-actions'>" +
-              "<button class='btn small question-delete-btn' type='button'>Eliminar</button>" +
+              "<button class='form-icon-btn danger question-delete-btn' type='button' title='Eliminar pregunta'>" +
+                "<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>" +
+              "</button>" +
             "</div>" +
           "</div>" +
           "<div class='form-question-grid'>" +
             "<div class='form-question-row'>" +
-              "<input class='search question-title-input' type='text' placeholder='Titulo de la pregunta' value='" + escapeHtml(question.title || "") + "'>" +
+              "<input class='search question-title-input' type='text' placeholder='Título de la pregunta' value='" + escapeHtml(question.title || "") + "'>" +
             "</div>" +
             "<div class='form-question-row'>" +
-              "<textarea class='search form-textarea question-description-input' placeholder='Descripcion opcional'>" + escapeHtml(question.description || "") + "</textarea>" +
+              "<input class='search question-description-input' type='text' placeholder='Descripción (opcional)' value='" + escapeHtml(question.description || "") + "'>" +
             "</div>" +
             "<div class='form-inline-row'>" +
               "<select class='search question-type-select'>" +
                 "<option value='short'" + (question.type === "short" ? " selected" : "") + ">Respuesta corta</option>" +
-                "<option value='paragraph'" + (question.type === "paragraph" ? " selected" : "") + ">Parrafo</option>" +
-                "<option value='choice'" + (question.type === "choice" ? " selected" : "") + ">Opcion unica</option>" +
+                "<option value='paragraph'" + (question.type === "paragraph" ? " selected" : "") + ">Párrafo</option>" +
+                "<option value='choice'" + (question.type === "choice" ? " selected" : "") + ">Opción única</option>" +
                 "<option value='checkbox'" + (question.type === "checkbox" ? " selected" : "") + ">Checkbox</option>" +
               "</select>" +
               "<label class='form-switch'><input class='question-required-input' type='checkbox'" + (question.required ? " checked" : "") + "> Obligatoria</label>" +
             "</div>" +
             "<div class='form-options-wrap" + (isChoice ? "" : " hidden-panel") + "'>" +
-              "<div class='form-card-meta'>Opciones</div>" +
               "<div class='form-options-list'></div>" +
-              "<button class='btn small question-add-option-btn' type='button'>Anadir opcion</button>" +
+              "<button class='btn small question-add-option-btn' type='button'>+ Opción</button>" +
             "</div>" +
           "</div>";
         const titleInput = card.querySelector(".question-title-input");
@@ -5643,7 +5729,7 @@
             row.className = "form-option-row";
             row.innerHTML =
               "<input class='search question-option-input' type='text' value='" + escapeHtml(option || "") + "'>" +
-              "<button class='btn small question-remove-option-btn' type='button'>Quitar</button>";
+              "<button class='form-icon-btn danger question-remove-option-btn' type='button' title='Quitar opción'><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><line x1='18' y1='6' x2='6' y2='18'/><line x1='6' y1='6' x2='18' y2='18'/></svg></button>";
             const optionInput = row.querySelector(".question-option-input");
             const removeOptionBtn = row.querySelector(".question-remove-option-btn");
             optionInput.disabled = !editing;
@@ -5668,8 +5754,10 @@
         requiredInput.disabled = !editing;
         addOptionBtn.disabled = !editing;
         deleteBtn.disabled = !editing;
+        var titlePreview = card.querySelector(".form-question-title-preview");
         titleInput.addEventListener("input", function () {
           question.title = titleInput.value;
+          if (titlePreview) titlePreview.textContent = titleInput.value || "Sin título";
           markFormDirty();
         });
         descriptionInput.addEventListener("input", function () {
