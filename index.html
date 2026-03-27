@@ -706,6 +706,24 @@
     .modal-form { display: grid; gap: 12px; }
     .modal-actions { justify-content: flex-end; }
     .modal-actions .btn { min-width: 110px; }
+    .dialog-body-text {
+      margin: 0;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+    .dialog-input-wrap {
+      display: grid;
+      gap: 6px;
+    }
+    .dialog-input-label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .dialog-input-readonly {
+      background: rgba(255, 249, 232, 0.8);
+      color: var(--ink);
+    }
     .move-target-meta {
       display: grid;
       gap: 4px;
@@ -1885,7 +1903,7 @@
             <p id="paellasEmpty" class="meta paella-empty hidden">No hay paellas todavia.</p>
           </div>
         </section>
-        <section id="direccionPanel" class="card paella-panel">
+        <section id="direccionPanel" class="card paella-panel hidden">
           <div class="paella-panel-head">
             <div>
               <div id="direccionPanelTitle" class="section-label">Dirección</div>
@@ -2094,6 +2112,35 @@
     </section>
   </div>
 
+  <div id="appDialogModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle">
+    <section id="appDialogCard" class="card modal-card">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="appDialogTitle" class="title">Accion</div>
+          <div id="appDialogSubtitle" class="meta">Confirma la accion.</div>
+        </div>
+        <button id="appDialogCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="modal-form">
+        <p id="appDialogBodyText" class="meta dialog-body-text hidden"></p>
+        <label id="appDialogInputWrap" class="dialog-input-wrap hidden">
+          <span id="appDialogInputLabel" class="dialog-input-label hidden"></span>
+          <input id="appDialogInput" class="search" type="text" autocomplete="off" spellcheck="false">
+        </label>
+        <label id="appDialogReadonlyWrap" class="dialog-input-wrap hidden">
+          <span id="appDialogReadonlyLabel" class="dialog-input-label hidden"></span>
+          <input id="appDialogReadonlyInput" class="search dialog-input-readonly" type="text" readonly spellcheck="false">
+        </label>
+        <div id="appDialogStatus" class="status"></div>
+      </div>
+      <div class="row modal-actions">
+        <button id="appDialogCancelBtn" class="btn small" type="button">Cancelar</button>
+        <button id="appDialogSecondaryBtn" class="btn small hidden" type="button">Accion</button>
+        <button id="appDialogConfirmBtn" class="btn primary small" type="button">Aceptar</button>
+      </div>
+    </section>
+  </div>
+
   <div id="moveModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="moveModalTitle">
     <section id="moveModalCard" class="card modal-card">
       <div class="head">
@@ -2139,6 +2186,27 @@
       </div>
       <div class="row modal-actions">
         <button id="trashModalCancelBtn" class="btn small" type="button">Cancelar</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="formDeleteModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="formDeleteModalTitle">
+    <section class="danger-card">
+      <div class="modal-copy">
+        <div id="formDeleteModalTitle" class="title">Eliminar elemento</div>
+        <div id="formDeleteModalSubtitle" class="meta">Desliza para confirmar.</div>
+      </div>
+      <div id="formDeleteConfirmSlider" class="confirm-slider" aria-label="Desliza para eliminar este elemento">
+        <div id="formDeleteConfirmFill" class="confirm-slider-fill"></div>
+        <div class="confirm-slider-text">Desliza para eliminar</div>
+        <div id="formDeleteConfirmHandle" class="confirm-slider-handle" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 6 15 12 9 18"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div class="row modal-actions">
+        <button id="formDeleteModalCancelBtn" class="btn small" type="button">Cancelar</button>
       </div>
     </section>
   </div>
@@ -2300,6 +2368,9 @@
     let trashSliderPointerId = null;
     let trashSliderStartX = 0;
     let trashSliderMax = 0;
+    let formDeleteSliderPointerId = null;
+    let formDeleteSliderStartX = 0;
+    let formDeleteSliderMax = 0;
 
     const state = {
       tokenClient: null,
@@ -2326,6 +2397,8 @@
       moveFolderStack: [{ id: "root", name: "Mi unidad" }],
       moveFolders: [],
       trashAction: null,
+      formDeleteAction: null,
+      appDialog: null,
       trashItems: [],
       activeDocumentType: "",
       spreadsheetId: "",
@@ -2491,6 +2564,22 @@
       nameModalCloseBtn: document.getElementById("nameModalCloseBtn"),
       nameModalCancelBtn: document.getElementById("nameModalCancelBtn"),
       nameModalConfirmBtn: document.getElementById("nameModalConfirmBtn"),
+      appDialogModal: document.getElementById("appDialogModal"),
+      appDialogCard: document.getElementById("appDialogCard"),
+      appDialogTitle: document.getElementById("appDialogTitle"),
+      appDialogSubtitle: document.getElementById("appDialogSubtitle"),
+      appDialogBodyText: document.getElementById("appDialogBodyText"),
+      appDialogInputWrap: document.getElementById("appDialogInputWrap"),
+      appDialogInputLabel: document.getElementById("appDialogInputLabel"),
+      appDialogInput: document.getElementById("appDialogInput"),
+      appDialogReadonlyWrap: document.getElementById("appDialogReadonlyWrap"),
+      appDialogReadonlyLabel: document.getElementById("appDialogReadonlyLabel"),
+      appDialogReadonlyInput: document.getElementById("appDialogReadonlyInput"),
+      appDialogStatus: document.getElementById("appDialogStatus"),
+      appDialogCloseBtn: document.getElementById("appDialogCloseBtn"),
+      appDialogCancelBtn: document.getElementById("appDialogCancelBtn"),
+      appDialogSecondaryBtn: document.getElementById("appDialogSecondaryBtn"),
+      appDialogConfirmBtn: document.getElementById("appDialogConfirmBtn"),
       moveModal: document.getElementById("moveModal"),
       moveModalCard: document.getElementById("moveModalCard"),
       moveModalTitle: document.getElementById("moveModalTitle"),
@@ -2512,6 +2601,13 @@
       trashConfirmFill: document.getElementById("trashConfirmFill"),
       trashConfirmHandle: document.getElementById("trashConfirmHandle"),
       trashModalCancelBtn: document.getElementById("trashModalCancelBtn"),
+      formDeleteModal: document.getElementById("formDeleteModal"),
+      formDeleteModalTitle: document.getElementById("formDeleteModalTitle"),
+      formDeleteModalSubtitle: document.getElementById("formDeleteModalSubtitle"),
+      formDeleteConfirmSlider: document.getElementById("formDeleteConfirmSlider"),
+      formDeleteConfirmFill: document.getElementById("formDeleteConfirmFill"),
+      formDeleteConfirmHandle: document.getElementById("formDeleteConfirmHandle"),
+      formDeleteModalCancelBtn: document.getElementById("formDeleteModalCancelBtn"),
       driveTrashModal: document.getElementById("driveTrashModal"),
       driveTrashModalCard: document.getElementById("driveTrashModalCard"),
       driveTrashCloseBtn: document.getElementById("driveTrashCloseBtn"),
@@ -2879,6 +2975,7 @@
     function setPaellaAccessStatus(text, tone) { setStatusOnElement(els.paellaAccessStatus, text, tone); }
     function setFormSyncStatus(text, tone) { setStatusOnElement(els.formSyncStatus, text, tone); }
     function setFormLinkStatus(text, tone) { setStatusOnElement(els.formLinkModalStatus, text, tone); }
+    function setAppDialogStatus(text, tone) { setStatusOnElement(els.appDialogStatus, text, tone); }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
     function currentNewSheetType() {
       return els.newSheetTypeSelect && els.newSheetTypeSelect.value === "form" ? "form" : "spreadsheet";
@@ -2984,7 +3081,7 @@
         templateKey: "",
         title: "Nueva seccion",
         description: "",
-        collapsed: false
+        collapsed: true
       };
     }
     function isFormSectionEntry(item) {
@@ -3243,16 +3340,138 @@
       els.formTemplatePeopleInput.value = String(count);
       els.formResizeTemplateBtn.disabled = !state.canEdit || state.editorMode !== "edit" || !isPaellaTemplateForm();
     }
-    function applyPaellaTemplateSelection() {
-      const promptValue = window.prompt(
-        "Cuantas personas quieres incluir por defecto en el formulario?",
-        String(isPaellaTemplateForm() ? getPaellaPeopleCountFromForm() : sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value))
-      );
-      if (promptValue == null) return;
-      const initialCount = sanitizePaellaPeopleCount(promptValue);
-      els.formTemplatePeopleInput.value = String(initialCount);
-      if (state.formItems.length && !isPaellaTemplateForm() && !window.confirm("Esta plantilla sustituira las preguntas actuales del formulario. Continuar?")) {
+    function resetAppDialog() {
+      setBusy(els.appDialogCard, false);
+      setAppDialogStatus("");
+      els.appDialogBodyText.textContent = "";
+      els.appDialogBodyText.classList.add("hidden");
+      els.appDialogInputWrap.classList.add("hidden");
+      els.appDialogInputLabel.textContent = "";
+      els.appDialogInputLabel.classList.add("hidden");
+      els.appDialogInput.value = "";
+      els.appDialogInput.type = "text";
+      els.appDialogInput.placeholder = "";
+      els.appDialogReadonlyWrap.classList.add("hidden");
+      els.appDialogReadonlyLabel.textContent = "";
+      els.appDialogReadonlyLabel.classList.add("hidden");
+      els.appDialogReadonlyInput.value = "";
+      els.appDialogCancelBtn.classList.remove("hidden");
+      els.appDialogSecondaryBtn.classList.add("hidden");
+      els.appDialogSecondaryBtn.textContent = "Accion";
+      els.appDialogConfirmBtn.textContent = "Aceptar";
+    }
+    function closeAppDialog(result) {
+      const dialog = state.appDialog;
+      state.appDialog = null;
+      els.appDialogModal.classList.remove("visible");
+      resetAppDialog();
+      if (dialog && typeof dialog.resolve === "function") {
+        dialog.resolve(result || { action: "cancel", value: "" });
+      }
+    }
+    function getAppDialogValue() {
+      if (!els.appDialogInputWrap.classList.contains("hidden")) return els.appDialogInput.value;
+      if (!els.appDialogReadonlyWrap.classList.contains("hidden")) return els.appDialogReadonlyInput.value;
+      return "";
+    }
+    function openAppDialog(config) {
+      const dialogConfig = config || {};
+      return new Promise(function (resolve) {
+        if (state.appDialog) closeAppDialog({ action: "cancel", value: getAppDialogValue() });
+        resetAppDialog();
+        state.appDialog = { resolve: resolve, config: dialogConfig };
+        els.appDialogTitle.textContent = dialogConfig.title || "Accion";
+        els.appDialogSubtitle.textContent = dialogConfig.subtitle || "";
+        if (dialogConfig.body) {
+          els.appDialogBodyText.textContent = dialogConfig.body;
+          els.appDialogBodyText.classList.remove("hidden");
+        }
+        if (dialogConfig.input) {
+          els.appDialogInputWrap.classList.remove("hidden");
+          els.appDialogInput.value = dialogConfig.inputValue || "";
+          els.appDialogInput.type = dialogConfig.inputType || "text";
+          els.appDialogInput.placeholder = dialogConfig.inputPlaceholder || "";
+          if (dialogConfig.inputLabel) {
+            els.appDialogInputLabel.textContent = dialogConfig.inputLabel;
+            els.appDialogInputLabel.classList.remove("hidden");
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(dialogConfig, "readonlyValue")) {
+          els.appDialogReadonlyWrap.classList.remove("hidden");
+          els.appDialogReadonlyInput.value = String(dialogConfig.readonlyValue || "");
+          if (dialogConfig.readonlyLabel) {
+            els.appDialogReadonlyLabel.textContent = dialogConfig.readonlyLabel;
+            els.appDialogReadonlyLabel.classList.remove("hidden");
+          }
+        }
+        els.appDialogCancelBtn.textContent = dialogConfig.cancelText || "Cancelar";
+        els.appDialogCancelBtn.classList.toggle("hidden", dialogConfig.showCancel === false);
+        els.appDialogConfirmBtn.textContent = dialogConfig.confirmText || "Aceptar";
+        if (dialogConfig.secondaryText) {
+          els.appDialogSecondaryBtn.textContent = dialogConfig.secondaryText;
+          els.appDialogSecondaryBtn.classList.remove("hidden");
+        }
+        els.appDialogModal.classList.add("visible");
+        requestAnimationFrame(function () {
+          if (!els.appDialogInputWrap.classList.contains("hidden")) {
+            els.appDialogInput.focus();
+            els.appDialogInput.select();
+            return;
+          }
+          if (!els.appDialogReadonlyWrap.classList.contains("hidden")) {
+            els.appDialogReadonlyInput.focus();
+            els.appDialogReadonlyInput.select();
+            return;
+          }
+          els.appDialogConfirmBtn.focus();
+        });
+      });
+    }
+    function resolveAppDialogAction(action) {
+      const dialog = state.appDialog;
+      if (!dialog) return;
+      const value = getAppDialogValue();
+      const config = dialog.config || {};
+      const handler = action === "secondary" ? config.onSecondary : action === "confirm" ? config.onConfirm : null;
+      if (typeof handler !== "function") {
+        closeAppDialog({ action: action, value: value });
         return;
+      }
+      setBusy(els.appDialogCard, true);
+      setAppDialogStatus("");
+      Promise.resolve(handler(value)).then(function (result) {
+        setBusy(els.appDialogCard, false);
+        if (result === false) return;
+        closeAppDialog({ action: action, value: value, result: result });
+      }).catch(function (err) {
+        console.error(err);
+        setBusy(els.appDialogCard, false);
+        setAppDialogStatus(messageFromError(err, "No se ha podido completar la accion."), "error");
+      });
+    }
+    async function applyPaellaTemplateSelection() {
+      const promptResult = await openAppDialog({
+        title: "Plantilla de paella",
+        subtitle: "Configura la plantilla antes de aplicarla.",
+        body: "Cuantas personas quieres incluir por defecto en el formulario?",
+        input: true,
+        inputType: "number",
+        inputLabel: "Personas del grupo",
+        inputValue: String(isPaellaTemplateForm() ? getPaellaPeopleCountFromForm() : sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value)),
+        inputPlaceholder: "Entre 2 y 40",
+        confirmText: "Aplicar"
+      });
+      if (!promptResult || promptResult.action !== "confirm") return;
+      const initialCount = sanitizePaellaPeopleCount(promptResult.value);
+      els.formTemplatePeopleInput.value = String(initialCount);
+      if (state.formItems.length && !isPaellaTemplateForm()) {
+        const confirmResult = await openAppDialog({
+          title: "Sustituir preguntas",
+          subtitle: "Se reemplazara el contenido actual del formulario.",
+          body: "Esta plantilla sustituira las preguntas actuales del formulario. Quieres continuar?",
+          confirmText: "Sustituir"
+        });
+        if (!confirmResult || confirmResult.action !== "confirm") return;
       }
       state.formItems = isPaellaTemplateForm()
         ? mergePaellaTemplateItems(state.formItems, initialCount)
@@ -3353,7 +3572,7 @@
           templateKey: "",
           title: item.title || "Seccion",
           description: item.description || "",
-          collapsed: false
+          collapsed: true
         };
       }
       if (!item || !item.questionItem) return null;
@@ -3510,7 +3729,50 @@
       const next = cloneFormItem(remoteItem);
       if (localItem && localItem.localId) next.localId = localItem.localId;
       if (localItem && localItem.templateKey) next.templateKey = localItem.templateKey;
+      if (isFormSectionEntry(next) && localItem && typeof localItem.collapsed === "boolean") {
+        next.collapsed = !!localItem.collapsed;
+      }
       return next;
+    }
+    function formSectionMatchKeys(item) {
+      if (!isFormSectionEntry(item)) return [];
+      const keys = [];
+      if (item.itemId) keys.push("id:" + item.itemId);
+      if (item.templateKey) keys.push("template:" + item.templateKey);
+      if (item.localId) keys.push("local:" + item.localId);
+      keys.push("text:" + (item.title || "") + "\n" + (item.description || ""));
+      return keys;
+    }
+    function preserveFormSectionCollapsed(sourceItems, targetItems) {
+      const collapsedByKey = new Map();
+      const fallbackCollapsed = [];
+      (sourceItems || []).forEach(function (item) {
+        if (!isFormSectionEntry(item)) return;
+        const collapsed = !!item.collapsed;
+        formSectionMatchKeys(item).forEach(function (key) {
+          if (!collapsedByKey.has(key)) collapsedByKey.set(key, collapsed);
+        });
+        fallbackCollapsed.push(collapsed);
+      });
+      let sectionIndex = 0;
+      return (targetItems || []).map(function (item) {
+        const next = cloneFormItem(item);
+        if (!isFormSectionEntry(next)) return next;
+        const matchKeys = formSectionMatchKeys(next);
+        let matched = false;
+        for (let index = 0; index < matchKeys.length; index += 1) {
+          const key = matchKeys[index];
+          if (!collapsedByKey.has(key)) continue;
+          next.collapsed = collapsedByKey.get(key);
+          matched = true;
+          break;
+        }
+        if (!matched && sectionIndex < fallbackCollapsed.length) {
+          next.collapsed = fallbackCollapsed[sectionIndex];
+        }
+        sectionIndex += 1;
+        return next;
+      });
     }
     function extractRemoteFormSnapshot(meta) {
       const file = meta && meta.file ? meta.file : {};
@@ -3584,6 +3846,7 @@
     }
     function rebaseFormDraftWithRemoteMeta(meta) {
       const snapshot = extractRemoteFormSnapshot(meta);
+      const previousItems = cloneFormItemList(state.formItems);
       const baseTitle = normalizeTitle(state.loadedFormTitle || state.savedFormTitle || snapshot.title);
       const baseDescription = String(state.loadedFormDescription || state.savedFormDescription || "");
       const baseItems = Array.isArray(state.loadedFormItems) ? cloneFormItemList(state.loadedFormItems) : [];
@@ -3597,7 +3860,10 @@
         : snapshot.description;
       state.formTitle = mergedTitle;
       state.formDescription = mergedDescription;
-      state.formItems = mergeFormDraftWithRemote(baseItems, state.formItems, snapshot.items);
+      state.formItems = preserveFormSectionCollapsed(
+        previousItems,
+        mergeFormDraftWithRemote(baseItems, state.formItems, snapshot.items)
+      );
       var prevResponseCount = state.formResponses.length;
       state.formResponses = snapshot.responses;
       var responsesChanged = snapshot.responses.length !== prevResponseCount;
@@ -3776,6 +4042,7 @@
     function applyFormDocumentMeta(meta, options) {
       const config = options || {};
       const snapshot = extractRemoteFormSnapshot(meta);
+      const previousItems = cloneFormItemList(state.formItems);
       const file = snapshot.file || {};
       const remoteTitle = snapshot.title;
       state.loadedFormTitle = snapshot.title;
@@ -3789,7 +4056,7 @@
       if (!config.preserveDirtyForm || !state.formDirty) {
         state.formDescription = snapshot.description;
         state.savedFormDescription = state.formDescription;
-        state.formItems = cloneFormItemList(snapshot.items);
+        state.formItems = preserveFormSectionCollapsed(previousItems, snapshot.items);
         state.formDirty = false;
       }
       state._loadedFormItemIds = snapshot.items.map(function (item) { return item.itemId; }).filter(Boolean);
@@ -4860,6 +5127,59 @@
         setDriveStatus(messageFromError(err, "No se ha podido enviar a la papelera"));
       });
     }
+    function setFormDeleteSliderOffset(offset) {
+      const slider = els.formDeleteConfirmSlider;
+      const handle = els.formDeleteConfirmHandle;
+      const fill = els.formDeleteConfirmFill;
+      const nextOffset = Math.max(0, Math.min(Number(offset) || 0, formDeleteSliderMax || 0));
+      slider.dataset.offset = String(nextOffset);
+      handle.style.transform = "translateX(" + nextOffset + "px)";
+      fill.style.width = (nextOffset + handle.offsetWidth + 4) + "px";
+    }
+    function resetFormDeleteSlider() {
+      if (!els.formDeleteConfirmSlider) return;
+      els.formDeleteConfirmSlider.classList.remove("dragging");
+      els.formDeleteConfirmSlider.dataset.offset = "0";
+      formDeleteSliderPointerId = null;
+      formDeleteSliderStartX = 0;
+      formDeleteSliderMax = Math.max(0, els.formDeleteConfirmSlider.clientWidth - els.formDeleteConfirmHandle.offsetWidth - 8);
+      setFormDeleteSliderOffset(0);
+    }
+    function closeFormDeleteModal() {
+      state.formDeleteAction = null;
+      els.formDeleteModal.classList.remove("visible");
+      resetFormDeleteSlider();
+    }
+    function openFormDeleteModal(action) {
+      if (!action) return;
+      state.formDeleteAction = action;
+      if (action.kind === "section") {
+        els.formDeleteModalTitle.textContent = "Eliminar seccion";
+        els.formDeleteModalSubtitle.textContent = "Desliza para eliminar \"" + (action.title || "esta seccion") + "\" y sus preguntas.";
+      } else {
+        els.formDeleteModalTitle.textContent = "Eliminar pregunta";
+        els.formDeleteModalSubtitle.textContent = "Desliza para eliminar \"" + (action.title || "esta pregunta") + "\".";
+      }
+      els.formDeleteModal.classList.add("visible");
+      requestAnimationFrame(resetFormDeleteSlider);
+    }
+    function confirmFormDeleteModal() {
+      const action = state.formDeleteAction;
+      if (!action) return;
+      closeFormDeleteModal();
+      if (action.kind === "section") {
+        let deleteCount = 1;
+        for (let pointer = action.index + 1; pointer < state.formItems.length; pointer += 1) {
+          if (isFormSectionEntry(state.formItems[pointer])) break;
+          deleteCount += 1;
+        }
+        state.formItems.splice(action.index, deleteCount);
+      } else {
+        state.formItems.splice(action.index, 1);
+      }
+      renderFormQuestions();
+      markFormDirty();
+    }
     function openItemActionMenu(item, context, anchorEl) {
       const canEdit = itemCanEdit(item);
       const menu = document.createElement("div");
@@ -5672,7 +5992,25 @@
       copyTextToClipboard(shareUrl).then(function () {
         setFormSyncStatus("Enlace del formulario copiado.", "good");
       }).catch(function () {
-        window.prompt("Copia el enlace del formulario:", shareUrl);
+        openAppDialog({
+          title: "Enlace del formulario",
+          subtitle: "Copia el enlace desde este popup interno.",
+          readonlyValue: shareUrl,
+          readonlyLabel: "Enlace publico",
+          confirmText: "Cerrar",
+          showCancel: false,
+          secondaryText: "Copiar",
+          onSecondary: function (value) {
+            return copyTextToClipboard(value).then(function () {
+              setAppDialogStatus("Enlace copiado.", "good");
+              setFormSyncStatus("Enlace del formulario copiado.", "good");
+              return false;
+            }).catch(function () {
+              setAppDialogStatus("No se ha podido copiar automaticamente. Puedes copiarlo manualmente.", "error");
+              return false;
+            });
+          }
+        });
       });
     }
     function renderFormResponses() {
@@ -5778,14 +6116,11 @@
             renderFormQuestions();
           });
           deleteBtn.addEventListener("click", function () {
-            let deleteCount = 1;
-            for (let pointer = index + 1; pointer < state.formItems.length; pointer += 1) {
-              if (isFormSectionEntry(state.formItems[pointer])) break;
-              deleteCount += 1;
-            }
-            state.formItems.splice(index, deleteCount);
-            renderFormQuestions();
-            markFormDirty();
+            openFormDeleteModal({
+              kind: "section",
+              index: index,
+              title: item.title || "Seccion"
+            });
           });
           els.formQuestionsList.appendChild(card);
           return;
@@ -5901,9 +6236,11 @@
           markFormDirty();
         });
         deleteBtn.addEventListener("click", function () {
-          state.formItems.splice(index, 1);
-          renderFormQuestions();
-          markFormDirty();
+          openFormDeleteModal({
+            kind: "question",
+            index: index,
+            title: question.title || "Pregunta"
+          });
         });
         if (!(question.type === "choice" || question.type === "checkbox")) {
           optionsWrap.classList.add("hidden-panel");
@@ -6118,16 +6455,21 @@
     function renderPaellaBreadcrumbs() {
       if (!els.paellaBreadcrumbs) return;
       const stack = cloneFolderStack(state.activePaellaStack);
+      const crumbs = [{ id: "", name: "Paellas", isRoot: true }].concat(stack);
       els.paellaBreadcrumbs.innerHTML = "";
-      els.paellaBreadcrumbs.classList.toggle("hidden", stack.length === 0);
-      stack.forEach(function (crumb, index) {
+      els.paellaBreadcrumbs.classList.remove("hidden");
+      crumbs.forEach(function (crumb, index) {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "crumb" + (index === stack.length - 1 ? " current" : "");
+        btn.className = "crumb" + (index === crumbs.length - 1 ? " current" : "");
         btn.textContent = crumb.name;
-        if (index !== stack.length - 1) {
+        if (index !== crumbs.length - 1) {
           btn.addEventListener("click", function () {
-            const nextStack = stack.slice(0, index + 1);
+            if (crumb.isRoot) {
+              closePaellaFolderView();
+              return;
+            }
+            const nextStack = stack.slice(0, index);
             loadPaellaFolder(nextStack[nextStack.length - 1].id, nextStack);
           });
         }
@@ -7881,6 +8223,71 @@
     }
     els.trashConfirmHandle.addEventListener("pointerup", releaseTrashSlider);
     els.trashConfirmHandle.addEventListener("pointercancel", releaseTrashSlider);
+    els.formDeleteModalCancelBtn.addEventListener("click", closeFormDeleteModal);
+    els.formDeleteModal.addEventListener("click", function (event) {
+      if (event.target === els.formDeleteModal) closeFormDeleteModal();
+    });
+    els.formDeleteConfirmHandle.addEventListener("pointerdown", function (event) {
+      if (!state.formDeleteAction) return;
+      event.preventDefault();
+      event.stopPropagation();
+      formDeleteSliderPointerId = event.pointerId;
+      formDeleteSliderMax = Math.max(0, els.formDeleteConfirmSlider.clientWidth - els.formDeleteConfirmHandle.offsetWidth - 8);
+      const currentOffset = Number(els.formDeleteConfirmSlider.dataset.offset || 0);
+      formDeleteSliderStartX = event.clientX - currentOffset;
+      els.formDeleteConfirmSlider.classList.add("dragging");
+      if (els.formDeleteConfirmHandle.setPointerCapture) {
+        els.formDeleteConfirmHandle.setPointerCapture(event.pointerId);
+      }
+    });
+    els.formDeleteConfirmHandle.addEventListener("pointermove", function (event) {
+      if (formDeleteSliderPointerId !== event.pointerId) return;
+      event.preventDefault();
+      setFormDeleteSliderOffset(event.clientX - formDeleteSliderStartX);
+    });
+    function releaseFormDeleteSlider(event) {
+      if (formDeleteSliderPointerId !== null && event && formDeleteSliderPointerId !== event.pointerId) return;
+      const offset = Number(els.formDeleteConfirmSlider.dataset.offset || 0);
+      const reachedEnd = formDeleteSliderMax > 0 && offset >= formDeleteSliderMax * 0.9;
+      if (event && els.formDeleteConfirmHandle.releasePointerCapture) {
+        try { els.formDeleteConfirmHandle.releasePointerCapture(event.pointerId); } catch (err) {}
+      }
+      if (reachedEnd) {
+        confirmFormDeleteModal();
+        return;
+      }
+      resetFormDeleteSlider();
+    }
+    els.formDeleteConfirmHandle.addEventListener("pointerup", releaseFormDeleteSlider);
+    els.formDeleteConfirmHandle.addEventListener("pointercancel", releaseFormDeleteSlider);
+    els.appDialogCloseBtn.addEventListener("click", function () {
+      closeAppDialog({ action: "cancel", value: getAppDialogValue() });
+    });
+    els.appDialogCancelBtn.addEventListener("click", function () {
+      closeAppDialog({ action: "cancel", value: getAppDialogValue() });
+    });
+    els.appDialogConfirmBtn.addEventListener("click", function () {
+      resolveAppDialogAction("confirm");
+    });
+    els.appDialogSecondaryBtn.addEventListener("click", function () {
+      resolveAppDialogAction("secondary");
+    });
+    els.appDialogModal.addEventListener("click", function (event) {
+      if (event.target === els.appDialogModal) {
+        closeAppDialog({ action: "cancel", value: getAppDialogValue() });
+      }
+    });
+    els.appDialogInput.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      resolveAppDialogAction("confirm");
+    });
+    els.appDialogReadonlyInput.addEventListener("keydown", function (event) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c") return;
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      closeAppDialog({ action: "confirm", value: getAppDialogValue() });
+    });
     els.shareModalCloseBtn.addEventListener("click", closeShareModal);
     els.shareConfirmBtn.addEventListener("click", function () {
       const targetId = currentDriveFileId();
@@ -7912,7 +8319,10 @@
       markFormDirty();
     });
     els.formApplyTemplateBtn.addEventListener("click", function () {
-      applyPaellaTemplateSelection();
+      applyPaellaTemplateSelection().catch(function (err) {
+        console.error(err);
+        setFormSyncStatus(messageFromError(err, "No se ha podido aplicar la plantilla."), "error");
+      });
     });
     els.formResizeTemplateBtn.addEventListener("click", function () {
       resizePaellaTemplatePeople();
