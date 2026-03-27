@@ -1871,6 +1871,7 @@
           <div class="paella-panel-head">
             <div>
               <div id="paellaPanelTitle" class="section-label">Paellas</div>
+              <div id="paellaBreadcrumbs" class="crumbs hidden"></div>
               <div id="paellaPanelMeta" class="paella-panel-meta hidden"></div>
             </div>
             <div class="paella-panel-actions">
@@ -1882,6 +1883,23 @@
           <div id="paellaPanelContent" class="paella-panel-content">
             <div id="paellasGrid" class="grid paella-grid"></div>
             <p id="paellasEmpty" class="meta paella-empty hidden">No hay paellas todavia.</p>
+          </div>
+        </section>
+        <section id="direccionPanel" class="card paella-panel">
+          <div class="paella-panel-head">
+            <div>
+              <div id="direccionPanelTitle" class="section-label">Dirección</div>
+              <div id="direccionBreadcrumbs" class="crumbs hidden"></div>
+              <div id="direccionPanelMeta" class="paella-panel-meta hidden"></div>
+            </div>
+            <div class="paella-panel-actions">
+              <button id="closeDireccionBtn" class="btn small hidden" type="button">Volver</button>
+              <button id="createDireccionBtn" class="btn primary paella-create-btn" type="button">Crear carpeta</button>
+            </div>
+          </div>
+          <div id="direccionPanelContent" class="paella-panel-content">
+            <div id="direccionGrid" class="grid paella-grid"></div>
+            <p id="direccionEmpty" class="meta paella-empty hidden">No hay carpetas de dirección todavía.</p>
           </div>
         </section>
         <section id="folderSection" class="card drive-section-card">
@@ -1946,10 +1964,6 @@
               <span id="formToolbarMeta" class="meta" style="font-size:0.76rem;"></span>
               <button id="formAddSectionBtn" class="btn small" type="button">+ Sección</button>
               <button id="formAddQuestionBtn" class="btn small" type="button">+ Pregunta</button>
-              <button id="formSyncSheetBtn" class="btn small" type="button">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                Sync
-              </button>
             </div>
           </div>
         </div>
@@ -2245,6 +2259,11 @@
       paellasApp: "paellas.net",
       paellasVersion: "1"
     });
+    const DIRECCION_APP_PROPERTIES = Object.freeze({
+      paellasType: "direccion",
+      paellasApp: "paellas.net",
+      paellasVersion: "1"
+    });
     const FORM_LINKED_SHEET_KEY = "paellasLinkedSheetId";
     const DRIVE_FOLDER_COLORS = Object.freeze([
       "#ac725e",
@@ -2296,6 +2315,11 @@
       activePaellaLoadError: "",
       activePaellaPermissions: [],
       pendingPaellaShares: [],
+      direccionItems: [],
+      direccionLoadError: "",
+      activeDireccionStack: [],
+      activeDireccionItems: [],
+      activeDireccionLoadError: [],
       sharedItems: [],
       activeItemMenu: null,
       moveAction: null,
@@ -2385,9 +2409,18 @@
       paellaAccessAvatars: document.getElementById("paellaAccessAvatars"),
       paellaPanel: document.getElementById("paellaPanel"),
       paellaPanelTitle: document.getElementById("paellaPanelTitle"),
+      paellaBreadcrumbs: document.getElementById("paellaBreadcrumbs"),
       paellaPanelMeta: document.getElementById("paellaPanelMeta"),
       paellasGrid: document.getElementById("paellasGrid"),
       paellasEmpty: document.getElementById("paellasEmpty"),
+      direccionPanel: document.getElementById("direccionPanel"),
+      direccionPanelTitle: document.getElementById("direccionPanelTitle"),
+      direccionBreadcrumbs: document.getElementById("direccionBreadcrumbs"),
+      direccionPanelMeta: document.getElementById("direccionPanelMeta"),
+      direccionGrid: document.getElementById("direccionGrid"),
+      direccionEmpty: document.getElementById("direccionEmpty"),
+      createDireccionBtn: document.getElementById("createDireccionBtn"),
+      closeDireccionBtn: document.getElementById("closeDireccionBtn"),
       newSheetModal: document.getElementById("newSheetModal"),
       newSheetModalCard: document.getElementById("newSheetModalCard"),
       newSheetCloseBtn: document.getElementById("newSheetCloseBtn"),
@@ -2435,7 +2468,6 @@
       formResizeTemplateBtn: document.getElementById("formResizeTemplateBtn"),
       formAddSectionBtn: document.getElementById("formAddSectionBtn"),
       formAddQuestionBtn: document.getElementById("formAddQuestionBtn"),
-      formSyncSheetBtn: document.getElementById("formSyncSheetBtn"),
       sheetWrap: document.getElementById("sheetWrap"),
       sheetSpacer: document.getElementById("sheetSpacer"),
       sheetGrid: document.getElementById("sheetGrid"),
@@ -2758,7 +2790,7 @@
       }).then(function () {
         setLoginStatus("");
         showView("drive");
-        return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas()]);
+        return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]);
       });
     }
     function restoreStoredSession() {
@@ -2876,8 +2908,7 @@
         : (creatingForm ? "Crear form" : "Crear");
     }
     function configurePickerMode(mode) {
-      const nextMode = mode === "paella" ? "paella" : "sheet";
-      state.pickerMode = nextMode;
+      state.pickerMode = mode === "paella" ? "paella" : mode === "direccion" ? "direccion" : "sheet";
       syncNewSheetTypeUi();
     }
     function currentFolderId() { return state.folderStack[state.folderStack.length - 1].id; }
@@ -3016,8 +3047,8 @@
       const safeMax = sanitizePaellaPeopleCount(maxAttendees);
       const items = [
         createPaellaTemplateSection(
-          "Integrantes",
-          "Datos de todas las personas extra del grupo. La persona responsable ya esta recogida en la primera seccion.",
+          "Integrantes (" + (safeMax - 1) + ")",
+          "Datos de los integrantes del grupo (sin contar al responsable).",
           "section:attendees"
         )
       ];
@@ -3120,7 +3151,7 @@
     }
     function getPaellaTemplateDescription(maxAttendees) {
       const safeMax = sanitizePaellaPeopleCount(maxAttendees);
-      return "Inscripcion estandar para paellas, organizada por secciones y preparada para grupos de hasta " + safeMax + " personas.";
+      return "Formulario de inscripcion para grupos de hasta " + safeMax + " personas.";
     }
     function getPaellaTemplateItemKey(item) {
       if (!item) return "";
@@ -3130,9 +3161,7 @@
         if (/^Responsable$/i.test(title)) return "section:responsable";
         if (/^Grupo y paella$/i.test(title)) return "section:grupo";
         if (/^Confirmacion final$/i.test(title)) return "section:confirmacion";
-        if (/^Integrantes$/i.test(title)) return "section:attendees";
-        const attendeeSection = title.match(/^Integrantes\s+(\d{2})\s+al\s+(\d{2})$/i);
-        if (attendeeSection) return "section:attendees:" + attendeeSection[1] + ":" + attendeeSection[2];
+        if (/^Integrantes/i.test(title)) return "section:attendees";
         return "";
       }
       if (/^Responsable\s+-\s+nombre completo$/i.test(title)) return "q:responsable:nombre";
@@ -3229,9 +3258,9 @@
         ? mergePaellaTemplateItems(state.formItems, initialCount)
         : buildPaellaTemplateItems(initialCount);
       state.formDescription = getPaellaTemplateDescription(initialCount);
+      els.formDescriptionInput.value = state.formDescription;
       renderFormQuestions();
       markFormDirty();
-      setFormSyncStatus("Plantilla de paella aplicada.", "good");
     }
     function resizePaellaTemplatePeople() {
       if (!isPaellaTemplateForm()) {
@@ -3241,9 +3270,10 @@
       const nextCount = sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value);
       els.formTemplatePeopleInput.value = String(nextCount);
       state.formItems = mergePaellaTemplateItems(state.formItems, nextCount);
+      state.formDescription = getPaellaTemplateDescription(nextCount);
+      els.formDescriptionInput.value = state.formDescription;
       renderFormQuestions();
       markFormDirty();
-      setFormSyncStatus("Numero de personas actualizado a " + nextCount + ".", "good");
     }
     function cloneFormItem(item) {
       if (isFormSectionEntry(item)) {
@@ -3568,7 +3598,9 @@
       state.formTitle = mergedTitle;
       state.formDescription = mergedDescription;
       state.formItems = mergeFormDraftWithRemote(baseItems, state.formItems, snapshot.items);
+      var prevResponseCount = state.formResponses.length;
       state.formResponses = snapshot.responses;
+      var responsesChanged = snapshot.responses.length !== prevResponseCount;
       state.formLinkedSheetId = snapshot.linkedSheetId;
       state.formResponderUri = snapshot.responderUri;
       state.formRevisionId = snapshot.revisionId;
@@ -3591,6 +3623,9 @@
       refreshDirtyState();
       return maybeHydrateLinkedSheetName().then(function () {
         renderFormQuestions();
+        if (responsesChanged && state.formLinkedSheetId) {
+          syncFormResponsesToSheet().catch(function () {});
+        }
         return true;
       });
     }
@@ -3772,6 +3807,9 @@
       if (!config.skipApplyMode) applyEditorMode();
       return maybeHydrateLinkedSheetName().then(function () {
         renderFormQuestions();
+        if (state.formLinkedSheetId && state.formResponses.length) {
+          syncFormResponsesToSheet().catch(function () {});
+        }
         return meta;
       });
     }
@@ -4316,6 +4354,9 @@
     function isPaellaFolder(item) {
       return !!(item && item.mimeType === DRIVE_FOLDER_MIME && item.appProperties && item.appProperties.paellasType === "paella");
     }
+    function isDireccionFolder(item) {
+      return !!(item && item.mimeType === DRIVE_FOLDER_MIME && item.appProperties && item.appProperties.paellasType === "direccion");
+    }
     function driveFolderIconMarkup(isPaella, color) {
       const normalizedColor = normalizeFolderColor(color);
       const styleAttr = normalizedColor ? " style='color:" + escapeHtml(normalizedColor) + ";'" : "";
@@ -4442,13 +4483,22 @@
       const tasks = [
         loadFolder(currentFolderId()).catch(function () {}),
         loadSharedDocs().catch(function () {}),
-        loadPaellas().catch(function () {})
+        loadPaellas().catch(function () {}),
+        loadDireccion().catch(function () {})
       ];
       if (state.activePaellaStack.length) {
         tasks.push(
           loadPaellaFolder(
             state.activePaellaStack[state.activePaellaStack.length - 1].id,
             cloneFolderStack(state.activePaellaStack)
+          ).catch(function () {})
+        );
+      }
+      if (state.activeDireccionStack.length) {
+        tasks.push(
+          loadDireccionFolder(
+            state.activeDireccionStack[state.activeDireccionStack.length - 1].id,
+            cloneFolderStack(state.activeDireccionStack)
           ).catch(function () {})
         );
       }
@@ -5422,11 +5472,10 @@
       if (els.paellaPanel) {
         els.paellaPanel.classList.toggle("is-folder-open", !!activeFolder);
       }
-      els.paellaPanelTitle.textContent = activeFolder ? (activeFolder.name || "Paella") : "Paellas";
-      els.paellaPanelMeta.textContent = activeFolder
-        ? state.activePaellaStack.map(function (entry) { return entry.name; }).join(" / ")
-        : "";
+      els.paellaPanelTitle.textContent = "Paellas";
+      els.paellaPanelMeta.textContent = activeFolder ? "Ruta de la paella activa" : "";
       els.paellaPanelMeta.classList.toggle("hidden", !activeFolder);
+      renderPaellaBreadcrumbs();
       els.closePaellaBtn.classList.toggle("hidden", !activeFolder);
       els.paellaAccessAvatars.classList.toggle("hidden", !activeFolder || !state.activePaellaPermissions.length);
       els.createPaellaBtn.textContent = activeFolder ? "Nuevo archivo" : "Crear paella";
@@ -5482,6 +5531,74 @@
         els.paellasGrid.appendChild(el);
       });
     }
+    function renderDireccion() {
+      closeItemActionMenu();
+      const activeFolder = state.activeDireccionStack[state.activeDireccionStack.length - 1] || null;
+      const query = (els.searchInput.value || "").trim().toLowerCase();
+      const filtered = (activeFolder ? state.activeDireccionItems : state.direccionItems).filter(function (item) {
+        return !query || (item.name || "").toLowerCase().includes(query);
+      });
+      if (els.direccionPanel) {
+        els.direccionPanel.classList.toggle("is-folder-open", !!activeFolder);
+      }
+      els.direccionPanelTitle.textContent = activeFolder ? (activeFolder.name || "Dirección") : "Dirección";
+      els.direccionPanelMeta.textContent = activeFolder ? "Ruta de la carpeta activa" : "";
+      els.direccionPanelMeta.classList.toggle("hidden", !activeFolder);
+      renderDireccionBreadcrumbs();
+      els.closeDireccionBtn.classList.toggle("hidden", !activeFolder);
+      els.createDireccionBtn.textContent = activeFolder ? "Nuevo archivo" : "Crear carpeta";
+      els.direccionGrid.innerHTML = "";
+      els.direccionEmpty.textContent = activeFolder
+        ? (state.activeDireccionLoadError || (query ? "No hay archivos que coincidan." : "Carpeta vacía."))
+        : (state.direccionLoadError || (query ? "No hay carpetas que coincidan." : "No hay carpetas de dirección todavía."));
+      els.direccionEmpty.classList.toggle("hidden", filtered.length !== 0);
+      if (activeFolder) {
+        filtered.forEach(function (item) {
+          const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
+          const el = document.createElement("article");
+          el.className = "item";
+          el.innerHTML =
+            "<div class='item-row'>" +
+              (isFolder ? driveFolderIconMarkup(false, item.folderColorRgb) : driveFileIconMarkup(item.mimeType)) +
+              itemTitleMarkup(item.name, !!item.shared) +
+            "</div>";
+          el.appendChild(createItemActionButton(item, "direccion-file"));
+          el.addEventListener("click", function () {
+            if (isFolder) {
+              openDireccionChildFolder(item);
+              return;
+            }
+            openDriveDocument(item);
+          });
+          els.direccionGrid.appendChild(el);
+        });
+        return;
+      }
+      filtered.forEach(function (item) {
+        const el = document.createElement("article");
+        const updatedLabel = formatDriveDate(item.modifiedTime);
+        el.className = "paella-card";
+        const styleAttr = paellaCardStyleAttr(item);
+        if (styleAttr) {
+          el.setAttribute("style", styleAttr);
+        }
+        el.innerHTML =
+          "<div class='paella-card-head'>" +
+            "<div class='paella-card-icon' aria-hidden='true'>&#128203;</div>" +
+            "<div class='paella-card-title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+          "</div>" +
+          "<div class='paella-card-meta'>" +
+            "<span class='paella-card-tag'>Carpeta Drive</span>" +
+            "<span>" + escapeHtml(updatedLabel || "Abrir") + "</span>" +
+          "</div>";
+        const head = el.querySelector(".paella-card-head");
+        if (head) head.appendChild(createItemActionButton(item, "direccion-root"));
+        el.addEventListener("click", function () {
+          openDireccionFolder(item);
+        });
+        els.direccionGrid.appendChild(el);
+      });
+    }
     function renderSharedItems() {
       closeItemActionMenu();
       const query = (els.searchInput.value || "").trim().toLowerCase();
@@ -5512,7 +5629,6 @@
         : "<div class='meta'>Todavía no hay ninguna spreadsheet vinculada.</div>";
       els.formCopyLinkBtn.disabled = !state.formId;
       els.formUnlinkSheetBtn.disabled = !hasLink || !state.canEdit;
-      els.formSyncSheetBtn.disabled = !hasLink;
     }
     function getFormShareUrl() {
       if (!state.formId) return "";
@@ -5900,11 +6016,8 @@
     }
     function syncFormResponsesToSheet() {
       if (!state.formLinkedSheetId) {
-        setFormSyncStatus("Primero vincula una spreadsheet.", "error");
         return Promise.resolve(false);
       }
-      setBusy(els.editorShell, true);
-      setFormSyncStatus("Sincronizando respuestas...", "");
       return fetchSpreadsheetDocumentMeta(state.formLinkedSheetId).then(function (meta) {
         const firstSheet = meta.sheet && Array.isArray(meta.sheet.sheets) ? meta.sheet.sheets[0] : null;
         if (!firstSheet || !firstSheet.properties || !firstSheet.properties.title) {
@@ -5946,14 +6059,10 @@
           );
         });
       }).then(function () {
-        setFormSyncStatus("Respuestas sincronizadas", "good");
         return true;
       }).catch(function (err) {
-        console.error(err);
-        setFormSyncStatus(messageFromError(err, "No se han podido sincronizar las respuestas"), "error");
+        console.error("Auto-sync error:", err);
         return false;
-      }).finally(function () {
-        setBusy(els.editorShell, false);
       });
     }
     function createLinkedSheetForForm() {
@@ -6004,6 +6113,44 @@
           });
         }
         els.breadcrumbs.appendChild(btn);
+      });
+    }
+    function renderPaellaBreadcrumbs() {
+      if (!els.paellaBreadcrumbs) return;
+      const stack = cloneFolderStack(state.activePaellaStack);
+      els.paellaBreadcrumbs.innerHTML = "";
+      els.paellaBreadcrumbs.classList.toggle("hidden", stack.length === 0);
+      stack.forEach(function (crumb, index) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "crumb" + (index === stack.length - 1 ? " current" : "");
+        btn.textContent = crumb.name;
+        if (index !== stack.length - 1) {
+          btn.addEventListener("click", function () {
+            const nextStack = stack.slice(0, index + 1);
+            loadPaellaFolder(nextStack[nextStack.length - 1].id, nextStack);
+          });
+        }
+        els.paellaBreadcrumbs.appendChild(btn);
+      });
+    }
+    function renderDireccionBreadcrumbs() {
+      if (!els.direccionBreadcrumbs) return;
+      const stack = cloneFolderStack(state.activeDireccionStack);
+      els.direccionBreadcrumbs.innerHTML = "";
+      els.direccionBreadcrumbs.classList.toggle("hidden", stack.length === 0);
+      stack.forEach(function (crumb, index) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "crumb" + (index === stack.length - 1 ? " current" : "");
+        btn.textContent = crumb.name;
+        if (index !== stack.length - 1) {
+          btn.addEventListener("click", function () {
+            const nextStack = stack.slice(0, index + 1);
+            loadDireccionFolder(nextStack[nextStack.length - 1].id, nextStack);
+          });
+        }
+        els.direccionBreadcrumbs.appendChild(btn);
       });
     }
     function renderPickerBreadcrumbs() {
@@ -6059,6 +6206,125 @@
       renderPaellaAccessAvatars([]);
       closePaellaAccessPopup();
       renderPaellas();
+    }
+    function openDireccionFolder(item) {
+      if (!item || !item.id) return;
+      showView("drive");
+      loadDireccionFolder(item.id, [{ id: item.id, name: item.name || "Dirección" }]).then(function () {
+        if (els.direccionPanelTitle && typeof els.direccionPanelTitle.scrollIntoView === "function") {
+          els.direccionPanelTitle.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    }
+    function openDireccionChildFolder(item) {
+      if (!item || !item.id) return;
+      var nextStack = cloneFolderStack(state.activeDireccionStack);
+      nextStack.push({ id: item.id, name: item.name || "Carpeta" });
+      loadDireccionFolder(item.id, nextStack);
+    }
+    function closeDireccionFolderView() {
+      state.activeDireccionStack = [];
+      state.activeDireccionItems = [];
+      state.activeDireccionLoadError = "";
+      renderDireccion();
+    }
+    function loadDireccion() {
+      if (!state.accessToken) {
+        state.direccionItems = [];
+        state.direccionLoadError = "";
+        renderDireccion();
+        return Promise.resolve([]);
+      }
+      const query = encodeURIComponent(
+        "trashed=false and mimeType='" + DRIVE_FOLDER_MIME + "' and appProperties has { key='paellasType' and value='direccion' }"
+      );
+      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query +
+        "&pageSize=200&orderBy=modifiedTime desc,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
+      ).then(function (data) {
+        state.direccionItems = data.files || [];
+        state.direccionLoadError = "";
+        renderDireccion();
+        return state.direccionItems;
+      }).catch(function (err) {
+        console.error(err);
+        state.direccionItems = [];
+        state.direccionLoadError = messageFromError(err, "No se han podido cargar las carpetas de dirección");
+        renderDireccion();
+        return [];
+      });
+    }
+    function loadDireccionFolder(folderId, nextStack) {
+      if (!folderId) return Promise.resolve([]);
+      if (Array.isArray(nextStack) && nextStack.length) {
+        state.activeDireccionStack = cloneFolderStack(nextStack);
+      }
+      setBusy(els.driveShell, true);
+      state.activeDireccionLoadError = "";
+      renderDireccion();
+      const query = encodeURIComponent(
+        "'" + folderId + "' in parents and trashed=false and " +
+        "(mimeType='" + DRIVE_FOLDER_MIME + "' or mimeType='" + DRIVE_SPREADSHEET_MIME + "' or mimeType='" + DRIVE_FORM_MIME + "')"
+      );
+      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query +
+        "&pageSize=200&orderBy=folder,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
+      ).then(function (data) {
+        state.activeDireccionItems = data.files || [];
+        state.activeDireccionLoadError = "";
+        renderDireccion();
+        return state.activeDireccionItems;
+      }).catch(function (err) {
+        console.error(err);
+        state.activeDireccionItems = [];
+        state.activeDireccionLoadError = messageFromError(err, "No se ha podido abrir esta carpeta");
+        renderDireccion();
+        return [];
+      }).finally(function () {
+        setBusy(els.driveShell, false);
+      });
+    }
+    function createDireccionFolder(options) {
+      if (!options || !options.name) {
+        return openNewSheetModal("direccion", "drive");
+      }
+      const targetFolderId = options.folderId || "root";
+      setBusy(els.driveShell, true);
+      setBusy(els.newSheetModalCard, true);
+      setDriveStatus("");
+      setPickerStatus("");
+      const body = {
+        name: options.name,
+        mimeType: DRIVE_FOLDER_MIME,
+        appProperties: DIRECCION_APP_PROPERTIES
+      };
+      if (targetFolderId !== "root") {
+        body.parents = [targetFolderId];
+      }
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,appProperties",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        }
+      ).then(function (folder) {
+        closeNewSheetModal();
+        return loadDireccion().then(function () {
+          setDriveStatus("Carpeta creada");
+          return folder;
+        });
+      }).catch(function (err) {
+        console.error(err);
+        const message = messageFromError(err, "No se ha podido crear la carpeta");
+        setDriveStatus(message);
+        setPickerStatus(message);
+      }).finally(function () {
+        setBusy(els.driveShell, false);
+        setBusy(els.newSheetModalCard, false);
+      });
     }
     function renderTabs() {
       els.sheetTabs.innerHTML = "";
@@ -6455,7 +6721,11 @@
     function openNewSheetModal(mode, context) {
       state.newSheetContext = context || "drive";
       configurePickerMode(mode);
-      state.pickerFolderStack = cloneFolderStack(state.newSheetContext === "paella-files" ? state.activePaellaStack : state.folderStack);
+      state.pickerFolderStack = cloneFolderStack(
+        state.newSheetContext === "paella-files" ? state.activePaellaStack :
+        state.newSheetContext === "direccion-files" ? state.activeDireccionStack :
+        state.folderStack
+      );
       state.pickerFolders = [];
       if (state.pickerMode === "paella") {
         state.pendingPaellaShares = [];
@@ -6486,7 +6756,10 @@
       if (state.pickerMode === "paella") {
         return createPaellaFolder(payload);
       }
-      if (state.newSheetContext === "paella-files" && currentNewSheetType() === "form") {
+      if (state.pickerMode === "direccion") {
+        return createDireccionFolder(payload);
+      }
+      if ((state.newSheetContext === "paella-files" || state.newSheetContext === "direccion-files") && currentNewSheetType() === "form") {
         return createForm(payload);
       }
       return createSpreadsheet(payload);
@@ -7403,7 +7676,7 @@
       });
     }
     els.profileLogoutBtn.addEventListener("click", resetSession);
-    els.searchInput.addEventListener("input", function() { renderItems(); renderPaellas(); renderSharedItems(); });
+    els.searchInput.addEventListener("input", function() { renderItems(); renderPaellas(); renderDireccion(); renderSharedItems(); });
     els.newSheetBtn.addEventListener("click", function () { openNewSheetModal("sheet", "drive"); });
     els.createPaellaBtn.addEventListener("click", function () {
       if (state.activePaellaStack.length) {
@@ -7413,6 +7686,14 @@
       openNewSheetModal("paella", "drive");
     });
     els.closePaellaBtn.addEventListener("click", closePaellaFolderView);
+    els.createDireccionBtn.addEventListener("click", function () {
+      if (state.activeDireccionStack.length) {
+        openNewSheetModal("sheet", "direccion-files");
+        return;
+      }
+      openNewSheetModal("direccion", "drive");
+    });
+    els.closeDireccionBtn.addEventListener("click", closeDireccionFolderView);
     els.newSheetCloseBtn.addEventListener("click", closeNewSheetModal);
     els.newSheetCancelBtn.addEventListener("click", closeNewSheetModal);
     els.newSheetCreateBtn.addEventListener("click", submitNewSheetModal);
@@ -7446,7 +7727,7 @@
     });
     els.profileRefreshBtn.addEventListener("click", function () {
       closeProfileMenu();
-      Promise.all([loadProfile(), loadFolder(currentFolderId()), loadSharedDocs(), loadPaellas()]).catch(function (err) {
+      Promise.all([loadProfile(), loadFolder(currentFolderId()), loadSharedDocs(), loadPaellas(), loadDireccion()]).catch(function (err) {
         console.error(err);
       });
     });
@@ -7636,6 +7917,9 @@
     els.formResizeTemplateBtn.addEventListener("click", function () {
       resizePaellaTemplatePeople();
     });
+    els.formTemplatePeopleInput.addEventListener("change", function () {
+      if (isPaellaTemplateForm()) resizePaellaTemplatePeople();
+    });
     els.formTemplatePeopleInput.addEventListener("keydown", function (event) {
       if (event.key !== "Enter") return;
       event.preventDefault();
@@ -7653,9 +7937,6 @@
       state.formItems.push(createLocalFormQuestion("short"));
       renderFormQuestions();
       markFormDirty();
-    });
-    els.formSyncSheetBtn.addEventListener("click", function () {
-      syncFormResponsesToSheet();
     });
     els.formLinkSheetBtn.addEventListener("click", function () {
       openFormLinkModal();
