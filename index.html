@@ -2360,6 +2360,7 @@
     const AUTH_REFRESH_MARGIN_MS = 120000;
     const AUTH_REFRESH_RETRY_MS = 15000;
     const AUTH_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+    const AUTH_SILENT_RETRY_COOLDOWN_MS = 90000;
 
     let presencePingTimer = 0;
     let presenceHeartbeatTimer = 0;
@@ -2452,7 +2453,8 @@
       profileMenuOpen: false,
       tokenRefreshTimer: 0,
       tokenRequestInFlight: null,
-      sessionRestoreInFlight: null
+      sessionRestoreInFlight: null,
+      silentAuthCooldownUntil: 0
     };
 
     const els = {
@@ -2734,6 +2736,15 @@
       clearTimeout(state.tokenRefreshTimer);
       state.tokenRefreshTimer = 0;
     }
+    function silentAuthRetryRemainingMs() {
+      return Math.max(0, Number(state.silentAuthCooldownUntil) - Date.now());
+    }
+    function setSilentAuthCooldown(delayMs) {
+      state.silentAuthCooldownUntil = Date.now() + Math.max(1000, Number(delayMs) || AUTH_SILENT_RETRY_COOLDOWN_MS);
+    }
+    function clearSilentAuthCooldown() {
+      state.silentAuthCooldownUntil = 0;
+    }
     function hasUsableAccessToken(bufferMs) {
       const buffer = Math.max(0, Number(bufferMs) || 0);
       return !!(state.accessToken && state.accessTokenExpiresAt && (Date.now() + buffer) < state.accessTokenExpiresAt);
@@ -2759,6 +2770,7 @@
       const expiresInSeconds = Math.max(60, Number(response && response.expires_in) || 3600);
       state.accessToken = response && response.access_token ? String(response.access_token) : "";
       state.accessTokenExpiresAt = state.accessToken ? (Date.now() + expiresInSeconds * 1000) : 0;
+      clearSilentAuthCooldown();
       saveStoredAuthSession();
       scheduleTokenRefresh();
     }
@@ -2767,6 +2779,7 @@
       const retryDelay = Math.max(1000, Number(retryDelayMs) || 0);
       if (!state.accessToken || !state.accessTokenExpiresAt) {
         if (!retryDelay || !getAuthLoginHint()) return;
+        const silentCooldown = silentAuthRetryRemainingMs();
         state.tokenRefreshTimer = window.setTimeout(function () {
           restoreGoogleSessionSilently().catch(function (err) {
             console.warn("No se ha podido reactivar la sesion en segundo plano:", err);
@@ -2774,10 +2787,13 @@
             renderProfileMenu();
             scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
           });
-        }, retryDelay);
+        }, Math.max(retryDelay, silentCooldown));
         return;
       }
-      const refreshIn = retryDelay || Math.max(1000, state.accessTokenExpiresAt - Date.now() - AUTH_REFRESH_MARGIN_MS);
+      const refreshIn = Math.max(
+        retryDelay || Math.max(1000, state.accessTokenExpiresAt - Date.now() - AUTH_REFRESH_MARGIN_MS),
+        silentAuthRetryRemainingMs()
+      );
       state.tokenRefreshTimer = window.setTimeout(function () {
         refreshAccessTokenSilently().catch(function (err) {
           console.warn("No se ha podido renovar el token en segundo plano:", err);
@@ -2805,6 +2821,9 @@
       }
       if (requestConfig.prompt === "") {
         delete requestConfig.prompt;
+      }
+      if (requestConfig.prompt !== "none") {
+        clearSilentAuthCooldown();
       }
       if (!requestConfig.login_hint) {
         const loginHint = getAuthLoginHint();
@@ -2857,9 +2876,15 @@
       if (!state.tokenClient) {
         return Promise.reject(new Error("Google Auth aun no esta listo."));
       }
+      if (silentAuthRetryRemainingMs() > 0) {
+        return Promise.reject(new Error("Reconexion automatica en espera."));
+      }
       return requestGoogleAccessToken({ prompt: "none" }).then(function (response) {
         applyAccessTokenResponse(response);
         return state.accessToken;
+      }).catch(function (err) {
+        setSilentAuthCooldown();
+        throw err;
       });
     }
     function ensureValidAccessToken() {
@@ -5798,7 +5823,7 @@
         els.paellaPanel.classList.toggle("is-folder-open", !!activeFolder);
       }
       els.paellaPanelTitle.textContent = "Paellas";
-      els.paellaPanelMeta.textContent = activeFolder ? "Ruta de la paella activa" : "";
+      els.paellaPanelMeta.textContent = "";
       els.paellaPanelMeta.classList.toggle("hidden", !activeFolder);
       renderPaellaBreadcrumbs();
       els.closePaellaBtn.classList.toggle("hidden", !activeFolder);
@@ -8003,6 +8028,7 @@
         state.pickerMode = "sheet";
         state.newSheetContext = "drive";
         state.sessionRestoreInFlight = null;
+        state.silentAuthCooldownUntil = 0;
         els.searchInput.value = "";
         els.itemsGrid.innerHTML = "";
         els.paellasGrid.innerHTML = "";
