@@ -308,6 +308,7 @@
       width: 28px;
       height: 28px;
       min-width: 28px;
+      position: relative;
       border-radius: 50%;
       border: 2px solid transparent;
       padding: 0;
@@ -317,6 +318,21 @@
     }
     .item-color-swatch:hover { transform: scale(1.08); }
     .item-color-swatch.active { border-color: var(--ink); }
+    .item-color-swatch.default {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0) 42%, rgba(196,71,42,0.95) 42%, rgba(196,71,42,0.95) 58%, rgba(255,255,255,0) 58%),
+        linear-gradient(180deg, rgba(255, 247, 220, 0.98) 0%, rgba(244, 233, 199, 0.98) 100%);
+    }
+    .item-color-swatch.default::after {
+      content: "×";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: rgba(90, 62, 18, 0.9);
+    }
     .item-icon { width: 24px; height: 24px; flex: 0 0 24px; color: var(--accent); }
     .shared-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); opacity: 0.6; }
     .title { font-size: 0.92rem; font-weight: 600; line-height: 1.2; min-width: 0; }
@@ -407,6 +423,7 @@
       place-items: center;
       color: var(--paella-folder-color);
       background: var(--paella-folder-bg);
+      border: 1px solid var(--paella-folder-color);
       font-size: 1.45rem;
       line-height: 1;
     }
@@ -2801,7 +2818,7 @@
     function paellaCardStyleAttr(item) {
       const color = normalizeFolderColor(item && item.folderColorRgb);
       if (!color) return "";
-      return " style='--paella-folder-color:" + escapeHtml(color) + ";--paella-folder-bg:" + escapeHtml(hexToRgba(color, 0.14)) + ";'";
+      return "--paella-folder-color:" + color + ";--paella-folder-bg:" + hexToRgba(color, 0.14) + ";";
     }
     function formatDriveDate(value) {
       if (!value) return "";
@@ -3160,6 +3177,23 @@
         menu.appendChild(label);
         const colorGrid = document.createElement("div");
         colorGrid.className = "item-color-grid";
+        const defaultSwatch = document.createElement("button");
+        defaultSwatch.type = "button";
+        defaultSwatch.className = "item-color-swatch default" + (!normalizeFolderColor(item.folderColorRgb) ? " active" : "");
+        defaultSwatch.title = "Quitar color";
+        defaultSwatch.disabled = !canEdit;
+        defaultSwatch.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          closeItemActionMenu();
+          handleDriveItemMutation(function () {
+            return updateDriveFolderColor(item, "");
+          }, "Color eliminado").catch(function (err) {
+            console.error(err);
+            setDriveStatus(messageFromError(err, "No se ha podido quitar el color"));
+          });
+        });
+        colorGrid.appendChild(defaultSwatch);
         DRIVE_FOLDER_COLORS.forEach(function (color) {
           const swatch = document.createElement("button");
           swatch.type = "button";
@@ -3781,12 +3815,16 @@
         const el = document.createElement("article");
         const updatedLabel = formatDriveDate(item.modifiedTime);
         el.className = "paella-card";
+        const styleAttr = paellaCardStyleAttr(item);
+        if (styleAttr) {
+          el.setAttribute("style", styleAttr);
+        }
         el.innerHTML =
-          "<div class='paella-card-head'" + paellaCardStyleAttr(item) + ">" +
+          "<div class='paella-card-head'>" +
             "<div class='paella-card-icon' aria-hidden='true'>" + paellaCardIconMarkup() + "</div>" +
             "<div class='paella-card-title'>" + escapeHtml(item.name || "Paella sin nombre") + "</div>" +
           "</div>" +
-          "<div class='paella-card-meta'" + paellaCardStyleAttr(item) + ">" +
+          "<div class='paella-card-meta'>" +
             "<span class='paella-card-tag'>Carpeta Drive</span>" +
             "<span>" + escapeHtml(updatedLabel || "Abrir") + "</span>" +
           "</div>";
@@ -5286,6 +5324,15 @@
         closePaellaAccessPopup();
       }
     });
+    document.addEventListener("pointerdown", function (event) {
+      if (
+        state.activeItemMenu &&
+        !state.activeItemMenu.el.contains(event.target) &&
+        !state.activeItemMenu.anchor.contains(event.target)
+      ) {
+        closeItemActionMenu();
+      }
+    });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
         closeItemActionMenu();
@@ -5300,6 +5347,9 @@
       if (!els.presencePopup.classList.contains("hidden")) positionPresencePopup();
       if (!els.paellaAccessPopup.classList.contains("hidden")) positionPopupToAnchor(els.paellaAccessPopup, els.paellaAccessAvatars);
     });
+    window.addEventListener("scroll", function () {
+      if (state.activeItemMenu) closeItemActionMenu();
+    }, true);
     function handleSessionPageExit() {
       stopCollabPolling();
       closePresencePopup();
