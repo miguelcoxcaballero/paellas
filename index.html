@@ -595,6 +595,7 @@
     }
     .paired-file-card-copy {
       min-width: 0;
+      max-width: 100%;
       display: grid;
       gap: 2px;
       align-content: center;
@@ -2103,13 +2104,39 @@
         padding: 10px 12px;
         border-radius: 12px;
         align-items: center;
+        overflow: hidden;
       }
-      .item-row { align-items: center; }
+      .item-row {
+        align-items: center;
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      .title,
+      .title-with-share,
+      .title-text,
+      .paired-file-card,
+      .paired-file-card-main,
+      .paired-file-card-copy,
+      .paired-file-card-title,
+      .paired-file-card-meta {
+        min-width: 0;
+        max-width: 100%;
+      }
       .item .title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .title-text {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+      .paired-file-card {
+        overflow: hidden;
+      }
+      .paired-file-card-title,
+      .paired-file-card-meta {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .drive-header { padding: 8px 12px; }
       .drive-scroll { padding: 10px 12px; gap: 12px; }
@@ -2266,15 +2293,25 @@
         min-height: 44px;
         padding: 8px 10px;
         border-radius: 10px;
+        overflow: hidden;
       }
       .item-icon { width: 20px; height: 20px; flex: 0 0 20px; }
-      .item-row { gap: 8px; }
+      .item-row {
+        gap: 8px;
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+      }
       .paired-item-kind { font-size: 0.62rem; padding: 2px 6px; }
-      .linked-pair-card { padding: 8px; gap: 6px; }
+      .linked-pair-card { padding: 0; gap: 0; }
       .linked-pair-grid { grid-template-columns: 1fr; }
       .linked-pair-badge { font-size: 0.6rem; padding: 2px 6px; }
       .linked-pair-title { font-size: 0.68rem; }
-      .paired-file-card { padding: 8px; gap: 8px; }
+      .paired-file-card {
+        padding: 8px;
+        gap: 8px;
+        overflow: hidden;
+      }
       .paella-panel.is-folder-open .paella-panel-head {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
@@ -2290,8 +2327,28 @@
         width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
       }
       .paired-file-card-icon .item-icon { width: 16px; height: 16px; flex: 0 0 16px; }
-      .paired-file-card-title { font-size: 0.84rem; }
-      .paired-file-card-meta { font-size: 0.7rem; }
+      .paired-file-card-main,
+      .paired-file-card-copy,
+      .title,
+      .title-with-share,
+      .title-text,
+      .paired-file-card-title,
+      .paired-file-card-meta {
+        min-width: 0;
+        max-width: 100%;
+      }
+      .paired-file-card-title {
+        font-size: 0.84rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .paired-file-card-meta {
+        font-size: 0.7rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .sheet-groups-view { padding: 10px; }
       .sheet-group-card { padding: 10px; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
@@ -2833,9 +2890,14 @@
 
   <script>
     const GOOGLE_CLIENT_ID = "435784295430-cmug30o42f1vu4ijgor9sjb0ro4oo37o.apps.googleusercontent.com";
+    const GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID = "AKfycbwg2ISflRs4ZZ1GCOo6KpU_Ze7Ci9z1tG9eddC-8FG39-Nhb9ZyY5-c_Bt7OivQnBU";
+    const LINKER_SCRIPT_STORAGE_KEY = "paellas-linker-script-id-v2";
     const GOOGLE_SCOPE = [
       "https://www.googleapis.com/auth/drive",
-      "https://www.googleapis.com/auth/spreadsheets"
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/forms",
+      "https://www.googleapis.com/auth/script.projects",
+      "https://www.googleapis.com/auth/script.deployments"
     ].join(" ");
     const CELL_WIDTH = 140;
     const CELL_HEIGHT = 42;
@@ -3252,6 +3314,16 @@
       } catch (err) {
         console.warn("No se ha podido borrar la sesion guardada:", err);
       }
+    }
+    function readStoredLinkerDeploymentId() {
+      try {
+        return String(localStorage.getItem(LINKER_SCRIPT_STORAGE_KEY) || "").trim();
+      } catch (err) {
+        return "";
+      }
+    }
+    function currentLinkerDeploymentId() {
+      return String(GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID || readStoredLinkerDeploymentId() || "").trim();
     }
     function saveStoredAuthSession() {
       const normalizedUser = normalizeStoredUser(state.currentUser);
@@ -7296,6 +7368,7 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "picker-item";
+        btn.disabled = !hasNativeFormLinker();
         btn.innerHTML =
           "<div class='picker-main'>" +
             "<div class='picker-title'>" + escapeHtml(item.name || "Spreadsheet") + "</div>" +
@@ -7321,6 +7394,9 @@
       setFormLinkStatus("", "");
       els.formLinkModalTargetMeta.textContent = currentFormFolderLabel();
       els.formLinkModal.classList.add("visible");
+      if (!hasNativeFormLinker()) {
+        setFormLinkStatus("Configura el deployment API executable del Apps Script para vincular Forms con Sheets de forma nativa.", "error");
+      }
       setBusy(els.formLinkModalCard, true);
       fetchLinkedSheetOptions(currentFormFolderId()).then(function (items) {
         renderFormLinkOptions(items.filter(function (item) { return item.id !== state.formId; }));
@@ -7337,12 +7413,16 @@
       setBusy(els.formLinkModalCard, false);
       setFormLinkStatus("", "");
     }
-    function persistFormLinkMeta() {
-      if (!state.formId) return Promise.resolve(false);
+    function hasNativeFormLinker() {
+      return !!String(GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID || "").trim();
+    }
+    function setFormLinkMirror(formId, linkedSheetId) {
+      const targetFormId = String(formId || state.formId || "").trim();
+      if (!targetFormId) return Promise.resolve(false);
       const appProperties = {};
-      appProperties[FORM_LINKED_SHEET_KEY] = state.formLinkedSheetId || null;
+      appProperties[FORM_LINKED_SHEET_KEY] = linkedSheetId || null;
       return fetchJson(
-        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(state.formId) +
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(targetFormId) +
         "?supportsAllDrives=true&fields=id,appProperties",
         {
           method: "PATCH",
@@ -7353,8 +7433,63 @@
         return true;
       });
     }
+    function persistFormLinkMeta() {
+      return setFormLinkMirror(state.formId, state.formLinkedSheetId);
+    }
+    function runAppsScriptLinker(functionName, parameters) {
+      const deploymentId = String(GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID || "").trim();
+      if (!deploymentId) {
+        return Promise.reject(new Error("No hay ningun Apps Script configurado para la vinculacion nativa."));
+      }
+      return fetchJson(
+        "https://script.googleapis.com/v1/scripts/" + encodeURIComponent(deploymentId) + ":run",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            function: functionName,
+            parameters: Array.isArray(parameters) ? parameters : []
+          })
+        }
+      ).then(function (result) {
+        if (result && result.error && result.error.details && result.error.details[0] && result.error.details[0].errorMessage) {
+          throw new Error(result.error.details[0].errorMessage);
+        }
+        if (result && result.error && result.error.message) {
+          throw new Error(result.error.message);
+        }
+        return result && result.response ? (result.response.result || {}) : {};
+      });
+    }
+    function linkFormToSheetNatively(formId, spreadsheetId) {
+      const targetFormId = String(formId || "").trim();
+      const targetSheetId = String(spreadsheetId || "").trim();
+      if (!targetFormId || !targetSheetId) {
+        return Promise.reject(new Error("Faltan datos para vincular el formulario."));
+      }
+      if (!hasNativeFormLinker()) {
+        return Promise.reject(new Error("Falta configurar el Apps Script de vinculacion nativa."));
+      }
+      return runAppsScriptLinker("linkFormToSpreadsheet", [targetFormId, targetSheetId]).then(function (result) {
+        return setFormLinkMirror(targetFormId, targetSheetId).then(function () {
+          return result || {};
+        });
+      });
+    }
+    function unlinkFormFromSheetNatively(formId) {
+      const targetFormId = String(formId || "").trim();
+      if (!targetFormId) return Promise.resolve(false);
+      if (!hasNativeFormLinker()) {
+        return Promise.reject(new Error("Falta configurar el Apps Script de vinculacion nativa."));
+      }
+      return runAppsScriptLinker("unlinkFormFromSpreadsheet", [targetFormId]).then(function (result) {
+        return setFormLinkMirror(targetFormId, "").then(function () {
+          return result || {};
+        });
+      });
+    }
     function syncFormResponsesToSheet() {
-      if (!state.formLinkedSheetId) {
+      if (!state.formLinkedSheetId || hasNativeFormLinker()) {
         return Promise.resolve(false);
       }
       return fetchSpreadsheetDocumentMeta(state.formLinkedSheetId).then(function (meta) {
@@ -7406,6 +7541,10 @@
     }
     function createLinkedSheetForForm() {
       if (!state.formId) return Promise.resolve(null);
+      if (!hasNativeFormLinker()) {
+        setFormSyncStatus("Falta configurar el Apps Script de vinculacion nativa.", "error");
+        return Promise.resolve(null);
+      }
       const folderId = currentFormFolderId();
       const folderStack = state.activePaellaStack && state.activePaellaStack.length
         ? cloneFolderStack(state.activePaellaStack)
@@ -7433,6 +7572,318 @@
         return null;
       }).finally(function () {
         setBusy(els.editorShell, false);
+      });
+    }
+    function renderFormLinkOptions(items) {
+      els.formLinkModalList.innerHTML = "";
+      els.formLinkModalEmpty.classList.toggle("hidden", (items || []).length !== 0);
+      (items || []).forEach(function (item) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "picker-item";
+        btn.innerHTML =
+          "<div class='picker-main'>" +
+            "<div class='picker-title'>" + escapeHtml(item.name || "Spreadsheet") + "</div>" +
+            "<div class='picker-subtitle'>" + escapeHtml(item.id) + "</div>" +
+          "</div>";
+        btn.addEventListener("click", function () {
+          state.formLinkedSheetId = item.id;
+          state.formLinkedSheetName = item.name || "";
+          linkFormToSheetNatively(state.formId, item.id).then(function () {
+            closeFormLinkModal();
+            renderFormLinkedSheetMeta();
+            setFormSyncStatus("Spreadsheet vinculada de forma nativa", "good");
+          }).catch(function (err) {
+            console.error(err);
+            setFormLinkStatus(messageFromError(err, "No se ha podido guardar el vinculo"), "error");
+          });
+        });
+        els.formLinkModalList.appendChild(btn);
+      });
+    }
+    function createLinkedSheetForForm() {
+      if (!state.formId) return Promise.resolve(null);
+      const folderId = currentFormFolderId();
+      const folderStack = state.activePaellaStack && state.activePaellaStack.length
+        ? cloneFolderStack(state.activePaellaStack)
+        : cloneFolderStack(state.folderStack);
+      const name = normalizeDriveItemName(state.formTitle || "Formulario", "Formulario") + " respuestas";
+      setBusy(els.editorShell, true);
+      setFormSyncStatus("Creando hoja vinculada...", "");
+      return createSpreadsheetFile({
+        name: name,
+        folderId: folderId,
+        folderStack: folderStack
+      }).then(function (file) {
+        state.formLinkedSheetId = file.id;
+        state.formLinkedSheetName = file.name || name;
+        return linkFormToSheetNatively(state.formId, file.id).then(function () {
+          renderFormLinkedSheetMeta();
+          return refreshVisibleDriveCollections().then(function () {
+            setFormSyncStatus("Hoja vinculada nativamente", "good");
+            return file;
+          });
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setFormSyncStatus(messageFromError(err, "No se ha podido crear la hoja vinculada"), "error");
+        return null;
+      }).finally(function () {
+        setBusy(els.editorShell, false);
+      });
+    }
+    function unlinkSpreadsheetFromForm(formItem) {
+      if (!formItem || !formItem.id) return Promise.resolve(false);
+      return unlinkFormFromSheetNatively(formItem.id).then(function () {
+        if (state.formId === formItem.id) {
+          state.formLinkedSheetId = "";
+          state.formLinkedSheetName = "";
+          renderFormLinkedSheetMeta();
+        }
+        return refreshVisibleDriveCollections().then(function () {
+          return true;
+        });
+      });
+    }
+    function syncFormResponsesToSheet() {
+      return Promise.resolve(false);
+    }
+    function renderFormLinkOptions(items) {
+      els.formLinkModalList.innerHTML = "";
+      els.formLinkModalEmpty.classList.toggle("hidden", (items || []).length !== 0);
+      (items || []).forEach(function (item) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "picker-item";
+        btn.disabled = !hasNativeFormLinker();
+        btn.innerHTML =
+          "<div class='picker-main'>" +
+            "<div class='picker-title'>" + escapeHtml(item.name || "Spreadsheet") + "</div>" +
+            "<div class='picker-subtitle'>" + escapeHtml(item.id) + "</div>" +
+          "</div>";
+        btn.addEventListener("click", function () {
+          if (!hasNativeFormLinker()) {
+            setFormLinkStatus("Falta configurar el Apps Script de vinculacion nativa.", "error");
+            return;
+          }
+          setBusy(els.formLinkModalCard, true);
+          setFormLinkStatus("", "");
+          linkFormToSheetNatively(state.formId, item.id).then(function () {
+            state.formLinkedSheetId = item.id;
+            state.formLinkedSheetName = item.name || "";
+            closeFormLinkModal();
+            renderFormLinkedSheetMeta();
+            return refreshVisibleDriveCollections();
+          }).then(function () {
+            setFormSyncStatus("Spreadsheet vinculada de forma nativa", "good");
+          }).catch(function (err) {
+            console.error(err);
+            setFormLinkStatus(messageFromError(err, "No se ha podido crear el vinculo nativo"), "error");
+          }).finally(function () {
+            setBusy(els.formLinkModalCard, false);
+          });
+        });
+        els.formLinkModalList.appendChild(btn);
+      });
+    }
+    function createLinkedSheetForForm() {
+      if (!state.formId) return Promise.resolve(null);
+      if (!hasNativeFormLinker()) {
+        setFormSyncStatus("Falta configurar el Apps Script de vinculacion nativa.", "error");
+        return Promise.resolve(null);
+      }
+      const folderId = currentFormFolderId();
+      const folderStack = state.activePaellaStack && state.activePaellaStack.length
+        ? cloneFolderStack(state.activePaellaStack)
+        : cloneFolderStack(state.folderStack);
+      const name = normalizeDriveItemName(state.formTitle || "Formulario", "Formulario") + " respuestas";
+      setBusy(els.editorShell, true);
+      setFormSyncStatus("Creando hoja vinculada...", "");
+      return createSpreadsheetFile({
+        name: name,
+        folderId: folderId,
+        folderStack: folderStack
+      }).then(function (file) {
+        return linkFormToSheetNatively(state.formId, file.id).then(function () {
+          state.formLinkedSheetId = file.id;
+          state.formLinkedSheetName = file.name || name;
+          renderFormLinkedSheetMeta();
+          return refreshVisibleDriveCollections().then(function () {
+            setFormSyncStatus("Hoja vinculada nativamente", "good");
+            return file;
+          });
+        }).catch(function (err) {
+          console.error(err);
+          setFormSyncStatus(messageFromError(err, "La hoja se ha creado pero Google no ha confirmado el vinculo nativo"), "error");
+          return null;
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setFormSyncStatus(messageFromError(err, "No se ha podido crear la hoja vinculada"), "error");
+        return null;
+      }).finally(function () {
+        setBusy(els.editorShell, false);
+      });
+    }
+    function unlinkSpreadsheetFromForm(formItem) {
+      if (!formItem || !formItem.id) return Promise.resolve(false);
+      return unlinkFormFromSheetNatively(formItem.id).then(function () {
+        if (state.formId === formItem.id) {
+          state.formLinkedSheetId = "";
+          state.formLinkedSheetName = "";
+          renderFormLinkedSheetMeta();
+        }
+        return refreshVisibleDriveCollections().then(function () {
+          return true;
+        });
+      });
+    }
+    function hasNativeFormLinker() {
+      return !!currentLinkerDeploymentId();
+    }
+    function runAppsScriptLinker(functionName, parameters) {
+      const deploymentId = currentLinkerDeploymentId();
+      if (!deploymentId) {
+        return Promise.reject(new Error("Falta configurar el deployment del Apps Script para la vinculacion nativa."));
+      }
+      return fetchJson(
+        "https://script.googleapis.com/v1/scripts/" + encodeURIComponent(deploymentId) + ":run",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            function: functionName,
+            parameters: Array.isArray(parameters) ? parameters : []
+          })
+        }
+      ).then(function (result) {
+        if (result && result.error && result.error.details && result.error.details[0] && result.error.details[0].errorMessage) {
+          throw new Error(result.error.details[0].errorMessage);
+        }
+        if (result && result.error && result.error.message) {
+          throw new Error(result.error.message);
+        }
+        return result && result.response ? (result.response.result || {}) : {};
+      });
+    }
+    function linkFormToSheetNatively(formId, spreadsheetId) {
+      const targetFormId = String(formId || "").trim();
+      const targetSheetId = String(spreadsheetId || "").trim();
+      if (!targetFormId || !targetSheetId) {
+        return Promise.reject(new Error("Faltan datos para vincular el formulario."));
+      }
+      if (!hasNativeFormLinker()) {
+        return Promise.reject(new Error("Falta configurar el Apps Script de vinculacion nativa."));
+      }
+      return runAppsScriptLinker("linkFormToSpreadsheet", [targetFormId, targetSheetId]).then(function (result) {
+        return setFormLinkMirror(targetFormId, targetSheetId).then(function () {
+          return result || {};
+        });
+      });
+    }
+    function unlinkFormFromSheetNatively(formId) {
+      const targetFormId = String(formId || "").trim();
+      if (!targetFormId) return Promise.resolve(false);
+      if (!hasNativeFormLinker()) {
+        return Promise.reject(new Error("Falta configurar el Apps Script de vinculacion nativa."));
+      }
+      return runAppsScriptLinker("unlinkFormFromSpreadsheet", [targetFormId]).then(function (result) {
+        return setFormLinkMirror(targetFormId, "").then(function () {
+          return result || {};
+        });
+      });
+    }
+    function syncFormResponsesToSheet() {
+      return Promise.resolve(false);
+    }
+    function renderFormLinkOptions(items) {
+      els.formLinkModalList.innerHTML = "";
+      els.formLinkModalEmpty.classList.toggle("hidden", (items || []).length !== 0);
+      (items || []).forEach(function (item) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "picker-item";
+        btn.disabled = !hasNativeFormLinker();
+        btn.innerHTML =
+          "<div class='picker-main'>" +
+            "<div class='picker-title'>" + escapeHtml(item.name || "Spreadsheet") + "</div>" +
+            "<div class='picker-subtitle'>" + escapeHtml(item.id) + "</div>" +
+          "</div>";
+        btn.addEventListener("click", function () {
+          if (!hasNativeFormLinker()) {
+            setFormLinkStatus("Falta configurar el Apps Script de vinculacion nativa.", "error");
+            return;
+          }
+          setBusy(els.formLinkModalCard, true);
+          setFormLinkStatus("", "");
+          linkFormToSheetNatively(state.formId, item.id).then(function () {
+            state.formLinkedSheetId = item.id;
+            state.formLinkedSheetName = item.name || "";
+            closeFormLinkModal();
+            renderFormLinkedSheetMeta();
+            return refreshVisibleDriveCollections();
+          }).then(function () {
+            setFormSyncStatus("Spreadsheet vinculada de forma nativa", "good");
+          }).catch(function (err) {
+            console.error(err);
+            setFormLinkStatus(messageFromError(err, "No se ha podido crear el vinculo nativo"), "error");
+          }).finally(function () {
+            setBusy(els.formLinkModalCard, false);
+          });
+        });
+        els.formLinkModalList.appendChild(btn);
+      });
+    }
+    function createLinkedSheetForForm() {
+      if (!state.formId) return Promise.resolve(null);
+      if (!hasNativeFormLinker()) {
+        setFormSyncStatus("Falta configurar el Apps Script de vinculacion nativa.", "error");
+        return Promise.resolve(null);
+      }
+      const folderId = currentFormFolderId();
+      const folderStack = state.activePaellaStack && state.activePaellaStack.length
+        ? cloneFolderStack(state.activePaellaStack)
+        : cloneFolderStack(state.folderStack);
+      const name = normalizeDriveItemName(state.formTitle || "Formulario", "Formulario") + " respuestas";
+      setBusy(els.editorShell, true);
+      setFormSyncStatus("Creando hoja vinculada...", "");
+      return createSpreadsheetFile({
+        name: name,
+        folderId: folderId,
+        folderStack: folderStack
+      }).then(function (file) {
+        return linkFormToSheetNatively(state.formId, file.id).then(function () {
+          state.formLinkedSheetId = file.id;
+          state.formLinkedSheetName = file.name || name;
+          renderFormLinkedSheetMeta();
+          return refreshVisibleDriveCollections().then(function () {
+            setFormSyncStatus("Hoja vinculada nativamente", "good");
+            return file;
+          });
+        }).catch(function (err) {
+          console.error(err);
+          setFormSyncStatus(messageFromError(err, "La hoja se ha creado pero Google no ha confirmado el vinculo nativo"), "error");
+          return null;
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setFormSyncStatus(messageFromError(err, "No se ha podido crear la hoja vinculada"), "error");
+        return null;
+      }).finally(function () {
+        setBusy(els.editorShell, false);
+      });
+    }
+    function unlinkSpreadsheetFromForm(formItem) {
+      if (!formItem || !formItem.id) return Promise.resolve(false);
+      return unlinkFormFromSheetNatively(formItem.id).then(function () {
+        if (state.formId === formItem.id) {
+          state.formLinkedSheetId = "";
+          state.formLinkedSheetName = "";
+          renderFormLinkedSheetMeta();
+        }
+        return refreshVisibleDriveCollections().then(function () {
+          return true;
+        });
       });
     }
     function currentSheetInfo() {
@@ -9406,6 +9857,25 @@
         setFormSyncStatus(messageFromError(err, "No se ha podido quitar el vínculo"), "error");
       });
     });
+    els.formUnlinkSheetBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!hasNativeFormLinker()) {
+        setFormSyncStatus("Falta configurar el Apps Script de vinculacion nativa.", "error");
+        return;
+      }
+      unlinkFormFromSheetNatively(state.formId).then(function () {
+        state.formLinkedSheetId = "";
+        state.formLinkedSheetName = "";
+        renderFormLinkedSheetMeta();
+        return refreshVisibleDriveCollections();
+      }).then(function () {
+        setFormSyncStatus("Vinculo nativo eliminado", "good");
+      }).catch(function (err) {
+        console.error(err);
+        setFormSyncStatus(messageFromError(err, "No se ha podido quitar el vinculo"), "error");
+      });
+    }, true);
     els.formLinkModalCloseBtn.addEventListener("click", closeFormLinkModal);
     els.formLinkModalCancelBtn.addEventListener("click", closeFormLinkModal);
     els.formLinkModal.addEventListener("click", function (event) {
