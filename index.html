@@ -200,6 +200,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 14px;
+      padding: 4px;
     }
     .item {
       border: 1px solid var(--line);
@@ -212,10 +213,10 @@
       gap: 6px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.03);
       cursor: pointer;
-      overflow: hidden;
-      transition: box-shadow .18s ease, transform .15s ease;
+      overflow: visible;
+      transition: box-shadow .18s ease, border-color .15s ease, background-color .15s ease;
     }
-    .item:hover { box-shadow: 0 4px 16px rgba(104,70,5,0.10); transform: translateY(-1px); }
+    .item:hover { box-shadow: none; }
     .btn:hover { transform: translateY(-1px); }
     .item-row { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; overflow: hidden; }
     .item-icon-emoji {
@@ -385,7 +386,7 @@
       align-content: start;
       max-height: min(46vh, 560px);
       overflow: auto;
-      padding-right: 4px;
+      padding: 4px;
     }
     .paella-panel.is-folder-open .paella-panel-content {
       max-height: min(58vh, 680px);
@@ -441,11 +442,10 @@
       gap: 12px;
       box-shadow: 0 4px 18px rgba(145, 88, 8, 0.08);
       cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      transition: box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
     }
     .paella-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(145, 88, 8, 0.12);
+      box-shadow: none;
       border-color: rgba(185, 90, 0, 0.24);
     }
     .paella-card-head {
@@ -532,8 +532,8 @@
     }
     .linked-pair-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: 1fr;
+      gap: 0;
     }
     .paired-file-card {
       border: 1px solid rgba(185, 90, 0, 0.10);
@@ -550,6 +550,19 @@
     .paired-file-card:hover {
       background: rgba(255,255,255,1);
       border-color: rgba(185, 90, 0, 0.22);
+    }
+    .linked-pair-grid .paired-file-card:first-child {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-bottom: 0;
+    }
+    .linked-pair-grid .paired-file-card:last-child {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      margin-top: -1px;
+    }
+    .linked-pair-grid .paired-file-card + .paired-file-card {
+      border-top-color: rgba(185, 90, 0, 0.12);
     }
     .paired-file-card-head {
       display: none;
@@ -2013,7 +2026,7 @@
       min-height: 0;
       height: 100%;
       overflow: auto;
-      padding-right: 4px;
+      padding: 4px;
     }
     .drive-scroll.paella-focus .linked-pair-grid {
       grid-template-columns: 1fr 1fr;
@@ -2042,7 +2055,7 @@
       min-height: 0;
       max-height: min(46vh, 560px);
       overflow: auto;
-      padding-right: 4px;
+      padding: 4px;
       display: grid;
       align-content: start;
       gap: 12px;
@@ -2211,7 +2224,7 @@
       .presence-avatars { padding-left: 0; }
       .presence-avatar-wrapper { width: 24px; height: 24px; margin-left: -6px; }
       .paella-panel.is-folder-open .paella-panel-actions {
-        order: 1;
+        order: 2;
         display: grid;
         grid-template-columns: auto auto;
         align-items: center;
@@ -2219,7 +2232,7 @@
         justify-items: end;
       }
       .paella-panel.is-folder-open .paella-panel-head > div:first-child {
-        order: 2;
+        order: 1;
       }
       .paella-panel.is-folder-open .paella-panel-actions .presence-avatars {
         justify-self: end;
@@ -2263,11 +2276,15 @@
       .linked-pair-title { font-size: 0.68rem; }
       .paired-file-card { padding: 8px; gap: 8px; }
       .paella-panel.is-folder-open .paella-panel-head {
-        gap: 8px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 8px 10px;
       }
       .paella-panel.is-folder-open .paella-panel-actions {
         grid-template-columns: auto auto;
         gap: 8px;
+        align-self: start;
       }
       .paired-file-card-icon {
         width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
