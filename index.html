@@ -348,6 +348,17 @@
       font-size: 1.2rem;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
     }
+    .paired-item-kind {
+      flex: 0 0 auto;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+    }
     .shared-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); opacity: 0.6; }
     .title { font-size: 0.92rem; font-weight: 600; line-height: 1.2; min-width: 0; }
     .title-with-share { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
@@ -481,42 +492,35 @@
       font-weight: 600;
     }
     .linked-pair-card {
-      border: 1px solid rgba(185, 90, 0, 0.18);
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255, 251, 238, 0.96) 0%, rgba(255, 246, 215, 0.9) 100%);
-      box-shadow: 0 8px 24px rgba(145, 88, 8, 0.1);
-      padding: 18px;
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 251, 238, 0.92);
+      padding: 10px;
       display: grid;
-      gap: 16px;
+      gap: 8px;
     }
     .linked-pair-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 2px;
     }
     .linked-pair-title {
-      font-size: 1.08rem;
-      font-weight: 800;
-      line-height: 1.2;
-      color: #7a4605;
-      letter-spacing: -0.02em;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #8a5211;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
-    .linked-pair-copy {
-      font-size: 0.92rem;
-      color: var(--muted);
-      line-height: 1.35;
-      max-width: 42ch;
-    }
+    .linked-pair-copy { display: none; }
     .linked-pair-badge {
       display: inline-flex;
       align-items: center;
-      padding: 6px 10px;
+      padding: 3px 7px;
       border-radius: 999px;
-      background: rgba(185, 90, 0, 0.12);
+      background: rgba(185, 90, 0, 0.10);
       color: #8a5211;
-      font-size: 0.72rem;
+      font-size: 0.64rem;
       font-weight: 700;
       letter-spacing: 0.02em;
       text-transform: uppercase;
@@ -524,102 +528,91 @@
     }
     .linked-pair-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
     .paired-file-card {
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.92);
-      box-shadow: 0 4px 14px rgba(145, 88, 8, 0.08);
-      padding: 14px;
-      display: grid;
-      gap: 12px;
+      border: 1px solid rgba(185, 90, 0, 0.10);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.88);
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       min-height: 0;
       cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      transition: background .16s ease, border-color .16s ease;
     }
     .paired-file-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(145, 88, 8, 0.12);
-      border-color: rgba(185, 90, 0, 0.2);
+      background: rgba(255,255,255,1);
+      border-color: rgba(185, 90, 0, 0.22);
     }
     .paired-file-card-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
+      display: none;
     }
     .paired-file-card-kind {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: #8a5211;
-      background: rgba(255, 231, 176, 0.78);
-      white-space: nowrap;
-      flex: 0 0 auto;
+      display: none;
     }
     .paired-file-card-main {
       display: flex;
-      align-items: flex-start;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
       min-width: 0;
+      flex: 1;
     }
     .paired-file-card-icon {
-      width: 52px;
-      height: 52px;
-      min-width: 52px;
-      border-radius: 14px;
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 9px;
       display: grid;
       place-items: center;
       background: rgba(255, 246, 215, 0.9);
-      border: 1px solid rgba(185, 90, 0, 0.14);
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      flex: 0 0 auto;
     }
     .paired-file-card-icon .item-icon {
-      width: 28px;
-      height: 28px;
-      flex: 0 0 28px;
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
     }
     .paired-file-card-copy {
       min-width: 0;
       display: grid;
-      gap: 6px;
-      align-content: start;
+      gap: 2px;
+      align-content: center;
     }
     .paired-file-card-title {
-      font-size: 1rem;
-      font-weight: 800;
-      line-height: 1.25;
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.2;
       color: var(--ink);
-      word-break: normal;
-      overflow-wrap: anywhere;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .paired-file-card-meta {
-      font-size: 0.82rem;
-      line-height: 1.35;
+      font-size: 0.74rem;
+      line-height: 1.2;
       color: var(--muted);
-      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .paired-file-card-foot {
+      display: none;
+    }
+    .paired-file-card .item-actions {
+      flex: 0 0 auto;
+    }
+    .paired-file-card-foot-legacy {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       flex-wrap: wrap;
     }
-    .paired-file-card-open {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #8a5211;
-    }
+    .paired-file-card-open { display: none; }
     .paella-empty {
       margin: 0;
     }
@@ -2019,7 +2012,7 @@
       padding-right: 4px;
     }
     .drive-scroll.paella-focus .linked-pair-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
     }
     .section-label {
       font-size: 0.72rem;
@@ -2069,10 +2062,10 @@
       table { width: max(100%, 760px); min-width: 760px; }
       .form-shell { grid-template-columns: 1fr; }
       .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-      .linked-pair-grid,
+      .linked-pair-grid { grid-template-columns: 1fr; }
       .sheet-group-columns { grid-template-columns: 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
-      .paired-file-card { min-height: 128px; }
+      .paired-file-card { min-height: 0; }
       .item {
         min-height: 58px;
         height: auto;
@@ -2169,27 +2162,21 @@
         grid-template-columns: 1fr;
       }
       .item { min-height: 62px; }
-      .linked-pair-card { padding: 12px; }
-      .linked-pair-title { font-size: 0.96rem; }
-      .linked-pair-copy { font-size: 0.84rem; }
+      .linked-pair-card { padding: 8px; }
+      .linked-pair-grid { grid-template-columns: 1fr; }
       .sheet-groups-view { padding: 12px; }
       .sheet-group-card { padding: 12px; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
       .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; }
-      .paired-file-card {
-        padding: 12px;
-        min-height: 0;
-      }
-      .paired-file-card-main {
-        grid-template-columns: 44px minmax(0, 1fr);
-        gap: 10px;
-      }
+      .paired-file-card { padding: 8px; gap: 8px; }
       .paired-file-card-icon {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        border-radius: 8px;
       }
-      .paired-file-card-title { font-size: 0.92rem; }
+      .paired-file-card-icon .item-icon { width: 16px; height: 16px; flex: 0 0 16px; }
+      .paired-file-card-title { font-size: 0.84rem; }
       .item-more-btn {
         width: 32px;
         height: 32px;
@@ -6472,26 +6459,17 @@
     function createPaellaLinkedFileCard(item) {
       const isForm = item && item.mimeType === DRIVE_FORM_MIME;
       const kindLabel = isForm ? "Form" : "Spreadsheet";
-      const metaLabel = isForm ? "Formulario principal" : "Hoja de respuestas";
-      const openLabel = isForm ? "Abrir form" : "Abrir spreadsheet";
       const card = document.createElement("article");
       card.className = "paired-file-card";
       card.innerHTML =
-        "<div class='paired-file-card-head'>" +
-          "<span class='paired-file-card-kind'>" + escapeHtml(kindLabel) + "</span>" +
-        "</div>" +
         "<div class='paired-file-card-main'>" +
           "<div class='paired-file-card-icon'>" + driveFileIconMarkup(item.mimeType) + "</div>" +
           "<div class='paired-file-card-copy'>" +
             "<div class='paired-file-card-title'>" + escapeHtml(item && item.name ? item.name : kindLabel) + "</div>" +
-            "<div class='paired-file-card-meta'>" + escapeHtml(metaLabel) + (item && item.shared ? " · Compartido" : "") + "</div>" +
+            "<div class='paired-file-card-meta'>" + escapeHtml(kindLabel) + "</div>" +
           "</div>" +
-        "</div>" +
-        "<div class='paired-file-card-foot'>" +
-          "<span class='paired-file-card-open'>" + escapeHtml(openLabel) + "</span>" +
         "</div>";
-      const head = card.querySelector(".paired-file-card-head");
-      if (head) head.appendChild(createItemActionButton(item, "paella-file"));
+      card.appendChild(createItemActionButton(item, "paella-file"));
       card.addEventListener("click", function () {
         openDriveDocument(item);
       });
@@ -6526,11 +6504,8 @@
       wrapper.className = "linked-pair-card";
       wrapper.innerHTML =
         "<div class='linked-pair-head'>" +
-          "<div>" +
-            "<div class='linked-pair-title'>Form y spreadsheet vinculados</div>" +
-            "<div class='linked-pair-copy'>El formulario y su hoja de respuestas se muestran juntos.</div>" +
-          "</div>" +
           "<span class='linked-pair-badge'>Vinculados</span>" +
+          "<span class='linked-pair-title'>Form + Spreadsheet</span>" +
         "</div>";
       const grid = document.createElement("div");
       grid.className = "linked-pair-grid";
