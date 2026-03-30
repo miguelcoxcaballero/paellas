@@ -607,15 +607,15 @@
       border: 1px solid rgba(185, 90, 0, 0.12);
       flex: 0 0 auto;
     }
-    .paired-file-card.is-form .paired-file-card-icon {
+    .item.is-form .item-icon,
+    .paired-file-card.is-form .item-icon,
+    .trash-item.is-form .item-icon {
       color: #7b61c8;
-      background: rgba(123, 97, 200, 0.12);
-      border-color: rgba(123, 97, 200, 0.28);
     }
-    .paired-file-card.is-sheet .paired-file-card-icon {
+    .item.is-sheet .item-icon,
+    .paired-file-card.is-sheet .item-icon,
+    .trash-item.is-sheet .item-icon {
       color: #2f9d57;
-      background: rgba(47, 157, 87, 0.12);
-      border-color: rgba(47, 157, 87, 0.28);
     }
     .paired-file-card-icon .item-icon {
       width: 18px;
@@ -5566,6 +5566,12 @@
         "<span class='title-text'>" + escapeHtml(name || "Sin nombre") + "</span>" +
       "</div>";
     }
+    function driveItemTypeClass(item) {
+      if (!item || !item.mimeType) return "";
+      if (item.mimeType === DRIVE_FORM_MIME) return " is-form";
+      if (item.mimeType === DRIVE_SPREADSHEET_MIME) return " is-sheet";
+      return "";
+    }
     function driveFileIconMarkup(mimeType) {
       if (mimeType === DRIVE_FORM_MIME) {
         return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><path d='M8 4h8l4 4v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'/><path d='M16 4v4h4' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'/><circle cx='10' cy='13' r='1.2' fill='currentColor'/><path d='M13 13h4M13 17h4M10 17h.01' stroke='currentColor' stroke-width='1.6' stroke-linecap='round'/></svg>";
@@ -5761,7 +5767,7 @@
       els.driveTrashEmpty.classList.toggle("hidden", items.length !== 0);
       items.forEach(function (item) {
         const row = document.createElement("div");
-        row.className = "trash-item";
+        row.className = "trash-item" + (item.mimeType === DRIVE_FOLDER_MIME ? "" : driveItemTypeClass(item));
 
         const main = document.createElement("div");
         main.className = "trash-item-main";
@@ -6701,7 +6707,7 @@
         const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
         const isPaella = isPaellaFolder(item);
         const el = document.createElement("article");
-        el.className = "item";
+        el.className = "item" + (isFolder ? "" : driveItemTypeClass(item));
         var icon = isFolder
           ? driveFolderIconMarkup(isPaella, item.folderColorRgb)
           : driveFileIconMarkup(item.mimeType);
@@ -6943,7 +6949,7 @@
         filtered.forEach(function (item) {
           const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
           const el = document.createElement("article");
-          el.className = "item";
+          el.className = "item" + (isFolder ? "" : driveItemTypeClass(item));
           el.innerHTML =
             "<div class='item-row'>" +
               (isFolder ? driveFolderIconMarkup(false, item.folderColorRgb) : driveFileIconMarkup(item.mimeType)) +
@@ -6996,7 +7002,7 @@
       els.sharedEmptyState.classList.toggle("hidden", filtered.length !== 0);
       filtered.forEach(function (item) {
         const el = document.createElement("article");
-        el.className = "item";
+        el.className = "item" + driveItemTypeClass(item);
         el.innerHTML = "<div class='item-row'>" + driveFileIconMarkup(item.mimeType) + itemTitleMarkup(item.name, true) + "</div>";
         el.appendChild(createItemActionButton(item, "shared"));
         el.addEventListener("click", function () {
