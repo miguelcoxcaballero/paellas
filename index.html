@@ -535,7 +535,7 @@
     }
     .linked-pair-link {
       position: absolute;
-      left: 27px;
+      left: 26px;
       top: 50%;
       transform: translate(-50%, -50%);
       display: flex;
@@ -552,20 +552,21 @@
       z-index: 2;
     }
     .paired-file-card {
-      border: 1px solid rgba(185, 90, 0, 0.10);
+      border: 1px solid var(--line);
+      background: var(--bg2);
       border-radius: 12px;
-      background: rgba(255,255,255,0.88);
-      padding: 10px;
+      padding: 10px 10px 10px 14px;
+      height: 48px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       min-height: 0;
       cursor: pointer;
-      transition: background .16s ease, border-color .16s ease;
+      overflow: visible;
+      transition: box-shadow .18s ease, border-color .15s ease, background-color .15s ease;
     }
     .paired-file-card:hover {
-      background: rgba(255,255,255,1);
-      border-color: rgba(185, 90, 0, 0.22);
+      box-shadow: none;
     }
     .linked-pair-grid .paired-file-card:first-child {
       border-bottom-left-radius: 0;
@@ -597,15 +598,7 @@
       flex: 1;
     }
     .paired-file-card-icon {
-      width: 34px;
-      height: 34px;
-      min-width: 34px;
-      border-radius: 9px;
-      display: grid;
-      place-items: center;
-      background: rgba(255, 246, 215, 0.9);
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      flex: 0 0 auto;
+      display: contents;
     }
     .item.is-form .item-icon,
     .paired-file-card.is-form .item-icon,
@@ -618,33 +611,20 @@
       color: #2f9d57;
     }
     .paired-file-card-icon .item-icon {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 18px;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 24px;
     }
     .paired-file-card-copy {
       min-width: 0;
       max-width: 100%;
-      display: grid;
-      gap: 2px;
-      align-content: center;
+      display: none;
     }
     .paired-file-card-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--ink);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      display: none;
     }
     .paired-file-card-meta {
-      font-size: 0.74rem;
-      line-height: 1.2;
-      color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      display: none;
     }
     .paired-file-card-foot {
       display: none;
@@ -2126,7 +2106,14 @@
       .linked-pair-grid { grid-template-columns: 1fr; }
       .sheet-group-columns { grid-template-columns: 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
-      .paired-file-card { min-height: 0; }
+      .paired-file-card {
+        min-height: 48px;
+        height: auto;
+        padding: 10px 12px;
+        border-radius: 12px;
+        align-items: center;
+        overflow: hidden;
+      }
       .item {
         min-height: 48px;
         height: auto;
@@ -2158,15 +2145,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .paired-file-card {
-        overflow: hidden;
-      }
-      .paired-file-card-title,
-      .paired-file-card-meta {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+      .paired-file-card { overflow: hidden; }
       .drive-header { padding: 8px 12px; }
       .drive-scroll { padding: 10px 12px; gap: 12px; }
       .drive-scroll.paella-focus {
@@ -2335,7 +2314,7 @@
       .linked-pair-card { padding: 0; gap: 0; }
       .linked-pair-grid { grid-template-columns: 1fr; }
       .linked-pair-link {
-        left: 27px;
+        left: 26px;
         width: 18px;
         height: 18px;
         font-size: 0.82rem;
@@ -2343,12 +2322,13 @@
       .linked-pair-badge { font-size: 0.6rem; padding: 2px 6px; }
       .linked-pair-title { font-size: 0.68rem; }
       .paired-file-card {
-        padding: 8px;
-        gap: 8px;
+        min-height: 44px;
+        padding: 8px 10px;
+        border-radius: 10px;
         overflow: hidden;
       }
       .linked-pair-link {
-        left: 23px;
+        left: 20px;
         width: 16px;
         height: 16px;
       }
@@ -2363,10 +2343,7 @@
         gap: 8px;
         align-self: start;
       }
-      .paired-file-card-icon {
-        width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
-      }
-      .paired-file-card-icon .item-icon { width: 16px; height: 16px; flex: 0 0 16px; }
+      .paired-file-card-icon .item-icon { width: 20px; height: 20px; flex: 0 0 20px; }
       .paired-file-card-main,
       .paired-file-card-copy,
       .title,
@@ -2377,18 +2354,8 @@
         min-width: 0;
         max-width: 100%;
       }
-      .paired-file-card-title {
-        font-size: 0.84rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .paired-file-card-meta {
-        font-size: 0.7rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+      .paired-file-card-title,
+      .paired-file-card-meta { display: none; }
       .sheet-groups-view { padding: 10px; }
       .sheet-group-card { padding: 10px; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
@@ -6757,14 +6724,12 @@
       const isForm = item && item.mimeType === DRIVE_FORM_MIME;
       const kindLabel = isForm ? "Form" : "Spreadsheet";
       const card = document.createElement("article");
-      card.className = "paired-file-card " + (isForm ? "is-form" : "is-sheet");
+      card.className = "item paired-file-card " + (isForm ? "is-form" : "is-sheet");
       card.innerHTML =
-        "<div class='paired-file-card-main'>" +
+        "<div class='item-row'>" +
           "<div class='paired-file-card-icon'>" + driveFileIconMarkup(item.mimeType) + "</div>" +
-          "<div class='paired-file-card-copy'>" +
-            "<div class='paired-file-card-title'>" + escapeHtml(item && item.name ? item.name : kindLabel) + "</div>" +
-            "<div class='paired-file-card-meta'>" + escapeHtml(kindLabel) + "</div>" +
-          "</div>" +
+          itemTitleMarkup(item && item.name ? item.name : kindLabel, !!(item && item.shared)) +
+          "<span class='paired-item-kind'>" + escapeHtml(kindLabel) + "</span>" +
         "</div>";
       card.appendChild(createItemActionButton(item, "paella-file"));
       card.addEventListener("click", function () {
