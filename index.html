@@ -1017,32 +1017,66 @@
     }
     .hidden-panel { display: none !important; }
     .form-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: nowrap;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 10px 12px;
       min-height: 36px;
-      overflow-x: auto;
-      padding-bottom: 2px;
     }
     .form-toolbar-group {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-shrink: 0;
+      flex-wrap: wrap;
+      min-width: 0;
     }
     .form-toolbar-actions {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-shrink: 0;
-      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      min-width: 0;
     }
     .form-toolbar-meta {
       font-size: 0.76rem;
       color: var(--muted);
-      white-space: nowrap;
+      white-space: normal;
       padding: 0 4px;
+    }
+    .form-view-switch {
+      display: inline-grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      padding: 4px;
+      border-radius: 14px;
+      background: rgba(255, 248, 227, 0.92);
+      border: 1px solid var(--line);
+      width: fit-content;
+      max-width: 100%;
+    }
+    .form-view-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      min-height: 40px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+      white-space: nowrap;
+    }
+    .form-view-btn:hover {
+      background: rgba(255,240,191,.55);
+      color: var(--ink);
+    }
+    .form-view-btn.active {
+      background: rgba(255,240,191,.98);
+      color: var(--ink);
+      box-shadow: inset 0 0 0 1px rgba(185, 90, 0, 0.08);
     }
     .form-template-btn {
       background: linear-gradient(180deg, rgba(255,240,191,.92) 0%, rgba(255,228,150,.88) 100%);
@@ -1112,10 +1146,16 @@
       min-height: 0;
       overflow: auto;
       display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.8fr);
-      gap: 14px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
       align-content: start;
       padding: 2px;
+    }
+    .form-panel {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      min-width: 0;
     }
     .form-column {
       display: grid;
@@ -2210,6 +2250,13 @@
       .profile-menu { left: auto; right: 0; max-width: min(92vw, 280px); }
       table { width: max(100%, 760px); min-width: 760px; }
       .form-shell { grid-template-columns: 1fr; }
+      .form-toolbar {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .form-toolbar-actions {
+        justify-content: flex-start;
+      }
       .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
       .linked-pair-grid { grid-template-columns: 1fr; }
       .sheet-group-columns { grid-template-columns: 1fr; }
@@ -2347,14 +2394,6 @@
         padding: 8px 14px;
         font-size: 0.86rem;
         border-radius: 12px;
-      }
-      .form-toolbar {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 2px;
-      }
-      .form-toolbar-group {
-        flex-shrink: 0;
       }
       .mode-toggle-text { display: none; }
       .mode-toggle-btn {
@@ -2514,6 +2553,15 @@
       .form-stepper-value { width: 36px; font-size: 0.78rem; }
       .form-stepper-apply { font-size: 0.68rem; padding: 0 8px; height: 30px; }
       .form-toolbar-meta { font-size: 0.7rem; }
+      .form-view-switch {
+        width: 100%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .form-view-btn {
+        min-height: 38px;
+        padding: 7px 10px;
+        font-size: 0.78rem;
+      }
       .form-link-actions .btn { font-size: 0.72rem; padding: 5px 8px; }
       .form-responses-list { max-height: min(50vh, 400px); }
       .form-response-item { padding: 8px; gap: 5px; border-radius: 8px; }
@@ -2722,7 +2770,12 @@
           <div id="sheetGroupsEmpty" class="form-empty hidden">No hay grupos para mostrar en esta hoja.</div>
         </div>
         <div id="formEditor" class="form-shell hidden-panel">
-          <div class="form-column">
+          <div id="formViewSwitch" class="form-view-switch">
+            <button id="formViewMainBtn" class="form-view-btn active" type="button">Formulario</button>
+            <button id="formViewResponsesBtn" class="form-view-btn" type="button">Respuestas</button>
+            <button id="formViewSettingsBtn" class="form-view-btn" type="button">Ajustes</button>
+          </div>
+          <div id="formPanelMain" class="form-column">
             <section class="form-card">
               <div class="form-card-head">
                 <div class="form-card-title">Descripción</div>
@@ -2737,8 +2790,8 @@
               <div id="formQuestionsEmpty" class="form-empty hidden">Sin preguntas</div>
             </section>
           </div>
-          <div class="form-column">
-            <section class="form-card">
+          <div id="formPanelSide" class="form-column hidden-panel">
+            <section id="formPanelSettings" class="form-card hidden-panel">
               <div class="form-card-head">
                 <div class="form-card-title">Hoja vinculada</div>
               </div>
@@ -2759,7 +2812,7 @@
               </div>
               <div id="formSyncStatus" class="status"></div>
             </section>
-            <section class="form-card">
+            <section id="formPanelResponses" class="form-card hidden-panel">
               <div class="form-card-head">
                 <div class="form-card-title">Respuestas</div>
               </div>
@@ -3165,6 +3218,7 @@
       loadedFormDescription: "",
       loadedFormItems: [],
       formDirty: false,
+      formPanelView: "main",
       nameModalAction: null,
       titleDirty: false,
       editorMode: "edit",
@@ -3299,6 +3353,14 @@
       sheetGroupsList: document.getElementById("sheetGroupsList"),
       sheetGroupsEmpty: document.getElementById("sheetGroupsEmpty"),
       formEditor: document.getElementById("formEditor"),
+      formViewSwitch: document.getElementById("formViewSwitch"),
+      formViewMainBtn: document.getElementById("formViewMainBtn"),
+      formViewResponsesBtn: document.getElementById("formViewResponsesBtn"),
+      formViewSettingsBtn: document.getElementById("formViewSettingsBtn"),
+      formPanelMain: document.getElementById("formPanelMain"),
+      formPanelSide: document.getElementById("formPanelSide"),
+      formPanelSettings: document.getElementById("formPanelSettings"),
+      formPanelResponses: document.getElementById("formPanelResponses"),
       formDescriptionInput: document.getElementById("formDescriptionInput"),
       formQuestionsList: document.getElementById("formQuestionsList"),
       formQuestionsEmpty: document.getElementById("formQuestionsEmpty"),
@@ -7277,6 +7339,18 @@
       const responses = state.formResponses.length;
       els.formToolbarMeta.textContent = count + (count === 1 ? " pregunta" : " preguntas") + " · " + responses + (responses === 1 ? " respuesta" : " respuestas");
     }
+    function setFormPanelView(view) {
+      const nextView = view === "responses" || view === "settings" ? view : "main";
+      state.formPanelView = nextView;
+      if (!els.formViewMainBtn) return;
+      els.formViewMainBtn.classList.toggle("active", nextView === "main");
+      els.formViewResponsesBtn.classList.toggle("active", nextView === "responses");
+      els.formViewSettingsBtn.classList.toggle("active", nextView === "settings");
+      els.formPanelMain.classList.toggle("hidden-panel", nextView !== "main");
+      els.formPanelSide.classList.toggle("hidden-panel", nextView === "main");
+      els.formPanelResponses.classList.toggle("hidden-panel", nextView !== "responses");
+      els.formPanelSettings.classList.toggle("hidden-panel", nextView !== "settings");
+    }
     function renderFormQuestions() {
       els.formQuestionsList.innerHTML = "";
       els.formQuestionsEmpty.classList.toggle("hidden", state.formItems.length !== 0);
@@ -7496,6 +7570,7 @@
       if (formMode) {
         els.formDescriptionInput.value = state.formDescription || "";
         renderFormQuestions();
+        setFormPanelView(state.formPanelView || "main");
       }
     }
     function currentFormFolderId() {
@@ -10015,6 +10090,15 @@
     });
     els.formLinkSheetBtn.addEventListener("click", function () {
       openFormLinkModal();
+    });
+    els.formViewMainBtn.addEventListener("click", function () {
+      setFormPanelView("main");
+    });
+    els.formViewResponsesBtn.addEventListener("click", function () {
+      setFormPanelView("responses");
+    });
+    els.formViewSettingsBtn.addEventListener("click", function () {
+      setFormPanelView("settings");
     });
     els.formCreateLinkedSheetBtn.addEventListener("click", function () {
       createLinkedSheetForForm();
