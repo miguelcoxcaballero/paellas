@@ -2148,15 +2148,29 @@
         gap: 8px;
         align-items: center;
       }
+      .paella-panel.is-folder-open .paella-panel-head {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 10px;
+      }
       .paella-panel-head > div:first-child {
         flex: 1 1 0;
         min-width: 0;
+      }
+      .paella-panel.is-folder-open .paella-panel-head > div:first-child {
+        width: 100%;
       }
       .paella-panel-actions {
         display: flex;
         flex-wrap: nowrap;
         gap: 6px;
         flex: 0 0 auto;
+      }
+      .paella-panel.is-folder-open .paella-panel-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
       }
       .paella-panel-actions > * {
         flex: 0 0 auto;
@@ -2214,6 +2228,12 @@
       .linked-pair-badge { font-size: 0.6rem; padding: 2px 6px; }
       .linked-pair-title { font-size: 0.68rem; }
       .paired-file-card { padding: 8px; gap: 8px; }
+      .paella-panel.is-folder-open .paella-panel-head {
+        gap: 8px;
+      }
+      .paella-panel.is-folder-open .paella-panel-actions {
+        gap: 8px;
+      }
       .paired-file-card-icon {
         width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
       }
@@ -2335,7 +2355,6 @@
             <input id="searchInput" class="search" type="search" placeholder="Buscar...">
           </div>
           <div id="driveStatus" class="pill hidden"></div>
-          <button id="newSheetBtn" class="btn small primary drive-primary-action" type="button"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg> Nueva</button>
         </div>
       </section>
       <div class="drive-scroll">
@@ -8928,7 +8947,9 @@
     }
     els.profileLogoutBtn.addEventListener("click", resetSession);
     els.searchInput.addEventListener("input", function() { renderItems(); renderPaellas(); renderDireccion(); renderSharedItems(); });
-    els.newSheetBtn.addEventListener("click", function () { openNewSheetModal("sheet", "drive"); });
+    if (els.newSheetBtn) {
+      els.newSheetBtn.addEventListener("click", function () { openNewSheetModal("sheet", "drive"); });
+    }
     els.createPaellaBtn.addEventListener("click", function () {
       if (state.activePaellaStack.length) {
         openNewSheetModal("sheet", "paella-files");
