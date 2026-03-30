@@ -1478,6 +1478,15 @@
       min-width: 0;
       overflow-wrap: anywhere;
     }
+    .form-response-lines {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .form-response-line {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
     .form-link-meta {
       display: grid;
       gap: 3px;
@@ -4543,19 +4552,26 @@
     function getQuestionLabel(question, index) {
       return normalizeDriveItemName(question && question.title, "Pregunta " + (index + 1));
     }
-    function parseFormAnswer(answer) {
-      if (!answer) return "";
+    function parseFormAnswerList(answer) {
+      if (!answer) return [];
       if (answer.textAnswers && Array.isArray(answer.textAnswers.answers)) {
         return answer.textAnswers.answers.map(function (entry) {
           return String(entry && entry.value || "").trim();
-        }).filter(Boolean).join(", ");
+        }).filter(Boolean);
       }
       if (answer.fileUploadAnswers && Array.isArray(answer.fileUploadAnswers.answers)) {
-        return answer.fileUploadAnswers.answers.map(function (entry) {
-          return String(entry && entry.fileId || "").trim();
-        }).filter(Boolean).join(", ");
+        return answer.fileUploadAnswers.answers.map(function (entry, index) {
+          const explicitName = String(
+            (entry && (entry.fileName || entry.name || entry.originalFileName || entry.displayName)) || ""
+          ).trim();
+          if (explicitName) return explicitName;
+          return "Archivo subido" + (answer.fileUploadAnswers.answers.length > 1 ? (" " + (index + 1)) : "");
+        }).filter(Boolean);
       }
-      return "";
+      return [];
+    }
+    function parseFormAnswer(answer) {
+      return parseFormAnswerList(answer).join(", ");
     }
     function syncEditorTitle() {
       const title = currentTitle();
@@ -7373,9 +7389,14 @@
       });
     }
     function renderFormResponses() {
-      const responses = Array.isArray(state.formResponses) ? state.formResponses : [];
+      const responses = (Array.isArray(state.formResponses) ? state.formResponses.slice() : []).sort(function (a, b) {
+        const aTime = Date.parse(a && (a.lastSubmittedTime || a.createTime || "")) || 0;
+        const bTime = Date.parse(b && (b.lastSubmittedTime || b.createTime || "")) || 0;
+        return bTime - aTime;
+      });
       const questionMap = new Map();
-      getFormQuestionItems().forEach(function (question) {
+      const orderedQuestions = getFormQuestionItems();
+      orderedQuestions.forEach(function (question) {
         if (question.questionId) questionMap.set(question.questionId, question);
       });
       els.formResponsesList.innerHTML = "";
@@ -7402,43 +7423,133 @@
         activeSection.questions.push(item);
       });
       if (activeSection.questions.length) responseSections.push(activeSection);
-      responses.forEach(function (response) {
+      if (!responseSections.length && orderedQuestions.length) {
+        responseSections.push({
+          key: "section:all",
+          title: "Preguntas",
+          description: "",
+          questions: orderedQuestions.slice()
+        });
+      }
+      responses.forEach(function (response, responseIndex) {
         const card = document.createElement("div");
         card.className = "form-response-item";
-        const createTime = response && response.lastSubmittedTime
-          ? new Date(response.lastSubmittedTime).toLocaleString("es-ES")
+        const submittedRaw = response && (response.lastSubmittedTime || response.createTime);
+        const createTime = submittedRaw
+          ? new Date(submittedRaw).toLocaleString("es-ES")
           : "Sin fecha";
+        const responseTitle = "Respuesta " + (responseIndex + 1);
         card.innerHTML =
           "<div class='form-response-head'>" +
-            "<strong>" + escapeHtml(response.respondentEmail || "Respuesta") + "</strong>" +
+            "<strong>" + escapeHtml(responseTitle) + "</strong>" +
             "<div class='form-response-meta'>" +
               "<div class='form-response-chip'><span>" + escapeHtml(createTime) + "</span></div>" +
-              (response.responseId ? ("<div class='form-response-chip'><span>" + escapeHtml(response.responseId) + "</span></div>") : "") +
+              (response.respondentEmail ? ("<div class='form-response-chip'><span>" + escapeHtml(response.respondentEmail) + "</span></div>") : "") +
             "</div>" +
           "</div>";
         const answers = response && response.answers ? response.answers : {};
         const sectionsWrap = document.createElement("div");
         sectionsWrap.className = "form-response-sections";
+        const renderedAnswerIds = new Set();
+        let renderedBlocks = 0;
         responseSections.forEach(function (section, sectionIndex) {
+          const answerBlocks = [];
           const sectionEl = document.createElement("section");
           sectionEl.className = "form-response-section";
+          section.questions.forEach(function (question, questionIndex) {
+            if (!question || !question.questionId) return;
+            const canonicalQuestion = questionMap.get(question.questionId) || question;
+            const values = parseFormAnswerList(answers[question.questionId]);
+            if (!values.length) return;
+            renderedAnswerIds.add(question.questionId);
+            const block = document.createElement("div");
+            block.className = "form-response-answer";
+            block.innerHTML =
+              "<div class='form-response-question'>" + escapeHtml(getQuestionLabel(canonicalQuestion, questionIndex)) + "</div>";
+            const valueWrap = document.createElement("div");
+            valueWrap.className = "form-response-value";
+            if (values.length === 1) {
+              valueWrap.textContent = values[0];
+            } else {
+              const lines = document.createElement("div");
+              lines.className = "form-response-lines";
+              values.forEach(function (value) {
+                const line = document.createElement("div");
+                line.className = "form-response-line";
+                line.textContent = value;
+                lines.appendChild(line);
+              });
+              valueWrap.appendChild(lines);
+            }
+            block.appendChild(valueWrap);
+            answerBlocks.push(block);
+          });
+          if (!answerBlocks.length) return;
           sectionEl.innerHTML =
             "<div class='form-response-section-head'>" +
               "<div class='form-response-section-title'>" + escapeHtml(section.title || ("Seccion " + (sectionIndex + 1))) + "</div>" +
               (section.description ? ("<div class='form-response-section-desc'>" + escapeHtml(section.description) + "</div>") : "") +
             "</div>";
-          section.questions.forEach(function (question) {
-            if (!question || !question.questionId) return;
-            const canonicalQuestion = questionMap.get(question.questionId) || question;
-            const block = document.createElement("div");
-            block.className = "form-response-answer";
-            block.innerHTML =
-              "<div class='form-response-question'>" + escapeHtml(getQuestionLabel(canonicalQuestion, 0)) + "</div>" +
-              "<div class='form-response-value'>" + escapeHtml(parseFormAnswer(answers[question.questionId]) || "Sin respuesta") + "</div>";
+          answerBlocks.forEach(function (block) {
             sectionEl.appendChild(block);
           });
           sectionsWrap.appendChild(sectionEl);
+          renderedBlocks += answerBlocks.length;
         });
+        const unmatchedBlocks = [];
+        Object.keys(answers).forEach(function (answerId, answerIndex) {
+          if (!answerId || renderedAnswerIds.has(answerId)) return;
+          const values = parseFormAnswerList(answers[answerId]);
+          if (!values.length) return;
+          const fallbackQuestion = questionMap.get(answerId);
+          const block = document.createElement("div");
+          block.className = "form-response-answer";
+          block.innerHTML =
+            "<div class='form-response-question'>" + escapeHtml(
+              fallbackQuestion ? getQuestionLabel(fallbackQuestion, answerIndex) : ("Pregunta " + (answerIndex + 1))
+            ) + "</div>";
+          const valueWrap = document.createElement("div");
+          valueWrap.className = "form-response-value";
+          if (values.length === 1) {
+            valueWrap.textContent = values[0];
+          } else {
+            const lines = document.createElement("div");
+            lines.className = "form-response-lines";
+            values.forEach(function (value) {
+              const line = document.createElement("div");
+              line.className = "form-response-line";
+              line.textContent = value;
+              lines.appendChild(line);
+            });
+            valueWrap.appendChild(lines);
+          }
+          block.appendChild(valueWrap);
+          unmatchedBlocks.push(block);
+        });
+        if (unmatchedBlocks.length) {
+          const extraSection = document.createElement("section");
+          extraSection.className = "form-response-section";
+          extraSection.innerHTML =
+            "<div class='form-response-section-head'>" +
+              "<div class='form-response-section-title'>Otras respuestas</div>" +
+              "<div class='form-response-section-desc'>Preguntas que ya no coinciden con la estructura actual del formulario.</div>" +
+            "</div>";
+          unmatchedBlocks.forEach(function (block) {
+            extraSection.appendChild(block);
+          });
+          sectionsWrap.appendChild(extraSection);
+          renderedBlocks += unmatchedBlocks.length;
+        }
+        if (!renderedBlocks) {
+          const emptySection = document.createElement("section");
+          emptySection.className = "form-response-section";
+          emptySection.innerHTML =
+            "<div class='form-response-section-head'>" +
+              "<div class='form-response-section-title'>Sin contenido legible</div>" +
+              "<div class='form-response-section-desc'>Esta respuesta no tiene preguntas compatibles con la vista actual.</div>" +
+            "</div>";
+          sectionsWrap.appendChild(emptySection);
+        }
         card.appendChild(sectionsWrap);
         els.formResponsesList.appendChild(card);
       });
