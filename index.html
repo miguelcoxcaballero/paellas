@@ -534,7 +534,7 @@
     }
     .paired-file-card {
       border: 1px solid rgba(185, 90, 0, 0.10);
-      border-radius: 0;
+      border-radius: 12px;
       background: rgba(255,255,255,0.88);
       padding: 10px;
       display: flex;
@@ -549,13 +549,20 @@
       border-color: rgba(185, 90, 0, 0.22);
     }
     .linked-pair-grid .paired-file-card:first-child {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
       margin-bottom: 0;
     }
     .linked-pair-grid .paired-file-card:last-child {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
       margin-top: -1px;
     }
     .linked-pair-grid .paired-file-card + .paired-file-card {
       border-top-color: rgba(185, 90, 0, 0.12);
+    }
+    .paired-file-card.standalone {
+      grid-column: 1 / -1;
     }
     .paired-file-card-head {
       display: none;
@@ -6600,6 +6607,11 @@
     }
     function createPaellaFileItemCard(item, extraClass) {
       const isFolder = item && item.mimeType === DRIVE_FOLDER_MIME;
+      if (!isFolder) {
+        const fileCard = createPaellaLinkedFileCard(item);
+        fileCard.classList.add("standalone");
+        return fileCard;
+      }
       const el = document.createElement("article");
       el.className = "item" + (extraClass ? " " + extraClass : "");
       const kindLabel = isFolder
