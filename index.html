@@ -607,6 +607,16 @@
       border: 1px solid rgba(185, 90, 0, 0.12);
       flex: 0 0 auto;
     }
+    .paired-file-card.is-form .paired-file-card-icon {
+      color: #7b61c8;
+      background: rgba(123, 97, 200, 0.12);
+      border-color: rgba(123, 97, 200, 0.28);
+    }
+    .paired-file-card.is-sheet .paired-file-card-icon {
+      color: #2f9d57;
+      background: rgba(47, 157, 87, 0.12);
+      border-color: rgba(47, 157, 87, 0.28);
+    }
     .paired-file-card-icon .item-icon {
       width: 18px;
       height: 18px;
@@ -6741,7 +6751,7 @@
       const isForm = item && item.mimeType === DRIVE_FORM_MIME;
       const kindLabel = isForm ? "Form" : "Spreadsheet";
       const card = document.createElement("article");
-      card.className = "paired-file-card";
+      card.className = "paired-file-card " + (isForm ? "is-form" : "is-sheet");
       card.innerHTML =
         "<div class='paired-file-card-main'>" +
           "<div class='paired-file-card-icon'>" + driveFileIconMarkup(item.mimeType) + "</div>" +
