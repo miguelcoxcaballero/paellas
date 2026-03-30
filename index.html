@@ -1020,68 +1020,125 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       min-height: 36px;
+      overflow-x: auto;
+      padding-bottom: 2px;
     }
     .form-toolbar-group {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      background: rgba(255,240,191,.5);
-      border: 1px solid rgba(185,90,0,.08);
+      flex-shrink: 0;
     }
     .form-toolbar-actions {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
+      flex-shrink: 0;
       margin-left: auto;
     }
-    .form-template-select {
-      min-width: 160px;
-      padding: 6px 10px;
-      font-size: 0.8rem;
+    .form-toolbar-meta {
+      font-size: 0.76rem;
+      color: var(--muted);
+      white-space: nowrap;
+      padding: 0 4px;
     }
-    .form-template-people-input {
-      width: 56px;
-      min-width: 56px;
+    .form-template-btn {
+      background: linear-gradient(180deg, rgba(255,240,191,.92) 0%, rgba(255,228,150,.88) 100%);
+      border-color: rgba(185,90,0,.18);
+      color: #7a4605;
+      font-weight: 700;
+    }
+    .form-template-btn:hover { opacity: 0.88; }
+    .form-people-stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid rgba(185,90,0,.15);
+      border-radius: var(--radius-sm);
+      background: rgba(255,248,227,.92);
+      overflow: hidden;
+    }
+    .form-people-stepper.hidden { display: none; }
+    .form-stepper-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--accent2);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background .15s ease;
+    }
+    .form-stepper-btn:hover { background: rgba(185,90,0,.08); }
+    .form-stepper-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .form-stepper-value {
+      width: 40px;
       text-align: center;
-      padding: 6px 8px;
-      font-size: 0.8rem;
+      border: none;
+      border-left: 1px solid rgba(185,90,0,.1);
+      border-right: 1px solid rgba(185,90,0,.1);
+      background: transparent;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 4px 0;
+      -moz-appearance: textfield;
+      appearance: textfield;
     }
+    .form-stepper-value::-webkit-inner-spin-button,
+    .form-stepper-value::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+    .form-stepper-apply {
+      height: 32px;
+      border: none;
+      border-left: 1px solid rgba(185,90,0,.1);
+      background: rgba(185,90,0,.06);
+      color: var(--accent2);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0 10px;
+      cursor: pointer;
+      transition: background .15s ease;
+      white-space: nowrap;
+    }
+    .form-stepper-apply:hover { background: rgba(185,90,0,.12); }
+    .form-stepper-apply:disabled { opacity: .35; cursor: not-allowed; }
+    .form-template-select { display: none; }
     .form-shell {
       min-height: 0;
       overflow: auto;
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-      gap: 16px;
+      grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.8fr);
+      gap: 14px;
       align-content: start;
       padding: 2px;
     }
     .form-column {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       align-content: start;
     }
     .form-card {
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 12px;
       background: var(--bg2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      padding: 12px;
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
     .form-card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
     .form-card-title {
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       font-weight: 700;
       line-height: 1.2;
     }
@@ -1096,40 +1153,34 @@
     }
     .form-question-list {
       display: grid;
-      gap: 12px;
+      gap: 8px;
     }
     .form-question {
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 10px;
       background: rgba(255,252,243,.95);
-      padding: 12px 14px;
+      padding: 10px 12px;
       display: grid;
-      gap: 10px;
+      gap: 8px;
       position: relative;
       overflow: hidden;
     }
     .form-question.is-section {
-      background: linear-gradient(135deg, rgba(255, 239, 166, 0.98), rgba(255, 228, 118, 0.92));
-      border-color: rgba(212, 122, 24, 0.3);
-      box-shadow: 0 2px 8px rgba(166, 95, 11, 0.08);
-    }
-    .form-question.is-section::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 3px;
-      background: linear-gradient(90deg, #d97b1d, #f2c35e);
+      background: linear-gradient(135deg, rgba(255, 239, 166, 0.95), rgba(255, 228, 118, 0.88));
+      border-color: rgba(212, 122, 24, 0.25);
+      border-left: 3px solid #d97b1d;
     }
     .form-question.is-section.is-collapsed {
-      gap: 6px;
+      gap: 4px;
     }
     .form-question.is-section.is-collapsed .form-question-grid {
       display: none;
     }
     .section-collapse-summary {
       display: none;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       color: var(--muted);
+      padding-left: 30px;
     }
     .form-question.is-section.is-collapsed .section-collapse-summary {
       display: block;
@@ -1137,8 +1188,8 @@
     .form-question-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
+      min-width: 0;
     }
     .form-question-number {
       display: inline-flex;
@@ -1149,7 +1200,7 @@
       border-radius: 6px;
       background: var(--accent);
       color: #fff8eb;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       flex: 0 0 22px;
     }
@@ -1165,26 +1216,50 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .form-question-section-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: #9a5b10;
-      background: rgba(255, 233, 180, 0.72);
-      border-radius: 999px;
-      padding: 3px 8px;
-      display: inline-flex;
-      width: fit-content;
+    .form-question-type-badge {
       flex: 0 0 auto;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.64rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(0,0,0,0.04);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .form-question-required-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d97b1d;
+      flex: 0 0 7px;
+    }
+    .form-question-required-dot.is-off {
+      background: rgba(0,0,0,0.08);
+    }
+    .form-question-section-label {
+      font-size: 0.64rem;
+      font-weight: 700;
+      color: #9a5b10;
+      background: rgba(255, 233, 180, 0.65);
+      border-radius: 999px;
+      padding: 2px 7px;
+      display: inline-flex;
+      flex: 0 0 auto;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
     }
     .form-question-actions {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       flex: 0 0 auto;
     }
     .form-icon-btn {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 6px;
       display: grid;
       place-items: center;
@@ -1201,92 +1276,125 @@
     .form-icon-btn:disabled { opacity: .35; cursor: not-allowed; }
     .form-question-grid {
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
     .form-question-row {
       display: grid;
-      gap: 6px;
+      gap: 4px;
+    }
+    .form-question-row .search {
+      padding: 7px 10px;
+      font-size: 0.84rem;
     }
     .form-inline-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       gap: 8px;
       align-items: center;
+      flex-wrap: wrap;
+    }
+    .form-inline-row .search {
+      flex: 1 1 auto;
+      min-width: 120px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+    }
+    .form-options-wrap {
+      display: grid;
+      gap: 6px;
     }
     .form-options-list {
       display: grid;
-      gap: 6px;
+      gap: 4px;
     }
     .form-option-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
+      display: flex;
       gap: 6px;
       align-items: center;
+    }
+    .form-option-row .search {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 0.82rem;
     }
     .form-switch {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
       cursor: pointer;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    .form-switch input[type="checkbox"] {
+      accent-color: var(--accent);
     }
     .form-responses-list {
       display: grid;
-      gap: 10px;
-      max-height: min(70vh, 720px);
+      gap: 8px;
+      max-height: min(60vh, 600px);
       overflow: auto;
       padding-right: 4px;
     }
     .form-response-item {
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 10px;
       background: rgba(255,255,255,.9);
-      padding: 12px;
+      padding: 10px;
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
     .form-response-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      font-size: 0.8rem;
+      gap: 8px;
+      font-size: 0.76rem;
       color: var(--muted);
     }
     .form-response-answer {
       display: grid;
-      gap: 4px;
+      gap: 2px;
     }
     .form-response-question {
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
     .form-response-value {
-      font-size: 0.88rem;
-      line-height: 1.4;
+      font-size: 0.84rem;
+      line-height: 1.35;
       word-break: break-word;
     }
     .form-link-meta {
       display: grid;
-      gap: 4px;
+      gap: 3px;
+    }
+    .form-link-meta .title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .form-link-meta .meta {
+      font-size: 0.72rem;
     }
     .form-link-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
-    .form-link-actions .btn { font-size: 0.78rem; padding: 6px 10px; }
+    .form-link-actions .btn { font-size: 0.76rem; padding: 5px 9px; }
     .form-empty {
       border: 1px dashed var(--line);
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       text-align: center;
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       background: rgba(255,255,255,.48);
     }
     .save-indicator {
@@ -2387,8 +2495,31 @@
       .editor-card { gap: 10px; }
       .editor-head { gap: 8px; }
       .editor-actions { gap: 6px; }
-      .form-card { padding: 10px; gap: 8px; }
-      .form-card-title { font-size: 0.82rem; }
+      .form-card { padding: 10px; gap: 6px; }
+      .form-card-title { font-size: 0.8rem; }
+      .form-question { padding: 8px 10px; gap: 6px; border-radius: 8px; }
+      .form-question-list { gap: 6px; }
+      .form-question-number { width: 20px; height: 20px; flex: 0 0 20px; font-size: 0.64rem; }
+      .form-question-title-preview { font-size: 0.8rem; }
+      .form-question-type-badge { font-size: 0.6rem; padding: 2px 5px; }
+      .form-question-section-label { font-size: 0.6rem; padding: 2px 5px; }
+      .form-icon-btn { width: 30px; height: 30px; }
+      .form-question-grid { gap: 5px; }
+      .form-question-row .search { padding: 6px 8px; font-size: 0.82rem; }
+      .form-inline-row .search { padding: 5px 8px; font-size: 0.8rem; min-width: 100px; }
+      .form-option-row .search { padding: 5px 8px; font-size: 0.8rem; }
+      .form-template-btn { font-size: 0.78rem; padding: 6px 10px; }
+      .form-people-stepper { border-radius: 8px; }
+      .form-stepper-btn { width: 30px; height: 30px; }
+      .form-stepper-value { width: 36px; font-size: 0.78rem; }
+      .form-stepper-apply { font-size: 0.68rem; padding: 0 8px; height: 30px; }
+      .form-toolbar-meta { font-size: 0.7rem; }
+      .form-link-actions .btn { font-size: 0.72rem; padding: 5px 8px; }
+      .form-responses-list { max-height: min(50vh, 400px); }
+      .form-response-item { padding: 8px; gap: 5px; border-radius: 8px; }
+      .form-response-head { font-size: 0.72rem; }
+      .form-response-question { font-size: 0.68rem; }
+      .form-response-value { font-size: 0.8rem; }
       .crumbs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
       .crumb, .tab { padding: 5px 10px; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
       .paella-card { padding: 10px; gap: 8px; border-radius: 12px; }
@@ -2561,19 +2692,21 @@
           </div>
           <div id="formToolbar" class="form-toolbar hidden-panel">
             <div class="form-toolbar-group">
-              <select id="formTemplateSelect" class="search form-template-select" aria-label="Plantilla">
+              <select id="formTemplateSelect" class="search form-template-select" aria-label="Plantilla" style="display:none">
                 <option value="paella">Paella</option>
               </select>
-              <button id="formApplyTemplateBtn" class="btn small" type="button">Aplicar</button>
-              <input id="formTemplatePeopleInput" class="search form-template-people-input" type="number" min="2" max="40" step="1" value="8" aria-label="Personas" title="Personas">
-              <button id="formResizeTemplateBtn" class="btn small" type="button" title="Actualizar personas">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-              </button>
+              <button id="formApplyTemplateBtn" class="btn small form-template-btn" type="button" title="Aplicar plantilla de paella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Plantilla</button>
+              <div id="formPeopleStepper" class="form-people-stepper hidden">
+                <button id="formPeopleMinusBtn" class="form-stepper-btn" type="button" title="Menos personas" aria-label="Menos personas">&minus;</button>
+                <input id="formTemplatePeopleInput" class="form-stepper-value" type="number" min="2" max="40" step="1" value="8" aria-label="Personas" title="Personas">
+                <button id="formPeoplePlusBtn" class="form-stepper-btn" type="button" title="Más personas" aria-label="Más personas">+</button>
+                <button id="formResizeTemplateBtn" class="form-stepper-apply" type="button" title="Aplicar cambio de personas">Aplicar</button>
+              </div>
             </div>
             <div class="form-toolbar-actions">
-              <span id="formToolbarMeta" class="meta" style="font-size:0.76rem;"></span>
-              <button id="formAddSectionBtn" class="btn small" type="button">+ Sección</button>
-              <button id="formAddQuestionBtn" class="btn small" type="button">+ Pregunta</button>
+              <span id="formToolbarMeta" class="form-toolbar-meta"></span>
+              <button id="formAddSectionBtn" class="btn small" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Sección</button>
+              <button id="formAddQuestionBtn" class="btn small primary" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Pregunta</button>
             </div>
           </div>
         </div>
@@ -3153,6 +3286,9 @@
       formApplyTemplateBtn: document.getElementById("formApplyTemplateBtn"),
       formTemplatePeopleInput: document.getElementById("formTemplatePeopleInput"),
       formResizeTemplateBtn: document.getElementById("formResizeTemplateBtn"),
+      formPeopleStepper: document.getElementById("formPeopleStepper"),
+      formPeopleMinusBtn: document.getElementById("formPeopleMinusBtn"),
+      formPeoplePlusBtn: document.getElementById("formPeoplePlusBtn"),
       formAddSectionBtn: document.getElementById("formAddSectionBtn"),
       formAddQuestionBtn: document.getElementById("formAddQuestionBtn"),
       sheetWrap: document.getElementById("sheetWrap"),
@@ -3996,9 +4132,16 @@
       return Math.max(2, maxNumber);
     }
     function syncPaellaTemplateToolbar() {
-      const count = isPaellaTemplateForm() ? getPaellaPeopleCountFromForm() : sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value);
+      const isTemplate = isPaellaTemplateForm();
+      const count = isTemplate ? getPaellaPeopleCountFromForm() : sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value);
       els.formTemplatePeopleInput.value = String(count);
-      els.formResizeTemplateBtn.disabled = !state.canEdit || state.editorMode !== "edit" || !isPaellaTemplateForm();
+      const editing = state.canEdit && state.editorMode === "edit";
+      els.formResizeTemplateBtn.disabled = !editing || !isTemplate;
+      if (els.formPeopleStepper) {
+        els.formPeopleStepper.classList.toggle("hidden", !isTemplate);
+      }
+      if (els.formPeopleMinusBtn) els.formPeopleMinusBtn.disabled = !editing || count <= 2;
+      if (els.formPeoplePlusBtn) els.formPeoplePlusBtn.disabled = !editing || count >= 40;
     }
     function resetAppDialog() {
       setBusy(els.appDialogCard, false);
@@ -6979,11 +7122,8 @@
       const hasLink = !!state.formLinkedSheetId;
       const safeName = state.formLinkedSheetName || "Spreadsheet vinculada";
       els.formLinkedSheetMeta.innerHTML = hasLink
-        ? (
-          "<div class='title'>" + escapeHtml(safeName) + "</div>" +
-          "<div class='meta'>" + escapeHtml(state.formLinkedSheetId) + "</div>"
-        )
-        : "<div class='meta'>Todavía no hay ninguna spreadsheet vinculada.</div>";
+        ? "<div class='title'>" + escapeHtml(safeName) + "</div>"
+        : "<div class='meta'>Sin hoja vinculada</div>";
       els.formCopyLinkBtn.disabled = !state.formId;
       els.formUnlinkSheetBtn.disabled = !hasLink || !state.canEdit;
     }
@@ -7135,7 +7275,7 @@
     function updateFormToolbarMeta() {
       const count = getFormQuestionItems().length;
       const responses = state.formResponses.length;
-      els.formToolbarMeta.textContent = count + "P · " + responses + "R";
+      els.formToolbarMeta.textContent = count + (count === 1 ? " pregunta" : " preguntas") + " · " + responses + (responses === 1 ? " respuesta" : " respuestas");
     }
     function renderFormQuestions() {
       els.formQuestionsList.innerHTML = "";
@@ -7218,14 +7358,17 @@
         questionNumber += 1;
         card.className = "form-question";
         const isChoice = question.type === "choice" || question.type === "checkbox";
+        const typeLabels = { short: "Corta", paragraph: "Párrafo", choice: "Opción", checkbox: "Check" };
         card.innerHTML =
           "<div class='form-question-head'>" +
             "<span class='form-question-number'>" + questionNumber + "</span>" +
+            "<span class='form-question-required-dot" + (question.required ? "" : " is-off") + "' title='" + (question.required ? "Obligatoria" : "Opcional") + "'></span>" +
             "<span class='form-question-title-preview'>" + escapeHtml(question.title || "Sin título") + "</span>" +
             (activeSectionTitle ? ("<span class='form-question-section-label'>" + escapeHtml(activeSectionTitle) + "</span>") : "") +
+            "<span class='form-question-type-badge'>" + escapeHtml(typeLabels[question.type] || question.type) + "</span>" +
             "<div class='form-question-actions'>" +
               "<button class='form-icon-btn danger question-delete-btn' type='button' title='Eliminar pregunta'>" +
-                "<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>" +
+                "<svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>" +
               "</button>" +
             "</div>" +
           "</div>" +
@@ -7303,6 +7446,8 @@
         });
         requiredInput.addEventListener("change", function () {
           question.required = requiredInput.checked;
+          var dot = card.querySelector(".form-question-required-dot");
+          if (dot) dot.classList.toggle("is-off", !question.required);
           markFormDirty();
         });
         typeSelect.addEventListener("change", function () {
@@ -7409,9 +7554,6 @@
       setFormLinkStatus("", "");
       els.formLinkModalTargetMeta.textContent = currentFormFolderLabel();
       els.formLinkModal.classList.add("visible");
-      if (!hasNativeFormLinker()) {
-        setFormLinkStatus("Configura el deployment API executable del Apps Script para vincular Forms con Sheets de forma nativa.", "error");
-      }
       setBusy(els.formLinkModalCard, true);
       fetchLinkedSheetOptions(currentFormFolderId()).then(function (items) {
         renderFormLinkOptions(items.filter(function (item) { return item.id !== state.formId; }));
@@ -9842,6 +9984,22 @@
       event.preventDefault();
       resizePaellaTemplatePeople();
     });
+    if (els.formPeopleMinusBtn) {
+      els.formPeopleMinusBtn.addEventListener("click", function () {
+        var current = sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value);
+        if (current <= 2) return;
+        els.formTemplatePeopleInput.value = String(current - 1);
+        resizePaellaTemplatePeople();
+      });
+    }
+    if (els.formPeoplePlusBtn) {
+      els.formPeoplePlusBtn.addEventListener("click", function () {
+        var current = sanitizePaellaPeopleCount(els.formTemplatePeopleInput.value);
+        if (current >= 40) return;
+        els.formTemplatePeopleInput.value = String(current + 1);
+        resizePaellaTemplatePeople();
+      });
+    }
     els.formAddSectionBtn.addEventListener("click", function () {
       state.formItems.push(createLocalFormSection());
       renderFormQuestions();
