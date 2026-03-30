@@ -1371,41 +1371,112 @@
     }
     .form-responses-list {
       display: grid;
-      gap: 8px;
+      gap: 12px;
       max-height: min(60vh, 600px);
       overflow: auto;
       padding-right: 4px;
     }
     .form-response-item {
       border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255,255,255,.9);
-      padding: 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.92);
+      padding: 12px;
       display: grid;
-      gap: 6px;
+      gap: 10px;
+      min-width: 0;
+      overflow: hidden;
     }
     .form-response-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      display: grid;
+      gap: 4px;
       font-size: 0.76rem;
       color: var(--muted);
+      min-width: 0;
+    }
+    .form-response-head strong {
+      color: var(--ink);
+      font-size: 0.88rem;
+      line-height: 1.2;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .form-response-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      min-width: 0;
+    }
+    .form-response-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      max-width: 100%;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,240,191,.55);
+      color: #7a4605;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .form-response-chip span {
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .form-response-sections {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+    .form-response-section {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(255, 248, 227, 0.42);
+      border: 1px solid rgba(185,90,0,.08);
+      min-width: 0;
+    }
+    .form-response-section-head {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .form-response-section-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .form-response-section-desc {
+      font-size: 0.73rem;
+      color: var(--muted);
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
     .form-response-answer {
       display: grid;
-      gap: 2px;
+      gap: 4px;
+      min-width: 0;
     }
     .form-response-question {
       font-size: 0.72rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
     .form-response-value {
       font-size: 0.84rem;
-      line-height: 1.35;
+      line-height: 1.42;
       word-break: break-word;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
     .form-link-meta {
       display: grid;
@@ -7309,6 +7380,28 @@
       });
       els.formResponsesList.innerHTML = "";
       els.formResponsesEmpty.classList.toggle("hidden", responses.length !== 0);
+      const responseSections = [];
+      let activeSection = {
+        key: "section:general",
+        title: "General",
+        description: "",
+        questions: []
+      };
+      state.formItems.forEach(function (item) {
+        if (isFormSectionEntry(item)) {
+          if (activeSection.questions.length) responseSections.push(activeSection);
+          activeSection = {
+            key: item.itemId || item.templateKey || ("section:" + responseSections.length),
+            title: item.title || "Seccion",
+            description: item.description || "",
+            questions: []
+          };
+          return;
+        }
+        if (!item || !item.questionId) return;
+        activeSection.questions.push(item);
+      });
+      if (activeSection.questions.length) responseSections.push(activeSection);
       responses.forEach(function (response) {
         const card = document.createElement("div");
         card.className = "form-response-item";
@@ -7317,20 +7410,36 @@
           : "Sin fecha";
         card.innerHTML =
           "<div class='form-response-head'>" +
-            "<span>" + escapeHtml(createTime) + "</span>" +
-            "<span>" + escapeHtml(response.respondentEmail || response.responseId || "") + "</span>" +
+            "<strong>" + escapeHtml(response.respondentEmail || "Respuesta") + "</strong>" +
+            "<div class='form-response-meta'>" +
+              "<div class='form-response-chip'><span>" + escapeHtml(createTime) + "</span></div>" +
+              (response.responseId ? ("<div class='form-response-chip'><span>" + escapeHtml(response.responseId) + "</span></div>") : "") +
+            "</div>" +
           "</div>";
         const answers = response && response.answers ? response.answers : {};
-        Object.keys(answers).forEach(function (questionId) {
-          const question = questionMap.get(questionId);
-          if (!question) return;
-          const block = document.createElement("div");
-          block.className = "form-response-answer";
-          block.innerHTML =
-            "<div class='form-response-question'>" + escapeHtml(getQuestionLabel(question, 0)) + "</div>" +
-            "<div class='form-response-value'>" + escapeHtml(parseFormAnswer(answers[questionId]) || "Sin respuesta") + "</div>";
-          card.appendChild(block);
+        const sectionsWrap = document.createElement("div");
+        sectionsWrap.className = "form-response-sections";
+        responseSections.forEach(function (section, sectionIndex) {
+          const sectionEl = document.createElement("section");
+          sectionEl.className = "form-response-section";
+          sectionEl.innerHTML =
+            "<div class='form-response-section-head'>" +
+              "<div class='form-response-section-title'>" + escapeHtml(section.title || ("Seccion " + (sectionIndex + 1))) + "</div>" +
+              (section.description ? ("<div class='form-response-section-desc'>" + escapeHtml(section.description) + "</div>") : "") +
+            "</div>";
+          section.questions.forEach(function (question) {
+            if (!question || !question.questionId) return;
+            const canonicalQuestion = questionMap.get(question.questionId) || question;
+            const block = document.createElement("div");
+            block.className = "form-response-answer";
+            block.innerHTML =
+              "<div class='form-response-question'>" + escapeHtml(getQuestionLabel(canonicalQuestion, 0)) + "</div>" +
+              "<div class='form-response-value'>" + escapeHtml(parseFormAnswer(answers[question.questionId]) || "Sin respuesta") + "</div>";
+            sectionEl.appendChild(block);
+          });
+          sectionsWrap.appendChild(sectionEl);
         });
+        card.appendChild(sectionsWrap);
         els.formResponsesList.appendChild(card);
       });
     }
