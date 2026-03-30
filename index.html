@@ -496,18 +496,15 @@
     }
     .linked-pair-card {
       grid-column: 1 / -1;
-      border: 1px solid rgba(185, 90, 0, 0.14);
-      border-radius: 14px;
-      background: rgba(255, 251, 238, 0.92);
-      padding: 10px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
       display: grid;
-      gap: 8px;
+      gap: 0;
     }
     .linked-pair-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 2px;
+      display: none;
     }
     .linked-pair-title {
       font-size: 0.74rem;
@@ -537,7 +534,7 @@
     }
     .paired-file-card {
       border: 1px solid rgba(185, 90, 0, 0.10);
-      border-radius: 12px;
+      border-radius: 0;
       background: rgba(255,255,255,0.88);
       padding: 10px;
       display: flex;
@@ -552,13 +549,9 @@
       border-color: rgba(185, 90, 0, 0.22);
     }
     .linked-pair-grid .paired-file-card:first-child {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
       margin-bottom: 0;
     }
     .linked-pair-grid .paired-file-card:last-child {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
       margin-top: -1px;
     }
     .linked-pair-grid .paired-file-card + .paired-file-card {
@@ -5989,6 +5982,9 @@
     }
     function openItemActionMenu(item, context, anchorEl) {
       const canEdit = itemCanEdit(item);
+      const linkedFormForSheet = context === "paella-file" && item && item.mimeType === DRIVE_SPREADSHEET_MIME
+        ? findLinkedFormForSpreadsheet(item.id, state.activePaellaItems)
+        : null;
       const menu = document.createElement("div");
       menu.className = "item-action-menu";
       menu.addEventListener("click", function (event) { event.stopPropagation(); });
@@ -6048,6 +6044,19 @@
           label: "Renombrar",
           action: function () { openRenameItemModal(item); }
         },
+        linkedFormForSheet ? {
+          label: "Desvincular de " + (linkedFormForSheet.name || "formulario"),
+          disabled: !itemCanEdit(linkedFormForSheet),
+          action: function () {
+            closeItemActionMenu();
+            return handleDriveItemMutation(function () {
+              return unlinkSpreadsheetFromForm(linkedFormForSheet);
+            }, "Vinculo eliminado").catch(function (err) {
+              console.error(err);
+              setDriveStatus(messageFromError(err, "No se ha podido desvincular del formulario"));
+            });
+          }
+        } : null,
         {
           label: "Mover",
           action: function () { openMoveModal(item, context); }
@@ -6057,11 +6066,11 @@
           danger: true,
           action: function () { openTrashModal(item); }
         }
-      ].forEach(function (entry) {
+      ].filter(Boolean).forEach(function (entry) {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = entry.label;
-        btn.disabled = !canEdit;
+        btn.disabled = !canEdit || !!entry.disabled;
         if (entry.danger) btn.classList.add("danger");
         btn.addEventListener("click", function (event) {
           event.preventDefault();
@@ -6656,6 +6665,35 @@
         pairById.set(linkedSheet.id, pair);
       });
       return pairById;
+    }
+    function findLinkedFormForSpreadsheet(spreadsheetId, items) {
+      const targetId = String(spreadsheetId || "").trim();
+      if (!targetId) return null;
+      const sourceItems = Array.isArray(items) ? items : [];
+      for (let index = 0; index < sourceItems.length; index += 1) {
+        const item = sourceItems[index];
+        if (!item || item.mimeType !== DRIVE_FORM_MIME) continue;
+        const linkedSheetId = item.appProperties && item.appProperties[FORM_LINKED_SHEET_KEY]
+          ? String(item.appProperties[FORM_LINKED_SHEET_KEY]).trim()
+          : "";
+        if (linkedSheetId === targetId) return item;
+      }
+      return null;
+    }
+    function unlinkSpreadsheetFromForm(formItem) {
+      if (!formItem || !formItem.id) return Promise.resolve(false);
+      const appProperties = {};
+      appProperties[FORM_LINKED_SHEET_KEY] = null;
+      return patchDriveItem(formItem.id, { appProperties: appProperties }, ["appProperties"]).then(function () {
+        if (state.formId === formItem.id) {
+          state.formLinkedSheetId = "";
+          state.formLinkedSheetName = "";
+          renderFormLinkedSheetMeta();
+        }
+        return refreshVisibleDriveCollections().then(function () {
+          return true;
+        });
+      });
     }
     function createPaellaLinkedPairCard(pair) {
       const wrapper = document.createElement("section");
