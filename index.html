@@ -2054,11 +2054,25 @@
     #editorView > .card:last-child { display: grid; min-height: 0; overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-bottom: none; padding: 0 20px 20px; }
     @media (max-width: 860px) {
       .app { width: 100vw; padding: 0; }
-      .topbar { padding: 10px 14px; min-height: 52px; gap: 8px; }
-      .row, .head, .sheet-bar { display: grid; grid-template-columns: 1fr; gap: 10px; }
-      .modal-card { padding: 16px; }
-      .editor-head-top, .editor-title-side, .editor-actions { display: grid; grid-template-columns: 1fr; }
-      .doc-title { max-width: 100%; }
+      .topbar { padding: 10px 14px; min-height: 48px; gap: 8px; }
+      .row, .head { display: flex; flex-wrap: wrap; gap: 8px; }
+      .sheet-bar { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+      .modal-card { padding: 16px; max-height: 90vh; }
+      .modal-overlay { padding: 10px; }
+      .editor-head-top {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .editor-title-side { flex: 1 1 100%; min-width: 0; }
+      .editor-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .doc-title { max-width: 100%; font-size: 1.1rem; }
       .profile-menu { left: auto; right: 0; max-width: min(92vw, 280px); }
       table { width: max(100%, 760px); min-width: 760px; }
       .form-shell { grid-template-columns: 1fr; }
@@ -2068,24 +2082,21 @@
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
       .paired-file-card { min-height: 0; }
       .item {
-        min-height: 58px;
+        min-height: 48px;
         height: auto;
-        padding: 12px;
+        padding: 10px 12px;
         border-radius: 12px;
-        align-items: flex-start;
+        align-items: center;
       }
       .item-row { align-items: center; }
-      .item .title { white-space: normal; }
+      .item .title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .title-text {
-        white-space: normal;
-        display: -webkit-box;
-        line-clamp: 2;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        white-space: nowrap;
         overflow: hidden;
+        text-overflow: ellipsis;
       }
-      .drive-header { padding: 10px 14px; }
-      .drive-scroll { padding: 12px 14px; gap: 14px; }
+      .drive-header { padding: 8px 12px; }
+      .drive-scroll { padding: 10px 12px; gap: 12px; }
       .drive-scroll.paella-focus {
         overflow: auto;
         align-content: start;
@@ -2100,25 +2111,25 @@
         padding-right: 0;
       }
       .drive-top-row {
-        flex-wrap: wrap;
-        align-items: stretch;
+        flex-wrap: nowrap;
+        align-items: center;
       }
       .drive-search-group {
-        flex: 1 1 100%;
+        flex: 1 1 0;
         min-width: 0;
       }
       .drive-top-row .pill {
-        order: 3;
-        width: 100%;
+        flex-shrink: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .drive-top-row .drive-primary-action {
-        order: 2;
-        margin-left: 0;
-        width: 100%;
-        min-height: 44px;
+        margin-left: auto;
+        flex-shrink: 0;
       }
       .drive-section-card {
-        padding: 14px;
+        padding: 12px;
         gap: 10px;
       }
       .drive-section-body,
@@ -2128,19 +2139,27 @@
         padding-right: 0;
       }
       .paella-panel {
-        padding: 16px;
-        gap: 12px;
+        padding: 12px;
+        gap: 10px;
       }
       .paella-panel-head {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .paella-panel-head > div:first-child {
+        flex: 1 1 0;
+        min-width: 0;
       }
       .paella-panel-actions {
-        justify-content: stretch;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        flex: 0 0 auto;
       }
       .paella-panel-actions > * {
-        flex: 1 1 auto;
+        flex: 0 0 auto;
       }
       .paella-panel.is-folder-open .paella-panel-content {
         max-height: none;
@@ -2148,53 +2167,122 @@
         padding-right: 0;
       }
       .paella-create-btn {
-        width: 100%;
+        width: auto;
         min-width: 0;
+        min-height: 40px;
+        padding: 8px 14px;
+        font-size: 0.86rem;
+        border-radius: 12px;
       }
-      #editorShell { padding: 12px 14px; }
-      #editorView > .card:last-child { padding: 0 14px 14px; }
+      .form-toolbar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .form-toolbar-group {
+        flex-shrink: 0;
+      }
+      .mode-toggle-text { display: none; }
+      .mode-toggle-btn {
+        grid-template-columns: 12px 38px;
+        padding: 8px 10px;
+      }
+      #editorShell { padding: 10px 12px; gap: 10px; }
+      #editorView > .card:last-child { padding: 0 10px 10px; }
       .brand-name { display: none; }
+      .presence-avatars { padding-left: 0; }
+      .presence-avatar-wrapper { width: 24px; height: 24px; margin-left: -6px; }
     }
     @media (max-width: 640px) {
-      .topbar { padding: 10px 12px; }
+      .topbar { padding: 8px 10px; min-height: 44px; }
       .profile-btn { width: 34px; height: 34px; }
       .grid,
       .paella-grid {
         grid-template-columns: 1fr;
+        gap: 6px;
       }
-      .item { min-height: 62px; }
-      .linked-pair-card { padding: 8px; }
+      .item {
+        min-height: 44px;
+        padding: 8px 10px;
+        border-radius: 10px;
+      }
+      .item-icon { width: 20px; height: 20px; flex: 0 0 20px; }
+      .item-row { gap: 8px; }
+      .paired-item-kind { font-size: 0.62rem; padding: 2px 6px; }
+      .linked-pair-card { padding: 8px; gap: 6px; }
       .linked-pair-grid { grid-template-columns: 1fr; }
-      .sheet-groups-view { padding: 12px; }
-      .sheet-group-card { padding: 12px; }
-      .sheet-view-toggle { width: 100%; justify-content: stretch; }
-      .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; }
+      .linked-pair-badge { font-size: 0.6rem; padding: 2px 6px; }
+      .linked-pair-title { font-size: 0.68rem; }
       .paired-file-card { padding: 8px; gap: 8px; }
       .paired-file-card-icon {
-        width: 30px;
-        height: 30px;
-        min-width: 30px;
-        border-radius: 8px;
+        width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
       }
       .paired-file-card-icon .item-icon { width: 16px; height: 16px; flex: 0 0 16px; }
       .paired-file-card-title { font-size: 0.84rem; }
-      .item-more-btn {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-      }
-      .drive-header { padding: 10px 12px; }
-      .drive-scroll { padding: 10px 12px 16px; }
+      .paired-file-card-meta { font-size: 0.7rem; }
+      .sheet-groups-view { padding: 10px; }
+      .sheet-group-card { padding: 10px; }
+      .sheet-view-toggle { width: 100%; justify-content: stretch; }
+      .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; padding: 6px 8px; font-size: 0.76rem; }
+      .item-more-btn { width: 32px; height: 32px; min-width: 32px; }
+      .drive-header { padding: 8px 10px; }
+      .drive-scroll { padding: 8px 10px 14px; gap: 10px; }
       .drive-section-card,
       .paella-panel {
-        padding: 12px;
-        border-radius: 14px;
+        padding: 10px;
+        border-radius: 12px;
+        gap: 8px;
       }
-      .presence-avatars { padding-left: 0; }
-      .section-label { font-size: 0.7rem; }
-      .title { font-size: 0.88rem; }
+      .section-label { font-size: 0.68rem; }
+      .title { font-size: 0.86rem; }
+      .search { padding: 8px 12px; font-size: 0.84rem; border-radius: 10px; }
       .btn.small,
-      .sheet-tool-btn { min-height: 42px; }
+      .sheet-tool-btn { min-height: 38px; padding: 6px 12px; font-size: 0.8rem; }
+      .btn-icon-sq { width: 34px; height: 34px; min-width: 34px; }
+      .modal-overlay { padding: 6px; }
+      .modal-card {
+        width: 100%;
+        max-height: 94vh;
+        padding: 14px;
+        border-radius: 16px;
+      }
+      .share-popup { width: min(400px, 96%); }
+      .doc-title { font-size: 1rem; min-height: 32px; }
+      .editor-card { gap: 10px; }
+      .editor-head { gap: 8px; }
+      .editor-actions { gap: 6px; }
+      .form-card { padding: 10px; gap: 8px; }
+      .form-card-title { font-size: 0.82rem; }
+      .crumbs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+      .crumb, .tab { padding: 5px 10px; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
+      .paella-card { padding: 10px; gap: 8px; border-radius: 12px; }
+      .paella-card-icon { width: 34px; height: 34px; min-width: 34px; border-radius: 10px; font-size: 1.2rem; }
+      .paella-card-title { font-size: 0.88rem; }
+      .paella-card-meta { font-size: 0.74rem; gap: 8px; }
+      .paella-card-tag { padding: 4px 8px; font-size: 0.68rem; }
+      .paella-panel-meta { font-size: 0.78rem; }
+      .paella-create-btn { min-height: 36px; padding: 6px 12px; font-size: 0.82rem; border-radius: 10px; }
+      .profile-menu { min-width: 220px; padding: 12px; }
+      .form-template-select { min-width: 120px; font-size: 0.76rem; }
+      .confirm-slider { height: 44px; }
+      .item-action-menu { min-width: min(220px, calc(100vw - 24px)); }
+      .item-action-menu button { padding: 10px 12px; min-height: 40px; font-size: 0.86rem; }
+    }
+    @media (max-width: 400px) {
+      .topbar { padding: 6px 8px; }
+      .drive-header { padding: 6px 8px; }
+      .drive-scroll { padding: 6px 8px 12px; gap: 8px; }
+      .drive-section-card,
+      .paella-panel { padding: 8px; }
+      .grid, .paella-grid { gap: 4px; }
+      .item { padding: 7px 8px; border-radius: 8px; gap: 4px; }
+      .item-row { gap: 6px; }
+      .paella-card { padding: 8px; gap: 6px; }
+      .modal-card { padding: 12px; border-radius: 14px; }
+      .crumb, .tab { padding: 4px 8px; font-size: 0.74rem; }
+      .search { padding: 7px 10px; font-size: 0.82rem; }
+      .btn.small, .sheet-tool-btn { min-height: 36px; padding: 5px 10px; font-size: 0.78rem; }
+      .paella-create-btn { min-height: 34px; font-size: 0.78rem; }
     }
   </style>
 </head>
@@ -8900,9 +8988,16 @@
         return;
       }
       if (!els.editorView.classList.contains("hidden")) {
-        returnToDrive();
+        returnToDrive().then(function (ok) {
+          if (ok !== false) {
+            closePaellaFolderView();
+            closeDireccionFolderView();
+          }
+        });
         return;
       }
+      closePaellaFolderView();
+      closeDireccionFolderView();
       showView("drive");
     });
     els.modeToggleBtn.addEventListener("click", toggleEditorMode);
