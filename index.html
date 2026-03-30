@@ -6729,7 +6729,6 @@
         "<div class='item-row'>" +
           "<div class='paired-file-card-icon'>" + driveFileIconMarkup(item.mimeType) + "</div>" +
           itemTitleMarkup(item && item.name ? item.name : kindLabel, !!(item && item.shared)) +
-          "<span class='paired-item-kind'>" + escapeHtml(kindLabel) + "</span>" +
         "</div>";
       card.appendChild(createItemActionButton(item, "paella-file"));
       card.addEventListener("click", function () {
