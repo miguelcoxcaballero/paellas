@@ -3229,6 +3229,8 @@
     const AUTH_REFRESH_RETRY_MS = 15000;
     const AUTH_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
     const AUTH_SILENT_RETRY_COOLDOWN_MS = 90000;
+    const AUTH_POST_INTERACTIVE_REAUTH_SUPPRESS_MS = 45000;
+    const AUTH_RECENT_INTERACTIVE_KEY = "paellas-auth-interactive-at-v1";
 
     let presencePingTimer = 0;
     let presenceHeartbeatTimer = 0;
@@ -3328,7 +3330,8 @@
       tokenRefreshTimer: 0,
       tokenRequestInFlight: null,
       sessionRestoreInFlight: null,
-      silentAuthCooldownUntil: 0
+      silentAuthCooldownUntil: 0,
+      lastInteractiveAuthAt: 0
     };
 
     const els = {
@@ -3636,6 +3639,33 @@
       if (stored.loginHint) return stored.loginHint;
       return stored.user && stored.user.emailAddress ? stored.user.emailAddress : "";
     }
+    function readRecentInteractiveAuthAt() {
+      try {
+        return Number(sessionStorage.getItem(AUTH_RECENT_INTERACTIVE_KEY) || 0) || 0;
+      } catch (err) {
+        return 0;
+      }
+    }
+    function markRecentInteractiveAuth() {
+      state.lastInteractiveAuthAt = Date.now();
+      try {
+        sessionStorage.setItem(AUTH_RECENT_INTERACTIVE_KEY, String(state.lastInteractiveAuthAt));
+      } catch (err) {
+      }
+    }
+    function clearRecentInteractiveAuth() {
+      state.lastInteractiveAuthAt = 0;
+      try {
+        sessionStorage.removeItem(AUTH_RECENT_INTERACTIVE_KEY);
+      } catch (err) {
+      }
+    }
+    function recentInteractiveAuthRemainingMs() {
+      return Math.max(0, (Number(state.lastInteractiveAuthAt) || 0) + AUTH_POST_INTERACTIVE_REAUTH_SUPPRESS_MS - Date.now());
+    }
+    function shouldSuppressAutomaticAuth() {
+      return recentInteractiveAuthRemainingMs() > 0;
+    }
     function clearTokenRefreshTimer() {
       clearTimeout(state.tokenRefreshTimer);
       state.tokenRefreshTimer = 0;
@@ -3720,6 +3750,7 @@
         return state.tokenRequestInFlight;
       }
       const requestConfig = Object.assign({}, config || {});
+      const isInteractiveRequest = requestConfig.prompt !== "none";
       if (!Object.prototype.hasOwnProperty.call(requestConfig, "scope")) {
         requestConfig.scope = GOOGLE_SCOPE;
       }
@@ -3747,6 +3778,9 @@
           if (!response || response.error || !response.access_token) {
             reject(new Error((response && (response.error_description || response.error || response.error_subtype)) || "Error de autenticacion"));
             return;
+          }
+          if (isInteractiveRequest) {
+            markRecentInteractiveAuth();
           }
           resolve(response);
         };
@@ -3780,6 +3814,9 @@
       if (!state.tokenClient) {
         return Promise.reject(new Error("Google Auth aun no esta listo."));
       }
+      if (shouldSuppressAutomaticAuth()) {
+        return Promise.reject(new Error("Reconexion automatica suprimida tras un login reciente."));
+      }
       if (silentAuthRetryRemainingMs() > 0) {
         return Promise.reject(new Error("Reconexion automatica en espera."));
       }
@@ -3797,6 +3834,9 @@
       }
       if (!state.tokenClient) {
         return state.accessToken ? Promise.resolve(state.accessToken) : Promise.reject(new Error("Sin sesion activa."));
+      }
+      if (!state.accessToken && shouldSuppressAutomaticAuth()) {
+        return Promise.reject(new Error("Reconexion automatica suprimida tras un login reciente."));
       }
       return restoreGoogleSessionSilently().catch(function (err) {
         if (hasUsableAccessToken(0)) {
@@ -6478,6 +6518,9 @@
       let res = await fetch(url, init);
       if (!res.ok && !skipAuthRefresh && (res.status === 401 || res.status === 403)) {
         try {
+          if (shouldSuppressAutomaticAuth()) {
+            throw new Error("Reconexion automatica suprimida tras un login reciente.");
+          }
           clearAccessTokenState({ keepUser: true, keepStoredSession: true });
           await restoreGoogleSessionSilently();
           init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
@@ -9833,6 +9876,7 @@
         setTimeout(initGoogle, 200);
         return;
       }
+      state.lastInteractiveAuthAt = readRecentInteractiveAuthAt();
       state.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPE,
@@ -9928,6 +9972,7 @@
         state.newSheetContext = "drive";
         state.sessionRestoreInFlight = null;
         state.silentAuthCooldownUntil = 0;
+        clearRecentInteractiveAuth();
         els.searchInput.value = "";
         els.itemsGrid.innerHTML = "";
         els.paellasGrid.innerHTML = "";
