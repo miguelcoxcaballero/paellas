@@ -6,6 +6,8 @@
   <title>paellas.net</title>
 
   <script src="https://accounts.google.com/gsi/client" async defer data-auto_prompt="false"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
   <style>
     :root {
       --bg: #ffd84a;
@@ -2254,6 +2256,9 @@
       gap: 4px;
       min-width: 0;
     }
+    .sheet-group-field.readonly {
+      cursor: default;
+    }
     .sheet-group-field-label {
       font-size: 0.72rem;
       color: var(--muted);
@@ -2295,6 +2300,18 @@
       opacity: 0.72;
       cursor: not-allowed;
       background: rgba(255,255,255,0.7);
+    }
+    .sheet-group-readonly {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.78);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.88rem;
+      padding: 10px 12px;
+      outline: none;
     }
     .sheet-group-inline-grid {
       display: grid;
@@ -2348,6 +2365,42 @@
       font-size: 0.76rem;
       color: var(--muted);
       line-height: 1.35;
+    }
+    .sheet-person-ticket {
+      display: grid;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(185, 90, 0, 0.18);
+    }
+    .sheet-person-ticket-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sheet-person-ticket-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(185, 90, 0, 0.18);
+      background: rgba(255,255,255,0.92);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .sheet-person-ticket-btn.primary {
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%);
+      color: #fff8eb;
+      border-color: transparent;
+    }
+    .sheet-person-ticket-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     .sheet-group-inline-grid.triple {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2420,6 +2473,102 @@
       gap: 8px;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       min-width: 0;
+    }
+    .ticket-reader-card {
+      width: min(920px, 100%);
+    }
+    .ticket-reader-body {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+    .ticket-reader-controls {
+      display: grid;
+      grid-template-columns: minmax(200px, 0.9fr) minmax(220px, 1.2fr) auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .ticket-reader-field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .ticket-reader-field span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+    .ticket-reader-search {
+      min-width: 0;
+    }
+    .ticket-reader-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .ticket-reader-camera {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(0, 0, 0, 0.82);
+      overflow: hidden;
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+    }
+    .ticket-reader-camera video {
+      width: 100%;
+      max-height: 42vh;
+      object-fit: cover;
+      display: block;
+    }
+    .ticket-reader-results {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      max-height: min(42vh, 420px);
+      overflow: auto;
+    }
+    .ticket-reader-result {
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.88);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .ticket-reader-result-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+    .ticket-reader-result-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .ticket-reader-result-meta,
+    .ticket-reader-result-line {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .ticket-reader-result-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .ticket-reader-result-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .sheet-spacer {
       position: absolute;
@@ -2632,6 +2781,8 @@
       .sheet-group-inline-grid { grid-template-columns: 1fr; }
       .sheet-assistant-fields { grid-template-columns: 1fr; }
       .sheet-groups-filters { grid-template-columns: 1fr; }
+      .ticket-reader-controls { grid-template-columns: 1fr; }
+      .ticket-reader-actions { justify-content: flex-start; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
       .paired-file-card {
         min-height: 48px;
@@ -3057,6 +3208,7 @@
             </div>
             <div class="paella-panel-actions">
               <div id="paellaAccessAvatars" class="presence-avatars hidden" aria-label="Accesos de la paella"></div>
+              <button id="paellaEntryReaderBtn" class="btn small hidden" type="button">Lector entradas</button>
               <button id="createPaellaBtn" class="btn primary paella-create-btn" type="button">Crear paella</button>
             </div>
           </div>
@@ -3487,6 +3639,43 @@
     </div>
   </div>
 
+  <div id="ticketReaderModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ticketReaderTitle">
+    <section id="ticketReaderCard" class="card modal-card ticket-reader-card">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="ticketReaderTitle" class="title">Lector de entradas</div>
+          <div id="ticketReaderSubtitle" class="meta">Valida entradas por QR o buscando por c&oacute;digo, nombre, tel&eacute;fono o DNI.</div>
+        </div>
+        <button id="ticketReaderCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="ticket-reader-body">
+        <div class="ticket-reader-controls">
+          <label class="ticket-reader-field">
+            <span>Hoja de respuestas</span>
+            <select id="ticketReaderSheetSelect" class="search"></select>
+          </label>
+          <label class="ticket-reader-field ticket-reader-search">
+            <span>Buscar o introducir c&oacute;digo</span>
+            <input id="ticketReaderSearchInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="C&oacute;digo, nombre, tel&eacute;fono o DNI">
+          </label>
+          <div class="ticket-reader-actions">
+            <button id="ticketReaderSearchBtn" class="btn small primary" type="button">Buscar</button>
+            <button id="ticketReaderCameraBtn" class="btn small" type="button">C&aacute;mara</button>
+            <button id="ticketReaderCameraStopBtn" class="btn small hidden" type="button">Detener</button>
+          </div>
+        </div>
+        <div id="ticketReaderStatus" class="status"></div>
+        <div id="ticketReaderCameraWrap" class="ticket-reader-camera hidden">
+          <video id="ticketReaderVideo" playsinline muted></video>
+        </div>
+        <div id="ticketReaderResults" class="ticket-reader-results"></div>
+      </div>
+      <div class="row modal-actions">
+        <button id="ticketReaderFooterCloseBtn" class="btn small" type="button">Cerrar</button>
+      </div>
+    </section>
+  </div>
+
   <div id="paellaAccessPopup" class="presence-popup hidden" role="dialog" aria-modal="false" aria-label="Acceso a la paella">
     <div class="presence-popup-header">
       <span>Acceso a la paella</span>
@@ -3641,6 +3830,16 @@
         fire: "all",
         contest: "all"
       },
+      ticketReader: {
+        folderId: "",
+        spreadsheetId: "",
+        sheetTitle: "",
+        rows: [],
+        sheets: [],
+        candidates: [],
+        lastScanText: "",
+        lastScanAt: 0
+      },
       formId: "",
       formTitle: "",
       savedFormTitle: "",
@@ -3724,6 +3923,7 @@
       paellaPanelMeta: document.getElementById("paellaPanelMeta"),
       paellasGrid: document.getElementById("paellasGrid"),
       paellasEmpty: document.getElementById("paellasEmpty"),
+      paellaEntryReaderBtn: document.getElementById("paellaEntryReaderBtn"),
       direccionPanel: document.getElementById("direccionPanel"),
       direccionPanelTitle: document.getElementById("direccionPanelTitle"),
       direccionBreadcrumbs: document.getElementById("direccionBreadcrumbs"),
@@ -3897,6 +4097,19 @@
       shareModalCloseBtn: document.getElementById("shareModalCloseBtn"),
       shareConfirmBtn: document.getElementById("shareConfirmBtn"),
       sharePeopleList: document.getElementById("sharePeopleList"),
+      ticketReaderModal: document.getElementById("ticketReaderModal"),
+      ticketReaderCard: document.getElementById("ticketReaderCard"),
+      ticketReaderCloseBtn: document.getElementById("ticketReaderCloseBtn"),
+      ticketReaderFooterCloseBtn: document.getElementById("ticketReaderFooterCloseBtn"),
+      ticketReaderSheetSelect: document.getElementById("ticketReaderSheetSelect"),
+      ticketReaderSearchInput: document.getElementById("ticketReaderSearchInput"),
+      ticketReaderSearchBtn: document.getElementById("ticketReaderSearchBtn"),
+      ticketReaderCameraBtn: document.getElementById("ticketReaderCameraBtn"),
+      ticketReaderCameraStopBtn: document.getElementById("ticketReaderCameraStopBtn"),
+      ticketReaderCameraWrap: document.getElementById("ticketReaderCameraWrap"),
+      ticketReaderVideo: document.getElementById("ticketReaderVideo"),
+      ticketReaderStatus: document.getElementById("ticketReaderStatus"),
+      ticketReaderResults: document.getElementById("ticketReaderResults"),
       paellaAccessPopup: document.getElementById("paellaAccessPopup"),
       paellaAccessPopupCloseBtn: document.getElementById("paellaAccessPopupCloseBtn"),
       paellaAccessEmailInput: document.getElementById("paellaAccessEmailInput"),
@@ -5697,6 +5910,731 @@
       if (Number.isNaN(parsed.getTime())) return raw;
       return parsed.toLocaleString("es-ES");
     }
+    function normalizeEntryStatus(value) {
+      const raw = String(value || "").trim();
+      const normalized = normalizeCompareText(raw);
+      if (!normalized || normalized === "pendiente") return "Pendiente";
+      if (normalized === "emitida" || normalized === "generada" || normalized === "lista") return "Emitida";
+      if (normalized === "ha entrado" || normalized === "validada" || normalized === "escaneada") return "HA ENTRADO";
+      return raw;
+    }
+    function setTicketReaderStatus(text, tone) {
+      setStatusOnElement(els.ticketReaderStatus, text, tone);
+    }
+    function getResponsibleEntryHeaderLabels() {
+      return [
+        "Responsable - entrada info",
+        "Responsable - entrada estado",
+        "Responsable - entrada codigo",
+        "Responsable - entrada escaneado a"
+      ];
+    }
+    function getAssistantEntryHeaderLabels(number) {
+      const label = formatPaellaAssistantNumber(number);
+      return [
+        "Asistente " + label + " - entrada info",
+        "Asistente " + label + " - entrada estado",
+        "Asistente " + label + " - entrada codigo",
+        "Asistente " + label + " - entrada escaneado a"
+      ];
+    }
+    function getAllCurrentEntryHeaderLabels(model) {
+      const labels = getResponsibleEntryHeaderLabels();
+      const assistantNumbers = Object.keys((model && model.assistantColumns) || {}).sort();
+      assistantNumbers.forEach(function (number) {
+        getAssistantEntryHeaderLabels(number).forEach(function (label) {
+          labels.push(label);
+        });
+      });
+      return labels;
+    }
+    function buildTicketCodeForPerson(spreadsheetId, sheetTitle, groupRow, role, number) {
+      const seed = [String(spreadsheetId || ""), String(sheetTitle || ""), String(groupRow || ""), String(role || ""), String(number || "")].join("|");
+      return "PAE-" + simpleHash(seed).toUpperCase();
+    }
+    function buildTicketQrText(spreadsheetId, sheetTitle, groupRow, role, number, code) {
+      return JSON.stringify({
+        app: "paellas.net",
+        kind: "ticket",
+        sid: String(spreadsheetId || ""),
+        sht: String(sheetTitle || ""),
+        row: Number(groupRow) || 0,
+        role: String(role || ""),
+        num: String(number || ""),
+        code: String(code || "")
+      });
+    }
+    function buildTicketPeopleFromGroup(group, options) {
+      const config = options || {};
+      const spreadsheetId = config.spreadsheetId || state.spreadsheetId || "";
+      const sheetTitle = config.sheetTitle || state.currentSheetTitle || "";
+      const people = [];
+      if (!group) return people;
+      const responsibleCode = buildTicketCodeForPerson(spreadsheetId, sheetTitle, group.sheetRow, "responsable", 1);
+      people.push({
+        key: group.id + "::responsable",
+        role: "responsable",
+        number: "01",
+        groupId: group.id,
+        groupTitle: group.title,
+        sheetRow: group.sheetRow,
+        name: group.responsible.name || group.title || "Responsable",
+        email: group.responsible.email || "",
+        dni: group.responsible.dni || "",
+        phone: group.responsible.phone || "",
+        info: group.responsible.entry ? group.responsible.entry.info : "",
+        status: group.responsible.entry ? normalizeEntryStatus(group.responsible.entry.status) : "Pendiente",
+        scannedAt: group.responsible.entry ? group.responsible.entry.scannedAt : "",
+        code: (group.responsible.entry && group.responsible.entry.code) || responsibleCode,
+        codeCol: group.responsible.entry ? group.responsible.entry.codeCol : -1,
+        infoCol: group.responsible.entry ? group.responsible.entry.infoCol : -1,
+        statusCol: group.responsible.entry ? group.responsible.entry.statusCol : -1,
+        scannedAtCol: group.responsible.entry ? group.responsible.entry.scannedAtCol : -1
+      });
+      (group.assistantSlots || []).forEach(function (assistant) {
+        if (!assistant.filled && !(config.includeDraftSlots && assistant.number)) return;
+        const fallbackCode = buildTicketCodeForPerson(spreadsheetId, sheetTitle, group.sheetRow, "asistente", assistant.number);
+        people.push({
+          key: group.id + "::asistente::" + String(assistant.number || ""),
+          role: "asistente",
+          number: assistant.number,
+          groupId: group.id,
+          groupTitle: group.title,
+          sheetRow: group.sheetRow,
+          name: assistant.name || ("Integrante " + String(Number(assistant.number) || assistant.number)),
+          email: assistant.email || "",
+          dni: assistant.dni || "",
+          phone: "",
+          info: assistant.entry ? assistant.entry.info : "",
+          status: assistant.entry ? normalizeEntryStatus(assistant.entry.status) : "Pendiente",
+          scannedAt: assistant.entry ? assistant.entry.scannedAt : "",
+          code: (assistant.entry && assistant.entry.code) || fallbackCode,
+          codeCol: assistant.entry ? assistant.entry.codeCol : -1,
+          infoCol: assistant.entry ? assistant.entry.infoCol : -1,
+          statusCol: assistant.entry ? assistant.entry.statusCol : -1,
+          scannedAtCol: assistant.entry ? assistant.entry.scannedAtCol : -1
+        });
+      });
+      return people;
+    }
+    function ensureAllCurrentEntryHeaders() {
+      const model = currentSheetGroupsModel();
+      if (!model) return Promise.resolve(false);
+      const labels = getAllCurrentEntryHeaderLabels(model);
+      return ensureCurrentSheetHeaders(labels).then(function () { return true; });
+    }
+    function getTicketReaderSheetCandidates() {
+      const items = Array.isArray(state.activePaellaItems) ? state.activePaellaItems : [];
+      return items.filter(function (item) {
+        return item && item.mimeType === DRIVE_SPREADSHEET_MIME;
+      });
+    }
+    function createSheetGroupReadonlyInput(value) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "sheet-group-readonly";
+      input.readOnly = true;
+      input.value = value || "";
+      return input;
+    }
+    function createTicketField(labelText, inputEl) {
+      const wrap = document.createElement("label");
+      wrap.className = "sheet-group-field" + (inputEl && inputEl.readOnly ? " readonly" : "");
+      const label = document.createElement("span");
+      label.className = "sheet-group-field-label";
+      label.textContent = labelText;
+      wrap.appendChild(label);
+      wrap.appendChild(inputEl);
+      return wrap;
+    }
+    function createPersonTicketBlock(group, person, options) {
+      const config = options || {};
+      const wrap = document.createElement("div");
+      wrap.className = "sheet-person-ticket";
+      const grid = document.createElement("div");
+      grid.className = "sheet-group-inline-grid";
+      grid.appendChild(createTicketField("Info entrada", createSheetGroupTextInput(group.id, group.sheetRow, person.infoCol, person.info, { placeholder: "Pulsera, menu, observaciones", role: config.rolePrefix + "-entry-info" })));
+      grid.appendChild(createTicketField("Estado entrada", createSheetGroupSelect(group.id, group.sheetRow, person.statusCol, normalizeEntryStatus(person.status), ["Pendiente", "Emitida", "HA ENTRADO"], { emptyLabel: "Pendiente" })));
+      wrap.appendChild(grid);
+      const infoGrid = document.createElement("div");
+      infoGrid.className = "sheet-group-inline-grid";
+      infoGrid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code || "")));
+      infoGrid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt || "")));
+      wrap.appendChild(infoGrid);
+      const actions = document.createElement("div");
+      actions.className = "sheet-person-ticket-actions";
+      const pdfBtn = document.createElement("button");
+      pdfBtn.type = "button";
+      pdfBtn.className = "sheet-person-ticket-btn";
+      pdfBtn.dataset.groupAction = "ticket-pdf-person";
+      pdfBtn.dataset.groupId = group.id;
+      pdfBtn.dataset.personRole = person.role;
+      pdfBtn.dataset.personNumber = String(person.number || "");
+      pdfBtn.textContent = "PDF entrada";
+      actions.appendChild(pdfBtn);
+      wrap.appendChild(actions);
+      return wrap;
+    }
+    function findGroupByIdInModel(model, groupId) {
+      const groups = Array.isArray(model && model.groups) ? model.groups : [];
+      for (let i = 0; i < groups.length; i += 1) {
+        if (groups[i] && groups[i].id === groupId) return groups[i];
+      }
+      return null;
+    }
+    function buildSheetSingleCellPayload(sheetTitle, row, col, value) {
+      return {
+        range: quoteSheetTitle(sheetTitle) + "!" + columnLabel(col) + (row + 1),
+        majorDimension: "ROWS",
+        values: [[value == null ? "" : String(value)]]
+      };
+    }
+    function writeSpreadsheetCellPayloads(spreadsheetId, payloads) {
+      const validPayloads = (payloads || []).filter(function (payload) {
+        return payload && payload.range && Array.isArray(payload.values);
+      });
+      if (!validPayloads.length) return Promise.resolve(false);
+      return fetchJson(
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(spreadsheetId) + "/values:batchUpdate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            valueInputOption: "USER_ENTERED",
+            data: validPayloads
+          })
+        }
+      ).then(function () { return true; });
+    }
+    function ensureTicketCodeDraftsForPeople(sheetTitle, people, options) {
+      const config = options || {};
+      const payloads = [];
+      (people || []).forEach(function (person) {
+        if (Number.isFinite(person.codeCol) && person.codeCol >= 0) {
+          const nextCode = person.code || buildTicketCodeForPerson(state.spreadsheetId, sheetTitle, person.sheetRow, person.role, person.number);
+          if (config.force || !String(person.code || "").trim()) {
+            applySheetGroupCellDraft(sheetTitle, person.sheetRow, person.codeCol, nextCode, { delay: 120 });
+            person.code = nextCode;
+          }
+        }
+        if (Number.isFinite(person.statusCol) && person.statusCol >= 0) {
+          const nextStatus = normalizeEntryStatus(person.status) || "Emitida";
+          if (!String(person.status || "").trim() || config.forceEmit) {
+            applySheetGroupCellDraft(sheetTitle, person.sheetRow, person.statusCol, nextStatus === "Pendiente" ? "Emitida" : nextStatus, { delay: 120 });
+            person.status = nextStatus === "Pendiente" ? "Emitida" : nextStatus;
+          }
+        }
+      });
+      return payloads;
+    }
+    function buildTicketCellsForPeople(sheetTitle, people, options) {
+      const config = options || {};
+      const payloads = [];
+      (people || []).forEach(function (person) {
+        const code = person.code || buildTicketCodeForPerson(config.spreadsheetId, sheetTitle, person.sheetRow, person.role, person.number);
+        if (Number.isFinite(person.codeCol) && person.codeCol >= 0) {
+          if (config.force || !String(person.code || "").trim()) {
+            payloads.push(buildSheetSingleCellPayload(sheetTitle, person.sheetRow, person.codeCol, code));
+            person.code = code;
+          }
+        }
+        if (Number.isFinite(person.statusCol) && person.statusCol >= 0) {
+          const normalizedStatus = normalizeEntryStatus(person.status);
+          if (!normalizedStatus || normalizedStatus === "Pendiente" || config.forceEmit) {
+            payloads.push(buildSheetSingleCellPayload(sheetTitle, person.sheetRow, person.statusCol, "Emitida"));
+            person.status = "Emitida";
+          }
+        }
+      });
+      return payloads;
+    }
+    function createQrDataUrl(text) {
+      const qrious = window.QRious;
+      if (!qrious) throw new Error("No se ha cargado el generador de QR.");
+      const qr = new qrious({
+        value: String(text || ""),
+        size: 460,
+        level: "M",
+        background: "#ffffff",
+        foreground: "#402405"
+      });
+      return qr.toDataURL("image/png");
+    }
+    function sanitizeExportName(name, fallback) {
+      const clean = String(name || "").replace(/[\\/:*?"<>|]+/g, "_").trim();
+      return clean || (fallback || "archivo");
+    }
+    function renderTicketPdfBlob(ticketPeople, options) {
+      const config = options || {};
+      const jsPDF = window.jspdf && window.jspdf.jsPDF;
+      if (!jsPDF) return Promise.reject(new Error("No se ha cargado el generador de PDF."));
+      const people = Array.isArray(ticketPeople) ? ticketPeople : [];
+      if (!people.length) return Promise.reject(new Error("No hay entradas para exportar."));
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [105, 148] });
+      people.forEach(function (person, index) {
+        if (index > 0) doc.addPage([105, 148], "portrait");
+        const qrText = buildTicketQrText(config.spreadsheetId, config.sheetTitle, person.sheetRow, person.role, person.number, person.code);
+        const qrDataUrl = createQrDataUrl(qrText);
+        doc.setFillColor(255, 248, 214);
+        doc.rect(0, 0, 105, 148, "F");
+        doc.setDrawColor(185, 90, 0);
+        doc.roundedRect(7, 7, 91, 134, 6, 6);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(64, 36, 5);
+        doc.setFontSize(18);
+        doc.text("Entrada paellas.net", 12, 18);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text(String(person.groupTitle || "Grupo"), 12, 26);
+        doc.addImage(qrDataUrl, "PNG", 58, 18, 32, 32);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(15);
+        doc.text(String(person.name || "Asistente"), 12, 42, { maxWidth: 40 });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const lines = [
+          "Rol: " + (person.role === "responsable" ? "Responsable" : ("Integrante " + String(Number(person.number) || person.number))),
+          person.dni ? ("DNI: " + person.dni) : "",
+          person.email ? ("Email: " + person.email) : "",
+          person.phone ? ("Telefono: " + person.phone) : "",
+          person.info ? ("Entrada: " + person.info) : "",
+          "Codigo: " + person.code
+        ].filter(Boolean);
+        let y = 58;
+        lines.forEach(function (line) {
+          const wrapped = doc.splitTextToSize(line, 78);
+          doc.text(wrapped, 12, y);
+          y += wrapped.length * 5;
+        });
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("Estado: " + normalizeEntryStatus(person.status || "Emitida"), 12, 122);
+        if (person.scannedAt) {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.text("Ultimo acceso: " + person.scannedAt, 12, 130, { maxWidth: 80 });
+        }
+      });
+      return Promise.resolve(doc.output("blob"));
+    }
+    function downloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 500);
+    }
+    function prepareCurrentSheetTicketPeople(group, personFilter) {
+      const collectPeople = function (resolvedGroup) {
+        const allPeople = buildTicketPeopleFromGroup(resolvedGroup, {
+          spreadsheetId: state.spreadsheetId,
+          sheetTitle: state.currentSheetTitle,
+          includeDraftSlots: true
+        });
+        return typeof personFilter === "function" ? allPeople.filter(personFilter) : allPeople;
+      };
+      if (!state.canEdit) {
+        return Promise.resolve(collectPeople(group));
+      }
+      return ensureSheetGroupsManagementColumnsForEditing().then(function () {
+        const freshGroup = findSheetGroupById(group.id) || group;
+        const people = collectPeople(freshGroup);
+        ensureTicketCodeDraftsForPeople(state.currentSheetTitle, people, {});
+        return flushPendingChanges({ force: true, message: "Preparando entradas..." }).then(function () {
+          rebuildCurrentSheetGroupsModel();
+          const latestGroup = findSheetGroupById(group.id) || freshGroup;
+          return collectPeople(latestGroup);
+        });
+      });
+    }
+    function exportTicketPdfForCurrentGroup(group, personFilter, fileName) {
+      if (!group) return Promise.resolve();
+      return prepareCurrentSheetTicketPeople(group, personFilter).then(function (people) {
+        return renderTicketPdfBlob(people, {
+          spreadsheetId: state.spreadsheetId,
+          sheetTitle: state.currentSheetTitle
+        }).then(function (blob) {
+          downloadBlob(blob, sanitizeExportName(fileName, "entradas") + ".pdf");
+          setSheetGroupsStatus("PDF generado.", "good");
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setSheetGroupsStatus(messageFromError(err, "No se pudo generar el PDF de entradas"), "error");
+      });
+    }
+    function stopTicketReaderCamera() {
+      const reader = state.ticketReader || {};
+      if (reader.scanTimer) {
+        clearInterval(reader.scanTimer);
+        reader.scanTimer = 0;
+      }
+      if (reader.stream) {
+        reader.stream.getTracks().forEach(function (track) { track.stop(); });
+        reader.stream = null;
+      }
+      if (els.ticketReaderVideo) {
+        els.ticketReaderVideo.pause();
+        els.ticketReaderVideo.srcObject = null;
+      }
+      if (els.ticketReaderCameraWrap) els.ticketReaderCameraWrap.classList.add("hidden");
+      if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.classList.remove("hidden");
+      if (els.ticketReaderCameraStopBtn) els.ticketReaderCameraStopBtn.classList.add("hidden");
+    }
+    function closeTicketReaderModal() {
+      stopTicketReaderCamera();
+      if (els.ticketReaderModal) els.ticketReaderModal.classList.remove("visible");
+      if (els.ticketReaderResults) els.ticketReaderResults.innerHTML = "";
+      setTicketReaderStatus("", "");
+    }
+    function buildReaderPeopleList(model, spreadsheetId) {
+      const groups = Array.isArray(model && model.groups) ? model.groups : [];
+      let people = [];
+      groups.forEach(function (group) {
+        people = people.concat(buildTicketPeopleFromGroup(group, {
+          spreadsheetId: spreadsheetId,
+          sheetTitle: model.sheetTitle,
+          includeDraftSlots: true
+        }));
+      });
+      return people;
+    }
+    function findReaderPersonByIdentity(model, spreadsheetId, identity) {
+      if (!identity) return null;
+      const people = buildReaderPeopleList(model, spreadsheetId);
+      for (let i = 0; i < people.length; i += 1) {
+        const person = people[i];
+        if (identity.code && String(person.code || "").trim().toUpperCase() === String(identity.code).trim().toUpperCase()) return person;
+        if (identity.row && Number(person.sheetRow) === Number(identity.row) && identity.role === person.role && String(identity.number) === String(person.number)) return person;
+      }
+      return null;
+    }
+    function decodeTicketPayload(text) {
+      const raw = String(text || "").trim();
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.kind === "ticket" && parsed.app === "paellas.net") return parsed;
+      } catch (err) {}
+      return null;
+    }
+    function fetchSpreadsheetRowsByTitle(spreadsheetId, sheetTitle, rowCount, columnCount) {
+      return fetchJson(
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(spreadsheetId) +
+        "/values:batchGet?ranges=" + encodeURIComponent(windowRange(sheetTitle, 0, 0, Math.max(1, rowCount || 1), Math.max(1, columnCount || 1)))
+      ).then(function (data) {
+        const valueRanges = Array.isArray(data && data.valueRanges) ? data.valueRanges : [];
+        return valueRanges[0] && Array.isArray(valueRanges[0].values) ? valueRanges[0].values : [];
+      });
+    }
+    function ensureRemoteSheetHeaders(spreadsheetId, meta, model, headerLabels) {
+      const sourceModel = model || { headerIndex: {}, header: [], sheetTitle: "" };
+      const sheetInfo = (meta && meta.sheet && Array.isArray(meta.sheet.sheets) ? meta.sheet.sheets : []).map(function (entry) {
+        return entry.properties || {};
+      }).find(function (props) {
+        return props.title === sourceModel.sheetTitle;
+      });
+      if (!sheetInfo) return Promise.resolve(false);
+      const assignments = {};
+      let nextCol = Math.max(Number(sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount) || 0, sourceModel.header.length || 0);
+      (headerLabels || []).forEach(function (label) {
+        const normalized = normalizeCompareText(label);
+        if (Number.isInteger(sourceModel.headerIndex[normalized])) {
+          assignments[label] = sourceModel.headerIndex[normalized];
+          return;
+        }
+        assignments[label] = nextCol;
+        nextCol += 1;
+      });
+      const missingLabels = Object.keys(assignments).filter(function (label) {
+        return !Number.isInteger(sourceModel.headerIndex[normalizeCompareText(label)]);
+      });
+      if (!missingLabels.length) return Promise.resolve(false);
+      const maybeGrow = nextCol > (Number(sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount) || 0)
+        ? fetchJson(
+            "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(spreadsheetId) + ":batchUpdate",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                requests: [{
+                  updateSheetProperties: {
+                    properties: {
+                      sheetId: sheetInfo.sheetId,
+                      gridProperties: { columnCount: nextCol }
+                    },
+                    fields: "gridProperties.columnCount"
+                  }
+                }]
+              })
+            }
+          )
+        : Promise.resolve();
+      return maybeGrow.then(function () {
+        const payloads = missingLabels.map(function (label) {
+          return buildSheetSingleCellPayload(sourceModel.sheetTitle, 0, assignments[label], label);
+        });
+        return writeSpreadsheetCellPayloads(spreadsheetId, payloads);
+      }).then(function () { return true; });
+    }
+    function loadTicketReaderSheet(spreadsheetId, preferredSheetTitle) {
+      const targetId = String(spreadsheetId || "").trim();
+      if (!targetId) return Promise.reject(new Error("No hay ninguna hoja seleccionada."));
+      setBusy(els.ticketReaderCard, true);
+      setTicketReaderStatus("Cargando hoja de entradas...", "");
+      return fetchSpreadsheetDocumentMeta(targetId).then(function (meta) {
+        const sheets = (meta && meta.sheet && meta.sheet.sheets || []).map(function (entry) { return entry.properties || {}; });
+        let sheetInfo = sheets.find(function (entry) { return entry.title === preferredSheetTitle; }) || sheets[0] || null;
+        if (!sheetInfo) throw new Error("La spreadsheet no tiene hojas visibles.");
+        return fetchSpreadsheetRowsByTitle(targetId, sheetInfo.title, sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount, sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount)
+          .then(function (rows) {
+            let model = buildPaellaGroupsFromSheetRows(rows, sheetInfo.title);
+            if (!model.groups.length) {
+              const compatibleSheet = sheets.find(function (entry) {
+                return entry.title !== sheetInfo.title;
+              });
+              if (compatibleSheet) {
+                sheetInfo = compatibleSheet;
+                return fetchSpreadsheetRowsByTitle(targetId, sheetInfo.title, sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount, sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount).then(function (otherRows) {
+                  model = buildPaellaGroupsFromSheetRows(otherRows, sheetInfo.title);
+                  return { meta: meta, sheetInfo: sheetInfo, model: model };
+                });
+              }
+            }
+            return { meta: meta, sheetInfo: sheetInfo, model: model };
+          });
+      }).then(function (result) {
+        return ensureRemoteSheetHeaders(targetId, result.meta, result.model, getAllCurrentEntryHeaderLabels(result.model)).then(function () {
+          return fetchSpreadsheetRowsByTitle(targetId, result.sheetInfo.title, result.sheetInfo.gridProperties && result.sheetInfo.gridProperties.rowCount, result.sheetInfo.gridProperties && result.sheetInfo.gridProperties.columnCount);
+        }).then(function (rows) {
+          const model = buildPaellaGroupsFromSheetRows(rows, result.sheetInfo.title);
+          state.ticketReader.spreadsheetId = targetId;
+          state.ticketReader.sheetTitle = result.sheetInfo.title;
+          state.ticketReader.model = model;
+          state.ticketReader.rows = rows;
+          state.ticketReader.sheets = (result.meta && result.meta.sheet && result.meta.sheet.sheets || []).map(function (entry) { return entry.properties || {}; });
+          setTicketReaderStatus(model.groups.length ? "" : "La hoja seleccionada no contiene respuestas de paella.", model.groups.length ? "" : "error");
+          renderTicketReaderResults([], model.groups.length ? "Busca una entrada o escanea un QR." : "No hay grupos de paella en esta hoja.");
+          return model;
+        });
+      }).finally(function () {
+        setBusy(els.ticketReaderCard, false);
+      });
+    }
+    function renderTicketReaderSheetOptions() {
+      const candidates = getTicketReaderSheetCandidates();
+      state.ticketReader.candidates = candidates;
+      els.ticketReaderSheetSelect.innerHTML = "";
+      candidates.forEach(function (item) {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.name || "Spreadsheet";
+        els.ticketReaderSheetSelect.appendChild(option);
+      });
+      els.ticketReaderSheetSelect.disabled = !candidates.length;
+      return candidates;
+    }
+    function renderTicketReaderResults(results, emptyText) {
+      if (!els.ticketReaderResults) return;
+      els.ticketReaderResults.innerHTML = "";
+      const items = Array.isArray(results) ? results : [];
+      if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "meta";
+        empty.textContent = emptyText || "Sin resultados.";
+        els.ticketReaderResults.appendChild(empty);
+        return;
+      }
+      items.forEach(function (person) {
+        const card = document.createElement("article");
+        card.className = "ticket-reader-result";
+        const normalizedStatus = normalizeEntryStatus(person.status);
+        card.innerHTML =
+          "<div class='ticket-reader-result-head'>" +
+            "<div>" +
+              "<div class='ticket-reader-result-title'>" + escapeHtml(person.name || "Asistente") + "</div>" +
+              "<div class='ticket-reader-result-meta'>" + escapeHtml(person.groupTitle || "Grupo") + "</div>" +
+            "</div>" +
+            "<div class='ticket-reader-result-badges'>" +
+              "<span class='sheet-group-chip'>" + escapeHtml(normalizedStatus || "Pendiente") + "</span>" +
+            "</div>" +
+          "</div>" +
+          "<div class='ticket-reader-result-line'>" + escapeHtml(person.code || "") + "</div>" +
+          "<div class='ticket-reader-result-line'>" + escapeHtml([person.dni, person.phone, person.email].filter(Boolean).join(" · ") || "Sin datos extra") + "</div>" +
+          (person.scannedAt ? ("<div class='ticket-reader-result-line'>Ultimo acceso: " + escapeHtml(person.scannedAt) + "</div>") : "");
+        const actions = document.createElement("div");
+        actions.className = "ticket-reader-result-actions";
+        const validateBtn = document.createElement("button");
+        validateBtn.type = "button";
+        validateBtn.className = "btn small primary";
+        validateBtn.textContent = normalizedStatus === "HA ENTRADO" ? "Ya validada" : "Validar";
+        validateBtn.dataset.ticketAction = "validate";
+        validateBtn.dataset.ticketCode = person.code || "";
+        actions.appendChild(validateBtn);
+        card.appendChild(actions);
+        els.ticketReaderResults.appendChild(card);
+      });
+    }
+    function searchTicketReaderPeople(query) {
+      const model = state.ticketReader.model;
+      if (!model) return [];
+      const people = buildReaderPeopleList(model, state.ticketReader.spreadsheetId);
+      const payload = decodeTicketPayload(query);
+      if (payload) {
+        const resolved = findReaderPersonByIdentity(model, state.ticketReader.spreadsheetId, {
+          row: payload.row,
+          role: payload.role,
+          number: payload.num,
+          code: payload.code
+        });
+        return resolved ? [resolved] : [];
+      }
+      const normalized = normalizeCompareText(query);
+      if (!normalized) return [];
+      return people.filter(function (person) {
+        const haystack = [
+          person.code,
+          person.name,
+          person.email,
+          person.dni,
+          person.phone,
+          person.groupTitle
+        ].map(normalizeCompareText).join(" | ");
+        return haystack.indexOf(normalized) !== -1 || haystack.includes(normalized);
+      });
+    }
+    function refreshTicketReaderModel() {
+      if (!state.ticketReader.spreadsheetId) return Promise.resolve(null);
+      return loadTicketReaderSheet(state.ticketReader.spreadsheetId, state.ticketReader.sheetTitle);
+    }
+    function promptValidateTicketPerson(person) {
+      if (!person) return Promise.resolve(false);
+      if (normalizeEntryStatus(person.status) === "HA ENTRADO") {
+        return openAppDialog({
+          title: "Entrada ya validada",
+          subtitle: person.name || "Asistente",
+          body: "Esta entrada ya se habia escaneado.\n\nUltimo acceso: " + (person.scannedAt || "Hora desconocida"),
+          confirmText: "Cerrar",
+          showCancel: false
+        }).then(function () { return false; });
+      }
+      return openAppDialog({
+        title: "Validar entrada",
+        subtitle: person.name || "Asistente",
+        body: [
+          person.groupTitle || "Grupo",
+          person.code ? ("Codigo: " + person.code) : "",
+          person.dni ? ("DNI: " + person.dni) : "",
+          person.phone ? ("Telefono: " + person.phone) : "",
+          person.email ? ("Email: " + person.email) : "",
+          person.info ? ("Entrada: " + person.info) : ""
+        ].filter(Boolean).join("\n"),
+        confirmText: "Todo esta correcto"
+      }).then(function (result) {
+        return !!(result && result.action === "confirm");
+      });
+    }
+    function markTicketPersonEntered(person) {
+      if (!person || !state.ticketReader.spreadsheetId || !state.ticketReader.sheetTitle) return Promise.resolve(false);
+      return refreshTicketReaderModel().then(function () {
+        const latest = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: person.code, row: person.sheetRow, role: person.role, number: person.number }) || person;
+        if (normalizeEntryStatus(latest.status) === "HA ENTRADO") {
+          return promptValidateTicketPerson(latest);
+        }
+        return promptValidateTicketPerson(latest).then(function (confirmed) {
+          if (!confirmed) return false;
+          const nowText = new Date().toLocaleString("es-ES");
+          const payloads = [];
+          if (Number.isFinite(latest.codeCol) && latest.codeCol >= 0) {
+            payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.codeCol, latest.code));
+          }
+          if (Number.isFinite(latest.statusCol) && latest.statusCol >= 0) {
+            payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.statusCol, "HA ENTRADO"));
+          }
+          if (Number.isFinite(latest.scannedAtCol) && latest.scannedAtCol >= 0) {
+            payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.scannedAtCol, nowText));
+          }
+          return writeSpreadsheetCellPayloads(state.ticketReader.spreadsheetId, payloads).then(function () {
+            setTicketReaderStatus("Entrada validada.", "good");
+            return refreshTicketReaderModel().then(function () {
+              const refreshed = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: latest.code, row: latest.sheetRow, role: latest.role, number: latest.number });
+              renderTicketReaderResults(refreshed ? [refreshed] : [], "Entrada validada.");
+              return true;
+            });
+          });
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setTicketReaderStatus(messageFromError(err, "No se pudo validar la entrada"), "error");
+        return false;
+      });
+    }
+    function openTicketReaderModal() {
+      const candidates = renderTicketReaderSheetOptions();
+      els.ticketReaderModal.classList.add("visible");
+      els.ticketReaderResults.innerHTML = "";
+      els.ticketReaderSearchInput.value = "";
+      setTicketReaderStatus("", "");
+      if (!candidates.length) {
+        renderTicketReaderResults([], "No hay spreadsheets de respuestas dentro de esta paella.");
+        return;
+      }
+      const preferred = state.ticketReader.spreadsheetId && candidates.some(function (item) { return item.id === state.ticketReader.spreadsheetId; })
+        ? state.ticketReader.spreadsheetId
+        : candidates[0].id;
+      els.ticketReaderSheetSelect.value = preferred;
+      loadTicketReaderSheet(preferred).catch(function (err) {
+        console.error(err);
+        renderTicketReaderResults([], messageFromError(err, "No se ha podido cargar la hoja de entradas."));
+      });
+    }
+    function startTicketReaderCamera() {
+      if (!window.BarcodeDetector || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setTicketReaderStatus("Este navegador no permite leer QR con camara aqui. Usa la busqueda manual.", "error");
+        return Promise.resolve(false);
+      }
+      stopTicketReaderCamera();
+      return navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false
+      }).then(function (stream) {
+        state.ticketReader.stream = stream;
+        els.ticketReaderVideo.srcObject = stream;
+        els.ticketReaderCameraWrap.classList.remove("hidden");
+        els.ticketReaderCameraBtn.classList.add("hidden");
+        els.ticketReaderCameraStopBtn.classList.remove("hidden");
+        setTicketReaderStatus("Camara activa. Apunta al QR.", "");
+        return els.ticketReaderVideo.play().catch(function () {});
+      }).then(function () {
+        const detector = new BarcodeDetector({ formats: ["qr_code"] });
+        state.ticketReader.scanTimer = setInterval(function () {
+          if (!els.ticketReaderVideo || els.ticketReaderVideo.readyState < 2) return;
+          detector.detect(els.ticketReaderVideo).then(function (codes) {
+            if (!codes || !codes.length) return;
+            const value = String(codes[0].rawValue || "").trim();
+            const now = Date.now();
+            if (!value) return;
+            if (state.ticketReader.lastScanText === value && (now - state.ticketReader.lastScanAt) < 3000) return;
+            state.ticketReader.lastScanText = value;
+            state.ticketReader.lastScanAt = now;
+            stopTicketReaderCamera();
+            const results = searchTicketReaderPeople(value);
+            renderTicketReaderResults(results, "No se ha encontrado ninguna entrada para ese QR.");
+            if (results[0]) {
+              markTicketPersonEntered(results[0]);
+            } else {
+              setTicketReaderStatus("No se ha reconocido el QR.", "error");
+            }
+          }).catch(function () {});
+        }, 700);
+        return true;
+      }).catch(function (err) {
+        console.error(err);
+        stopTicketReaderCamera();
+        setTicketReaderStatus(messageFromError(err, "No se pudo abrir la camara"), "error");
+        return false;
+      });
+    }
     function parseEuroAmount(value) {
       const raw = String(value || "").trim();
       if (!raw) return 0;
@@ -5890,7 +6828,11 @@
       return ensureCurrentSheetHeaders([
         "Asistente " + label + " - nombre completo",
         "Asistente " + label + " - DNI",
-        "Asistente " + label + " - email UPV"
+        "Asistente " + label + " - email UPV",
+        "Asistente " + label + " - entrada info",
+        "Asistente " + label + " - entrada estado",
+        "Asistente " + label + " - entrada codigo",
+        "Asistente " + label + " - entrada escaneado a"
       ]).then(function (assignments) {
         const model = currentSheetGroupsModel();
         state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(
@@ -5902,6 +6844,12 @@
           nameCol: assignments["Asistente " + label + " - nombre completo"],
           dniCol: assignments["Asistente " + label + " - DNI"],
           emailCol: assignments["Asistente " + label + " - email UPV"],
+          entry: {
+            infoCol: assignments["Asistente " + label + " - entrada info"],
+            statusCol: assignments["Asistente " + label + " - entrada estado"],
+            codeCol: assignments["Asistente " + label + " - entrada codigo"],
+            scannedAtCol: assignments["Asistente " + label + " - entrada escaneado a"]
+          },
           filled: false
         };
       });
@@ -6004,7 +6952,11 @@
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups" || !isCurrentSheetPaellaResponseSheet()) {
         return Promise.resolve(false);
       }
-      return ensurePaellaManagementHeaders().then(function (changed) {
+      return ensurePaellaManagementHeaders().then(function (changedPayment) {
+        return ensureAllCurrentEntryHeaders().then(function (changedEntries) {
+          return !!(changedPayment || changedEntries);
+        });
+      }).then(function (changed) {
         if (!changed) {
           syncSheetGroupsInteractivity();
           return false;
@@ -6019,10 +6971,10 @@
         return false;
       });
     }
-    function buildPaellaGroupsFromSheetRows(rows) {
+    function buildPaellaGroupsFromSheetRows(rows, sheetTitleOverride) {
       const sheetRows = cloneSheetRows(rows);
       const baseModel = {
-        sheetTitle: state.currentSheetTitle || "",
+        sheetTitle: sheetTitleOverride || state.currentSheetTitle || "",
         rows: sheetRows,
         header: sheetRows[0] || [],
         headerIndex: {},
@@ -6045,12 +6997,16 @@
       baseModel.headerIndex = headerIndex;
       const assistantColumnMap = {};
       normalizedHeader.forEach(function (value, index) {
-        const match = /^asistente (\d{2}) - (nombre completo|dni|email upv)$/.exec(value);
+        const match = /^asistente (\d{2}) - (nombre completo|dni|email upv|entrada info|entrada estado|entrada codigo|entrada escaneado a)$/.exec(value);
         if (!match) return;
         if (!assistantColumnMap[match[1]]) assistantColumnMap[match[1]] = {};
         if (match[2] === "nombre completo") assistantColumnMap[match[1]].nameCol = index;
         if (match[2] === "dni") assistantColumnMap[match[1]].dniCol = index;
         if (match[2] === "email upv") assistantColumnMap[match[1]].emailCol = index;
+        if (match[2] === "entrada info") assistantColumnMap[match[1]].entryInfoCol = index;
+        if (match[2] === "entrada estado") assistantColumnMap[match[1]].entryStatusCol = index;
+        if (match[2] === "entrada codigo") assistantColumnMap[match[1]].entryCodeCol = index;
+        if (match[2] === "entrada escaneado a") assistantColumnMap[match[1]].entryScannedAtCol = index;
       });
       baseModel.assistantColumns = assistantColumnMap;
       const assistantNumbers = Object.keys(assistantColumnMap).sort();
@@ -6075,7 +7031,17 @@
           nameCol: headerIndex["responsable - nombre completo"],
           emailCol: Number.isInteger(headerIndex["responsable - email upv"]) ? headerIndex["responsable - email upv"] : headerIndex["responsable - email"],
           dniCol: headerIndex["responsable - dni"],
-          phoneCol: headerIndex["responsable - telefono"]
+          phoneCol: headerIndex["responsable - telefono"],
+          entry: {
+            info: valueAt(values, headerIndex["responsable - entrada info"]),
+            status: normalizeEntryStatus(valueAt(values, headerIndex["responsable - entrada estado"])),
+            code: valueAt(values, headerIndex["responsable - entrada codigo"]),
+            scannedAt: parseSheetTimestamp(valueAt(values, headerIndex["responsable - entrada escaneado a"])),
+            infoCol: headerIndex["responsable - entrada info"],
+            statusCol: headerIndex["responsable - entrada estado"],
+            codeCol: headerIndex["responsable - entrada codigo"],
+            scannedAtCol: headerIndex["responsable - entrada escaneado a"]
+          }
         };
         const assistantSlots = assistantNumbers.map(function (assistantNumber) {
           const assistantFields = assistantColumnMap[assistantNumber] || {};
@@ -6086,7 +7052,17 @@
             email: valueAt(values, assistantFields.emailCol),
             nameCol: assistantFields.nameCol,
             dniCol: assistantFields.dniCol,
-            emailCol: assistantFields.emailCol
+            emailCol: assistantFields.emailCol,
+            entry: {
+              info: valueAt(values, assistantFields.entryInfoCol),
+              status: normalizeEntryStatus(valueAt(values, assistantFields.entryStatusCol)),
+              code: valueAt(values, assistantFields.entryCodeCol),
+              scannedAt: parseSheetTimestamp(valueAt(values, assistantFields.entryScannedAtCol)),
+              infoCol: assistantFields.entryInfoCol,
+              statusCol: assistantFields.entryStatusCol,
+              codeCol: assistantFields.entryCodeCol,
+              scannedAtCol: assistantFields.entryScannedAtCol
+            }
           };
           slot.filled = !!(slot.name || slot.dni || slot.email);
           return slot;
@@ -6221,6 +7197,8 @@
         els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
       }
       (filteredGroups || []).forEach(function (group, index) {
+        const ticketPeople = buildTicketPeopleFromGroup(group);
+        const responsibleTicketPerson = ticketPeople[0] || null;
         const card = document.createElement("details");
         card.className = "sheet-group-card";
         card.dataset.groupId = group.id;
@@ -6283,6 +7261,9 @@
         responsibleFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.dniCol, group.responsible.dni, { placeholder: "DNI" })));
         responsibleFields.appendChild(createSheetGroupField("Telefono", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.phoneCol, group.responsible.phone, { placeholder: "Telefono" })));
         responsibleBlock.appendChild(responsibleFields);
+        if (responsibleTicketPerson) {
+          responsibleBlock.appendChild(createPersonTicketBlock(group, responsibleTicketPerson, { rolePrefix: "responsable" }));
+        }
         sections.appendChild(responsibleBlock);
 
         const settingsBlock = document.createElement("section");
@@ -6329,6 +7310,13 @@
         assistantsHead.innerHTML = "<div class='sheet-group-block-title'>Integrantes</div>";
         const assistantsActions = document.createElement("div");
         assistantsActions.className = "sheet-group-block-actions";
+        const groupPdfBtn = document.createElement("button");
+        groupPdfBtn.type = "button";
+        groupPdfBtn.className = "sheet-group-add-btn";
+        groupPdfBtn.dataset.groupAction = "ticket-pdf-group";
+        groupPdfBtn.dataset.groupId = group.id;
+        groupPdfBtn.textContent = "PDF grupo";
+        assistantsActions.appendChild(groupPdfBtn);
         if (state.canEdit && state.editorMode === "edit") {
           const addAssistantBtn = document.createElement("button");
           addAssistantBtn.type = "button";
@@ -6387,6 +7375,12 @@
             assistantFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, assistant.dniCol, assistant.dni, { placeholder: "DNI", role: "assistant-dni" })));
             assistantFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, assistant.emailCol, assistant.email, { type: "email", placeholder: "correo@upv.es", role: "assistant-email" })));
             assistantBody.appendChild(assistantFields);
+            const ticketPerson = ticketPeople.find(function (person) {
+              return person.role === "asistente" && String(person.number) === String(assistant.number);
+            });
+            if (ticketPerson) {
+              assistantBody.appendChild(createPersonTicketBlock(group, ticketPerson, { rolePrefix: "assistant" }));
+            }
             assistantCard.appendChild(assistantBody);
             assistantsList.appendChild(assistantCard);
           });
@@ -8259,6 +9253,10 @@
       els.paellaPanelMeta.classList.toggle("hidden", !activeFolder);
       renderPaellaBreadcrumbs();
       els.paellaAccessAvatars.classList.toggle("hidden", !activeFolder || !state.activePaellaPermissions.length);
+      if (els.paellaEntryReaderBtn) {
+        const hasTicketSheet = !!(activeFolder && getTicketReaderSheetCandidates().length);
+        els.paellaEntryReaderBtn.classList.toggle("hidden", !hasTicketSheet);
+      }
       els.createPaellaBtn.textContent = activeFolder ? "Nuevo archivo" : "Crear paella";
       els.paellasGrid.innerHTML = "";
       els.paellasEmpty.textContent = activeFolder
@@ -9576,6 +10574,7 @@
       loadPaellaFolder(item.id, [{ id: item.id, name: item.name || "Paella" }]);
     }
     function closePaellaFolderView() {
+      closeTicketReaderModal();
       state.activePaellaStack = [];
       state.activePaellaItems = [];
       state.activePaellaLoadError = "";
@@ -10962,8 +11961,10 @@
     function handleSheetGroupsActionClick(event) {
       const button = event.target.closest("[data-group-action]");
       if (!button) return;
-      if (button.disabled || state.editorMode !== "edit" || !state.canEdit || !state.currentSheetTitle) return;
       const action = button.dataset.groupAction;
+      if (button.disabled || !state.currentSheetTitle) return;
+      const requiresEdit = action === "payment-status" || action === "assistant-add";
+      if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
       const groupId = button.dataset.groupId;
       const group = findSheetGroupById(groupId);
       if (!group) return;
@@ -10987,6 +11988,18 @@
           console.error(err);
           setSheetGroupsStatus(messageFromError(err, "No se ha podido actualizar el estado de pago"), "error");
         });
+        return;
+      }
+      if (action === "ticket-pdf-group") {
+        exportTicketPdfForCurrentGroup(group, null, (group.title || "grupo") + " entradas");
+        return;
+      }
+      if (action === "ticket-pdf-person") {
+        const role = String(button.dataset.personRole || "");
+        const number = String(button.dataset.personNumber || "");
+        exportTicketPdfForCurrentGroup(group, function (person) {
+          return person.role === role && String(person.number) === number;
+        }, (group.title || "entrada") + " " + (role === "responsable" ? "responsable" : ("integrante " + number)));
         return;
       }
       if (action === "assistant-add") {
@@ -11060,6 +12073,7 @@
       return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).then(function (ok) {
         if (!ok && hasPendingChanges()) return false;
         stopCollabPolling();
+        closeTicketReaderModal();
         closePresencePopup();
         return clearPresence().catch(function () {
         }).finally(function () {
@@ -11211,6 +12225,11 @@
       }
       openNewSheetModal("paella", "drive");
     });
+    if (els.paellaEntryReaderBtn) {
+      els.paellaEntryReaderBtn.addEventListener("click", function () {
+        openTicketReaderModal();
+      });
+    }
     els.createDireccionBtn.addEventListener("click", function () {
       if (state.activeDireccionStack.length) {
         openNewSheetModal("sheet", "direccion-files");
@@ -11287,6 +12306,50 @@
     if (els.sheetGroupsPaymentFilter) els.sheetGroupsPaymentFilter.addEventListener("change", handleSheetGroupsFilterChange);
     if (els.sheetGroupsFireFilter) els.sheetGroupsFireFilter.addEventListener("change", handleSheetGroupsFilterChange);
     if (els.sheetGroupsContestFilter) els.sheetGroupsContestFilter.addEventListener("change", handleSheetGroupsFilterChange);
+    if (els.ticketReaderCloseBtn) els.ticketReaderCloseBtn.addEventListener("click", closeTicketReaderModal);
+    if (els.ticketReaderFooterCloseBtn) els.ticketReaderFooterCloseBtn.addEventListener("click", closeTicketReaderModal);
+    if (els.ticketReaderModal) {
+      els.ticketReaderModal.addEventListener("click", function (event) {
+        if (event.target === els.ticketReaderModal) closeTicketReaderModal();
+      });
+    }
+    if (els.ticketReaderSheetSelect) {
+      els.ticketReaderSheetSelect.addEventListener("change", function () {
+        stopTicketReaderCamera();
+        loadTicketReaderSheet(els.ticketReaderSheetSelect.value).catch(function (err) {
+          console.error(err);
+          renderTicketReaderResults([], messageFromError(err, "No se pudo cargar la hoja."));
+        });
+      });
+    }
+    if (els.ticketReaderSearchBtn) {
+      els.ticketReaderSearchBtn.addEventListener("click", function () {
+        const query = String(els.ticketReaderSearchInput.value || "").trim();
+        const results = searchTicketReaderPeople(query);
+        renderTicketReaderResults(results, query ? "Sin coincidencias." : "Introduce un dato para buscar.");
+      });
+    }
+    if (els.ticketReaderSearchInput) {
+      els.ticketReaderSearchInput.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        const query = String(els.ticketReaderSearchInput.value || "").trim();
+        const results = searchTicketReaderPeople(query);
+        renderTicketReaderResults(results, query ? "Sin coincidencias." : "Introduce un dato para buscar.");
+      });
+    }
+    if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.addEventListener("click", startTicketReaderCamera);
+    if (els.ticketReaderCameraStopBtn) els.ticketReaderCameraStopBtn.addEventListener("click", stopTicketReaderCamera);
+    if (els.ticketReaderResults) {
+      els.ticketReaderResults.addEventListener("click", function (event) {
+        const button = event.target.closest("[data-ticket-action='validate']");
+        if (!button) return;
+        const code = String(button.dataset.ticketCode || "");
+        const person = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: code });
+        if (!person) return;
+        markTicketPersonEntered(person);
+      });
+    }
     els.shareDocBtn.addEventListener("click", openShareModal);
     els.addSheetTabBtn.addEventListener("click", function () {
       openNameModal({
