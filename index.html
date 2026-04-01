@@ -1997,90 +1997,103 @@
       background: linear-gradient(180deg, rgba(255, 252, 243, 0.98) 0%, rgba(255, 248, 227, 0.94) 100%);
       display: grid;
       align-content: start;
-      gap: 10px;
-      padding: 14px;
+      gap: 14px;
+      padding: 16px;
     }
     .sheet-groups-list {
       display: grid;
-      gap: 8px;
+      gap: 10px;
       align-content: start;
     }
     .sheet-groups-toolbar {
       display: grid;
-      gap: 10px;
+      gap: 14px;
       align-content: start;
       position: relative;
     }
     .sheet-groups-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border: 1px solid rgba(185, 90, 0, 0.1);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.82);
+      overflow: hidden;
     }
     .sheet-groups-stat {
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.88);
-      padding: 12px;
+      flex: 1 1 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 10px 14px;
       display: grid;
-      gap: 4px;
+      gap: 2px;
       min-width: 0;
+      border-right: 1px solid rgba(185, 90, 0, 0.08);
+    }
+    .sheet-groups-stat:last-child {
+      border-right: none;
     }
     .sheet-groups-stat-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       font-weight: 700;
     }
     .sheet-groups-stat-value {
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.1;
       min-width: 0;
     }
     .sheet-groups-stat-meta {
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       color: var(--muted);
-      line-height: 1.35;
+      line-height: 1.3;
     }
     .sheet-groups-filters {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      display: flex;
       gap: 10px;
+      align-items: end;
     }
     .sheet-groups-filter {
       display: grid;
-      gap: 6px;
+      gap: 5px;
       min-width: 0;
+      flex: 1 1 0;
     }
     .sheet-groups-filter span {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       font-weight: 700;
     }
     .sheet-groups-filter-select {
       width: 100%;
       min-width: 0;
-      border: 1px solid rgba(185, 90, 0, 0.16);
-      border-radius: 12px;
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      border-radius: 10px;
       background: rgba(255,255,255,0.95);
       color: var(--ink);
       font: inherit;
-      font-size: 0.9rem;
-      padding: 10px 12px;
+      font-size: 0.86rem;
+      padding: 8px 10px;
       outline: none;
     }
     .sheet-group-card {
-      border: 1px solid rgba(185, 90, 0, 0.14);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.78);
       overflow: hidden;
       min-width: 0;
+      transition: border-color .18s ease, box-shadow .18s ease;
     }
     .sheet-group-card[open] {
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
+      border-color: rgba(185, 90, 0, 0.2);
+      box-shadow: 0 4px 20px rgba(104, 70, 5, 0.06);
     }
     .sheet-group-summary,
     .sheet-assistant-summary {
@@ -2095,72 +2108,70 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
       align-items: center;
-      padding: 12px 14px;
+      padding: 14px 16px;
       cursor: pointer;
+      transition: background .15s ease;
+    }
+    .sheet-group-summary:hover {
+      background: rgba(255, 248, 227, 0.4);
     }
     .sheet-group-summary-main {
       min-width: 0;
       display: grid;
-      gap: 7px;
+      gap: 6px;
     }
     .sheet-group-head {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
       min-width: 0;
     }
     .sheet-group-title {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       line-height: 1.2;
       min-width: 0;
       word-break: break-word;
     }
     .sheet-group-meta {
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       color: var(--muted);
       line-height: 1.35;
       white-space: nowrap;
       flex: 0 0 auto;
     }
     .sheet-group-responsible-line {
-      font-size: 0.84rem;
-      color: var(--muted);
-      line-height: 1.35;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      display: none;
     }
     .sheet-group-chips {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
       justify-content: flex-start;
     }
     .sheet-group-chip {
       display: inline-flex;
       align-items: center;
-      padding: 5px 9px;
+      padding: 4px 8px;
       border-radius: 999px;
-      background: rgba(255, 236, 190, 0.78);
+      background: rgba(255, 236, 190, 0.65);
       color: #8a5211;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       line-height: 1;
     }
     .sheet-group-chip.is-paid {
-      background: rgba(212, 247, 222, 0.92);
+      background: rgba(212, 247, 222, 0.82);
       color: #1c6b34;
     }
     .sheet-group-chip.is-partial {
-      background: rgba(255, 238, 188, 0.92);
+      background: rgba(255, 238, 188, 0.82);
       color: #8a5211;
     }
     .sheet-group-chip.is-pending {
-      background: rgba(255, 223, 223, 0.92);
+      background: rgba(255, 223, 223, 0.82);
       color: #a23d3d;
     }
     .sheet-group-summary-side {
@@ -2171,46 +2182,50 @@
       flex: 0 0 auto;
     }
     .sheet-group-chevron {
-      width: 34px;
-      height: 34px;
+      width: 30px;
+      height: 30px;
       border-radius: 999px;
-      border: 1px solid rgba(185, 90, 0, 0.14);
-      background: rgba(255, 247, 225, 0.92);
+      border: none;
+      background: rgba(255, 243, 210, 0.7);
       color: #8a5211;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
-      transition: transform .2s ease;
+      font-size: 0.85rem;
+      transition: transform .2s ease, background .15s ease;
     }
     .sheet-group-card[open] .sheet-group-chevron,
     .sheet-assistant-item[open] .sheet-group-chevron {
       transform: rotate(180deg);
+      background: rgba(255, 236, 190, 0.8);
     }
     .sheet-group-body {
       display: grid;
-      gap: 12px;
-      padding: 0 14px 14px;
-      border-top: 1px solid rgba(185, 90, 0, 0.1);
+      gap: 0;
+      padding: 0 16px 16px;
+    }
+    .sheet-group-section-divider {
+      height: 1px;
+      background: rgba(185, 90, 0, 0.08);
+      margin: 14px 0;
     }
     .sheet-group-sections {
       display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr);
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 0;
       min-width: 0;
-      align-items: start;
     }
     .sheet-group-block {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 251, 238, 0.85);
-      padding: 11px 12px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
       display: grid;
       gap: 10px;
       min-width: 0;
     }
     .sheet-group-block.assistants {
-      grid-column: 1 / -1;
+      grid-column: auto;
     }
     .sheet-group-block.responsible .sheet-group-field-list {
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2221,7 +2236,7 @@
       grid-column: 1 / -1;
     }
     .sheet-group-block.settings .sheet-group-payment-wrap {
-      padding-top: 2px;
+      padding-top: 0;
     }
     .sheet-group-block-head {
       display: flex;
@@ -2231,10 +2246,10 @@
       flex-wrap: wrap;
     }
     .sheet-group-block-title {
-      font-size: 0.74rem;
-      color: var(--muted);
+      font-size: 0.72rem;
+      color: var(--accent2);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       font-weight: 700;
     }
     .sheet-group-block-actions {
@@ -2247,15 +2262,19 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      border: 1px solid rgba(185, 90, 0, 0.18);
+      border: 1px solid rgba(185, 90, 0, 0.16);
       border-radius: 999px;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.88);
       color: var(--ink);
       font: inherit;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
-      padding: 7px 11px;
+      padding: 6px 10px;
       cursor: pointer;
+      transition: background .15s ease;
+    }
+    .sheet-group-add-btn:hover {
+      background: rgba(255, 243, 210, 0.9);
     }
     .sheet-group-add-btn:disabled {
       opacity: 0.48;
@@ -2268,20 +2287,21 @@
     }
     .sheet-group-field {
       display: grid;
-      gap: 4px;
+      gap: 3px;
       min-width: 0;
     }
     .sheet-group-field.readonly {
       cursor: default;
     }
     .sheet-group-field-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      font-weight: 600;
     }
     .sheet-group-field-value {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       line-height: 1.35;
       word-break: break-word;
     }
@@ -2289,13 +2309,13 @@
     .sheet-group-select {
       width: 100%;
       min-width: 0;
-      border: 1px solid rgba(185, 90, 0, 0.16);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.92);
       color: var(--ink);
       font: inherit;
-      font-size: 0.9rem;
-      padding: 9px 11px;
+      font-size: 0.86rem;
+      padding: 8px 10px;
       outline: none;
       transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
@@ -2314,18 +2334,18 @@
     .sheet-group-select:disabled {
       opacity: 0.72;
       cursor: not-allowed;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.65);
     }
     .sheet-group-readonly {
       width: 100%;
       min-width: 0;
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(185, 90, 0, 0.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.7);
       color: var(--ink);
       font: inherit;
-      font-size: 0.88rem;
-      padding: 9px 11px;
+      font-size: 0.86rem;
+      padding: 8px 10px;
       outline: none;
     }
     .sheet-group-inline-grid {
@@ -2336,27 +2356,27 @@
     }
     .sheet-group-payment-wrap {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
     }
     .sheet-group-pill-toggle {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
     .sheet-group-pill {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
-      padding: 8px 12px;
+      min-height: 34px;
+      padding: 7px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(185, 90, 0, 0.16);
-      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      background: rgba(255,255,255,0.88);
       color: var(--ink);
       font: inherit;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       transition: border-color .2s ease, background .2s ease, color .2s ease;
@@ -2383,9 +2403,9 @@
     }
     .sheet-person-ticket {
       display: grid;
-      gap: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed rgba(185, 90, 0, 0.18);
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(185, 90, 0, 0.06);
     }
     .sheet-person-ticket-head {
       display: flex;
@@ -2397,7 +2417,7 @@
     .sheet-person-ticket-grid {
       display: grid;
       gap: 8px;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.95fr) minmax(170px, 0.9fr) minmax(170px, 0.9fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       min-width: 0;
     }
     .sheet-person-ticket-actions {
@@ -2411,16 +2431,20 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
-      padding: 8px 12px;
+      min-height: 34px;
+      padding: 7px 11px;
       border-radius: 999px;
-      border: 1px solid rgba(185, 90, 0, 0.18);
-      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(185, 90, 0, 0.16);
+      background: rgba(255,255,255,0.88);
       color: var(--ink);
       font: inherit;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
+      transition: background .15s ease;
+    }
+    .sheet-person-ticket-btn:hover {
+      background: rgba(255, 243, 210, 0.9);
     }
     .sheet-person-ticket-btn.primary {
       background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%);
@@ -2436,32 +2460,37 @@
     }
     .sheet-assistants-list {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       grid-template-columns: 1fr;
       min-width: 0;
     }
     .sheet-assistant-item {
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(185, 90, 0, 0.08);
+      border-radius: 10px;
+      background: rgba(255, 252, 243, 0.7);
       overflow: hidden;
       min-width: 0;
+      transition: border-color .15s ease;
+    }
+    .sheet-assistant-item[open] {
+      border-color: rgba(185, 90, 0, 0.16);
+      background: rgba(255, 252, 243, 0.9);
     }
     .sheet-assistant-summary {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
       align-items: center;
-      padding: 10px 12px;
+      padding: 8px 10px;
       cursor: pointer;
     }
     .sheet-assistant-summary-main {
       min-width: 0;
       display: grid;
-      gap: 4px;
+      gap: 3px;
     }
     .sheet-assistant-name {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 700;
       line-height: 1.2;
       min-width: 0;
@@ -2470,7 +2499,7 @@
       white-space: nowrap;
     }
     .sheet-assistant-meta {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       color: var(--muted);
       min-width: 0;
       overflow: hidden;
@@ -2481,21 +2510,21 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 34px;
-      height: 24px;
-      padding: 0 8px;
+      min-width: 28px;
+      height: 22px;
+      padding: 0 6px;
       border-radius: 999px;
-      background: rgba(255, 236, 190, 0.78);
+      background: rgba(255, 236, 190, 0.6);
       color: #8a5211;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       flex: 0 0 auto;
     }
     .sheet-assistant-body {
       display: grid;
       gap: 8px;
-      padding: 0 12px 12px;
-      border-top: 1px solid rgba(185, 90, 0, 0.1);
+      padding: 0 10px 10px;
+      border-top: 1px solid rgba(185, 90, 0, 0.06);
     }
     .sheet-assistant-fields {
       display: grid;
@@ -2882,7 +2911,10 @@
       .sheet-group-sections { grid-template-columns: 1fr; }
       .sheet-group-inline-grid { grid-template-columns: 1fr; }
       .sheet-assistant-fields { grid-template-columns: 1fr 1fr; }
-      .sheet-groups-filters { grid-template-columns: 1fr; }
+      .sheet-groups-filters { flex-direction: column; }
+      .sheet-groups-stats { flex-direction: column; }
+      .sheet-groups-stat { border-right: none; border-bottom: 1px solid rgba(185, 90, 0, 0.08); }
+      .sheet-groups-stat:last-child { border-bottom: none; }
       .sheet-group-block.responsible .sheet-group-field-list { grid-template-columns: 1fr 1fr; }
       .sheet-assistants-list { grid-template-columns: 1fr; }
       .ticket-reader-controls { grid-template-columns: 1fr; }
@@ -3095,13 +3127,14 @@
         padding: 0 10px 10px;
       }
       .sheet-group-card,
-      .sheet-group-block,
       .sheet-assistant-item {
         border-radius: 12px;
       }
       .sheet-groups-stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        flex-direction: column;
       }
+      .sheet-groups-stat { border-right: none; border-bottom: 1px solid rgba(185, 90, 0, 0.08); }
+      .sheet-groups-stat:last-child { border-bottom: none; }
       .sheet-group-responsible-line,
       .sheet-assistant-name,
       .sheet-assistant-meta {
@@ -7688,8 +7721,6 @@
 
         const body = document.createElement("div");
         body.className = "sheet-group-body";
-        const sections = document.createElement("div");
-        sections.className = "sheet-group-sections";
 
         const responsibleBlock = document.createElement("section");
         responsibleBlock.className = "sheet-group-block responsible";
@@ -7704,7 +7735,11 @@
         if (responsibleTicketPerson) {
           responsibleBlock.appendChild(createPersonTicketBlock(group, responsibleTicketPerson, { rolePrefix: "responsable" }));
         }
-        sections.appendChild(responsibleBlock);
+        body.appendChild(responsibleBlock);
+
+        var divider1 = document.createElement("div");
+        divider1.className = "sheet-group-section-divider";
+        body.appendChild(divider1);
 
         const settingsBlock = document.createElement("section");
         settingsBlock.className = "sheet-group-block settings";
@@ -7741,7 +7776,11 @@
         paymentWrap.appendChild(createSheetGroupField("Quien paga", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.payerCol, group.payment.payer, { placeholder: "Responsable, todos, invitado..." })));
         paymentWrap.appendChild(createSheetGroupField("Importe", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.amountCol, group.payment.amount, { placeholder: "0,00", inputMode: "decimal" })));
         settingsBlock.appendChild(paymentWrap);
-        sections.appendChild(settingsBlock);
+        body.appendChild(settingsBlock);
+
+        var divider2 = document.createElement("div");
+        divider2.className = "sheet-group-section-divider";
+        body.appendChild(divider2);
 
         const assistantsBlock = document.createElement("section");
         assistantsBlock.className = "sheet-group-block assistants";
@@ -7830,8 +7869,7 @@
           });
         }
         assistantsBlock.appendChild(assistantsList);
-        sections.appendChild(assistantsBlock);
-        body.appendChild(sections);
+        body.appendChild(assistantsBlock);
         card.appendChild(body);
         els.sheetGroupsList.appendChild(card);
       });
