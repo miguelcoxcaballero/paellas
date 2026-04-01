@@ -3971,7 +3971,8 @@
         lastScanAt: 0,
         scanInFlight: false,
         reviewIdentity: null,
-        reviewSubmitting: false
+        reviewSubmitting: false,
+        loadTimer: 0
       },
       formId: "",
       formTitle: "",
@@ -4003,6 +4004,8 @@
       lastKnownRevisionId: "",
       lastKnownModifiedTime: 0,
       lastKnownFileName: "",
+      lastKnownNonPresenceAppPropsSig: "",
+      lastKnownPresenceAppPropsSig: "",
       collabEnabled: false,
       collabPollInterval: 0,
       collabPollInProgress: false,
@@ -5722,6 +5725,11 @@
       if (meta.name) {
         state.lastKnownFileName = meta.name;
       }
+      const appProperties = meta.appProperties || config.appProperties || null;
+      if (appProperties) {
+        state.lastKnownNonPresenceAppPropsSig = getAppPropertiesSignature(appProperties, false);
+        state.lastKnownPresenceAppPropsSig = getAppPropertiesSignature(appProperties, true);
+      }
       if (config.markPresenceWrite) {
         state.lastPresenceWriteAt = state.lastKnownModifiedTime || Date.now();
       }
@@ -5881,6 +5889,28 @@
     function clearDeferredRemotePull() {
       state.remotePullDeferred = false;
       state.remotePullMeta = null;
+    }
+    function getAppPropertiesSignature(appProperties, presenceOnly) {
+      const props = appProperties || {};
+      const keys = Object.keys(props).filter(function (key) {
+        const isPresenceKey = /^p_[a-z0-9]+_[nedtvlchp]$/i.test(key || "");
+        return presenceOnly ? isPresenceKey : !isPresenceKey;
+      }).sort();
+      return keys.map(function (key) {
+        const value = props[key];
+        return key + "=" + (value == null ? "" : String(value));
+      }).join("|");
+    }
+    function isPresenceOnlyMetaChange(meta) {
+      if (!meta) return false;
+      const remoteName = normalizeTitle(meta.name || "");
+      const localName = normalizeTitle(state.lastKnownFileName || "");
+      if (remoteName && localName && remoteName !== localName) return false;
+      const remoteNonPresenceSig = getAppPropertiesSignature(meta.appProperties || {}, false);
+      const remotePresenceSig = getAppPropertiesSignature(meta.appProperties || {}, true);
+      if (remoteNonPresenceSig !== (state.lastKnownNonPresenceAppPropsSig || "")) return false;
+      if (remotePresenceSig === (state.lastKnownPresenceAppPropsSig || "")) return false;
+      return true;
     }
     function shouldApplyRemoteMeta(meta) {
       if (!meta) return false;
@@ -6423,6 +6453,13 @@
       if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.classList.remove("hidden");
       if (els.ticketReaderCameraStopBtn) els.ticketReaderCameraStopBtn.classList.add("hidden");
     }
+    function clearTicketReaderLoadTimer() {
+      const reader = state.ticketReader || {};
+      if (reader.loadTimer) {
+        clearTimeout(reader.loadTimer);
+        reader.loadTimer = 0;
+      }
+    }
     function closeTicketReaderReview() {
       state.ticketReader.reviewIdentity = null;
       state.ticketReader.reviewSubmitting = false;
@@ -6438,6 +6475,7 @@
       }
     }
     function closeTicketReaderModal() {
+      clearTicketReaderLoadTimer();
       stopTicketReaderCamera();
       closeTicketReaderReview();
       if (els.ticketReaderModal) els.ticketReaderModal.classList.remove("visible");
@@ -6562,19 +6600,16 @@
             return { meta: meta, sheetInfo: sheetInfo, model: model };
           });
       }).then(function (result) {
-        return ensureRemoteSheetHeaders(targetId, result.meta, result.model, getAllCurrentEntryHeaderLabels(result.model)).then(function () {
-          return fetchSpreadsheetRowsByTitle(targetId, result.sheetInfo.title, result.sheetInfo.gridProperties && result.sheetInfo.gridProperties.rowCount, result.sheetInfo.gridProperties && result.sheetInfo.gridProperties.columnCount);
-        }).then(function (rows) {
-          const model = buildPaellaGroupsFromSheetRows(rows, result.sheetInfo.title);
-          state.ticketReader.spreadsheetId = targetId;
-          state.ticketReader.sheetTitle = result.sheetInfo.title;
-          state.ticketReader.model = model;
-          state.ticketReader.rows = rows;
-          state.ticketReader.sheets = (result.meta && result.meta.sheet && result.meta.sheet.sheets || []).map(function (entry) { return entry.properties || {}; });
-          setTicketReaderStatus(model.groups.length ? "" : "La hoja seleccionada no contiene respuestas de paella.", model.groups.length ? "" : "error");
-          renderTicketReaderResults([], model.groups.length ? "Busca una entrada o escanea un QR." : "No hay grupos de paella en esta hoja.");
-          return model;
-        });
+        const rows = result.model && Array.isArray(result.model.rows) ? result.model.rows : [];
+        const model = buildPaellaGroupsFromSheetRows(rows, result.sheetInfo.title);
+        state.ticketReader.spreadsheetId = targetId;
+        state.ticketReader.sheetTitle = result.sheetInfo.title;
+        state.ticketReader.model = model;
+        state.ticketReader.rows = rows;
+        state.ticketReader.sheets = (result.meta && result.meta.sheet && result.meta.sheet.sheets || []).map(function (entry) { return entry.properties || {}; });
+        setTicketReaderStatus(model.groups.length ? "" : "La hoja seleccionada no contiene respuestas de paella.", model.groups.length ? "" : "error");
+        renderTicketReaderResults([], model.groups.length ? "Busca una entrada o escanea un QR." : "No hay grupos de paella en esta hoja.");
+        return model;
       }).finally(function () {
         setBusy(els.ticketReaderCard, false);
       });
@@ -6751,30 +6786,53 @@
     }
     function commitTicketReaderPersonEntry(person) {
       if (!person || !state.ticketReader.spreadsheetId || !state.ticketReader.sheetTitle) return Promise.resolve(false);
-      const latest = resolveTicketReaderPerson(person);
-      if (!latest) return Promise.resolve(false);
-      if (normalizeEntryStatus(latest.status) === "HA ENTRADO") {
-        openTicketReaderReview(latest);
-        return Promise.resolve(false);
-      }
-      const nowText = new Date().toLocaleString("es-ES");
-      const payloads = [];
-      if (Number.isFinite(latest.codeCol) && latest.codeCol >= 0) {
-        payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.codeCol, latest.code));
-      }
-      if (Number.isFinite(latest.statusCol) && latest.statusCol >= 0) {
-        payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.statusCol, "HA ENTRADO"));
-      }
-      if (Number.isFinite(latest.scannedAtCol) && latest.scannedAtCol >= 0) {
-        payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.scannedAtCol, nowText));
-      }
-      return writeSpreadsheetCellPayloads(state.ticketReader.spreadsheetId, payloads).then(function () {
-        setTicketReaderStatus("Entrada validada.", "good");
-        closeTicketReaderReview();
-        return refreshTicketReaderModel().then(function () {
-          const refreshed = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: latest.code, row: latest.sheetRow, role: latest.role, number: latest.number });
-          renderTicketReaderResults(refreshed ? [refreshed] : [], "Entrada validada.");
-          return true;
+      const ensureColumnsIfNeeded = function (resolvedPerson) {
+        if (!resolvedPerson) return Promise.resolve(null);
+        if (
+          Number.isFinite(resolvedPerson.codeCol) && resolvedPerson.codeCol >= 0 &&
+          Number.isFinite(resolvedPerson.statusCol) && resolvedPerson.statusCol >= 0 &&
+          Number.isFinite(resolvedPerson.scannedAtCol) && resolvedPerson.scannedAtCol >= 0
+        ) {
+          return Promise.resolve(resolvedPerson);
+        }
+        return fetchSpreadsheetDocumentMeta(state.ticketReader.spreadsheetId).then(function (meta) {
+          return ensureRemoteSheetHeaders(
+            state.ticketReader.spreadsheetId,
+            meta,
+            state.ticketReader.model,
+            getAllCurrentEntryHeaderLabels(state.ticketReader.model)
+          );
+        }).then(function () {
+          return refreshTicketReaderModel();
+        }).then(function () {
+          return resolveTicketReaderPerson(resolvedPerson) || resolvedPerson;
+        });
+      };
+      return ensureColumnsIfNeeded(resolveTicketReaderPerson(person)).then(function (latest) {
+        if (!latest) return false;
+        if (normalizeEntryStatus(latest.status) === "HA ENTRADO") {
+          openTicketReaderReview(latest);
+          return false;
+        }
+        const nowText = new Date().toLocaleString("es-ES");
+        const payloads = [];
+        if (Number.isFinite(latest.codeCol) && latest.codeCol >= 0) {
+          payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.codeCol, latest.code));
+        }
+        if (Number.isFinite(latest.statusCol) && latest.statusCol >= 0) {
+          payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.statusCol, "HA ENTRADO"));
+        }
+        if (Number.isFinite(latest.scannedAtCol) && latest.scannedAtCol >= 0) {
+          payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.scannedAtCol, nowText));
+        }
+        return writeSpreadsheetCellPayloads(state.ticketReader.spreadsheetId, payloads).then(function () {
+          setTicketReaderStatus("Entrada validada.", "good");
+          closeTicketReaderReview();
+          return refreshTicketReaderModel().then(function () {
+            const refreshed = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: latest.code, row: latest.sheetRow, role: latest.role, number: latest.number });
+            renderTicketReaderResults(refreshed ? [refreshed] : [], "Entrada validada.");
+            return true;
+          });
         });
       }).catch(function (err) {
         console.error(err);
@@ -6802,12 +6860,13 @@
       return Promise.resolve(true);
     }
     function openTicketReaderModal() {
+      clearTicketReaderLoadTimer();
       const candidates = renderTicketReaderSheetOptions();
       els.ticketReaderModal.classList.add("visible");
       els.ticketReaderResults.innerHTML = "";
       els.ticketReaderSearchInput.value = "";
       closeTicketReaderReview();
-      setTicketReaderStatus("", "");
+      setTicketReaderStatus(candidates.length ? "Preparando lector..." : "", "");
       if (!candidates.length) {
         renderTicketReaderResults([], "No hay spreadsheets de respuestas dentro de esta paella.");
         return;
@@ -6816,10 +6875,13 @@
         ? state.ticketReader.spreadsheetId
         : candidates[0].id;
       els.ticketReaderSheetSelect.value = preferred;
-      loadTicketReaderSheet(preferred).catch(function (err) {
-        console.error(err);
-        renderTicketReaderResults([], messageFromError(err, "No se ha podido cargar la hoja de entradas."));
-      });
+      state.ticketReader.loadTimer = setTimeout(function () {
+        state.ticketReader.loadTimer = 0;
+        loadTicketReaderSheet(preferred).catch(function (err) {
+          console.error(err);
+          renderTicketReaderResults([], messageFromError(err, "No se ha podido cargar la hoja de entradas."));
+        });
+      }, 80);
     }
     function startTicketReaderCamera() {
       if (!window.BarcodeDetector || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -11502,6 +11564,8 @@
       state.lastKnownRevisionId = "";
       state.lastKnownModifiedTime = 0;
       state.lastKnownFileName = "";
+      state.lastKnownNonPresenceAppPropsSig = "";
+      state.lastKnownPresenceAppPropsSig = "";
       state.collabPollInProgress = false;
       state.collabPullInProgress = false;
       state.lastRemotePollAt = 0;
@@ -11579,6 +11643,8 @@
       state.lastKnownRevisionId = "";
       state.lastKnownModifiedTime = 0;
       state.lastKnownFileName = "";
+      state.lastKnownNonPresenceAppPropsSig = "";
+      state.lastKnownPresenceAppPropsSig = "";
       state.collabPollInProgress = false;
       state.collabPullInProgress = false;
       state.lastRemotePollAt = 0;
@@ -11914,6 +11980,10 @@
         .then(function (meta) {
           state.lastRemotePollAt = Date.now();
           if (meta.appProperties) updatePresenceFromProps(meta.appProperties);
+          if (isPresenceOnlyMetaChange(meta)) {
+            updateKnownDriveMeta(meta);
+            return flushDeferredRemotePull();
+          }
           if (remoteMetaChanged(meta)) {
             if (hasUnsyncedLocalChanges()) {
               deferRemotePull(meta);
@@ -12416,6 +12486,8 @@
         state.lastKnownRevisionId = "";
         state.lastKnownModifiedTime = 0;
         state.lastKnownFileName = "";
+        state.lastKnownNonPresenceAppPropsSig = "";
+        state.lastKnownPresenceAppPropsSig = "";
         state.remotePullDeferred = false;
         state.remotePullMeta = null;
         state.lastRemotePollAt = 0;
