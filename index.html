@@ -6859,6 +6859,7 @@
         const card = document.createElement("article");
         card.className = "ticket-reader-result";
         const normalizedStatus = normalizeEntryStatus(person.status);
+        const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
         card.innerHTML =
           "<div class='ticket-reader-result-head'>" +
             "<div>" +
@@ -6866,7 +6867,7 @@
               "<div class='ticket-reader-result-meta'>" + escapeHtml(person.groupTitle || "Grupo") + "</div>" +
             "</div>" +
             "<div class='ticket-reader-result-badges'>" +
-              "<span class='sheet-group-chip'>" + escapeHtml(normalizedStatus || "Pendiente") + "</span>" +
+              "<span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus || "Pendiente") + "</span>" +
             "</div>" +
           "</div>" +
           "<div class='ticket-reader-result-line'>" + escapeHtml(person.code || "") + "</div>" +
@@ -6973,18 +6974,26 @@
       }
       if (els.ticketReaderReviewGrid) {
         els.ticketReaderReviewGrid.innerHTML = "";
+        const normalizedStatus = normalizeEntryStatus(latest.status) || "Pendiente";
+        const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
+        const statusHtml = "<span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus) + "</span>";
+
         [
-          ["Grupo", latest.groupTitle || "Grupo"],
-          ["Codigo", latest.code || ""],
-          ["DNI", latest.dni || ""],
-          ["Telefono", latest.phone || ""],
-          ["Email", latest.email || ""],
-          ["Entrada", latest.info || ""],
-          ["Estado", normalizeEntryStatus(latest.status) || "Pendiente"],
-          ["Ultimo acceso", latest.scannedAt || "Sin registrar"]
+          ["Grupo", escapeHtml(latest.groupTitle || "Grupo"), true],
+          ["Codigo", escapeHtml(latest.code || ""), true],
+          ["DNI", escapeHtml(latest.dni || ""), true],
+          ["Telefono", escapeHtml(latest.phone || ""), true],
+          ["Email", escapeHtml(latest.email || ""), true],
+          ["Entrada", escapeHtml(latest.info || ""), true],
+          ["Estado", statusHtml, false],
+          ["Ultimo acceso", escapeHtml(latest.scannedAt || "Sin registrar"), true]
         ].forEach(function (entry) {
           if (!entry[1] && entry[0] !== "Ultimo acceso") return;
-          els.ticketReaderReviewGrid.appendChild(createTicketReaderReviewField(entry[0], entry[1]));
+          const field = document.createElement("div");
+          field.className = "ticket-reader-review-field";
+          field.innerHTML = "<div class='ticket-reader-review-field-label'>" + escapeHtml(entry[0]) + "</div>" +
+            "<div class='ticket-reader-review-field-value'>" + (entry[2] ? entry[1] : entry[1]) + "</div>";
+          els.ticketReaderReviewGrid.appendChild(field);
         });
       }
       if (els.ticketReaderReviewConfirmBtn) {
@@ -7871,11 +7880,17 @@
             const ticketPerson = ticketPeople.find(function (person) {
               return person.role === "asistente" && String(person.number) === String(assistant.number);
             });
-            assistantMeta.textContent = [
-              assistant.email || assistant.dni || "Pulsa para editar los datos",
-              ticketPerson && ticketPerson.info ? ticketPerson.info : "",
-              ticketPerson && ticketPerson.status ? normalizeEntryStatus(ticketPerson.status) : ""
+            const infoText = [
+              assistant.email || assistant.dni || "Pulsa para editar datos",
+              ticketPerson && ticketPerson.info ? ticketPerson.info : ""
             ].filter(Boolean).join(" · ");
+            const normalizedStatus = ticketPerson && ticketPerson.status ? normalizeEntryStatus(ticketPerson.status) : "";
+            let statusHtml = "";
+            if (normalizedStatus) {
+              const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
+              statusHtml = " · <span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus) + "</span>";
+            }
+            assistantMeta.innerHTML = escapeHtml(infoText) + statusHtml;
             assistantSummaryMain.appendChild(assistantMeta);
             assistantSummary.appendChild(assistantSummaryMain);
             const assistantSummarySide = document.createElement("div");
