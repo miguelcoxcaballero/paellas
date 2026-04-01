@@ -3231,6 +3231,8 @@
     const AUTH_SILENT_RETRY_COOLDOWN_MS = 90000;
     const AUTH_POST_INTERACTIVE_REAUTH_SUPPRESS_MS = 45000;
     const AUTH_RECENT_INTERACTIVE_KEY = "paellas-auth-interactive-at-v1";
+    const AUTH_RECENT_AUTO_AUTH_KEY = "paellas-auth-auto-at-v1";
+    const AUTH_AUTO_AUTH_LOOP_GUARD_MS = 120000;
 
     let presencePingTimer = 0;
     let presenceHeartbeatTimer = 0;
@@ -3331,7 +3333,8 @@
       tokenRequestInFlight: null,
       sessionRestoreInFlight: null,
       silentAuthCooldownUntil: 0,
-      lastInteractiveAuthAt: 0
+      lastInteractiveAuthAt: 0,
+      lastAutomaticAuthAt: 0
     };
 
     const els = {
@@ -3666,6 +3669,33 @@
     function shouldSuppressAutomaticAuth() {
       return recentInteractiveAuthRemainingMs() > 0;
     }
+    function readRecentAutomaticAuthAt() {
+      try {
+        return Number(sessionStorage.getItem(AUTH_RECENT_AUTO_AUTH_KEY) || 0) || 0;
+      } catch (err) {
+        return 0;
+      }
+    }
+    function markRecentAutomaticAuth() {
+      state.lastAutomaticAuthAt = Date.now();
+      try {
+        sessionStorage.setItem(AUTH_RECENT_AUTO_AUTH_KEY, String(state.lastAutomaticAuthAt));
+      } catch (err) {
+      }
+    }
+    function clearRecentAutomaticAuth() {
+      state.lastAutomaticAuthAt = 0;
+      try {
+        sessionStorage.removeItem(AUTH_RECENT_AUTO_AUTH_KEY);
+      } catch (err) {
+      }
+    }
+    function recentAutomaticAuthRemainingMs() {
+      return Math.max(0, (Number(state.lastAutomaticAuthAt) || 0) + AUTH_AUTO_AUTH_LOOP_GUARD_MS - Date.now());
+    }
+    function shouldDeferAutomaticAuthLoop() {
+      return recentAutomaticAuthRemainingMs() > 0;
+    }
     function clearTokenRefreshTimer() {
       clearTimeout(state.tokenRefreshTimer);
       state.tokenRefreshTimer = 0;
@@ -3764,6 +3794,9 @@
         const loginHint = getAuthLoginHint();
         if (loginHint) requestConfig.login_hint = loginHint;
       }
+      if (!isInteractiveRequest) {
+        markRecentAutomaticAuth();
+      }
       state.tokenRequestInFlight = new Promise(function (resolve, reject) {
         let settled = false;
         function cleanup() {
@@ -3814,6 +3847,9 @@
       if (!state.tokenClient) {
         return Promise.reject(new Error("Google Auth aun no esta listo."));
       }
+      if (shouldDeferAutomaticAuthLoop()) {
+        return Promise.reject(new Error("Auto OAuth pausado para evitar un bucle de reautenticacion."));
+      }
       if (shouldSuppressAutomaticAuth()) {
         return Promise.reject(new Error("Reconexion automatica suprimida tras un login reciente."));
       }
@@ -3853,6 +3889,7 @@
       return ensureValidAccessToken().then(function () {
         return loadProfile();
       }).then(function () {
+        clearRecentAutomaticAuth();
         setLoginStatus("");
         showView("drive");
         return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]);
@@ -3873,6 +3910,11 @@
       setLoginStatus("Recuperando sesion...");
       if (state.accessToken) {
         scheduleTokenRefresh();
+      }
+      if (!hasUsableAccessToken(0) && shouldDeferAutomaticAuthLoop()) {
+        showView("login");
+        setLoginStatus("Pulsa Entrar con Google para continuar.");
+        return Promise.resolve(false);
       }
       const restoreWork = hasUsableAccessToken(0)
         ? Promise.resolve()
@@ -9877,6 +9919,7 @@
         return;
       }
       state.lastInteractiveAuthAt = readRecentInteractiveAuthAt();
+      state.lastAutomaticAuthAt = readRecentAutomaticAuthAt();
       state.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPE,
@@ -9973,6 +10016,7 @@
         state.sessionRestoreInFlight = null;
         state.silentAuthCooldownUntil = 0;
         clearRecentInteractiveAuth();
+        clearRecentAutomaticAuth();
         els.searchInput.value = "";
         els.itemsGrid.innerHTML = "";
         els.paellasGrid.innerHTML = "";
