@@ -1997,18 +1997,23 @@
       background: linear-gradient(180deg, rgba(255, 252, 243, 0.98) 0%, rgba(255, 248, 227, 0.94) 100%);
       display: grid;
       align-content: start;
-      gap: 12px;
+      gap: 10px;
       padding: 14px;
     }
     .sheet-groups-list {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       align-content: start;
     }
     .sheet-groups-toolbar {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       align-content: start;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding-bottom: 2px;
+      background: linear-gradient(180deg, rgba(255, 252, 243, 0.98) 0%, rgba(255, 248, 227, 0.94) 88%, rgba(255, 248, 227, 0) 100%);
     }
     .sheet-groups-stats {
       display: grid;
@@ -2094,19 +2099,19 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
       align-items: center;
-      padding: 14px;
+      padding: 12px 14px;
       cursor: pointer;
     }
     .sheet-group-summary-main {
       min-width: 0;
       display: grid;
-      gap: 6px;
+      gap: 7px;
     }
     .sheet-group-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 8px;
+      gap: 12px;
       min-width: 0;
     }
     .sheet-group-title {
@@ -2120,9 +2125,11 @@
       font-size: 0.8rem;
       color: var(--muted);
       line-height: 1.35;
+      white-space: nowrap;
+      flex: 0 0 auto;
     }
     .sheet-group-responsible-line {
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       color: var(--muted);
       line-height: 1.35;
       min-width: 0;
@@ -2186,27 +2193,39 @@
     }
     .sheet-group-body {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       padding: 0 14px 14px;
       border-top: 1px solid rgba(185, 90, 0, 0.1);
     }
     .sheet-group-sections {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr);
+      gap: 12px;
       min-width: 0;
+      align-items: start;
     }
     .sheet-group-block {
       border: 1px solid var(--line);
       border-radius: 14px;
       background: rgba(255, 251, 238, 0.85);
-      padding: 12px;
+      padding: 11px 12px;
       display: grid;
-      gap: 8px;
+      gap: 10px;
       min-width: 0;
     }
     .sheet-group-block.assistants {
       grid-column: 1 / -1;
+    }
+    .sheet-group-block.responsible .sheet-group-field-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 10px;
+      row-gap: 8px;
+    }
+    .sheet-group-block.responsible .sheet-person-ticket {
+      grid-column: 1 / -1;
+    }
+    .sheet-group-block.settings .sheet-group-payment-wrap {
+      padding-top: 2px;
     }
     .sheet-group-block-head {
       display: flex;
@@ -2280,7 +2299,7 @@
       color: var(--ink);
       font: inherit;
       font-size: 0.9rem;
-      padding: 10px 12px;
+      padding: 9px 11px;
       outline: none;
       transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
@@ -2310,7 +2329,7 @@
       color: var(--ink);
       font: inherit;
       font-size: 0.88rem;
-      padding: 10px 12px;
+      padding: 9px 11px;
       outline: none;
     }
     .sheet-group-inline-grid {
@@ -2368,15 +2387,29 @@
     }
     .sheet-person-ticket {
       display: grid;
-      gap: 8px;
-      padding-top: 8px;
+      gap: 10px;
+      padding-top: 10px;
       border-top: 1px dashed rgba(185, 90, 0, 0.18);
+    }
+    .sheet-person-ticket-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sheet-person-ticket-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.95fr) minmax(170px, 0.9fr) minmax(170px, 0.9fr);
+      min-width: 0;
     }
     .sheet-person-ticket-actions {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
+      justify-content: flex-end;
     }
     .sheet-person-ticket-btn {
       display: inline-flex;
@@ -2476,6 +2509,7 @@
     }
     .ticket-reader-card {
       width: min(920px, 100%);
+      position: relative;
     }
     .ticket-reader-body {
       display: grid;
@@ -2531,6 +2565,78 @@
       align-content: start;
       max-height: min(42vh, 420px);
       overflow: auto;
+    }
+    .ticket-reader-review-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(34, 24, 11, 0.36);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 3;
+    }
+    .ticket-reader-review-card {
+      width: min(560px, 100%);
+      border: 1px solid rgba(185, 90, 0, 0.16);
+      border-radius: 18px;
+      background: rgba(255, 252, 245, 0.98);
+      box-shadow: 0 18px 48px rgba(68, 40, 10, 0.18);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+    .ticket-reader-review-card.is-warning {
+      border-color: rgba(182, 92, 92, 0.26);
+      background: rgba(255, 244, 244, 0.98);
+    }
+    .ticket-reader-review-head {
+      display: grid;
+      gap: 4px;
+    }
+    .ticket-reader-review-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+    .ticket-reader-review-subtitle {
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .ticket-reader-review-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-width: 0;
+    }
+    .ticket-reader-review-field {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.88);
+    }
+    .ticket-reader-review-field-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+    .ticket-reader-review-field-value {
+      font-size: 0.9rem;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .ticket-reader-review-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .ticket-reader-result {
       border: 1px solid rgba(185, 90, 0, 0.14);
@@ -2779,10 +2885,14 @@
       .linked-pair-grid { grid-template-columns: 1fr; }
       .sheet-group-sections { grid-template-columns: 1fr; }
       .sheet-group-inline-grid { grid-template-columns: 1fr; }
-      .sheet-assistant-fields { grid-template-columns: 1fr; }
+      .sheet-assistant-fields { grid-template-columns: 1fr 1fr; }
       .sheet-groups-filters { grid-template-columns: 1fr; }
+      .sheet-group-block.responsible .sheet-group-field-list { grid-template-columns: 1fr 1fr; }
+      .sheet-assistants-list { grid-template-columns: 1fr; }
       .ticket-reader-controls { grid-template-columns: 1fr; }
       .ticket-reader-actions { justify-content: flex-start; }
+      .sheet-person-ticket-grid { grid-template-columns: 1fr 1fr; }
+      .ticket-reader-review-grid { grid-template-columns: 1fr 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
       .paired-file-card {
         min-height: 48px;
@@ -3004,6 +3114,13 @@
       .sheet-assistant-fields {
         grid-template-columns: 1fr;
       }
+      .sheet-group-block.responsible .sheet-group-field-list {
+        grid-template-columns: 1fr;
+      }
+      .sheet-person-ticket-grid,
+      .ticket-reader-review-grid {
+        grid-template-columns: 1fr;
+      }
       .linked-pair-card { padding: 0; gap: 0; }
       .linked-pair-grid { grid-template-columns: 1fr; }
       .linked-pair-link {
@@ -3050,7 +3167,7 @@
       .paired-file-card-title,
       .paired-file-card-meta { display: none; }
       .sheet-groups-view { padding: 10px; }
-      .sheet-group-card { padding: 10px; }
+      .sheet-group-card { padding: 0; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
       .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; padding: 6px 8px; font-size: 0.76rem; }
       .item-more-btn { width: 32px; height: 32px; min-width: 32px; }
@@ -3670,6 +3787,19 @@
         </div>
         <div id="ticketReaderResults" class="ticket-reader-results"></div>
       </div>
+      <div id="ticketReaderReviewOverlay" class="ticket-reader-review-overlay hidden">
+        <section id="ticketReaderReviewCard" class="ticket-reader-review-card" aria-live="polite">
+          <div class="ticket-reader-review-head">
+            <div id="ticketReaderReviewTitle" class="ticket-reader-review-title">Validar entrada</div>
+            <div id="ticketReaderReviewSubtitle" class="ticket-reader-review-subtitle"></div>
+          </div>
+          <div id="ticketReaderReviewGrid" class="ticket-reader-review-grid"></div>
+          <div class="ticket-reader-review-actions">
+            <button id="ticketReaderReviewCloseBtn" class="btn small" type="button">Cerrar</button>
+            <button id="ticketReaderReviewConfirmBtn" class="btn small primary" type="button">Todo est&aacute; correcto</button>
+          </div>
+        </section>
+      </div>
       <div class="row modal-actions">
         <button id="ticketReaderFooterCloseBtn" class="btn small" type="button">Cerrar</button>
       </div>
@@ -3838,7 +3968,10 @@
         sheets: [],
         candidates: [],
         lastScanText: "",
-        lastScanAt: 0
+        lastScanAt: 0,
+        scanInFlight: false,
+        reviewIdentity: null,
+        reviewSubmitting: false
       },
       formId: "",
       formTitle: "",
@@ -4110,6 +4243,13 @@
       ticketReaderVideo: document.getElementById("ticketReaderVideo"),
       ticketReaderStatus: document.getElementById("ticketReaderStatus"),
       ticketReaderResults: document.getElementById("ticketReaderResults"),
+      ticketReaderReviewOverlay: document.getElementById("ticketReaderReviewOverlay"),
+      ticketReaderReviewCard: document.getElementById("ticketReaderReviewCard"),
+      ticketReaderReviewTitle: document.getElementById("ticketReaderReviewTitle"),
+      ticketReaderReviewSubtitle: document.getElementById("ticketReaderReviewSubtitle"),
+      ticketReaderReviewGrid: document.getElementById("ticketReaderReviewGrid"),
+      ticketReaderReviewCloseBtn: document.getElementById("ticketReaderReviewCloseBtn"),
+      ticketReaderReviewConfirmBtn: document.getElementById("ticketReaderReviewConfirmBtn"),
       paellaAccessPopup: document.getElementById("paellaAccessPopup"),
       paellaAccessPopupCloseBtn: document.getElementById("paellaAccessPopupCloseBtn"),
       paellaAccessEmailInput: document.getElementById("paellaAccessEmailInput"),
@@ -6051,16 +6191,9 @@
       const config = options || {};
       const wrap = document.createElement("div");
       wrap.className = "sheet-person-ticket";
-      const grid = document.createElement("div");
-      grid.className = "sheet-group-inline-grid";
-      grid.appendChild(createTicketField("Info entrada", createSheetGroupTextInput(group.id, group.sheetRow, person.infoCol, person.info, { placeholder: "Pulsera, menu, observaciones", role: config.rolePrefix + "-entry-info" })));
-      grid.appendChild(createTicketField("Estado entrada", createSheetGroupSelect(group.id, group.sheetRow, person.statusCol, normalizeEntryStatus(person.status), ["Pendiente", "Emitida", "HA ENTRADO"], { emptyLabel: "Pendiente" })));
-      wrap.appendChild(grid);
-      const infoGrid = document.createElement("div");
-      infoGrid.className = "sheet-group-inline-grid";
-      infoGrid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code || "")));
-      infoGrid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt || "")));
-      wrap.appendChild(infoGrid);
+      const head = document.createElement("div");
+      head.className = "sheet-person-ticket-head";
+      head.innerHTML = "<div class='sheet-group-block-title'>Entrada</div>";
       const actions = document.createElement("div");
       actions.className = "sheet-person-ticket-actions";
       const pdfBtn = document.createElement("button");
@@ -6072,7 +6205,15 @@
       pdfBtn.dataset.personNumber = String(person.number || "");
       pdfBtn.textContent = "PDF entrada";
       actions.appendChild(pdfBtn);
-      wrap.appendChild(actions);
+      head.appendChild(actions);
+      wrap.appendChild(head);
+      const grid = document.createElement("div");
+      grid.className = "sheet-person-ticket-grid";
+      grid.appendChild(createTicketField("Info entrada", createSheetGroupTextInput(group.id, group.sheetRow, person.infoCol, person.info, { placeholder: "Pulsera, menu, observaciones", role: config.rolePrefix + "-entry-info" })));
+      grid.appendChild(createTicketField("Estado entrada", createSheetGroupSelect(group.id, group.sheetRow, person.statusCol, normalizeEntryStatus(person.status), ["Pendiente", "Emitida", "HA ENTRADO"], { emptyLabel: "Pendiente" })));
+      grid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code || "")));
+      grid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt || "")));
+      wrap.appendChild(grid);
       return wrap;
     }
     function findGroupByIdInModel(model, groupId) {
@@ -6269,6 +6410,7 @@
         clearInterval(reader.scanTimer);
         reader.scanTimer = 0;
       }
+      reader.scanInFlight = false;
       if (reader.stream) {
         reader.stream.getTracks().forEach(function (track) { track.stop(); });
         reader.stream = null;
@@ -6281,8 +6423,23 @@
       if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.classList.remove("hidden");
       if (els.ticketReaderCameraStopBtn) els.ticketReaderCameraStopBtn.classList.add("hidden");
     }
+    function closeTicketReaderReview() {
+      state.ticketReader.reviewIdentity = null;
+      state.ticketReader.reviewSubmitting = false;
+      if (els.ticketReaderReviewOverlay) els.ticketReaderReviewOverlay.classList.add("hidden");
+      if (els.ticketReaderReviewCard) els.ticketReaderReviewCard.classList.remove("is-warning");
+      if (els.ticketReaderReviewTitle) els.ticketReaderReviewTitle.textContent = "Validar entrada";
+      if (els.ticketReaderReviewSubtitle) els.ticketReaderReviewSubtitle.textContent = "";
+      if (els.ticketReaderReviewGrid) els.ticketReaderReviewGrid.innerHTML = "";
+      if (els.ticketReaderReviewConfirmBtn) {
+        els.ticketReaderReviewConfirmBtn.disabled = false;
+        els.ticketReaderReviewConfirmBtn.classList.remove("hidden");
+        els.ticketReaderReviewConfirmBtn.textContent = "Todo esta correcto";
+      }
+    }
     function closeTicketReaderModal() {
       stopTicketReaderCamera();
+      closeTicketReaderReview();
       if (els.ticketReaderModal) els.ticketReaderModal.classList.remove("visible");
       if (els.ticketReaderResults) els.ticketReaderResults.innerHTML = "";
       setTicketReaderStatus("", "");
@@ -6380,6 +6537,7 @@
     function loadTicketReaderSheet(spreadsheetId, preferredSheetTitle) {
       const targetId = String(spreadsheetId || "").trim();
       if (!targetId) return Promise.reject(new Error("No hay ninguna hoja seleccionada."));
+      closeTicketReaderReview();
       setBusy(els.ticketReaderCard, true);
       setTicketReaderStatus("Cargando hoja de entradas...", "");
       return fetchSpreadsheetDocumentMeta(targetId).then(function (meta) {
@@ -6467,13 +6625,32 @@
         const validateBtn = document.createElement("button");
         validateBtn.type = "button";
         validateBtn.className = "btn small primary";
-        validateBtn.textContent = normalizedStatus === "HA ENTRADO" ? "Ya validada" : "Validar";
+        validateBtn.textContent = normalizedStatus === "HA ENTRADO" ? "Ver validacion" : "Revisar y validar";
         validateBtn.dataset.ticketAction = "validate";
         validateBtn.dataset.ticketCode = person.code || "";
         actions.appendChild(validateBtn);
         card.appendChild(actions);
         els.ticketReaderResults.appendChild(card);
       });
+    }
+    function handleDetectedTicketValue(rawValue) {
+      const value = String(rawValue || "").trim();
+      if (!value) return Promise.resolve(false);
+      if (els.ticketReaderSearchInput) els.ticketReaderSearchInput.value = value;
+      const results = searchTicketReaderPeople(value);
+      renderTicketReaderResults(results, "No se ha encontrado ninguna entrada para ese QR.");
+      if (!results.length) {
+        setTicketReaderStatus("No se ha reconocido el QR.", "error");
+        return Promise.resolve(false);
+      }
+      if (results.length > 1) {
+        stopTicketReaderCamera();
+        setTicketReaderStatus("Se han encontrado varias coincidencias. Revisa la lista antes de validar.", "");
+        return Promise.resolve(true);
+      }
+      stopTicketReaderCamera();
+      setTicketReaderStatus("Entrada detectada. Revisa los datos antes de confirmar.", "");
+      return markTicketPersonEntered(results[0]).then(function () { return true; });
     }
     function searchTicketReaderPeople(query) {
       const model = state.ticketReader.model;
@@ -6507,61 +6684,97 @@
       if (!state.ticketReader.spreadsheetId) return Promise.resolve(null);
       return loadTicketReaderSheet(state.ticketReader.spreadsheetId, state.ticketReader.sheetTitle);
     }
-    function promptValidateTicketPerson(person) {
-      if (!person) return Promise.resolve(false);
-      if (normalizeEntryStatus(person.status) === "HA ENTRADO") {
-        return openAppDialog({
-          title: "Entrada ya validada",
-          subtitle: person.name || "Asistente",
-          body: "Esta entrada ya se habia escaneado.\n\nUltimo acceso: " + (person.scannedAt || "Hora desconocida"),
-          confirmText: "Cerrar",
-          showCancel: false
-        }).then(function () { return false; });
-      }
-      return openAppDialog({
-        title: "Validar entrada",
-        subtitle: person.name || "Asistente",
-        body: [
-          person.groupTitle || "Grupo",
-          person.code ? ("Codigo: " + person.code) : "",
-          person.dni ? ("DNI: " + person.dni) : "",
-          person.phone ? ("Telefono: " + person.phone) : "",
-          person.email ? ("Email: " + person.email) : "",
-          person.info ? ("Entrada: " + person.info) : ""
-        ].filter(Boolean).join("\n"),
-        confirmText: "Todo esta correcto"
-      }).then(function (result) {
-        return !!(result && result.action === "confirm");
-      });
+    function createTicketReaderReviewField(labelText, valueText) {
+      const field = document.createElement("div");
+      field.className = "ticket-reader-review-field";
+      field.innerHTML =
+        "<div class='ticket-reader-review-field-label'>" + escapeHtml(labelText) + "</div>" +
+        "<div class='ticket-reader-review-field-value'>" + escapeHtml(valueText || "-") + "</div>";
+      return field;
     }
-    function markTicketPersonEntered(person) {
-      if (!person || !state.ticketReader.spreadsheetId || !state.ticketReader.sheetTitle) return Promise.resolve(false);
-      return refreshTicketReaderModel().then(function () {
-        const latest = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: person.code, row: person.sheetRow, role: person.role, number: person.number }) || person;
-        if (normalizeEntryStatus(latest.status) === "HA ENTRADO") {
-          return promptValidateTicketPerson(latest);
+    function resolveTicketReaderPerson(person) {
+      if (!person || !state.ticketReader.spreadsheetId) return null;
+      return findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, {
+        code: person.code,
+        row: person.sheetRow,
+        role: person.role,
+        number: person.number
+      }) || person;
+    }
+    function openTicketReaderReview(person) {
+      const latest = resolveTicketReaderPerson(person);
+      if (!latest) return false;
+      const alreadyEntered = normalizeEntryStatus(latest.status) === "HA ENTRADO";
+      state.ticketReader.reviewIdentity = {
+        code: latest.code,
+        row: latest.sheetRow,
+        role: latest.role,
+        number: latest.number
+      };
+      state.ticketReader.reviewSubmitting = false;
+      if (els.ticketReaderReviewCard) els.ticketReaderReviewCard.classList.toggle("is-warning", alreadyEntered);
+      if (els.ticketReaderReviewTitle) {
+        els.ticketReaderReviewTitle.textContent = alreadyEntered ? "Entrada ya validada" : "Revisar entrada";
+      }
+      if (els.ticketReaderReviewSubtitle) {
+        els.ticketReaderReviewSubtitle.textContent = latest.name || "Asistente";
+      }
+      if (els.ticketReaderReviewGrid) {
+        els.ticketReaderReviewGrid.innerHTML = "";
+        [
+          ["Grupo", latest.groupTitle || "Grupo"],
+          ["Codigo", latest.code || ""],
+          ["DNI", latest.dni || ""],
+          ["Telefono", latest.phone || ""],
+          ["Email", latest.email || ""],
+          ["Entrada", latest.info || ""],
+          ["Estado", normalizeEntryStatus(latest.status) || "Pendiente"],
+          ["Ultimo acceso", latest.scannedAt || "Sin registrar"]
+        ].forEach(function (entry) {
+          if (!entry[1] && entry[0] !== "Ultimo acceso") return;
+          els.ticketReaderReviewGrid.appendChild(createTicketReaderReviewField(entry[0], entry[1]));
+        });
+      }
+      if (els.ticketReaderReviewConfirmBtn) {
+        els.ticketReaderReviewConfirmBtn.disabled = false;
+        els.ticketReaderReviewConfirmBtn.classList.toggle("hidden", alreadyEntered);
+      }
+      if (els.ticketReaderReviewOverlay) els.ticketReaderReviewOverlay.classList.remove("hidden");
+      requestAnimationFrame(function () {
+        if (alreadyEntered && els.ticketReaderReviewCloseBtn) {
+          els.ticketReaderReviewCloseBtn.focus();
+        } else if (els.ticketReaderReviewConfirmBtn) {
+          els.ticketReaderReviewConfirmBtn.focus();
         }
-        return promptValidateTicketPerson(latest).then(function (confirmed) {
-          if (!confirmed) return false;
-          const nowText = new Date().toLocaleString("es-ES");
-          const payloads = [];
-          if (Number.isFinite(latest.codeCol) && latest.codeCol >= 0) {
-            payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.codeCol, latest.code));
-          }
-          if (Number.isFinite(latest.statusCol) && latest.statusCol >= 0) {
-            payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.statusCol, "HA ENTRADO"));
-          }
-          if (Number.isFinite(latest.scannedAtCol) && latest.scannedAtCol >= 0) {
-            payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.scannedAtCol, nowText));
-          }
-          return writeSpreadsheetCellPayloads(state.ticketReader.spreadsheetId, payloads).then(function () {
-            setTicketReaderStatus("Entrada validada.", "good");
-            return refreshTicketReaderModel().then(function () {
-              const refreshed = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: latest.code, row: latest.sheetRow, role: latest.role, number: latest.number });
-              renderTicketReaderResults(refreshed ? [refreshed] : [], "Entrada validada.");
-              return true;
-            });
-          });
+      });
+      return true;
+    }
+    function commitTicketReaderPersonEntry(person) {
+      if (!person || !state.ticketReader.spreadsheetId || !state.ticketReader.sheetTitle) return Promise.resolve(false);
+      const latest = resolveTicketReaderPerson(person);
+      if (!latest) return Promise.resolve(false);
+      if (normalizeEntryStatus(latest.status) === "HA ENTRADO") {
+        openTicketReaderReview(latest);
+        return Promise.resolve(false);
+      }
+      const nowText = new Date().toLocaleString("es-ES");
+      const payloads = [];
+      if (Number.isFinite(latest.codeCol) && latest.codeCol >= 0) {
+        payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.codeCol, latest.code));
+      }
+      if (Number.isFinite(latest.statusCol) && latest.statusCol >= 0) {
+        payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.statusCol, "HA ENTRADO"));
+      }
+      if (Number.isFinite(latest.scannedAtCol) && latest.scannedAtCol >= 0) {
+        payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.scannedAtCol, nowText));
+      }
+      return writeSpreadsheetCellPayloads(state.ticketReader.spreadsheetId, payloads).then(function () {
+        setTicketReaderStatus("Entrada validada.", "good");
+        closeTicketReaderReview();
+        return refreshTicketReaderModel().then(function () {
+          const refreshed = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: latest.code, row: latest.sheetRow, role: latest.role, number: latest.number });
+          renderTicketReaderResults(refreshed ? [refreshed] : [], "Entrada validada.");
+          return true;
         });
       }).catch(function (err) {
         console.error(err);
@@ -6569,11 +6782,31 @@
         return false;
       });
     }
+    function confirmTicketReaderReview() {
+      if (state.ticketReader.reviewSubmitting || !state.ticketReader.reviewIdentity) return Promise.resolve(false);
+      const latest = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, state.ticketReader.reviewIdentity);
+      if (!latest) {
+        closeTicketReaderReview();
+        return Promise.resolve(false);
+      }
+      state.ticketReader.reviewSubmitting = true;
+      if (els.ticketReaderReviewConfirmBtn) els.ticketReaderReviewConfirmBtn.disabled = true;
+      return commitTicketReaderPersonEntry(latest).finally(function () {
+        state.ticketReader.reviewSubmitting = false;
+        if (els.ticketReaderReviewConfirmBtn) els.ticketReaderReviewConfirmBtn.disabled = false;
+      });
+    }
+    function markTicketPersonEntered(person) {
+      if (!person) return Promise.resolve(false);
+      openTicketReaderReview(person);
+      return Promise.resolve(true);
+    }
     function openTicketReaderModal() {
       const candidates = renderTicketReaderSheetOptions();
       els.ticketReaderModal.classList.add("visible");
       els.ticketReaderResults.innerHTML = "";
       els.ticketReaderSearchInput.value = "";
+      closeTicketReaderReview();
       setTicketReaderStatus("", "");
       if (!candidates.length) {
         renderTicketReaderResults([], "No hay spreadsheets de respuestas dentro de esta paella.");
@@ -6594,6 +6827,9 @@
         return Promise.resolve(false);
       }
       stopTicketReaderCamera();
+      closeTicketReaderReview();
+      state.ticketReader.lastScanText = "";
+      state.ticketReader.lastScanAt = 0;
       return navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" } },
         audio: false
@@ -6608,7 +6844,8 @@
       }).then(function () {
         const detector = new BarcodeDetector({ formats: ["qr_code"] });
         state.ticketReader.scanTimer = setInterval(function () {
-          if (!els.ticketReaderVideo || els.ticketReaderVideo.readyState < 2) return;
+          if (!els.ticketReaderVideo || els.ticketReaderVideo.readyState < 2 || state.ticketReader.scanInFlight || !els.ticketReaderReviewOverlay.classList.contains("hidden")) return;
+          state.ticketReader.scanInFlight = true;
           detector.detect(els.ticketReaderVideo).then(function (codes) {
             if (!codes || !codes.length) return;
             const value = String(codes[0].rawValue || "").trim();
@@ -6617,15 +6854,10 @@
             if (state.ticketReader.lastScanText === value && (now - state.ticketReader.lastScanAt) < 3000) return;
             state.ticketReader.lastScanText = value;
             state.ticketReader.lastScanAt = now;
-            stopTicketReaderCamera();
-            const results = searchTicketReaderPeople(value);
-            renderTicketReaderResults(results, "No se ha encontrado ninguna entrada para ese QR.");
-            if (results[0]) {
-              markTicketPersonEntered(results[0]);
-            } else {
-              setTicketReaderStatus("No se ha reconocido el QR.", "error");
-            }
-          }).catch(function () {});
+            return handleDetectedTicketValue(value);
+          }).catch(function () {}).finally(function () {
+            state.ticketReader.scanInFlight = false;
+          });
         }, 700);
         return true;
       }).catch(function (err) {
@@ -7252,7 +7484,7 @@
         sections.className = "sheet-group-sections";
 
         const responsibleBlock = document.createElement("section");
-        responsibleBlock.className = "sheet-group-block";
+        responsibleBlock.className = "sheet-group-block responsible";
         responsibleBlock.innerHTML = "<div class='sheet-group-block-title'>Responsable</div>";
         const responsibleFields = document.createElement("div");
         responsibleFields.className = "sheet-group-field-list";
@@ -7267,7 +7499,7 @@
         sections.appendChild(responsibleBlock);
 
         const settingsBlock = document.createElement("section");
-        settingsBlock.className = "sheet-group-block";
+        settingsBlock.className = "sheet-group-block settings";
         settingsBlock.innerHTML = "<div class='sheet-group-block-title'>Grupo y pago</div>";
         const settingsGrid = document.createElement("div");
         settingsGrid.className = "sheet-group-inline-grid triple";
@@ -7351,7 +7583,14 @@
             assistantSummaryMain.appendChild(assistantName);
             const assistantMeta = document.createElement("div");
             assistantMeta.className = "sheet-assistant-meta";
-            assistantMeta.textContent = assistant.email || assistant.dni || "Pulsa para editar los datos";
+            const ticketPerson = ticketPeople.find(function (person) {
+              return person.role === "asistente" && String(person.number) === String(assistant.number);
+            });
+            assistantMeta.textContent = [
+              assistant.email || assistant.dni || "Pulsa para editar los datos",
+              ticketPerson && ticketPerson.info ? ticketPerson.info : "",
+              ticketPerson && ticketPerson.status ? normalizeEntryStatus(ticketPerson.status) : ""
+            ].filter(Boolean).join(" · ");
             assistantSummaryMain.appendChild(assistantMeta);
             assistantSummary.appendChild(assistantSummaryMain);
             const assistantSummarySide = document.createElement("div");
@@ -7375,9 +7614,6 @@
             assistantFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, assistant.dniCol, assistant.dni, { placeholder: "DNI", role: "assistant-dni" })));
             assistantFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, assistant.emailCol, assistant.email, { type: "email", placeholder: "correo@upv.es", role: "assistant-email" })));
             assistantBody.appendChild(assistantFields);
-            const ticketPerson = ticketPeople.find(function (person) {
-              return person.role === "asistente" && String(person.number) === String(assistant.number);
-            });
             if (ticketPerson) {
               assistantBody.appendChild(createPersonTicketBlock(group, ticketPerson, { rolePrefix: "assistant" }));
             }
@@ -12308,9 +12544,20 @@
     if (els.sheetGroupsContestFilter) els.sheetGroupsContestFilter.addEventListener("change", handleSheetGroupsFilterChange);
     if (els.ticketReaderCloseBtn) els.ticketReaderCloseBtn.addEventListener("click", closeTicketReaderModal);
     if (els.ticketReaderFooterCloseBtn) els.ticketReaderFooterCloseBtn.addEventListener("click", closeTicketReaderModal);
+    if (els.ticketReaderReviewCloseBtn) els.ticketReaderReviewCloseBtn.addEventListener("click", closeTicketReaderReview);
+    if (els.ticketReaderReviewConfirmBtn) {
+      els.ticketReaderReviewConfirmBtn.addEventListener("click", function () {
+        confirmTicketReaderReview();
+      });
+    }
     if (els.ticketReaderModal) {
       els.ticketReaderModal.addEventListener("click", function (event) {
         if (event.target === els.ticketReaderModal) closeTicketReaderModal();
+      });
+    }
+    if (els.ticketReaderReviewOverlay) {
+      els.ticketReaderReviewOverlay.addEventListener("click", function (event) {
+        if (event.target === els.ticketReaderReviewOverlay) closeTicketReaderReview();
       });
     }
     if (els.ticketReaderSheetSelect) {
