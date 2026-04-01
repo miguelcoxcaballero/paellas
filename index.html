@@ -2393,9 +2393,9 @@
       }
       .drive-scroll.paella-focus .paella-panel-content {
         height: auto;
-        max-height: min(68vh, 780px);
-        overflow: auto;
-        padding-right: 2px;
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
       }
       .drive-top-row {
         flex-wrap: nowrap;
@@ -8531,11 +8531,7 @@
     function openPaellaFolder(item) {
       if (!item || !item.id) return;
       showView("drive");
-      loadPaellaFolder(item.id, [{ id: item.id, name: item.name || "Paella" }]).then(function () {
-        if (els.paellaPanelTitle && typeof els.paellaPanelTitle.scrollIntoView === "function") {
-          els.paellaPanelTitle.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      });
+      loadPaellaFolder(item.id, [{ id: item.id, name: item.name || "Paella" }]);
     }
     function closePaellaFolderView() {
       state.activePaellaStack = [];
