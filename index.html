@@ -2009,11 +2009,7 @@
       display: grid;
       gap: 10px;
       align-content: start;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      padding-bottom: 2px;
-      background: linear-gradient(180deg, rgba(255, 252, 243, 0.98) 0%, rgba(255, 248, 227, 0.94) 88%, rgba(255, 248, 227, 0) 100%);
+      position: relative;
     }
     .sheet-groups-stats {
       display: grid;
@@ -3892,9 +3888,11 @@
     ]);
     const AUTH_SESSION_KEY = "paellas-auth-session-v2";
     const LEGACY_AUTH_SESSION_KEY = "paellas-auth-session-v1";
+    const UI_SESSION_KEY = "paellas-ui-session-v1";
     const AUTH_REFRESH_MARGIN_MS = 120000;
     const AUTH_REFRESH_RETRY_MS = 15000;
     const AUTH_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+    const UI_SESSION_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
     const AUTH_SILENT_RETRY_COOLDOWN_MS = 90000;
     const AUTH_POST_INTERACTIVE_REAUTH_SUPPRESS_MS = 45000;
     const AUTH_RECENT_INTERACTIVE_KEY = "paellas-auth-interactive-at-v1";
@@ -4324,6 +4322,76 @@
         console.warn("No se ha podido borrar la sesion guardada:", err);
       }
     }
+    function readStoredUiSession() {
+      try {
+        const raw = localStorage.getItem(UI_SESSION_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== "object") return null;
+        const updatedAt = Number(data.updatedAt) || 0;
+        if (updatedAt && (Date.now() - updatedAt) > UI_SESSION_MAX_AGE_MS) {
+          localStorage.removeItem(UI_SESSION_KEY);
+          return null;
+        }
+        return {
+          view: data.view === "editor" ? "editor" : "drive",
+          activeDocumentType: data.activeDocumentType === "form" ? "form" : (data.activeDocumentType === "sheet" ? "sheet" : ""),
+          formId: String(data.formId || ""),
+          formTitle: String(data.formTitle || ""),
+          spreadsheetId: String(data.spreadsheetId || ""),
+          spreadsheetTitle: String(data.spreadsheetTitle || ""),
+          currentSheetTitle: String(data.currentSheetTitle || ""),
+          spreadsheetViewMode: data.spreadsheetViewMode === "table" ? "table" : "groups",
+          folderStack: cloneFolderStack(data.folderStack),
+          activePaellaStack: normalizePaellaFolderStack(data.activePaellaStack),
+          activeDireccionStack: Array.isArray(data.activeDireccionStack)
+            ? data.activeDireccionStack.map(function (entry) {
+                return {
+                  id: entry && entry.id ? entry.id : "",
+                  name: entry && entry.name ? entry.name : "Carpeta"
+                };
+              }).filter(function (entry) { return !!entry.id; })
+            : [],
+          updatedAt: updatedAt
+        };
+      } catch (err) {
+        console.warn("No se ha podido leer el estado de interfaz guardado:", err);
+        return null;
+      }
+    }
+    function clearStoredUiSession() {
+      try {
+        localStorage.removeItem(UI_SESSION_KEY);
+      } catch (err) {
+        console.warn("No se ha podido borrar el estado de interfaz guardado:", err);
+      }
+    }
+    function saveStoredUiSession() {
+      try {
+        const payload = {
+          view: els.editorView && !els.editorView.classList.contains("hidden") ? "editor" : "drive",
+          activeDocumentType: state.activeDocumentType || "",
+          formId: state.formId || "",
+          formTitle: state.formTitle || "",
+          spreadsheetId: state.spreadsheetId || "",
+          spreadsheetTitle: state.spreadsheetTitle || "",
+          currentSheetTitle: state.currentSheetTitle || "",
+          spreadsheetViewMode: state.spreadsheetViewMode || "groups",
+          folderStack: cloneFolderStack(state.folderStack),
+          activePaellaStack: normalizePaellaFolderStack(state.activePaellaStack),
+          activeDireccionStack: (Array.isArray(state.activeDireccionStack) ? state.activeDireccionStack : []).map(function (entry) {
+            return {
+              id: entry && entry.id ? entry.id : "",
+              name: entry && entry.name ? entry.name : "Carpeta"
+            };
+          }).filter(function (entry) { return !!entry.id; }),
+          updatedAt: Date.now()
+        };
+        localStorage.setItem(UI_SESSION_KEY, JSON.stringify(payload));
+      } catch (err) {
+        console.warn("No se ha podido guardar el estado de interfaz:", err);
+      }
+    }
     function readStoredLinkerDeploymentId() {
       try {
         return String(localStorage.getItem(LINKER_SCRIPT_STORAGE_KEY) || "").trim();
@@ -4612,8 +4680,80 @@
         clearRecentAutomaticAuth();
         setLoginStatus("");
         showView("drive");
-        return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]);
+        return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]).then(function () {
+          return restoreStoredUiAfterAuth();
+        });
       });
+    }
+    function restoreStoredUiAfterAuth() {
+      const snapshot = readStoredUiSession();
+      if (!snapshot) return Promise.resolve(false);
+      if (snapshot.view === "editor") {
+        if (snapshot.activeDocumentType === "sheet" && snapshot.spreadsheetId) {
+          return fetchDriveFileMeta(snapshot.spreadsheetId).then(function (item) {
+            return openSpreadsheet({
+              id: item.id,
+              name: item.name || snapshot.spreadsheetTitle || "Google Sheets"
+            });
+          }).then(function () {
+            const selectSheet = snapshot.currentSheetTitle && snapshot.currentSheetTitle !== state.currentSheetTitle
+              ? loadSheet(snapshot.currentSheetTitle, { quiet: true })
+              : Promise.resolve(true);
+            return selectSheet.then(function () {
+              setSpreadsheetViewMode(snapshot.spreadsheetViewMode || "groups");
+              saveStoredUiSession();
+              return true;
+            });
+          }).catch(function (err) {
+            console.warn("No se ha podido restaurar el spreadsheet abierto:", err);
+            return false;
+          });
+        }
+        if (snapshot.activeDocumentType === "form" && snapshot.formId) {
+          return fetchDriveFileMeta(snapshot.formId).then(function (item) {
+            return openForm({
+              id: item.id,
+              name: item.name || snapshot.formTitle || "Formulario"
+            });
+          }).then(function () {
+            saveStoredUiSession();
+            return true;
+          }).catch(function (err) {
+            console.warn("No se ha podido restaurar el formulario abierto:", err);
+            return false;
+          });
+        }
+      }
+      if (snapshot.activePaellaStack && snapshot.activePaellaStack.length) {
+        return loadPaellaFolder(snapshot.activePaellaStack[snapshot.activePaellaStack.length - 1].id, snapshot.activePaellaStack).then(function () {
+          saveStoredUiSession();
+          return true;
+        }).catch(function (err) {
+          console.warn("No se ha podido restaurar la paella abierta:", err);
+          return false;
+        });
+      }
+      if (snapshot.activeDireccionStack && snapshot.activeDireccionStack.length) {
+        return loadDireccionFolder(snapshot.activeDireccionStack[snapshot.activeDireccionStack.length - 1].id, snapshot.activeDireccionStack).then(function () {
+          saveStoredUiSession();
+          return true;
+        }).catch(function (err) {
+          console.warn("No se ha podido restaurar la carpeta de direccion abierta:", err);
+          return false;
+        });
+      }
+      if (snapshot.folderStack && snapshot.folderStack.length) {
+        state.folderStack = cloneFolderStack(snapshot.folderStack);
+        const current = state.folderStack[state.folderStack.length - 1] || { id: "root" };
+        return loadFolder(current.id).then(function () {
+          saveStoredUiSession();
+          return true;
+        }).catch(function (err) {
+          console.warn("No se ha podido restaurar la carpeta de Drive abierta:", err);
+          return false;
+        });
+      }
+      return Promise.resolve(false);
     }
     function restoreStoredSession() {
       if (state.sessionRestoreInFlight) {
@@ -4632,11 +4772,16 @@
         scheduleTokenRefresh();
       }
       if (!hasUsableAccessToken(0) && shouldDeferAutomaticAuthLoop()) {
-        clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-        renderProfileMenu();
+        const waitMs = Math.max(600, recentAutomaticAuthRemainingMs() + 120);
         showView("login");
-        setLoginStatus("Pulsa Entrar con Google para continuar.");
-        return Promise.resolve(false);
+        setLoginStatus("Recuperando sesion...");
+        state.sessionRestoreInFlight = new Promise(function (resolve) {
+          setTimeout(function () {
+            state.sessionRestoreInFlight = null;
+            restoreStoredSession().then(resolve);
+          }, waitMs);
+        });
+        return state.sessionRestoreInFlight;
       }
       const restoreWork = hasUsableAccessToken(0)
         ? Promise.resolve()
@@ -5987,6 +6132,7 @@
       }
       syncSheetViewToggle();
       syncEditorSurface();
+      saveStoredUiSession();
       if (state.spreadsheetViewMode === "groups") {
         renderSheetGroupsView();
       }
@@ -8207,6 +8353,7 @@
       if (name !== "drive") closeProfileMenu();
       if (name !== "editor") closePresencePopup();
       if (name !== "editor") closeFormLinkModal();
+      if (name !== "login") saveStoredUiSession();
     }
     function escapeHtml(value) {
       return String(value || "")
@@ -10880,6 +11027,7 @@
       renderPaellaAccessAvatars([]);
       closePaellaAccessPopup();
       renderPaellas();
+      saveStoredUiSession();
     }
     function openDireccionFolder(item) {
       if (!item || !item.id) return;
@@ -10901,6 +11049,7 @@
       state.activeDireccionItems = [];
       state.activeDireccionLoadError = "";
       renderDireccion();
+      saveStoredUiSession();
     }
     function loadDireccion() {
       if (!state.accessToken) {
@@ -10949,6 +11098,7 @@
         state.activeDireccionItems = data.files || [];
         state.activeDireccionLoadError = "";
         renderDireccion();
+        saveStoredUiSession();
         return state.activeDireccionItems;
       }).catch(function (err) {
         console.error(err);
@@ -11269,6 +11419,7 @@
           els.folderMeta.textContent = state.folderStack[state.folderStack.length - 1].name;
           setDriveStatus("");
           renderSharedItems();
+          saveStoredUiSession();
         })
         .catch(function (err) {
           console.error(err);
@@ -11302,6 +11453,7 @@
         state.activePaellaLoadError = "";
         return refreshActivePaellaPermissions().then(function () {
           renderPaellas();
+          saveStoredUiSession();
           return state.activePaellaItems;
         });
       }).catch(function (err) {
@@ -11490,6 +11642,7 @@
           });
           renderTabs();
           renderGrid();
+          saveStoredUiSession();
           if (!config.skipDirtyState) refreshDirtyState();
           if (state.spreadsheetViewMode === "groups" && isCurrentSheetPaellaResponseSheet()) {
             return renderSheetGroupsView().then(function () { return true; });
@@ -11575,11 +11728,13 @@
       setFormSyncStatus("", "");
       syncEditorTitle();
       applyEditorMode();
+      saveStoredUiSession();
       return loadFormMeta(item.id)
         .then(function () {
           if (!state.canEdit) state.editorMode = "read";
           applyEditorMode();
           refreshDirtyState();
+          saveStoredUiSession();
           startCollabPolling();
         })
         .catch(function (err) {
@@ -11654,6 +11809,7 @@
       renderPresenceAvatars([]);
       syncEditorTitle();
       applyEditorMode();
+      saveStoredUiSession();
       return loadSpreadsheetMeta(item.id)
         .then(function (meta) {
           if (!state.spreadsheetSheets.length) {
@@ -11663,6 +11819,7 @@
           if (!state.canEdit) state.editorMode = "read";
           applyEditorMode();
           refreshDirtyState();
+          saveStoredUiSession();
           return loadSheet(state.currentSheetTitle || state.spreadsheetSheets[0].title).then(function () {
             startCollabPolling();
           });
@@ -12432,6 +12589,7 @@
           google.accounts.oauth2.revoke(state.accessToken, function () {});
         }
         clearAccessTokenState();
+        clearStoredUiSession();
         state.currentUser = null;
         state.folderStack = [{ id: "root", name: "Mi unidad" }];
         state.currentItems = [];
@@ -13102,6 +13260,7 @@
       if (state.activeItemMenu) closeItemActionMenu();
     }, true);
     function handleSessionPageExit() {
+      saveStoredUiSession();
       stopCollabPolling();
       closePresencePopup();
       clearPresence();
