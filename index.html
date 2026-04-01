@@ -3742,14 +3742,15 @@
       clearTokenRefreshTimer();
       const retryDelay = Math.max(1000, Number(retryDelayMs) || 0);
       if (!state.accessToken || !state.accessTokenExpiresAt) {
-        if (!retryDelay || !getAuthLoginHint()) return;
+        if (!retryDelay || !getAuthLoginHint() || shouldDeferAutomaticAuthLoop()) return;
         const silentCooldown = silentAuthRetryRemainingMs();
         state.tokenRefreshTimer = window.setTimeout(function () {
+          if (shouldDeferAutomaticAuthLoop()) return;
           restoreGoogleSessionSilently().catch(function (err) {
             console.warn("No se ha podido reactivar la sesion en segundo plano:", err);
             clearAccessTokenState({ keepUser: true, keepStoredSession: true });
             renderProfileMenu();
-            scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
+            if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
           });
         }, Math.max(retryDelay, silentCooldown));
         return;
@@ -3759,6 +3760,7 @@
         silentAuthRetryRemainingMs()
       );
       state.tokenRefreshTimer = window.setTimeout(function () {
+        if (shouldDeferAutomaticAuthLoop()) return;
         refreshAccessTokenSilently().catch(function (err) {
           console.warn("No se ha podido renovar el token en segundo plano:", err);
           if (hasUsableAccessToken(0)) {
@@ -3767,7 +3769,7 @@
           }
           clearAccessTokenState({ keepUser: true, keepStoredSession: true });
           renderProfileMenu();
-          scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
+          if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
           if (!els.loginView.classList.contains("hidden")) setLoginStatus("Reconectando con Google...");
         });
       }, refreshIn);
@@ -3881,7 +3883,7 @@
         }
         clearAccessTokenState({ keepUser: true, keepStoredSession: true });
         renderProfileMenu();
-        scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
+        if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
         throw err;
       });
     }
@@ -3908,10 +3910,12 @@
       state.accessTokenExpiresAt = stored.expiresAt || 0;
       renderProfileMenu();
       setLoginStatus("Recuperando sesion...");
-      if (state.accessToken) {
+      if (hasUsableAccessToken(0)) {
         scheduleTokenRefresh();
       }
       if (!hasUsableAccessToken(0) && shouldDeferAutomaticAuthLoop()) {
+        clearAccessTokenState({ keepUser: true, keepStoredSession: true });
+        renderProfileMenu();
         showView("login");
         setLoginStatus("Pulsa Entrar con Google para continuar.");
         return Promise.resolve(false);
@@ -6563,6 +6567,9 @@
           if (shouldSuppressAutomaticAuth()) {
             throw new Error("Reconexion automatica suprimida tras un login reciente.");
           }
+          if (shouldDeferAutomaticAuthLoop()) {
+            throw new Error("Auto OAuth pausado para evitar un bucle de reautenticacion.");
+          }
           clearAccessTokenState({ keepUser: true, keepStoredSession: true });
           await restoreGoogleSessionSilently();
           init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
@@ -6570,7 +6577,7 @@
         } catch (err) {
           if (!hasUsableAccessToken(0)) {
             clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-            scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
+            if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
             renderProfileMenu();
           }
         }
