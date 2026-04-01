@@ -2533,13 +2533,27 @@
       min-width: 0;
     }
     .ticket-reader-card {
-      width: min(960px, 100%);
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
       position: relative;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      padding: 18px;
+    }
+    #ticketReaderModal {
+      padding: 0;
+      background: rgba(34, 21, 5, 0.42);
     }
     .ticket-reader-body {
       display: grid;
       gap: 14px;
       min-width: 0;
+      min-height: 0;
+      align-content: start;
+      grid-template-rows: auto auto minmax(0, 1fr);
     }
     .ticket-reader-controls {
       display: flex;
@@ -2591,13 +2605,15 @@
       display: grid;
       gap: 8px;
       align-content: start;
-      max-height: min(42vh, 420px);
+      max-height: none;
+      min-height: 0;
       overflow: auto;
+      padding-right: 4px;
     }
     .ticket-reader-review-overlay {
       position: absolute;
       inset: 0;
-      border-radius: inherit;
+      border-radius: 0;
       background: rgba(34, 24, 11, 0.44);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
@@ -2607,14 +2623,14 @@
       z-index: 3;
     }
     .ticket-reader-review-card {
-      width: min(540px, 100%);
+      width: min(760px, 100%);
       border: 1px solid rgba(185, 90, 0, 0.14);
-      border-radius: 20px;
+      border-radius: 26px;
       background: rgba(255, 253, 248, 0.98);
       box-shadow: 0 24px 60px rgba(68, 40, 10, 0.22), 0 4px 16px rgba(68, 40, 10, 0.08);
-      padding: 20px;
+      padding: 22px;
       display: grid;
-      gap: 16px;
+      gap: 18px;
       min-width: 0;
     }
     .ticket-reader-review-card.is-warning {
@@ -2638,38 +2654,85 @@
     }
     .ticket-reader-review-grid {
       display: grid;
-      gap: 6px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
       min-width: 0;
     }
-    .ticket-reader-review-field {
+    .ticket-reader-review-state {
       display: grid;
-      gap: 3px;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
       min-width: 0;
-      padding: 8px 10px;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255, 248, 230, 0.6);
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 238, 196, 0.78);
     }
-    .ticket-reader-review-card.is-warning .ticket-reader-review-field {
-      background: rgba(255, 235, 235, 0.5);
+    .ticket-reader-review-state.is-fresh {
+      background: rgba(218, 247, 227, 0.92);
+      color: #1f7138;
     }
-    .ticket-reader-review-field-label {
-      font-size: 0.66rem;
+    .ticket-reader-review-state.is-warning {
+      background: rgba(255, 228, 228, 0.96);
+      color: #9d3f3f;
+    }
+    .ticket-reader-review-state-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.68);
+      font-size: 1.7rem;
+    }
+    .ticket-reader-review-state-copy {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+    .ticket-reader-review-state-title {
+      font-size: 1.12rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+    .ticket-reader-review-state-text {
+      font-size: 0.9rem;
+      line-height: 1.35;
+      color: inherit;
+      opacity: 0.92;
+    }
+    .ticket-reader-review-details {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .ticket-reader-review-row {
+      display: grid;
+      grid-template-columns: minmax(110px, 140px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 10px 0;
+      border-top: 1px solid rgba(185, 90, 0, 0.1);
+    }
+    .ticket-reader-review-row:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    .ticket-reader-review-row-label {
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-weight: 700;
     }
-    .ticket-reader-review-field-value {
-      font-size: 0.88rem;
-      line-height: 1.3;
+    .ticket-reader-review-row-value {
+      font-size: 0.98rem;
+      line-height: 1.35;
       word-break: break-word;
       font-weight: 600;
     }
     .ticket-reader-review-actions {
       display: flex;
-      justify-content: center;
+      justify-content: flex-end;
       gap: 8px;
       flex-wrap: wrap;
     }
@@ -2920,6 +2983,7 @@
       .sheet-bar { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
       .modal-card { padding: 16px; max-height: 90vh; }
       .modal-overlay { padding: 10px; }
+      .ticket-reader-card { padding: 16px; max-height: none; border-radius: 0; }
       .editor-head-top {
         display: flex;
         flex-wrap: wrap;
@@ -2958,7 +3022,6 @@
       .ticket-reader-controls { grid-template-columns: 1fr; }
       .ticket-reader-actions { justify-content: flex-start; }
       .sheet-person-ticket-grid { grid-template-columns: 1fr 1fr; }
-      .ticket-reader-review-grid { grid-template-columns: 1fr 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
       .paired-file-card {
         min-height: 48px;
@@ -3184,9 +3247,12 @@
       .sheet-group-block.responsible .sheet-group-field-list {
         grid-template-columns: 1fr;
       }
-      .sheet-person-ticket-grid,
-      .ticket-reader-review-grid {
+      .sheet-person-ticket-grid {
         grid-template-columns: 1fr;
+      }
+      .ticket-reader-review-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
       }
       .linked-pair-card { padding: 0; gap: 0; }
       .linked-pair-grid { grid-template-columns: 1fr; }
@@ -3259,6 +3325,12 @@
         padding: 14px;
         border-radius: 16px;
       }
+      .ticket-reader-card {
+        max-height: none;
+        height: 100%;
+        padding: 14px;
+        border-radius: 0;
+      }
       .share-popup { width: min(400px, 96%); }
       .doc-title { font-size: 1rem; min-height: 32px; }
       .editor-card { gap: 10px; }
@@ -3324,6 +3396,7 @@
       .item-row { gap: 6px; }
       .paella-card { padding: 8px; gap: 6px; }
       .modal-card { padding: 12px; border-radius: 14px; }
+      .ticket-reader-card { padding: 12px; border-radius: 0; }
       .crumb, .tab { padding: 4px 8px; font-size: 0.74rem; }
       .search { padding: 7px 10px; font-size: 0.82rem; }
       .btn.small, .sheet-tool-btn { min-height: 36px; padding: 5px 10px; font-size: 0.78rem; }
@@ -6711,6 +6784,23 @@
       });
       return people;
     }
+    function getEffectiveTicketReaderModel() {
+      const activeModel = currentSheetGroupsModel();
+      if (
+        activeModel &&
+        state.spreadsheetId &&
+        state.ticketReader.spreadsheetId &&
+        state.spreadsheetId === state.ticketReader.spreadsheetId &&
+        state.currentSheetTitle &&
+        state.ticketReader.sheetTitle &&
+        state.currentSheetTitle === state.ticketReader.sheetTitle
+      ) {
+        const rebuilt = rebuildCurrentSheetGroupsModel() || activeModel;
+        state.ticketReader.model = rebuilt;
+        return rebuilt;
+      }
+      return state.ticketReader.model || null;
+    }
     function findReaderPersonByIdentity(model, spreadsheetId, identity) {
       if (!identity) return null;
       const people = buildReaderPeopleList(model, spreadsheetId);
@@ -6906,7 +6996,7 @@
       return markTicketPersonEntered(results[0]).then(function () { return true; });
     }
     function searchTicketReaderPeople(query) {
-      const model = state.ticketReader.model;
+      const model = getEffectiveTicketReaderModel();
       if (!model) return [];
       const people = buildReaderPeopleList(model, state.ticketReader.spreadsheetId);
       const payload = decodeTicketPayload(query);
@@ -6934,20 +7024,15 @@
       });
     }
     function refreshTicketReaderModel() {
+      const effectiveModel = getEffectiveTicketReaderModel();
+      if (effectiveModel) return Promise.resolve(effectiveModel);
       if (!state.ticketReader.spreadsheetId) return Promise.resolve(null);
       return loadTicketReaderSheet(state.ticketReader.spreadsheetId, state.ticketReader.sheetTitle);
     }
-    function createTicketReaderReviewField(labelText, valueText) {
-      const field = document.createElement("div");
-      field.className = "ticket-reader-review-field";
-      field.innerHTML =
-        "<div class='ticket-reader-review-field-label'>" + escapeHtml(labelText) + "</div>" +
-        "<div class='ticket-reader-review-field-value'>" + escapeHtml(valueText || "-") + "</div>";
-      return field;
-    }
     function resolveTicketReaderPerson(person) {
-      if (!person || !state.ticketReader.spreadsheetId) return null;
-      return findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, {
+      const model = getEffectiveTicketReaderModel();
+      if (!person || !state.ticketReader.spreadsheetId || !model) return person || null;
+      return findReaderPersonByIdentity(model, state.ticketReader.spreadsheetId, {
         code: person.code,
         row: person.sheetRow,
         role: person.role,
@@ -6970,31 +7055,42 @@
         els.ticketReaderReviewTitle.textContent = alreadyEntered ? "Entrada ya validada" : "Revisar entrada";
       }
       if (els.ticketReaderReviewSubtitle) {
-        els.ticketReaderReviewSubtitle.textContent = latest.name || "Asistente";
+        els.ticketReaderReviewSubtitle.textContent = latest.groupTitle || "Grupo";
       }
       if (els.ticketReaderReviewGrid) {
-        els.ticketReaderReviewGrid.innerHTML = "";
         const normalizedStatus = normalizeEntryStatus(latest.status) || "Pendiente";
+        const stateClass = alreadyEntered ? "is-warning" : "is-fresh";
+        const stateIcon = alreadyEntered ? "⚠️" : "✅";
+        const stateTitle = alreadyEntered ? "Esta entrada ya fue validada" : "Entrada lista para validar";
+        const stateText = alreadyEntered
+          ? ("Acceso anterior: " + (latest.scannedAt || "Hora desconocida"))
+          : "Revisa los datos y confirma antes de marcar HA ENTRADO.";
+        const details = [
+          ["Nombre", latest.name || "Asistente"],
+          ["Grupo", latest.groupTitle || "Grupo"],
+          ["Estado", normalizedStatus],
+          ["Codigo", latest.code || "-"],
+          ["DNI", latest.dni || "-"],
+          ["Telefono", latest.phone || "-"],
+          ["Email", latest.email || "-"],
+          ["Entrada", latest.info || "-"],
+          ["Ultimo acceso", latest.scannedAt || "Sin registrar"]
+        ].map(function (entry) {
+          return "<div class='ticket-reader-review-row'>" +
+            "<div class='ticket-reader-review-row-label'>" + escapeHtml(entry[0]) + "</div>" +
+            "<div class='ticket-reader-review-row-value'>" + escapeHtml(entry[1]) + "</div>" +
+          "</div>";
+        }).join("");
         const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
-        const statusHtml = "<span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus) + "</span>";
-
-        [
-          ["Grupo", escapeHtml(latest.groupTitle || "Grupo"), true],
-          ["Codigo", escapeHtml(latest.code || ""), true],
-          ["DNI", escapeHtml(latest.dni || ""), true],
-          ["Telefono", escapeHtml(latest.phone || ""), true],
-          ["Email", escapeHtml(latest.email || ""), true],
-          ["Entrada", escapeHtml(latest.info || ""), true],
-          ["Estado", statusHtml, false],
-          ["Ultimo acceso", escapeHtml(latest.scannedAt || "Sin registrar"), true]
-        ].forEach(function (entry) {
-          if (!entry[1] && entry[0] !== "Ultimo acceso") return;
-          const field = document.createElement("div");
-          field.className = "ticket-reader-review-field";
-          field.innerHTML = "<div class='ticket-reader-review-field-label'>" + escapeHtml(entry[0]) + "</div>" +
-            "<div class='ticket-reader-review-field-value'>" + (entry[2] ? entry[1] : entry[1]) + "</div>";
-          els.ticketReaderReviewGrid.appendChild(field);
-        });
+        els.ticketReaderReviewGrid.innerHTML =
+          "<div class='ticket-reader-review-state " + stateClass + "'>" +
+            "<div class='ticket-reader-review-state-icon' aria-hidden='true'>" + stateIcon + "</div>" +
+            "<div class='ticket-reader-review-state-copy'>" +
+              "<div class='ticket-reader-review-state-title'>" + escapeHtml(stateTitle) + "</div>" +
+              "<div class='ticket-reader-review-state-text'><span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus) + "</span> " + escapeHtml(stateText) + "</div>" +
+            "</div>" +
+          "</div>" +
+          "<div class='ticket-reader-review-details'>" + details + "</div>";
       }
       if (els.ticketReaderReviewConfirmBtn) {
         els.ticketReaderReviewConfirmBtn.disabled = false;
