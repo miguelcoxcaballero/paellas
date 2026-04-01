@@ -2000,52 +2000,149 @@
     }
     .sheet-groups-list {
       display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .sheet-groups-toolbar {
+      display: grid;
       gap: 12px;
       align-content: start;
+    }
+    .sheet-groups-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .sheet-groups-stat {
+      border: 1px solid rgba(185, 90, 0, 0.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.88);
+      padding: 12px;
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+    .sheet-groups-stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+    .sheet-groups-stat-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.15;
+      min-width: 0;
+    }
+    .sheet-groups-stat-meta {
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .sheet-groups-filters {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .sheet-groups-filter {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .sheet-groups-filter span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+    .sheet-groups-filter-select {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(185, 90, 0, 0.16);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.95);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      outline: none;
     }
     .sheet-group-card {
       border: 1px solid rgba(185, 90, 0, 0.14);
       border-radius: 18px;
       background: rgba(255,255,255,0.84);
-      box-shadow: 0 6px 20px rgba(145, 88, 8, 0.08);
-      padding: 14px;
-      display: grid;
-      gap: 12px;
+      overflow: hidden;
       min-width: 0;
+    }
+    .sheet-group-card[open] {
+      background: rgba(255,255,255,0.9);
+    }
+    .sheet-group-summary,
+    .sheet-assistant-summary {
+      list-style: none;
+    }
+    .sheet-group-summary::-webkit-details-marker,
+    .sheet-assistant-summary::-webkit-details-marker {
+      display: none;
+    }
+    .sheet-group-summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      cursor: pointer;
+    }
+    .sheet-group-summary-main {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
     }
     .sheet-group-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 8px;
+      min-width: 0;
     }
     .sheet-group-title {
       font-size: 1rem;
       font-weight: 800;
       line-height: 1.2;
+      min-width: 0;
+      word-break: break-word;
     }
     .sheet-group-meta {
       font-size: 0.8rem;
       color: var(--muted);
       line-height: 1.35;
-      margin-top: 4px;
+    }
+    .sheet-group-responsible-line {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.35;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .sheet-group-chips {
       display: flex;
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
     .sheet-group-chip {
       display: inline-flex;
       align-items: center;
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 999px;
       background: rgba(255, 236, 190, 0.78);
       color: #8a5211;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
       line-height: 1;
     }
@@ -2061,10 +2158,40 @@
       background: rgba(255, 223, 223, 0.92);
       color: #a23d3d;
     }
+    .sheet-group-summary-side {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      align-self: start;
+      flex: 0 0 auto;
+    }
+    .sheet-group-chevron {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(185, 90, 0, 0.14);
+      background: rgba(255, 247, 225, 0.92);
+      color: #8a5211;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: transform .2s ease;
+    }
+    .sheet-group-card[open] .sheet-group-chevron,
+    .sheet-assistant-item[open] .sheet-group-chevron {
+      transform: rotate(180deg);
+    }
+    .sheet-group-body {
+      display: grid;
+      gap: 10px;
+      padding: 0 14px 14px;
+      border-top: 1px solid rgba(185, 90, 0, 0.1);
+    }
     .sheet-group-sections {
       display: grid;
-      grid-template-columns: minmax(240px, 1fr) minmax(260px, 1fr);
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 10px;
       min-width: 0;
     }
     .sheet-group-block {
@@ -2073,7 +2200,7 @@
       background: rgba(255, 251, 238, 0.85);
       padding: 12px;
       display: grid;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
     }
     .sheet-group-block.assistants {
@@ -2087,7 +2214,7 @@
       flex-wrap: wrap;
     }
     .sheet-group-block-title {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -2119,12 +2246,12 @@
     }
     .sheet-group-field-list {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
     }
     .sheet-group-field {
       display: grid;
-      gap: 5px;
+      gap: 4px;
       min-width: 0;
     }
     .sheet-group-field-label {
@@ -2171,7 +2298,7 @@
     }
     .sheet-group-inline-grid {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       min-width: 0;
     }
@@ -2222,32 +2349,51 @@
       color: var(--muted);
       line-height: 1.35;
     }
+    .sheet-group-inline-grid.triple {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     .sheet-assistants-list {
       display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      grid-template-columns: 1fr;
       min-width: 0;
     }
-    .sheet-assistant-card {
+    .sheet-assistant-item {
       border: 1px solid rgba(185, 90, 0, 0.12);
       border-radius: 12px;
       background: rgba(255,255,255,0.88);
-      padding: 10px 12px;
-      display: grid;
-      gap: 8px;
+      overflow: hidden;
       min-width: 0;
     }
-    .sheet-assistant-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .sheet-assistant-summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    .sheet-assistant-summary-main {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
     }
     .sheet-assistant-name {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
       line-height: 1.2;
-      word-break: break-word;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sheet-assistant-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .sheet-assistant-badge {
       display: inline-flex;
@@ -2263,9 +2409,16 @@
       font-weight: 700;
       flex: 0 0 auto;
     }
+    .sheet-assistant-body {
+      display: grid;
+      gap: 8px;
+      padding: 0 12px 12px;
+      border-top: 1px solid rgba(185, 90, 0, 0.1);
+    }
     .sheet-assistant-fields {
       display: grid;
       gap: 8px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       min-width: 0;
     }
     .sheet-spacer {
@@ -2477,6 +2630,8 @@
       .linked-pair-grid { grid-template-columns: 1fr; }
       .sheet-group-sections { grid-template-columns: 1fr; }
       .sheet-group-inline-grid { grid-template-columns: 1fr; }
+      .sheet-assistant-fields { grid-template-columns: 1fr; }
+      .sheet-groups-filters { grid-template-columns: 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
       .paired-file-card {
         min-height: 48px;
@@ -2675,6 +2830,29 @@
         overflow: hidden;
       }
       .paired-item-kind { font-size: 0.62rem; padding: 2px 6px; }
+      .sheet-group-summary,
+      .sheet-assistant-summary {
+        padding: 10px;
+      }
+      .sheet-group-body {
+        padding: 0 10px 10px;
+      }
+      .sheet-group-card,
+      .sheet-group-block,
+      .sheet-assistant-item {
+        border-radius: 12px;
+      }
+      .sheet-groups-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .sheet-group-responsible-line,
+      .sheet-assistant-name,
+      .sheet-assistant-meta {
+        white-space: normal;
+      }
+      .sheet-assistant-fields {
+        grid-template-columns: 1fr;
+      }
       .linked-pair-card { padding: 0; gap: 0; }
       .linked-pair-grid { grid-template-columns: 1fr; }
       .linked-pair-link {
@@ -2983,6 +3161,39 @@
         </div>
         <div id="sheetGroupsView" class="sheet-groups-view hidden-panel">
           <div id="sheetGroupsStatus" class="status"></div>
+          <div id="sheetGroupsToolbar" class="sheet-groups-toolbar hidden">
+            <div id="sheetGroupsStats" class="sheet-groups-stats"></div>
+            <div class="sheet-groups-filters">
+              <label class="sheet-groups-filter">
+                <span>Pago</span>
+                <select id="sheetGroupsPaymentFilter" class="sheet-groups-filter-select">
+                  <option value="all">Todos</option>
+                  <option value="paid">Pagados</option>
+                  <option value="partial">Parciales</option>
+                  <option value="pending">Pendientes</option>
+                </select>
+              </label>
+              <label class="sheet-groups-filter">
+                <span>Punto de fuego</span>
+                <select id="sheetGroupsFireFilter" class="sheet-groups-filter-select">
+                  <option value="all">Todos</option>
+                  <option value="any">Con punto de fuego</option>
+                  <option value="paella">🥘 Paella</option>
+                  <option value="torra">🔥 Torrá</option>
+                  <option value="shared">🤝 Compartido</option>
+                  <option value="no">❌ No</option>
+                </select>
+              </label>
+              <label class="sheet-groups-filter">
+                <span>Concurso</span>
+                <select id="sheetGroupsContestFilter" class="sheet-groups-filter-select">
+                  <option value="all">Todos</option>
+                  <option value="yes">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </label>
+            </div>
+          </div>
           <div id="sheetGroupsList" class="sheet-groups-list"></div>
           <div id="sheetGroupsEmpty" class="form-empty hidden">No hay grupos para mostrar en esta hoja.</div>
         </div>
@@ -3423,6 +3634,13 @@
       sheetGroupLoadToken: 0,
       sheetGroupsModel: null,
       sheetGroupsDraftSlots: {},
+      sheetGroupsExpanded: {},
+      sheetGroupAssistantExpanded: {},
+      sheetGroupsFilters: {
+        payment: "all",
+        fire: "all",
+        contest: "all"
+      },
       formId: "",
       formTitle: "",
       savedFormTitle: "",
@@ -3577,6 +3795,11 @@
       sheetGroupsStatus: document.getElementById("sheetGroupsStatus"),
       sheetGroupsList: document.getElementById("sheetGroupsList"),
       sheetGroupsEmpty: document.getElementById("sheetGroupsEmpty"),
+      sheetGroupsToolbar: document.getElementById("sheetGroupsToolbar"),
+      sheetGroupsStats: document.getElementById("sheetGroupsStats"),
+      sheetGroupsPaymentFilter: document.getElementById("sheetGroupsPaymentFilter"),
+      sheetGroupsFireFilter: document.getElementById("sheetGroupsFireFilter"),
+      sheetGroupsContestFilter: document.getElementById("sheetGroupsContestFilter"),
       formEditor: document.getElementById("formEditor"),
       formViewSwitch: document.getElementById("formViewSwitch"),
       formViewMainBtn: document.getElementById("formViewMainBtn"),
@@ -4364,8 +4587,10 @@
           type: "choice",
           required: true,
           options: [
-            "Si, para paella",
-            "Comparto punto de fuego con otro grupo"
+            "🥘 Sí, para paella",
+            "🔥 Sí, para torrá",
+            "🤝 Comparto punto de fuego con otro grupo",
+            "❌ No"
           ]
         }),
         createPaellaTemplateQuestion({
@@ -5426,6 +5651,138 @@
       if (normalized === "parcial" || normalized === "a medias" || normalized === "medio pagado") return "Parcial";
       return raw;
     }
+    function normalizeFirePointValue(value) {
+      const raw = String(value || "").trim();
+      const normalized = normalizeCompareText(raw);
+      if (!normalized) return "";
+      if (normalized === "no" || normalized === "x" || normalized === "no tiene") return "❌ No";
+      if (normalized.indexOf("torra") !== -1 || normalized.indexOf("barbacoa") !== -1) return "🔥 Sí, para torrá";
+      if (normalized.indexOf("comparto") !== -1 || normalized.indexOf("otro grupo") !== -1) return "🤝 Comparto punto de fuego con otro grupo";
+      if (normalized.indexOf("paella") !== -1 || normalized === "si" || normalized === "sí") return "🥘 Sí, para paella";
+      return raw;
+    }
+    function firePointFilterKey(value) {
+      const normalized = normalizeCompareText(String(value || ""));
+      if (!normalized) return "none";
+      if (normalized.indexOf("torra") !== -1 || normalized.indexOf("barbacoa") !== -1) return "torra";
+      if (normalized.indexOf("comparto") !== -1 || normalized.indexOf("otro grupo") !== -1) return "shared";
+      if (normalized.indexOf("paella") !== -1) return "paella";
+      if (normalized === "no" || normalized.indexOf("❌") !== -1) return "no";
+      return "other";
+    }
+    function normalizeYesNoValue(value) {
+      const raw = String(value || "").trim();
+      const normalized = normalizeCompareText(raw);
+      if (!normalized) return "";
+      if (normalized === "si" || normalized === "sí") return "Sí";
+      if (normalized === "no") return "No";
+      return raw;
+    }
+    function parseSheetTimestamp(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const directDate = new Date(raw);
+      if (!Number.isNaN(directDate.getTime())) {
+        return directDate.toLocaleString("es-ES");
+      }
+      const match = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(raw);
+      if (!match) return raw;
+      const day = Number(match[1]);
+      const month = Number(match[2]) - 1;
+      const year = Number(match[3].length === 2 ? ("20" + match[3]) : match[3]);
+      const hours = Number(match[4] || 0);
+      const minutes = Number(match[5] || 0);
+      const seconds = Number(match[6] || 0);
+      const parsed = new Date(year, month, day, hours, minutes, seconds);
+      if (Number.isNaN(parsed.getTime())) return raw;
+      return parsed.toLocaleString("es-ES");
+    }
+    function parseEuroAmount(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return 0;
+      let normalized = raw.replace(/\s+/g, "").replace(/€/g, "");
+      if (normalized.indexOf(",") !== -1 && normalized.indexOf(".") !== -1) {
+        normalized = normalized.replace(/\./g, "").replace(",", ".");
+      } else if (normalized.indexOf(",") !== -1) {
+        normalized = normalized.replace(",", ".");
+      } else {
+        const dotParts = normalized.split(".");
+        if (dotParts.length > 2) {
+          const decimal = dotParts.pop();
+          normalized = dotParts.join("") + "." + decimal;
+        }
+      }
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    function formatEuroAmount(value) {
+      const number = Number(value) || 0;
+      return number.toLocaleString("es-ES", { style: "currency", currency: "EUR" });
+    }
+    function renderSheetGroupsToolbar(model, filteredGroups) {
+      const groups = Array.isArray(model && model.groups) ? model.groups : [];
+      const visible = Array.isArray(filteredGroups) ? filteredGroups : groups;
+      if (!els.sheetGroupsToolbar || !els.sheetGroupsStats || !els.sheetGroupsPaymentFilter || !els.sheetGroupsFireFilter || !els.sheetGroupsContestFilter) return;
+      const totalAttendees = groups.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
+      const filteredAttendees = visible.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
+      const totalRevenue = groups.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
+      const filteredRevenue = visible.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
+      els.sheetGroupsToolbar.classList.toggle("hidden", !groups.length);
+      if (!groups.length) {
+        els.sheetGroupsStats.innerHTML = "";
+        return;
+      }
+      els.sheetGroupsPaymentFilter.value = state.sheetGroupsFilters.payment || "all";
+      els.sheetGroupsFireFilter.value = state.sheetGroupsFilters.fire || "all";
+      els.sheetGroupsContestFilter.value = state.sheetGroupsFilters.contest || "all";
+      const stats = [
+        { label: "Dinero recaudado", value: formatEuroAmount(filteredRevenue), meta: "Total global: " + formatEuroAmount(totalRevenue) },
+        { label: "Grupos visibles", value: String(visible.length), meta: "Total: " + String(groups.length) },
+        { label: "Asistentes visibles", value: String(filteredAttendees), meta: "Total: " + String(totalAttendees) },
+        {
+          label: "Pagados",
+          value: String(visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === "Pagado"; }).length),
+          meta: "Pendientes visibles: " + String(visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === "Pendiente"; }).length)
+        }
+      ];
+      els.sheetGroupsStats.innerHTML = stats.map(function (stat) {
+        return "<div class='sheet-groups-stat'>" +
+          "<div class='sheet-groups-stat-label'>" + escapeHtml(stat.label) + "</div>" +
+          "<div class='sheet-groups-stat-value'>" + escapeHtml(stat.value) + "</div>" +
+          "<div class='sheet-groups-stat-meta'>" + escapeHtml(stat.meta) + "</div>" +
+        "</div>";
+      }).join("");
+    }
+    function filterSheetGroups(groups) {
+      const filters = state.sheetGroupsFilters || {};
+      return (groups || []).filter(function (group) {
+        const paymentStatus = normalizePaymentStatus(group.payment && group.payment.status);
+        const fireKey = firePointFilterKey(group.firePoint && group.firePoint.value);
+        const contestValue = normalizeYesNoValue(group.contest && group.contest.value);
+        if (filters.payment === "paid" && paymentStatus !== "Pagado") return false;
+        if (filters.payment === "partial" && paymentStatus !== "Parcial") return false;
+        if (filters.payment === "pending" && paymentStatus !== "Pendiente") return false;
+        if (filters.fire === "any" && (fireKey === "none" || fireKey === "no")) return false;
+        if (filters.fire === "paella" && fireKey !== "paella") return false;
+        if (filters.fire === "torra" && fireKey !== "torra") return false;
+        if (filters.fire === "shared" && fireKey !== "shared") return false;
+        if (filters.fire === "no" && fireKey !== "no" && fireKey !== "none") return false;
+        if (filters.contest === "yes" && contestValue !== "Sí") return false;
+        if (filters.contest === "no" && contestValue !== "No") return false;
+        return true;
+      });
+    }
+    function handleSheetGroupsFilterChange() {
+      state.sheetGroupsFilters.payment = els.sheetGroupsPaymentFilter ? (els.sheetGroupsPaymentFilter.value || "all") : "all";
+      state.sheetGroupsFilters.fire = els.sheetGroupsFireFilter ? (els.sheetGroupsFireFilter.value || "all") : "all";
+      state.sheetGroupsFilters.contest = els.sheetGroupsContestFilter ? (els.sheetGroupsContestFilter.value || "all") : "all";
+      rerenderSheetGroupsFromModel();
+    }
+    function sheetGroupsStatusText(model) {
+      const groups = Array.isArray(model && model.groups) ? model.groups : [];
+      if (!groups.length) return "Esta hoja no contiene respuestas agrupables.";
+      return "";
+    }
     function updateSheetGroupsModelCell(row, col, value) {
       const model = currentSheetGroupsModel();
       if (!model || !Number.isFinite(row) || !Number.isFinite(col)) return;
@@ -5500,8 +5857,17 @@
     }
     function ensurePaellaManagementHeaders() {
       const model = currentSheetGroupsModel();
-      if (!model || model.hasPaymentColumns) return Promise.resolve(false);
-      return ensureCurrentSheetHeaders(["Pago - estado", "Pago - quien paga"]).then(function () {
+      if (!model) return Promise.resolve(false);
+      const requiredLabels = [];
+      if (!Number.isInteger(model.headerIndex["pago - estado"])) requiredLabels.push("Pago - estado");
+      if (!Number.isInteger(model.headerIndex["pago - quien paga"]) && !Number.isInteger(model.headerIndex["pago - paga"])) {
+        requiredLabels.push("Pago - quien paga");
+      }
+      if (!Number.isInteger(model.headerIndex["pago - importe"]) && !Number.isInteger(model.headerIndex["pago - cantidad"]) && !Number.isInteger(model.headerIndex["pago - euros"])) {
+        requiredLabels.push("Pago - importe");
+      }
+      if (!requiredLabels.length) return Promise.resolve(false);
+      return ensureCurrentSheetHeaders(requiredLabels).then(function () {
         return true;
       });
     }
@@ -5557,6 +5923,7 @@
       input.className = "sheet-group-input" + (hasColumn && isCellDirty(state.currentSheetTitle, row, col) ? " is-dirty" : "");
       input.value = value || "";
       input.placeholder = options && options.placeholder ? options.placeholder : "";
+      if (options && options.inputMode) input.inputMode = options.inputMode;
       input.disabled = !state.canEdit || state.editorMode !== "edit" || !hasColumn;
       input.dataset.groupId = groupId;
       input.dataset.row = String(row);
@@ -5587,6 +5954,69 @@
       const openSlots = state.sheetGroupsDraftSlots[group.id] || [];
       return (group.assistantSlots || []).filter(function (slot) {
         return slot.filled || openSlots.indexOf(slot.number) !== -1;
+      });
+    }
+    function snapshotSheetGroupsOpenState() {
+      if (!els.sheetGroupsList) return;
+      const groupState = {};
+      const assistantState = {};
+      Array.prototype.forEach.call(els.sheetGroupsList.querySelectorAll(".sheet-group-card[data-group-id]"), function (item) {
+        const groupId = String(item.dataset.groupId || "");
+        if (groupId) groupState[groupId] = !!item.open;
+      });
+      Array.prototype.forEach.call(els.sheetGroupsList.querySelectorAll(".sheet-assistant-item[data-group-id][data-assistant-number]"), function (item) {
+        const groupId = String(item.dataset.groupId || "");
+        const number = String(item.dataset.assistantNumber || "");
+        if (groupId && number) assistantState[groupId + "::" + number] = !!item.open;
+      });
+      state.sheetGroupsExpanded = groupState;
+      state.sheetGroupAssistantExpanded = assistantState;
+    }
+    function isSheetGroupExpanded(groupId, index) {
+      if (Object.prototype.hasOwnProperty.call(state.sheetGroupsExpanded, groupId)) {
+        return !!state.sheetGroupsExpanded[groupId];
+      }
+      return index === 0;
+    }
+    function isSheetAssistantExpanded(groupId, assistantNumber, forceOpen) {
+      const key = String(groupId || "") + "::" + String(assistantNumber || "");
+      if (forceOpen) return true;
+      if (Object.prototype.hasOwnProperty.call(state.sheetGroupAssistantExpanded, key)) {
+        return !!state.sheetGroupAssistantExpanded[key];
+      }
+      return false;
+    }
+    function syncSheetGroupsInteractivity() {
+      const editing = state.editorMode === "edit" && state.canEdit;
+      if (!els.sheetGroupsView || state.spreadsheetViewMode !== "groups") return;
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-input, .sheet-group-select"), function (input) {
+        const col = Number(input.dataset.col);
+        const hasColumn = Number.isFinite(col) && col >= 0;
+        input.disabled = !editing || !hasColumn;
+      });
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='assistant-add']"), function (button) {
+        const col = Number(button.dataset.col);
+        const requiresColumn = button.dataset.groupAction === "payment-status";
+        button.disabled = !editing || (requiresColumn && (!Number.isFinite(col) || col < 0));
+      });
+    }
+    function ensureSheetGroupsManagementColumnsForEditing() {
+      if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups" || !isCurrentSheetPaellaResponseSheet()) {
+        return Promise.resolve(false);
+      }
+      return ensurePaellaManagementHeaders().then(function (changed) {
+        if (!changed) {
+          syncSheetGroupsInteractivity();
+          return false;
+        }
+        rebuildCurrentSheetGroupsModel();
+        rerenderSheetGroupsFromModel();
+        syncSheetGroupsInteractivity();
+        return true;
+      }).catch(function (err) {
+        console.error(err);
+        setSheetGroupsStatus(messageFromError(err, "No se pudieron preparar las columnas de gestion"), "error");
+        return false;
       });
     }
     function buildPaellaGroupsFromSheetRows(rows) {
@@ -5628,7 +6058,12 @@
       const paymentPayerCol = Number.isInteger(headerIndex["pago - quien paga"])
         ? headerIndex["pago - quien paga"]
         : (Number.isInteger(headerIndex["pago - paga"]) ? headerIndex["pago - paga"] : -1);
-      baseModel.hasPaymentColumns = paymentStatusCol >= 0 && paymentPayerCol >= 0;
+      const paymentAmountCol = Number.isInteger(headerIndex["pago - importe"])
+        ? headerIndex["pago - importe"]
+        : (Number.isInteger(headerIndex["pago - cantidad"])
+          ? headerIndex["pago - cantidad"]
+          : (Number.isInteger(headerIndex["pago - euros"]) ? headerIndex["pago - euros"] : -1));
+      baseModel.hasPaymentColumns = paymentStatusCol >= 0 && paymentPayerCol >= 0 && paymentAmountCol >= 0;
       baseModel.groups = sheetRows.slice(1).map(function (row, rowIndex) {
         const values = header.map(function (_, index) { return String(row[index] || "").trim(); });
         if (!values.some(Boolean)) return null;
@@ -5659,12 +6094,8 @@
         const assistants = assistantSlots.filter(function (assistant) {
           return assistant.filled;
         });
-        const submittedRaw = valueAt(values, headerIndex["submittedat"]);
-        let submittedAt = submittedRaw;
-        if (submittedRaw) {
-          const parsedDate = new Date(submittedRaw);
-          if (!Number.isNaN(parsedDate.getTime())) submittedAt = parsedDate.toLocaleString("es-ES");
-        }
+        const submittedRaw = valueAt(values, Number.isInteger(headerIndex["submittedat"]) ? headerIndex["submittedat"] : headerIndex["timestamp"]);
+        const submittedAt = parseSheetTimestamp(submittedRaw);
         return {
           id: "group-" + rowIndex,
           sheetRow: rowIndex + 1,
@@ -5676,7 +6107,7 @@
           assistantSlots: assistantSlots,
           attendeeCount: 1 + assistants.length,
           firePoint: {
-            value: valueAt(values, headerIndex["paella - punto de fuego"]),
+            value: normalizeFirePointValue(valueAt(values, headerIndex["paella - punto de fuego"])),
             col: headerIndex["paella - punto de fuego"]
           },
           sharedLead: {
@@ -5684,14 +6115,16 @@
             col: headerIndex["paella - responsable del otro grupo"]
           },
           contest: {
-            value: valueAt(values, headerIndex["paella - participa en concurso"]),
+            value: normalizeYesNoValue(valueAt(values, headerIndex["paella - participa en concurso"])),
             col: headerIndex["paella - participa en concurso"]
           },
           payment: {
             status: normalizePaymentStatus(valueAt(values, paymentStatusCol)),
             payer: valueAt(values, paymentPayerCol),
+            amount: valueAt(values, paymentAmountCol),
             statusCol: paymentStatusCol,
-            payerCol: paymentPayerCol
+            payerCol: paymentPayerCol,
+            amountCol: paymentAmountCol
           }
         };
       }).filter(Boolean);
@@ -5759,6 +6192,7 @@
       setSheetGroupsStatus("Cargando grupos...", "");
       els.sheetGroupsList.innerHTML = "";
       els.sheetGroupsEmpty.classList.add("hidden");
+      if (els.sheetGroupsToolbar) els.sheetGroupsToolbar.classList.add("hidden");
       return fetchCurrentSheetRows().then(function (rows) {
         if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
         const groups = buildPaellaGroupsFromSheetRows(rows);
@@ -5770,25 +6204,46 @@
         if (requestId !== state.sheetGroupLoadToken) return false;
         els.sheetGroupsList.innerHTML = "";
         els.sheetGroupsEmpty.classList.remove("hidden");
+        if (els.sheetGroupsToolbar) els.sheetGroupsToolbar.classList.add("hidden");
         setSheetGroupsStatus(messageFromError(err, "No se han podido cargar los grupos"), "error");
         return false;
       });
     }
     function renderSheetGroupsList(groups) {
+      snapshotSheetGroupsOpenState();
       els.sheetGroupsList.innerHTML = "";
-      els.sheetGroupsEmpty.classList.toggle("hidden", (groups || []).length !== 0);
-      (groups || []).forEach(function (group) {
-        const card = document.createElement("article");
+      const filteredGroups = filterSheetGroups(groups || []);
+      renderSheetGroupsToolbar(currentSheetGroupsModel() || { groups: groups || [] }, filteredGroups);
+      if (els.sheetGroupsEmpty) {
+        els.sheetGroupsEmpty.textContent = (groups || []).length && !filteredGroups.length
+          ? "No hay grupos que cumplan los filtros actuales."
+          : "No hay grupos para mostrar en esta hoja.";
+        els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
+      }
+      (filteredGroups || []).forEach(function (group, index) {
+        const card = document.createElement("details");
         card.className = "sheet-group-card";
         card.dataset.groupId = group.id;
+        card.open = isSheetGroupExpanded(group.id, index);
+
+        const summary = document.createElement("summary");
+        summary.className = "sheet-group-summary";
+        const summaryMain = document.createElement("div");
+        summaryMain.className = "sheet-group-summary-main";
 
         const head = document.createElement("div");
         head.className = "sheet-group-head";
-        const titleWrap = document.createElement("div");
-        titleWrap.innerHTML =
-          "<div class='sheet-group-title'>" + escapeHtml(group.title) + "</div>" +
-          "<div class='sheet-group-meta'>" + escapeHtml(group.submittedAt || "Sin fecha de envio") + "</div>";
-        head.appendChild(titleWrap);
+        let headHtml = "<div class='sheet-group-title'>" + escapeHtml(group.title) + "</div>";
+        if (group.submittedAt) {
+          headHtml += "<div class='sheet-group-meta'>" + escapeHtml(group.submittedAt) + "</div>";
+        }
+        head.innerHTML = headHtml;
+        summaryMain.appendChild(head);
+
+        const responsibleLine = document.createElement("div");
+        responsibleLine.className = "sheet-group-responsible-line";
+        responsibleLine.textContent = (group.responsible && group.responsible.name) || "Sin responsable";
+        summaryMain.appendChild(responsibleLine);
 
         const chipsWrap = document.createElement("div");
         chipsWrap.className = "sheet-group-chips";
@@ -5800,12 +6255,21 @@
           const paymentClass = normalizedStatus === "Pagado" ? " is-paid" : normalizedStatus === "Parcial" ? " is-partial" : " is-pending";
           chips.push("<span class='sheet-group-chip" + paymentClass + "'>" + escapeHtml(normalizedStatus) + "</span>");
         }
+        if (group.payment && group.payment.amount) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.payment.amount) + " €</span>");
         if (group.contest && group.contest.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.contest.value) + "</span>");
         if (group.firePoint && group.firePoint.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.firePoint.value) + "</span>");
         chipsWrap.innerHTML = chips.join("");
-        head.appendChild(chipsWrap);
-        card.appendChild(head);
+        summaryMain.appendChild(chipsWrap);
+        summary.appendChild(summaryMain);
 
+        const summarySide = document.createElement("div");
+        summarySide.className = "sheet-group-summary-side";
+        summarySide.innerHTML = "<span class='sheet-group-chevron'>⌄</span>";
+        summary.appendChild(summarySide);
+        card.appendChild(summary);
+
+        const body = document.createElement("div");
+        body.className = "sheet-group-body";
         const sections = document.createElement("div");
         sections.className = "sheet-group-sections";
 
@@ -5825,9 +6289,9 @@
         settingsBlock.className = "sheet-group-block";
         settingsBlock.innerHTML = "<div class='sheet-group-block-title'>Grupo y pago</div>";
         const settingsGrid = document.createElement("div");
-        settingsGrid.className = "sheet-group-inline-grid";
-        settingsGrid.appendChild(createSheetGroupField("Punto de fuego", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "Si, para paella", "Comparto punto de fuego con otro grupo"], { emptyLabel: "Sin valor" })));
-        settingsGrid.appendChild(createSheetGroupField("Concurso", createSheetGroupSelect(group.id, group.sheetRow, group.contest.col, group.contest.value, ["", "Si", "No"], { emptyLabel: "Sin valor" })));
+        settingsGrid.className = "sheet-group-inline-grid triple";
+        settingsGrid.appendChild(createSheetGroupField("Punto de fuego", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Sin valor" })));
+        settingsGrid.appendChild(createSheetGroupField("Concurso", createSheetGroupSelect(group.id, group.sheetRow, group.contest.col, group.contest.value, ["", "Sí", "No"], { emptyLabel: "Sin valor" })));
         settingsGrid.appendChild(createSheetGroupField("Otro responsable", createSheetGroupTextInput(group.id, group.sheetRow, group.sharedLead.col, group.sharedLead.value, { placeholder: "Nombre o NO" })));
         settingsBlock.appendChild(settingsGrid);
 
@@ -5854,10 +6318,7 @@
         });
         paymentWrap.appendChild(paymentPills);
         paymentWrap.appendChild(createSheetGroupField("Quien paga", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.payerCol, group.payment.payer, { placeholder: "Responsable, todos, invitado..." })));
-        const paymentNote = document.createElement("div");
-        paymentNote.className = "sheet-group-note";
-        paymentNote.textContent = "Los cambios se guardan en la hoja y conviviran con las nuevas respuestas del formulario.";
-        paymentWrap.appendChild(paymentNote);
+        paymentWrap.appendChild(createSheetGroupField("Importe", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.amountCol, group.payment.amount, { placeholder: "0,00", inputMode: "decimal" })));
         settingsBlock.appendChild(paymentWrap);
         sections.appendChild(settingsBlock);
 
@@ -5886,27 +6347,57 @@
           assistantsList.innerHTML = "<div class='form-empty'>Sin integrantes adicionales. Puedes anadir uno nuevo.</div>";
         } else {
           visibleSlots.forEach(function (assistant) {
-            const assistantCard = document.createElement("article");
-            assistantCard.className = "sheet-assistant-card";
-            assistantCard.innerHTML =
-              "<div class='sheet-assistant-head'>" +
-                "<div class='sheet-assistant-name'>Integrante #" + escapeHtml(String(Number(assistant.number) || assistant.number)) + "</div>" +
-                "<span class='sheet-assistant-badge'>#" + escapeHtml(String(Number(assistant.number) || assistant.number)) + "</span>" +
-              "</div>";
+            const assistantCard = document.createElement("details");
+            assistantCard.className = "sheet-assistant-item";
+            assistantCard.dataset.groupId = group.id;
+            assistantCard.dataset.assistantNumber = String(assistant.number || "");
+            assistantCard.open = isSheetAssistantExpanded(group.id, assistant.number, !assistant.filled);
+
+            const assistantSummary = document.createElement("summary");
+            assistantSummary.className = "sheet-assistant-summary";
+            const assistantSummaryMain = document.createElement("div");
+            assistantSummaryMain.className = "sheet-assistant-summary-main";
+            const assistantName = document.createElement("div");
+            assistantName.className = "sheet-assistant-name";
+            assistantName.textContent = assistant.name || ("Integrante " + String(Number(assistant.number) || assistant.number));
+            assistantSummaryMain.appendChild(assistantName);
+            const assistantMeta = document.createElement("div");
+            assistantMeta.className = "sheet-assistant-meta";
+            assistantMeta.textContent = assistant.email || assistant.dni || "Pulsa para editar los datos";
+            assistantSummaryMain.appendChild(assistantMeta);
+            assistantSummary.appendChild(assistantSummaryMain);
+            const assistantSummarySide = document.createElement("div");
+            assistantSummarySide.className = "sheet-group-summary-side";
+            const assistantBadge = document.createElement("span");
+            assistantBadge.className = "sheet-assistant-badge";
+            assistantBadge.textContent = "#" + String(Number(assistant.number) || assistant.number);
+            const assistantChevron = document.createElement("span");
+            assistantChevron.className = "sheet-group-chevron";
+            assistantChevron.textContent = "⌄";
+            assistantSummarySide.appendChild(assistantBadge);
+            assistantSummarySide.appendChild(assistantChevron);
+            assistantSummary.appendChild(assistantSummarySide);
+            assistantCard.appendChild(assistantSummary);
+
+            const assistantBody = document.createElement("div");
+            assistantBody.className = "sheet-assistant-body";
             const assistantFields = document.createElement("div");
             assistantFields.className = "sheet-assistant-fields";
-            assistantFields.appendChild(createSheetGroupField("Nombre", createSheetGroupTextInput(group.id, group.sheetRow, assistant.nameCol, assistant.name, { placeholder: "Nombre completo" })));
-            assistantFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, assistant.dniCol, assistant.dni, { placeholder: "DNI" })));
-            assistantFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, assistant.emailCol, assistant.email, { type: "email", placeholder: "correo@upv.es" })));
-            assistantCard.appendChild(assistantFields);
+            assistantFields.appendChild(createSheetGroupField("Nombre", createSheetGroupTextInput(group.id, group.sheetRow, assistant.nameCol, assistant.name, { placeholder: "Nombre completo", role: "assistant-name" })));
+            assistantFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, assistant.dniCol, assistant.dni, { placeholder: "DNI", role: "assistant-dni" })));
+            assistantFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, assistant.emailCol, assistant.email, { type: "email", placeholder: "correo@upv.es", role: "assistant-email" })));
+            assistantBody.appendChild(assistantFields);
+            assistantCard.appendChild(assistantBody);
             assistantsList.appendChild(assistantCard);
           });
         }
         assistantsBlock.appendChild(assistantsList);
         sections.appendChild(assistantsBlock);
-        card.appendChild(sections);
+        body.appendChild(sections);
+        card.appendChild(body);
         els.sheetGroupsList.appendChild(card);
       });
+      syncSheetGroupsInteractivity();
     }
     function renderSheetGroupsView() {
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups") return Promise.resolve(false);
@@ -5925,7 +6416,7 @@
           if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
           const model = currentSheetGroupsModel() || { groups: [] };
           renderSheetGroupsList(model.groups);
-          setSheetGroupsStatus(model.groups.length ? "Edicion por grupos activa. Los cambios se guardan automaticamente." : "Esta hoja no contiene respuestas agrupables.", model.groups.length ? "" : "error");
+          setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
           return true;
         });
       }).catch(function (err) {
@@ -5941,7 +6432,7 @@
       const model = currentSheetGroupsModel();
       if (!model || state.spreadsheetViewMode !== "groups") return;
       renderSheetGroupsList(model.groups);
-      setSheetGroupsStatus(model.groups.length ? "Edicion por grupos activa. Los cambios se guardan automaticamente." : "Esta hoja no contiene respuestas agrupables.", model.groups.length ? "" : "error");
+      setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
     }
     function setCellValue(sheetTitle, row, col, value) {
       const data = ensureSheetState(sheetTitle);
@@ -6324,6 +6815,7 @@
         cell.readOnly = !editing;
       });
       syncEditorSurface();
+      syncSheetGroupsInteractivity();
       refreshDirtyState();
     }
     function queueAutosave(delay) {
@@ -9670,6 +10162,8 @@
       if (state.currentSheetTitle && state.currentSheetTitle !== title) {
         state.sheetGroupsModel = null;
         state.sheetGroupsDraftSlots = {};
+        state.sheetGroupsExpanded = {};
+        state.sheetGroupAssistantExpanded = {};
       }
       const requestId = ++state.sheetLoadToken;
       if (!config.quiet) {
@@ -9764,6 +10258,8 @@
       state.sheetGroupLoadToken = 0;
       state.sheetGroupsModel = null;
       state.sheetGroupsDraftSlots = {};
+      state.sheetGroupsExpanded = {};
+      state.sheetGroupAssistantExpanded = {};
       clearTimeout(state.saveTimer);
       state.saveQueued = false;
       state.saveInFlight = false;
@@ -9832,10 +10328,12 @@
       state.sheetData = {};
       state.sheetWindow = {};
       state.sheetDirtyCells = {};
-      state.spreadsheetViewMode = "table";
+      state.spreadsheetViewMode = "groups";
       state.sheetGroupLoadToken = 0;
       state.sheetGroupsModel = null;
       state.sheetGroupsDraftSlots = {};
+      state.sheetGroupsExpanded = {};
+      state.sheetGroupAssistantExpanded = {};
       state.titleDirty = false;
       state.editorMode = "read";
       state.canEdit = true;
@@ -10441,6 +10939,20 @@
         const card = target.closest(".sheet-group-card");
         const titleEl = card ? card.querySelector(".sheet-group-title") : null;
         if (titleEl) titleEl.textContent = String(target.value || "").trim() || "Grupo";
+        const responsibleLineEl = card ? card.querySelector(".sheet-group-responsible-line") : null;
+        if (responsibleLineEl) responsibleLineEl.textContent = String(target.value || "").trim() || "Sin responsable";
+      }
+      if (target.dataset.role === "assistant-name" || target.dataset.role === "assistant-email" || target.dataset.role === "assistant-dni") {
+        const assistantItem = target.closest(".sheet-assistant-item");
+        if (assistantItem) {
+          const nameInput = assistantItem.querySelector(".sheet-group-input[data-role='assistant-name']");
+          const emailInput = assistantItem.querySelector(".sheet-group-input[data-role='assistant-email']");
+          const dniInput = assistantItem.querySelector(".sheet-group-input[data-role='assistant-dni']");
+          const nameEl = assistantItem.querySelector(".sheet-assistant-name");
+          const metaEl = assistantItem.querySelector(".sheet-assistant-meta");
+          if (nameEl) nameEl.textContent = String(nameInput && nameInput.value || "").trim() || "Integrante";
+          if (metaEl) metaEl.textContent = String(emailInput && emailInput.value || "").trim() || String(dniInput && dniInput.value || "").trim() || "Pulsa para editar los datos";
+        }
       }
       if (target.classList.contains("sheet-group-select")) {
         rebuildCurrentSheetGroupsModel();
@@ -10483,6 +10995,8 @@
           const openSlots = state.sheetGroupsDraftSlots[groupId] ? state.sheetGroupsDraftSlots[groupId].slice() : [];
           if (openSlots.indexOf(slot.number) === -1) openSlots.push(slot.number);
           state.sheetGroupsDraftSlots[groupId] = openSlots;
+          state.sheetGroupsExpanded[groupId] = true;
+          state.sheetGroupAssistantExpanded[groupId + "::" + slot.number] = true;
           rebuildCurrentSheetGroupsModel();
           rerenderSheetGroupsFromModel();
           setSheetGroupsStatus("Integrante listo para editar.", "good");
@@ -10538,7 +11052,9 @@
       }
       state.editorMode = "edit";
       applyEditorMode();
-      return Promise.resolve();
+      return ensureSheetGroupsManagementColumnsForEditing().then(function () {
+        return true;
+      });
     }
     function returnToDrive() {
       return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).then(function (ok) {
@@ -10618,6 +11134,8 @@
         state.sheetDirtyCells = {};
         state.sheetGroupsModel = null;
         state.sheetGroupsDraftSlots = {};
+        state.sheetGroupsExpanded = {};
+        state.sheetGroupAssistantExpanded = {};
           state.spreadsheetViewMode = "table";
           state.sheetGroupLoadToken = 0;
           state.formId = "";
@@ -10766,6 +11284,9 @@
     els.sheetGroupsView.addEventListener("input", handleSheetGroupsFieldInput);
     els.sheetGroupsView.addEventListener("change", handleSheetGroupsFieldInput);
     els.sheetGroupsView.addEventListener("click", handleSheetGroupsActionClick);
+    if (els.sheetGroupsPaymentFilter) els.sheetGroupsPaymentFilter.addEventListener("change", handleSheetGroupsFilterChange);
+    if (els.sheetGroupsFireFilter) els.sheetGroupsFireFilter.addEventListener("change", handleSheetGroupsFilterChange);
+    if (els.sheetGroupsContestFilter) els.sheetGroupsContestFilter.addEventListener("change", handleSheetGroupsFilterChange);
     els.shareDocBtn.addEventListener("click", openShareModal);
     els.addSheetTabBtn.addEventListener("click", function () {
       openNameModal({
