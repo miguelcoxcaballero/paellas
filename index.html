@@ -2624,6 +2624,7 @@
     }
     .ticket-reader-review-card {
       width: min(760px, 100%);
+      max-height: min(calc(100dvh - 48px), 100%);
       border: 1px solid rgba(185, 90, 0, 0.14);
       border-radius: 26px;
       background: rgba(255, 253, 248, 0.98);
@@ -2632,6 +2633,9 @@
       display: grid;
       gap: 18px;
       min-width: 0;
+      min-height: 0;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      overflow: hidden;
     }
     .ticket-reader-review-card.is-warning {
       border-color: rgba(182, 72, 72, 0.28);
@@ -2656,6 +2660,8 @@
       display: grid;
       gap: 14px;
       min-width: 0;
+      min-height: 0;
+      grid-template-rows: auto minmax(0, 1fr);
     }
     .ticket-reader-review-state {
       display: grid;
@@ -2704,6 +2710,9 @@
       display: grid;
       gap: 8px;
       min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
     }
     .ticket-reader-review-row {
       display: grid;
@@ -4114,7 +4123,8 @@
         scanInFlight: false,
         reviewIdentity: null,
         reviewSubmitting: false,
-        loadTimer: 0
+        loadTimer: 0,
+        resumeCameraAfterReview: false
       },
       formId: "",
       formTitle: "",
@@ -6750,6 +6760,17 @@
         reader.loadTimer = 0;
       }
     }
+    function scheduleTicketReaderCameraResume() {
+      if (!state.ticketReader.resumeCameraAfterReview || state.ticketReader.stream || state.ticketReader.scanTimer) return;
+      state.ticketReader.resumeCameraAfterReview = false;
+      state.ticketReader.lastScanText = "";
+      state.ticketReader.lastScanAt = 0;
+      setTimeout(function () {
+        if (!els.ticketReaderModal || !els.ticketReaderModal.classList.contains("visible")) return;
+        if (els.ticketReaderReviewOverlay && !els.ticketReaderReviewOverlay.classList.contains("hidden")) return;
+        startTicketReaderCamera().catch(function () {});
+      }, 120);
+    }
     function closeTicketReaderReview() {
       state.ticketReader.reviewIdentity = null;
       state.ticketReader.reviewSubmitting = false;
@@ -6763,10 +6784,12 @@
         els.ticketReaderReviewConfirmBtn.classList.remove("hidden");
         els.ticketReaderReviewConfirmBtn.textContent = "Todo esta correcto";
       }
+      scheduleTicketReaderCameraResume();
     }
     function closeTicketReaderModal() {
       clearTicketReaderLoadTimer();
       stopTicketReaderCamera();
+      state.ticketReader.resumeCameraAfterReview = false;
       closeTicketReaderReview();
       if (els.ticketReaderModal) els.ticketReaderModal.classList.remove("visible");
       if (els.ticketReaderResults) els.ticketReaderResults.innerHTML = "";
@@ -6979,6 +7002,7 @@
     function handleDetectedTicketValue(rawValue) {
       const value = String(rawValue || "").trim();
       if (!value) return Promise.resolve(false);
+      const fromCamera = !!(state.ticketReader.stream || state.ticketReader.scanTimer);
       if (els.ticketReaderSearchInput) els.ticketReaderSearchInput.value = value;
       const results = searchTicketReaderPeople(value);
       renderTicketReaderResults(results, "No se ha encontrado ninguna entrada para ese QR.");
@@ -6987,10 +7011,12 @@
         return Promise.resolve(false);
       }
       if (results.length > 1) {
+        state.ticketReader.resumeCameraAfterReview = false;
         stopTicketReaderCamera();
         setTicketReaderStatus("Se han encontrado varias coincidencias. Revisa la lista antes de validar.", "");
         return Promise.resolve(true);
       }
+      state.ticketReader.resumeCameraAfterReview = fromCamera;
       stopTicketReaderCamera();
       setTicketReaderStatus("Entrada detectada. Revisa los datos antes de confirmar.", "");
       return markTicketPersonEntered(results[0]).then(function () { return true; });
@@ -7164,7 +7190,7 @@
     }
     function confirmTicketReaderReview() {
       if (state.ticketReader.reviewSubmitting || !state.ticketReader.reviewIdentity) return Promise.resolve(false);
-      const latest = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, state.ticketReader.reviewIdentity);
+      const latest = resolveTicketReaderPerson(state.ticketReader.reviewIdentity);
       if (!latest) {
         closeTicketReaderReview();
         return Promise.resolve(false);
