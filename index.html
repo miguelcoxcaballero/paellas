@@ -2748,7 +2748,7 @@
       display: grid;
       place-items: center;
       padding: 16px;
-      z-index: 3;
+      z-index: 30;
     }
     .ticket-reader-review-card {
       width: min(520px, 100%);
@@ -3044,9 +3044,7 @@
       border-right-width: 3px;
       border-top-right-radius: 10px;
     }
-    .ticket-reader-camera .ticket-reader-focus-frame-bottom {
-      display: none;
-    }
+    /* Bottom frame rules removed */
     .ticket-reader-focus-frame-bottom-left,
     .ticket-reader-focus-frame-bottom-right {
       content: "";
@@ -4558,7 +4556,10 @@
           </div>
             <div id="ticketReaderCameraWrap" class="ticket-reader-camera hidden">
               <video id="ticketReaderVideo" playsinline muted></video>
-              <div class="ticket-reader-focus-frame" aria-hidden="true"></div>
+              <div class="ticket-reader-focus-frame" aria-hidden="true">
+                <div class="ticket-reader-focus-frame-bottom-left"></div>
+                <div class="ticket-reader-focus-frame-bottom-right"></div>
+              </div>
             </div>
           </div>
         </section>
@@ -7790,6 +7791,45 @@
       if (!state.ticketReader.spreadsheetId) return Promise.resolve(null);
       return loadTicketReaderSheet(state.ticketReader.spreadsheetId, state.ticketReader.sheetTitle);
     }
+    let sharedScanAudioCtx = null;
+    function playScanBeep(type) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        if (!sharedScanAudioCtx) sharedScanAudioCtx = new AudioContext();
+        const ctx = sharedScanAudioCtx;
+        if (ctx.state === "suspended") ctx.resume();
+        if (type === "valid") {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(800, ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.setTargetAtTime(0, ctx.currentTime, 0.04);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.15);
+        } else if (type === "error") {
+          let t = ctx.currentTime;
+          for (let i = 0; i < 3; i++) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = "square";
+            osc.frequency.setValueAtTime(250, t);
+            gain.gain.setValueAtTime(0.1, t);
+            gain.gain.setTargetAtTime(0, t, 0.02);
+            osc.start(t);
+            osc.stop(t + 0.1);
+            t += 0.15;
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
     function resolveTicketReaderPerson(person) {
       const model = getEffectiveTicketReaderModel();
       if (!person || !state.ticketReader.spreadsheetId || !model) return person || null;
@@ -7804,6 +7844,7 @@
       const latest = resolveTicketReaderPerson(person);
       if (!latest) return false;
       const alreadyEntered = normalizeEntryStatus(latest.status) === "HA ENTRADO";
+      playScanBeep(alreadyEntered ? "error" : "valid");
       state.ticketReader.reviewIdentity = {
         code: latest.code,
         row: latest.sheetRow,
