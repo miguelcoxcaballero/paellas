@@ -7785,11 +7785,27 @@
         return haystack.indexOf(normalized) !== -1 || haystack.includes(normalized);
       });
     }
+    function silentRefreshTicketReaderRows() {
+      const spreadsheetId = state.ticketReader.spreadsheetId;
+      const sheetTitle = state.ticketReader.sheetTitle;
+      if (!spreadsheetId || !sheetTitle) return Promise.resolve(null);
+      const sheetInfo = (state.ticketReader.sheets || []).find(function (s) { return s.title === sheetTitle; });
+      const rowCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount) || 1000;
+      const columnCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount) || 50;
+      return fetchSpreadsheetRowsByTitle(spreadsheetId, sheetTitle, rowCount, columnCount)
+        .then(function (rows) {
+          const model = buildPaellaGroupsFromSheetRows(rows, sheetTitle);
+          state.ticketReader.model = model;
+          state.ticketReader.rows = rows;
+          return model;
+        });
+    }
     function refreshTicketReaderModel() {
-      const effectiveModel = getEffectiveTicketReaderModel();
-      if (effectiveModel) return Promise.resolve(effectiveModel);
       if (!state.ticketReader.spreadsheetId) return Promise.resolve(null);
-      return loadTicketReaderSheet(state.ticketReader.spreadsheetId, state.ticketReader.sheetTitle);
+      if (!state.ticketReader.sheetTitle) {
+        return loadTicketReaderSheet(state.ticketReader.spreadsheetId);
+      }
+      return silentRefreshTicketReaderRows();
     }
     let sharedScanAudioCtx = null;
     function playScanBeep(type) {
@@ -7984,8 +8000,13 @@
     }
     function markTicketPersonEntered(person) {
       if (!person) return Promise.resolve(false);
-      openTicketReaderReview(person);
-      return Promise.resolve(true);
+      return silentRefreshTicketReaderRows().then(function () {
+        openTicketReaderReview(resolveTicketReaderPerson(person) || person);
+        return true;
+      }).catch(function () {
+        openTicketReaderReview(person);
+        return true;
+      });
     }
     function openTicketReaderModal() {
       clearTicketReaderLoadTimer();
