@@ -469,11 +469,8 @@
     .paella-entry-reader-icon svg {
       width: 28px;
       height: 28px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      display: block;
+      fill: currentColor;
     }
     .paella-entry-reader-copy {
       min-width: 0;
@@ -3622,15 +3619,18 @@
             <button id="paellaEntryReaderBtn" class="btn hidden paella-entry-reader-btn" type="button">
               <span class="paella-entry-reader-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path d="M4 4h5v5H4z"></path>
-                  <path d="M15 4h5v5h-5z"></path>
-                  <path d="M4 15h5v5H4z"></path>
-                  <path d="M16 16h1"></path>
-                  <path d="M19 16h1v1"></path>
-                  <path d="M16 19h1"></path>
-                  <path d="M18 18h2v2h-2z"></path>
-                  <path d="M16 12h2v2h-2z"></path>
-                  <path d="M19 12h1v2"></path>
+                  <rect x="3" y="3" width="7" height="7" rx="1.2"></rect>
+                  <rect x="5" y="5" width="3" height="3" rx="0.6" fill="rgba(255,248,228,0.92)"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1.2"></rect>
+                  <rect x="16" y="5" width="3" height="3" rx="0.6" fill="rgba(255,248,228,0.92)"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1.2"></rect>
+                  <rect x="5" y="16" width="3" height="3" rx="0.6" fill="rgba(255,248,228,0.92)"></rect>
+                  <rect x="14" y="14" width="2.6" height="2.6" rx="0.5"></rect>
+                  <rect x="17.4" y="14" width="3.6" height="2.6" rx="0.5"></rect>
+                  <rect x="14" y="17.4" width="2.6" height="3.6" rx="0.5"></rect>
+                  <rect x="17.4" y="17.4" width="1.8" height="1.8" rx="0.35"></rect>
+                  <rect x="19.8" y="17.4" width="1.2" height="3.6" rx="0.35"></rect>
+                  <rect x="17.4" y="19.8" width="1.8" height="1.2" rx="0.35"></rect>
                 </svg>
               </span>
               <span class="paella-entry-reader-copy">
