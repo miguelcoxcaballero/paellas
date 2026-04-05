@@ -2176,6 +2176,15 @@
       border-color: rgba(185,90,0,0.22);
       box-shadow: 0 4px 18px rgba(104,70,5,0.07);
     }
+    .sheet-groups-banner {
+      background: #1e1508;
+      color: #f5e9c8;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
     .sheet-group-summary,
     .sheet-assistant-summary {
       list-style: none;
@@ -2185,45 +2194,33 @@
       display: none;
     }
     .sheet-group-summary {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: background .15s ease;
-    }
-    .sheet-group-summary:hover {
-      background: rgba(255,248,227,0.35);
-    }
-    .sheet-group-summary-main {
-      min-width: 0;
-      display: grid;
-      gap: 5px;
-    }
-    .sheet-group-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 10px;
+      padding: 14px 18px;
+      cursor: pointer;
+      background: rgba(255,249,230,0.9);
+      transition: background .15s ease;
       min-width: 0;
     }
-    .sheet-group-title {
-      font-size: 0.98rem;
+    .sheet-group-summary:hover {
+      background: rgba(255,244,215,0.95);
+    }
+    .sheet-group-title-large {
+      font-size: 1.1rem;
       font-weight: 800;
       line-height: 1.2;
       min-width: 0;
+      flex: 1 1 0;
       word-break: break-word;
+      color: #1e1508;
     }
-    .sheet-group-meta {
-      font-size: 0.72rem;
-      color: var(--muted);
-      line-height: 1.3;
-      white-space: nowrap;
+    .sheet-group-summary-info {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
       flex: 0 0 auto;
-    }
-    .sheet-group-responsible-line {
-      display: none;
     }
     .sheet-group-chips {
       display: flex;
@@ -2277,27 +2274,112 @@
       flex: 0 0 auto;
     }
     .sheet-group-chevron {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
-      border: none;
-      background: rgba(255,243,210,0.6);
+      border: 1.5px solid rgba(185,90,0,0.15);
+      background: rgba(255,255,255,0.8);
       color: #8a5211;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.78rem;
-      transition: transform .2s ease, background .15s ease;
+      font-size: 1rem;
+      font-weight: 400;
+      flex: 0 0 auto;
+      transition: background .15s ease;
     }
-    .sheet-group-card[open] .sheet-group-chevron,
-    .sheet-assistant-item[open] .sheet-group-chevron {
-      transform: rotate(180deg);
-      background: rgba(255,236,190,0.75);
-    }
+    .sheet-group-chevron::before { content: "+"; }
+    .sheet-group-card[open] > summary .sheet-group-chevron::before { content: "−"; }
+    .sheet-assistant-item[open] .sheet-group-chevron { transform: rotate(180deg); }
     .sheet-group-body {
       display: grid;
       gap: 0;
-      padding: 0 14px 14px;
+      padding: 0;
+    }
+    .sheet-member-list {
+      border-top: 1px solid rgba(185,90,0,0.08);
+    }
+    .sheet-member-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-bottom: 1px solid rgba(185,90,0,0.06);
+      min-width: 0;
+      background: #fff;
+    }
+    .sheet-member-row:last-of-type {
+      border-bottom: none;
+    }
+    .sheet-member-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex: 0 0 auto;
+      min-width: 22px;
+      text-align: right;
+    }
+    .sheet-member-name-text {
+      font-size: 0.88rem;
+      font-weight: 700;
+      flex: 1 1 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sheet-member-role-badge {
+      background: #c97820;
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      flex: 0 0 auto;
+    }
+    .sheet-member-info-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(185,90,0,0.18);
+      background: rgba(255,255,255,0.9);
+      color: #8a5211;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .sheet-member-info-btn:hover {
+      background: rgba(255,243,210,0.9);
+      border-color: rgba(185,90,0,0.35);
+    }
+    .sheet-member-info-btn.is-open {
+      background: rgba(255,236,190,0.9);
+      border-color: rgba(185,90,0,0.45);
+    }
+    .sheet-member-detail {
+      padding: 12px 18px 14px;
+      background: rgba(250,248,242,0.9);
+      border-bottom: 1px solid rgba(185,90,0,0.07);
+    }
+    .sheet-member-detail.hidden { display: none; }
+    .sheet-group-footer {
+      display: grid;
+      gap: 10px;
+      padding: 12px 18px 14px;
+      border-top: 1px solid rgba(185,90,0,0.08);
+      background: rgba(255,249,230,0.5);
+    }
+    .sheet-group-footer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .sheet-group-section-divider {
       height: 1px;
@@ -2322,16 +2404,8 @@
     .sheet-group-block.assistants {
       grid-column: auto;
     }
-    .sheet-group-block.responsible .sheet-group-field-list {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      column-gap: 8px;
-      row-gap: 6px;
-    }
-    .sheet-group-block.responsible .sheet-person-ticket {
-      grid-column: 1 / -1;
-    }
-    .sheet-group-block.settings .sheet-group-payment-wrap {
-      padding-top: 0;
+    .sheet-member-detail .sheet-assistant-fields {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .sheet-group-block-head {
       display: flex;
@@ -8705,107 +8779,141 @@
           : "No hay grupos para mostrar en esta hoja.";
         els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
       }
+      if (!filteredGroups.length) return;
+      const allGroups = groups || [];
+      const totalAttendees = allGroups.reduce(function (s, g) { return s + (g.attendeeCount || 0); }, 0);
+      const banner = document.createElement("div");
+      banner.className = "sheet-groups-banner";
+      banner.textContent = allGroups.length + " Grupos | " + totalAttendees + " Asistentes";
+      els.sheetGroupsList.appendChild(banner);
       (filteredGroups || []).forEach(function (group, index) {
         const ticketPeople = buildTicketPeopleFromGroup(group);
-        const responsibleTicketPerson = ticketPeople[0] || null;
+        const hasEntrySystem = ticketPeople.some(function (p) { return p.statusCol >= 0; });
         const card = document.createElement("details");
         card.className = "sheet-group-card";
         card.dataset.groupId = group.id;
         card.open = isSheetGroupExpanded(group.id, index);
-
         const summary = document.createElement("summary");
         summary.className = "sheet-group-summary";
-        const summaryMain = document.createElement("div");
-        summaryMain.className = "sheet-group-summary-main";
-
-        const head = document.createElement("div");
-        head.className = "sheet-group-head";
-        let headHtml = "<div class='sheet-group-title'>" + escapeHtml(group.title) + "</div>";
-        if (group.submittedAt) {
-          headHtml += "<div class='sheet-group-meta'>" + escapeHtml(group.submittedAt) + "</div>";
-        }
-        head.innerHTML = headHtml;
-        summaryMain.appendChild(head);
-
-        const responsibleLine = document.createElement("div");
-        responsibleLine.className = "sheet-group-responsible-line";
-        responsibleLine.textContent = (group.responsible && group.responsible.name) || "Sin responsable";
-        summaryMain.appendChild(responsibleLine);
-
-        const chipsWrap = document.createElement("div");
-        chipsWrap.className = "sheet-group-chips";
-        const chips = [
-          "<span class='sheet-group-chip'>" + escapeHtml(String(group.attendeeCount)) + " personas</span>"
-        ];
-        const hasEntrySystem = ticketPeople.some(function (p) { return p.statusCol >= 0; });
+        const titleEl = document.createElement("div");
+        titleEl.className = "sheet-group-title-large";
+        titleEl.textContent = "Grupo " + (index + 1) + ": " + group.title;
+        summary.appendChild(titleEl);
+        const infoRow = document.createElement("div");
+        infoRow.className = "sheet-group-summary-info";
         if (hasEntrySystem) {
           const enteredCount = ticketPeople.filter(function (p) { return p.status === "HA ENTRADO"; }).length;
           const totalCount = ticketPeople.length;
-          const allEntered = enteredCount === totalCount && totalCount > 0;
-          const progressClass = allEntered ? " is-progress-complete" : " is-progress";
-          const progressText = allEntered ? ("✓ " + enteredCount + "/" + totalCount + " han entrado") : (enteredCount + "/" + totalCount + " han entrado");
-          chips.push("<span class='sheet-group-chip" + progressClass + "'>" + escapeHtml(progressText) + "</span>");
+          const allIn = enteredCount === totalCount && totalCount > 0;
+          const chip = document.createElement("span");
+          chip.className = "sheet-group-chip " + (allIn ? "is-progress-complete" : "is-progress");
+          chip.textContent = (allIn ? "✓ " : "") + enteredCount + "/" + totalCount + " han entrado";
+          infoRow.appendChild(chip);
         }
         if (group.payment && group.payment.status) {
-          const normalizedStatus = normalizePaymentStatus(group.payment.status);
-          const paymentClass = normalizedStatus === "Pagado" ? " is-paid" : normalizedStatus === "Parcial" ? " is-partial" : " is-pending";
-          chips.push("<span class='sheet-group-chip" + paymentClass + "'>" + escapeHtml(normalizedStatus) + "</span>");
+          const ns = normalizePaymentStatus(group.payment.status);
+          const pchip = document.createElement("span");
+          pchip.className = "sheet-group-chip " + (ns === "Pagado" ? "is-paid" : ns === "Parcial" ? "is-partial" : "is-pending");
+          pchip.textContent = ns;
+          infoRow.appendChild(pchip);
         }
-        if (group.payment && group.payment.amount) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.payment.amount) + " €</span>");
-        if (group.firePoint && group.firePoint.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.firePoint.value) + "</span>");
-        if (group.contest && group.contest.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.contest.value) + "</span>");
-        chipsWrap.innerHTML = chips.join("");
-        summaryMain.appendChild(chipsWrap);
-        summary.appendChild(summaryMain);
-
-        const summarySide = document.createElement("div");
-        summarySide.className = "sheet-group-summary-side";
-        summarySide.innerHTML = "<span class='sheet-group-chevron'>⌄</span>";
-        summary.appendChild(summarySide);
+        summary.appendChild(infoRow);
+        const chevron = document.createElement("span");
+        chevron.className = "sheet-group-chevron";
+        summary.appendChild(chevron);
         card.appendChild(summary);
-
         const body = document.createElement("div");
         body.className = "sheet-group-body";
-
-        const responsibleBlock = document.createElement("section");
-        responsibleBlock.className = "sheet-group-block responsible";
-        responsibleBlock.innerHTML = "<div class='sheet-group-block-title'>Responsable</div>";
-        const responsibleFields = document.createElement("div");
-        responsibleFields.className = "sheet-group-field-list";
-        responsibleFields.appendChild(createSheetGroupField("Nombre", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.nameCol, group.responsible.name, { placeholder: "Nombre completo", role: "group-title" })));
-        responsibleFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.emailCol, group.responsible.email, { type: "email", placeholder: "correo@upv.es" })));
-        responsibleFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.dniCol, group.responsible.dni, { placeholder: "DNI" })));
-        responsibleFields.appendChild(createSheetGroupField("Telefono", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.phoneCol, group.responsible.phone, { placeholder: "Telefono" })));
-        responsibleBlock.appendChild(responsibleFields);
-        if (responsibleTicketPerson) {
-          responsibleBlock.appendChild(createPersonTicketBlock(group, responsibleTicketPerson, { rolePrefix: "responsable" }));
+        const memberList = document.createElement("div");
+        memberList.className = "sheet-member-list";
+        function addMemberRow(person, isResponsable, assistant) {
+          var memberNum = isResponsable ? 1 : (Number(person && person.number) || (assistant && assistant.number) || "?");
+          var memberName = (person && person.name) || (isResponsable ? "Responsable" : ("Integrante " + memberNum));
+          var normalizedStatus = (person && person.status) ? normalizeEntryStatus(person.status) : "";
+          var hasTicket = person && person.statusCol >= 0;
+          var row = document.createElement("div");
+          row.className = "sheet-member-row";
+          var numEl = document.createElement("span");
+          numEl.className = "sheet-member-num";
+          numEl.textContent = memberNum + "#";
+          row.appendChild(numEl);
+          var nameEl = document.createElement("span");
+          nameEl.className = "sheet-member-name-text";
+          nameEl.textContent = memberName;
+          row.appendChild(nameEl);
+          if (isResponsable) {
+            var badge = document.createElement("span");
+            badge.className = "sheet-member-role-badge";
+            badge.textContent = "Responsable";
+            row.appendChild(badge);
+          }
+          if (hasTicket && normalizedStatus) {
+            var sc = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
+            var statusChip = document.createElement("span");
+            statusChip.className = "entry-status-chip " + sc;
+            statusChip.textContent = normalizedStatus;
+            row.appendChild(statusChip);
+          }
+          var infoBtn = document.createElement("button");
+          infoBtn.type = "button";
+          infoBtn.className = "sheet-member-info-btn";
+          infoBtn.textContent = "ⓘ";
+          infoBtn.title = "Ver / editar datos";
+          row.appendChild(infoBtn);
+          memberList.appendChild(row);
+          var detail = document.createElement("div");
+          detail.className = "sheet-member-detail hidden";
+          var detailFields = document.createElement("div");
+          detailFields.className = "sheet-assistant-fields";
+          if (isResponsable) {
+            detailFields.appendChild(createSheetGroupField("Nombre", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.nameCol, group.responsible.name, { placeholder: "Nombre completo", role: "group-title" })));
+            detailFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.emailCol, group.responsible.email, { type: "email", placeholder: "correo@upv.es" })));
+            detailFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.dniCol, group.responsible.dni, { placeholder: "DNI" })));
+            detailFields.appendChild(createSheetGroupField("Telefono", createSheetGroupTextInput(group.id, group.sheetRow, group.responsible.phoneCol, group.responsible.phone, { placeholder: "Telefono" })));
+          } else if (assistant) {
+            detailFields.appendChild(createSheetGroupField("Nombre", createSheetGroupTextInput(group.id, group.sheetRow, assistant.nameCol, assistant.name, { placeholder: "Nombre completo", role: "assistant-name" })));
+            detailFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, assistant.dniCol, assistant.dni, { placeholder: "DNI", role: "assistant-dni" })));
+            detailFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, assistant.emailCol, assistant.email, { type: "email", placeholder: "correo@upv.es", role: "assistant-email" })));
+          }
+          detail.appendChild(detailFields);
+          if (person && person.statusCol >= 0) {
+            detail.appendChild(createPersonTicketBlock(group, person, { rolePrefix: isResponsable ? "responsable" : "assistant" }));
+          }
+          memberList.appendChild(detail);
+          infoBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var isOpen = !detail.classList.contains("hidden");
+            detail.classList.toggle("hidden", isOpen);
+            infoBtn.classList.toggle("is-open", !isOpen);
+          });
         }
-        body.appendChild(responsibleBlock);
-
-        var divider1 = document.createElement("div");
-        divider1.className = "sheet-group-section-divider";
-        body.appendChild(divider1);
-
-        const settingsBlock = document.createElement("section");
-        settingsBlock.className = "sheet-group-block settings";
-        settingsBlock.innerHTML = "<div class='sheet-group-block-title'>Grupo y pago</div>";
-        const settingsGrid = document.createElement("div");
-        settingsGrid.className = "sheet-group-inline-grid triple";
-        settingsGrid.appendChild(createSheetGroupField("Punto de fuego", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Sin valor" })));
-        settingsGrid.appendChild(createSheetGroupField("Concurso", createSheetGroupSelect(group.id, group.sheetRow, group.contest.col, group.contest.value, ["", "Sí", "No"], { emptyLabel: "Sin valor" })));
-        settingsGrid.appendChild(createSheetGroupField("Otro responsable", createSheetGroupTextInput(group.id, group.sheetRow, group.sharedLead.col, group.sharedLead.value, { placeholder: "Nombre o NO" })));
-        settingsBlock.appendChild(settingsGrid);
-
-        const paymentWrap = document.createElement("div");
-        paymentWrap.className = "sheet-group-payment-wrap";
-        const paymentLabel = document.createElement("div");
+        addMemberRow(ticketPeople[0] || null, true, null);
+        var visibleSlots = getVisibleAssistantSlots(group);
+        if (!visibleSlots.length) {
+          var emptyEl = document.createElement("div");
+          emptyEl.className = "form-empty";
+          emptyEl.style.padding = "10px 18px";
+          emptyEl.textContent = "Sin integrantes adicionales.";
+          memberList.appendChild(emptyEl);
+        } else {
+          visibleSlots.forEach(function (assistant) {
+            var tp = ticketPeople.find(function (p) { return p.role === "asistente" && String(p.number) === String(assistant.number); });
+            addMemberRow(tp || null, false, assistant);
+          });
+        }
+        body.appendChild(memberList);
+        var footer = document.createElement("div");
+        footer.className = "sheet-group-footer";
+        var paymentRow = document.createElement("div");
+        paymentRow.className = "sheet-group-footer-row";
+        var paymentLabel = document.createElement("div");
         paymentLabel.className = "sheet-group-field-label";
         paymentLabel.textContent = "Pago";
-        paymentWrap.appendChild(paymentLabel);
-        const paymentPills = document.createElement("div");
+        paymentRow.appendChild(paymentLabel);
+        var paymentPills = document.createElement("div");
         paymentPills.className = "sheet-group-pill-toggle";
         ["Pendiente", "Parcial", "Pagado"].forEach(function (statusValue) {
-          const btn = document.createElement("button");
+          var btn = document.createElement("button");
           btn.type = "button";
           btn.className = "sheet-group-pill" + (normalizePaymentStatus(group.payment.status) === statusValue ? " active" : "");
           btn.dataset.groupAction = "payment-status";
@@ -8817,111 +8925,34 @@
           btn.textContent = statusValue;
           paymentPills.appendChild(btn);
         });
-        paymentWrap.appendChild(paymentPills);
-        paymentWrap.appendChild(createSheetGroupField("Quien paga", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.payerCol, group.payment.payer, { placeholder: "Responsable, todos, invitado..." })));
-        paymentWrap.appendChild(createSheetGroupField("Importe", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.amountCol, group.payment.amount, { placeholder: "0,00", inputMode: "decimal" })));
-        settingsBlock.appendChild(paymentWrap);
-        body.appendChild(settingsBlock);
-
-        var divider2 = document.createElement("div");
-        divider2.className = "sheet-group-section-divider";
-        body.appendChild(divider2);
-
-        const assistantsBlock = document.createElement("section");
-        assistantsBlock.className = "sheet-group-block assistants";
-        const assistantsHead = document.createElement("div");
-        assistantsHead.className = "sheet-group-block-head";
-        assistantsHead.innerHTML = "<div class='sheet-group-block-title'>Integrantes</div>";
-        const assistantsActions = document.createElement("div");
-        assistantsActions.className = "sheet-group-block-actions";
-        const groupPdfBtn = document.createElement("button");
+        paymentRow.appendChild(paymentPills);
+        footer.appendChild(paymentRow);
+        var settingsGrid = document.createElement("div");
+        settingsGrid.className = "sheet-group-inline-grid triple";
+        settingsGrid.appendChild(createSheetGroupField("Punto de fuego", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Sin valor" })));
+        settingsGrid.appendChild(createSheetGroupField("Concurso", createSheetGroupSelect(group.id, group.sheetRow, group.contest.col, group.contest.value, ["", "Sí", "No"], { emptyLabel: "Sin valor" })));
+        settingsGrid.appendChild(createSheetGroupField("Importe", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.amountCol, group.payment.amount, { placeholder: "0,00", inputMode: "decimal" })));
+        footer.appendChild(settingsGrid);
+        var actionsRow = document.createElement("div");
+        actionsRow.className = "sheet-group-footer-row";
+        var groupPdfBtn = document.createElement("button");
         groupPdfBtn.type = "button";
         groupPdfBtn.className = "sheet-group-add-btn";
         groupPdfBtn.dataset.groupAction = "ticket-pdf-group";
         groupPdfBtn.dataset.groupId = group.id;
         groupPdfBtn.textContent = "PDF grupo";
-        assistantsActions.appendChild(groupPdfBtn);
+        actionsRow.appendChild(groupPdfBtn);
         if (state.canEdit && state.editorMode === "edit") {
-          const addAssistantBtn = document.createElement("button");
+          var addAssistantBtn = document.createElement("button");
           addAssistantBtn.type = "button";
           addAssistantBtn.className = "sheet-group-add-btn";
           addAssistantBtn.dataset.groupAction = "assistant-add";
           addAssistantBtn.dataset.groupId = group.id;
           addAssistantBtn.textContent = "+ Integrante";
-          assistantsActions.appendChild(addAssistantBtn);
+          actionsRow.appendChild(addAssistantBtn);
         }
-        assistantsHead.appendChild(assistantsActions);
-        assistantsBlock.appendChild(assistantsHead);
-        const assistantsList = document.createElement("div");
-        assistantsList.className = "sheet-assistants-list";
-        const visibleSlots = getVisibleAssistantSlots(group);
-        if (!visibleSlots.length) {
-          assistantsList.innerHTML = "<div class='form-empty'>Sin integrantes adicionales. Puedes anadir uno nuevo.</div>";
-        } else {
-          visibleSlots.forEach(function (assistant) {
-            const assistantCard = document.createElement("details");
-            assistantCard.className = "sheet-assistant-item";
-            assistantCard.dataset.groupId = group.id;
-            assistantCard.dataset.assistantNumber = String(assistant.number || "");
-            assistantCard.open = isSheetAssistantExpanded(group.id, assistant.number, !assistant.filled);
-
-            const assistantSummary = document.createElement("summary");
-            assistantSummary.className = "sheet-assistant-summary";
-            const assistantSummaryMain = document.createElement("div");
-            assistantSummaryMain.className = "sheet-assistant-summary-main";
-            const assistantName = document.createElement("div");
-            assistantName.className = "sheet-assistant-name";
-            assistantName.textContent = assistant.name || ("Integrante " + String(Number(assistant.number) || assistant.number));
-            assistantSummaryMain.appendChild(assistantName);
-            const assistantMeta = document.createElement("div");
-            assistantMeta.className = "sheet-assistant-meta";
-            const ticketPerson = ticketPeople.find(function (person) {
-              return person.role === "asistente" && String(person.number) === String(assistant.number);
-            });
-            const contactInfo = assistant.email || assistant.dni || "Pulsa para editar datos";
-            const entryInfo = ticketPerson && ticketPerson.info ? ticketPerson.info : "";
-            const metaText = [contactInfo, entryInfo].filter(Boolean).join(" · ");
-            assistantMeta.textContent = metaText;
-            assistantSummaryMain.appendChild(assistantMeta);
-            assistantSummary.appendChild(assistantSummaryMain);
-            const assistantSummarySide = document.createElement("div");
-            assistantSummarySide.className = "sheet-group-summary-side";
-            const normalizedStatus = ticketPerson && ticketPerson.status ? normalizeEntryStatus(ticketPerson.status) : "";
-            if (normalizedStatus && ticketPerson && ticketPerson.statusCol >= 0) {
-              const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
-              const statusChip = document.createElement("span");
-              statusChip.className = "entry-status-chip " + statusClass;
-              statusChip.textContent = normalizedStatus;
-              assistantSummarySide.appendChild(statusChip);
-            }
-            const assistantBadge = document.createElement("span");
-            assistantBadge.className = "sheet-assistant-badge";
-            assistantBadge.textContent = "#" + String(Number(assistant.number) || assistant.number);
-            const assistantChevron = document.createElement("span");
-            assistantChevron.className = "sheet-group-chevron";
-            assistantChevron.textContent = "⌄";
-            assistantSummarySide.appendChild(assistantBadge);
-            assistantSummarySide.appendChild(assistantChevron);
-            assistantSummary.appendChild(assistantSummarySide);
-            assistantCard.appendChild(assistantSummary);
-
-            const assistantBody = document.createElement("div");
-            assistantBody.className = "sheet-assistant-body";
-            const assistantFields = document.createElement("div");
-            assistantFields.className = "sheet-assistant-fields";
-            assistantFields.appendChild(createSheetGroupField("Nombre", createSheetGroupTextInput(group.id, group.sheetRow, assistant.nameCol, assistant.name, { placeholder: "Nombre completo", role: "assistant-name" })));
-            assistantFields.appendChild(createSheetGroupField("DNI", createSheetGroupTextInput(group.id, group.sheetRow, assistant.dniCol, assistant.dni, { placeholder: "DNI", role: "assistant-dni" })));
-            assistantFields.appendChild(createSheetGroupField("Email", createSheetGroupTextInput(group.id, group.sheetRow, assistant.emailCol, assistant.email, { type: "email", placeholder: "correo@upv.es", role: "assistant-email" })));
-            assistantBody.appendChild(assistantFields);
-            if (ticketPerson) {
-              assistantBody.appendChild(createPersonTicketBlock(group, ticketPerson, { rolePrefix: "assistant" }));
-            }
-            assistantCard.appendChild(assistantBody);
-            assistantsList.appendChild(assistantCard);
-          });
-        }
-        assistantsBlock.appendChild(assistantsList);
-        body.appendChild(assistantsBlock);
+        footer.appendChild(actionsRow);
+        body.appendChild(footer);
         card.appendChild(body);
         els.sheetGroupsList.appendChild(card);
       });
