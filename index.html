@@ -1027,8 +1027,8 @@
       position: absolute;
       top: 4px;
       left: 4px;
-      width: 46px;
-      height: 46px;
+      height: calc(100% - 8px);
+      aspect-ratio: 1;
       border-radius: 14px;
       background: linear-gradient(180deg, #db6a47 0%, #b64e31 100%);
       color: #fff8eb;
@@ -2796,13 +2796,13 @@
       color: #9d3f3f;
     }
     .ticket-reader-review-state-icon {
-      width: 40px;
-      height: 40px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      flex: 0 0 40px;
-      font-size: 1.1rem;
+      flex: 0 0 56px;
+      font-size: 1.8rem;
     }
     .ticket-reader-review-state.is-fresh .ticket-reader-review-state-icon {
       background: rgba(30, 126, 67, 0.15);
@@ -2816,7 +2816,7 @@
       min-width: 0;
     }
     .ticket-reader-review-state-title {
-      font-size: 0.95rem;
+      font-size: 1.3rem;
       font-weight: 800;
       line-height: 1.15;
     }
@@ -2836,25 +2836,25 @@
     }
     .ticket-reader-review-row {
       display: grid;
-      grid-template-columns: 100px minmax(0, 1fr);
+      grid-template-columns: 80px minmax(0, 1fr);
       gap: 8px;
       align-items: baseline;
-      padding: 8px 0;
-      border-top: 1px solid rgba(185, 90, 0, 0.07);
+      padding: 6px 0;
+      border-top: 1px solid rgba(185, 90, 0, 0.05);
     }
     .ticket-reader-review-row:first-child {
       border-top: none;
       padding-top: 4px;
     }
     .ticket-reader-review-row-label {
-      font-size: 0.66rem;
+      font-size: 0.6rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
       font-weight: 700;
     }
     .ticket-reader-review-row-value {
-      font-size: 0.92rem;
+      font-size: 0.74rem;
       line-height: 1.3;
       word-break: break-word;
       font-weight: 600;
@@ -4555,8 +4555,6 @@
           </label>
           <div class="ticket-reader-actions">
             <button id="ticketReaderSearchBtnLegacy" class="btn small primary" type="button">Buscar</button>
-            <button id="ticketReaderCameraBtnLegacy" class="btn small" type="button">Cámara</button>
-            <button id="ticketReaderCameraStopBtnLegacy" class="btn small hidden" type="button">Detener</button>
           </div>
             <div id="ticketReaderCameraWrap" class="ticket-reader-camera hidden">
               <video id="ticketReaderVideo" playsinline muted></video>
@@ -4577,8 +4575,6 @@
               </label>
               <div class="ticket-reader-actions">
                 <button id="ticketReaderSearchBtn" class="btn small primary" type="button">Buscar</button>
-                <button id="ticketReaderCameraBtn" class="btn small" type="button">Cámara</button>
-                <button id="ticketReaderCameraStopBtn" class="btn small hidden" type="button">Detener</button>
               </div>
             </div>
           </div>
@@ -4597,7 +4593,7 @@
           <div id="ticketReaderReviewGrid" class="ticket-reader-review-grid"></div>
           <div class="ticket-reader-review-actions">
             <button id="ticketReaderReviewCloseBtn" class="btn small" type="button">Cerrar</button>
-            <button id="ticketReaderReviewConfirmBtn" class="btn small primary" type="button">Todo está correcto</button>
+            <button id="ticketReaderReviewConfirmBtn" class="btn primary" style="font-size: 1.2rem; padding: 14px; border-radius: 14px; font-weight: 800;" type="button">Validar</button>
           </div>
         </section>
       </div>
@@ -7515,7 +7511,7 @@
       if (els.ticketReaderReviewConfirmBtn) {
         els.ticketReaderReviewConfirmBtn.disabled = false;
         els.ticketReaderReviewConfirmBtn.classList.remove("hidden");
-        els.ticketReaderReviewConfirmBtn.textContent = "Todo esta correcto";
+        els.ticketReaderReviewConfirmBtn.textContent = "Validar";
       }
       scheduleTicketReaderCameraResume();
     }
@@ -7742,14 +7738,14 @@
       const value = String(rawValue || "").trim();
       if (!value) return Promise.resolve(false);
       const fromCamera = !!(state.ticketReader.stream || state.ticketReader.scanTimer);
-      if (els.ticketReaderSearchInput) els.ticketReaderSearchInput.value = value;
       const results = searchTicketReaderPeople(value);
-      renderTicketReaderResults(results, "No se ha encontrado ninguna entrada para ese QR.");
       if (!results.length) {
         setTicketReaderStatus("QR no reconocido.", "error");
         return Promise.resolve(false);
       }
       if (results.length > 1) {
+        if (els.ticketReaderSearchInput) els.ticketReaderSearchInput.value = value;
+        renderTicketReaderResults(results, "Múltiples coincidencias");
         state.ticketReader.resumeCameraAfterReview = false;
         stopTicketReaderCamera();
         setTicketReaderStatus("Varias coincidencias.", "");
@@ -7974,6 +7970,9 @@
           renderTicketReaderResults([], messageFromError(err, "No se ha podido cargar la hoja de entradas."));
         });
       }, 16);
+      
+      // Auto-start camera
+      startTicketReaderCamera().catch(function() {});
     }
     function startTicketReaderCamera() {
       if (!window.BarcodeDetector || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -7990,9 +7989,9 @@
       }).then(function (stream) {
         state.ticketReader.stream = stream;
         els.ticketReaderVideo.srcObject = stream;
-        els.ticketReaderCameraWrap.classList.remove("hidden");
-        els.ticketReaderCameraBtn.classList.add("hidden");
-        els.ticketReaderCameraStopBtn.classList.remove("hidden");
+        if (els.ticketReaderCameraWrap) els.ticketReaderCameraWrap.classList.remove("hidden");
+        if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.classList.add("hidden");
+        if (els.ticketReaderCameraStopBtn) els.ticketReaderCameraStopBtn.classList.remove("hidden");
         syncTicketReaderCameraUi();
         setTicketReaderStatus("", "");
         return els.ticketReaderVideo.play().catch(function () {});
