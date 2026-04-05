@@ -7020,8 +7020,44 @@
       syncEditorSurface();
       saveStoredUiSession();
       if (state.spreadsheetViewMode === "groups") {
-        renderSheetGroupsView();
+        renderSheetGroupsView().then(function () { startGroupsViewPoll(); });
+      } else {
+        stopGroupsViewPoll();
       }
+    }
+    var sheetGroupsPollTimer = 0;
+    var sheetGroupsSilentPollBusy = false;
+    var sheetGroupsLastRowSig = "";
+    var GROUPS_VIEW_POLL_INTERVAL = 4000;
+    function startGroupsViewPoll() {
+      stopGroupsViewPoll();
+      if (!isSpreadsheetDocumentActive()) return;
+      sheetGroupsLastRowSig = "";
+      sheetGroupsPollTimer = setInterval(silentPollGroupsView, GROUPS_VIEW_POLL_INTERVAL);
+    }
+    function stopGroupsViewPoll() {
+      if (!sheetGroupsPollTimer) return;
+      clearInterval(sheetGroupsPollTimer);
+      sheetGroupsPollTimer = 0;
+    }
+    function silentPollGroupsView() {
+      if (sheetGroupsSilentPollBusy || state.spreadsheetViewMode !== "groups" || !isSpreadsheetDocumentActive()) return;
+      var active = document.activeElement;
+      if (active && els.sheetGroupsView && els.sheetGroupsView.contains(active)) return;
+      sheetGroupsSilentPollBusy = true;
+      var titleAtStart = state.currentSheetTitle;
+      fetchCurrentSheetRows().then(function (rows) {
+        if (state.spreadsheetViewMode !== "groups" || state.currentSheetTitle !== titleAtStart) return;
+        var sig = JSON.stringify(rows);
+        if (sig === sheetGroupsLastRowSig) return;
+        sheetGroupsLastRowSig = sig;
+        var newModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows));
+        state.sheetGroupsModel = newModel;
+        renderSheetGroupsList(newModel.groups);
+        setSheetGroupsStatus(sheetGroupsStatusText(newModel), newModel.groups.length ? "" : "error");
+      }).catch(function () {}).finally(function () {
+        sheetGroupsSilentPollBusy = false;
+      });
     }
     function fetchCurrentSheetRows() {
       const info = currentSheetInfo();
@@ -12726,7 +12762,7 @@
       });
     }
     function openForm(item) {
-      stopCollabPolling();
+      stopGroupsViewPoll(); stopCollabPolling();
       stopPresencePing();
       closePresencePopup();
       clearDeferredRemotePull();
@@ -12805,7 +12841,7 @@
         });
     }
     function openSpreadsheet(item) {
-      stopCollabPolling();
+      stopGroupsViewPoll(); stopCollabPolling();
       stopPresencePing();
       closePresencePopup();
       clearDeferredRemotePull();
@@ -12881,6 +12917,7 @@
           saveStoredUiSession();
           return loadSheet(state.currentSheetTitle || state.spreadsheetSheets[0].title).then(function () {
             startCollabPolling();
+            if (state.spreadsheetViewMode === "groups") startGroupsViewPoll();
           });
         })
         .catch(function (err) {
@@ -13594,7 +13631,7 @@
     function returnToDrive() {
       return flushPendingChanges({ force: true, message: "Guardando antes de salir..." }).then(function (ok) {
         if (!ok && hasPendingChanges()) return false;
-        stopCollabPolling();
+        stopGroupsViewPoll(); stopCollabPolling();
         closeTicketReaderModal();
         closePresencePopup();
         return clearPresence().catch(function () {
@@ -13640,7 +13677,7 @@
       });
     });
     function resetSession() {
-      stopCollabPolling();
+      stopGroupsViewPoll(); stopCollabPolling();
       closePresencePopup();
       return clearPresence().catch(function () {
       }).finally(function () {
@@ -14320,7 +14357,7 @@
     }, true);
     function handleSessionPageExit() {
       saveStoredUiSession();
-      stopCollabPolling();
+      stopGroupsViewPoll(); stopCollabPolling();
       closePresencePopup();
       clearPresence();
     }
