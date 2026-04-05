@@ -5112,7 +5112,7 @@
             updatedAt: Number(data.updatedAt) || 0
           };
           const sessionAge = session.updatedAt ? (Date.now() - session.updatedAt) : 0;
-          if (!session.accessToken && !session.user) {
+          if (!session.accessToken && !session.user && !session.loginHint) {
             localStorage.removeItem(storageKey);
             continue;
           }
@@ -5220,23 +5220,40 @@
     function currentLinkerDeploymentId() {
       return String(GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID || readStoredLinkerDeploymentId() || "").trim();
     }
-    function saveStoredAuthSession() {
-      const normalizedUser = normalizeStoredUser(state.currentUser);
-      if (!state.accessToken && !normalizedUser) {
+    function writeStoredAuthSessionSnapshot(snapshot) {
+      const data = snapshot && typeof snapshot === "object" ? snapshot : {};
+      const normalizedUser = normalizeStoredUser(data.user);
+      const accessToken = data.accessToken ? String(data.accessToken) : "";
+      const expiresAt = Number(data.expiresAt) || 0;
+      const loginHint = data.loginHint
+        ? String(data.loginHint)
+        : (normalizedUser && normalizedUser.emailAddress ? normalizedUser.emailAddress : "");
+      if (!accessToken && !normalizedUser && !loginHint) {
         clearStoredAuthSession();
         return;
       }
       try {
         localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
-          accessToken: state.accessToken || "",
-          expiresAt: state.accessTokenExpiresAt || 0,
+          accessToken: accessToken,
+          expiresAt: expiresAt,
           user: normalizedUser,
-          loginHint: normalizedUser && normalizedUser.emailAddress ? normalizedUser.emailAddress : "",
+          loginHint: loginHint,
           updatedAt: Date.now()
         }));
       } catch (err) {
         console.warn("No se ha podido guardar la sesion:", err);
       }
+    }
+    function saveStoredAuthSession(snapshot) {
+      const source = snapshot && typeof snapshot === "object"
+        ? snapshot
+        : {
+            accessToken: state.accessToken || "",
+            expiresAt: state.accessTokenExpiresAt || 0,
+            user: state.currentUser || null,
+            loginHint: getAuthLoginHint()
+          };
+      writeStoredAuthSessionSnapshot(source);
     }
     function getAuthLoginHint() {
       const currentUser = normalizeStoredUser(state.currentUser);
@@ -5323,13 +5340,29 @@
       const preservedUser = config.keepUser
         ? (state.currentUser || (storedSession ? storedSession.user : null))
         : (storedSession ? storedSession.user : null);
+      const preservedLoginHint = config.keepLoginHint === false
+        ? ""
+        : (
+            config.loginHint
+              ? String(config.loginHint)
+              : (
+                  (storedSession && storedSession.loginHint)
+                  || (preservedUser && preservedUser.emailAddress)
+                  || ""
+                )
+          );
       clearTokenRefreshTimer();
       state.tokenRequestInFlight = null;
       state.accessToken = "";
       state.accessTokenExpiresAt = 0;
       state.currentUser = preservedUser || null;
       if (config.keepStoredSession) {
-        saveStoredAuthSession();
+        writeStoredAuthSessionSnapshot({
+          accessToken: config.preserveStoredToken === false ? "" : (storedSession && storedSession.accessToken ? storedSession.accessToken : ""),
+          expiresAt: config.preserveStoredToken === false ? 0 : (storedSession && storedSession.expiresAt ? storedSession.expiresAt : 0),
+          user: preservedUser || null,
+          loginHint: preservedLoginHint
+        });
       } else {
         clearStoredAuthSession();
       }
@@ -5470,8 +5503,13 @@
         throw err;
       });
     }
-    function ensureValidAccessToken() {
+    function ensureValidAccessToken(options) {
+      const config = options || {};
       if (hasUsableAccessToken(AUTH_REFRESH_MARGIN_MS)) {
+        return Promise.resolve(state.accessToken);
+      }
+      if (config.allowCurrentToken && hasUsableAccessToken(0)) {
+        scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
         return Promise.resolve(state.accessToken);
       }
       if (!state.tokenClient) {
@@ -5491,8 +5529,8 @@
         throw err;
       });
     }
-    function openAuthenticatedDrive() {
-      return ensureValidAccessToken().then(function () {
+    function openAuthenticatedDrive(options) {
+      return ensureValidAccessToken(options).then(function () {
         return loadProfile();
       }).then(function () {
         clearRecentAutomaticAuth();
@@ -5601,11 +5639,12 @@
         });
         return state.sessionRestoreInFlight;
       }
-      const restoreWork = hasUsableAccessToken(0)
+      const allowCurrentStoredToken = hasUsableAccessToken(0);
+      const restoreWork = allowCurrentStoredToken
         ? Promise.resolve()
         : restoreGoogleSessionSilently();
       state.sessionRestoreInFlight = restoreWork.then(function () {
-        return openAuthenticatedDrive();
+        return openAuthenticatedDrive({ allowCurrentToken: allowCurrentStoredToken });
       }).then(function () {
         return true;
       }).catch(function (err) {
