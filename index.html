@@ -3829,14 +3829,6 @@
     </main>
   </div>
 
-  <div id="presencePopup" class="presence-popup hidden" role="dialog" aria-modal="false" aria-label="Actividad del documento">
-    <div class="presence-popup-header">
-      <span>Dispositivos conectados</span>
-      <button id="presencePopupCloseBtn" class="presence-popup-close" type="button" aria-label="Cerrar lista de actividad">&times;</button>
-    </div>
-    <div id="presencePopupList" class="presence-popup-list"></div>
-  </div>
-
   <div id="newSheetModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="newSheetModalTitle">
     <section id="newSheetModalCard" class="card modal-card">
         <div class="head">
@@ -3977,6 +3969,34 @@
     </section>
   </div>
 
+  <div id="driveTrashModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="driveTrashModalTitle">
+    <section id="driveTrashModalCard" class="card modal-card">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="driveTrashModalTitle" class="title">Papelera</div>
+          <div class="meta">Archivos enviados a la papelera. Puedes recuperarlos desde aqui.</div>
+        </div>
+        <button id="driveTrashCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="trash-modal-body">
+        <div id="driveTrashStatus" class="status"></div>
+        <div id="driveTrashList" class="trash-list"></div>
+        <p id="driveTrashEmpty" class="meta trash-empty hidden">La papelera esta vacia.</p>
+      </div>
+      <div class="row modal-actions">
+        <button id="driveTrashFooterCloseBtn" class="btn small" type="button">Cerrar</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="presencePopup" class="presence-popup hidden" role="dialog" aria-modal="false" aria-label="Actividad del documento">
+    <div class="presence-popup-header">
+      <span>Dispositivos conectados</span>
+      <button id="presencePopupCloseBtn" class="presence-popup-close" type="button" aria-label="Cerrar lista de actividad">&times;</button>
+    </div>
+    <div id="presencePopupList" class="presence-popup-list"></div>
+  </div>
+
   <div id="formDeleteModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="formDeleteModalTitle">
     <section class="danger-card">
       <div class="modal-copy">
@@ -3994,26 +4014,6 @@
       </div>
       <div class="row modal-actions">
         <button id="formDeleteModalCancelBtn" class="btn small" type="button">Cancelar</button>
-      </div>
-    </section>
-  </div>
-
-  <div id="driveTrashModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="driveTrashModalTitle">
-    <section id="driveTrashModalCard" class="card modal-card">
-      <div class="head">
-        <div class="modal-copy">
-          <div id="driveTrashModalTitle" class="title">Papelera</div>
-          <div class="meta">Archivos enviados a la papelera. Puedes recuperarlos desde aqui.</div>
-        </div>
-        <button id="driveTrashCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
-      </div>
-      <div class="trash-modal-body">
-        <div id="driveTrashStatus" class="status"></div>
-        <div id="driveTrashList" class="trash-list"></div>
-        <p id="driveTrashEmpty" class="meta trash-empty hidden">La papelera esta vacia.</p>
-      </div>
-      <div class="row modal-actions">
-        <button id="driveTrashFooterCloseBtn" class="btn small" type="button">Cerrar</button>
       </div>
     </section>
   </div>
@@ -4068,7 +4068,7 @@
       <div class="head">
         <div class="modal-copy">
           <div id="ticketReaderTitle" class="title">Lector de entradas</div>
-          <div id="ticketReaderSubtitle" class="meta">Valida entradas por QR o buscando por c&oacute;digo, nombre, tel&eacute;fono o DNI.</div>
+          <div id="ticketReaderSubtitle" class="meta">Valida entradas por QR o buscando por código, nombre, teléfono o DNI.</div>
         </div>
         <button id="ticketReaderCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
       </div>
@@ -4079,12 +4079,12 @@
             <select id="ticketReaderSheetSelect" class="search"></select>
           </label>
           <label class="ticket-reader-field ticket-reader-search">
-            <span>Buscar o introducir c&oacute;digo</span>
-            <input id="ticketReaderSearchInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="C&oacute;digo, nombre, tel&eacute;fono o DNI">
+            <span>Buscar o introducir código</span>
+            <input id="ticketReaderSearchInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Código, nombre, teléfono o DNI">
           </label>
           <div class="ticket-reader-actions">
             <button id="ticketReaderSearchBtn" class="btn small primary" type="button">Buscar</button>
-            <button id="ticketReaderCameraBtn" class="btn small" type="button">C&aacute;mara</button>
+            <button id="ticketReaderCameraBtn" class="btn small" type="button">Cámara</button>
             <button id="ticketReaderCameraStopBtn" class="btn small hidden" type="button">Detener</button>
           </div>
         </div>
@@ -4103,7 +4103,7 @@
           <div id="ticketReaderReviewGrid" class="ticket-reader-review-grid"></div>
           <div class="ticket-reader-review-actions">
             <button id="ticketReaderReviewCloseBtn" class="btn small" type="button">Cerrar</button>
-            <button id="ticketReaderReviewConfirmBtn" class="btn small primary" type="button">Todo est&aacute; correcto</button>
+            <button id="ticketReaderReviewConfirmBtn" class="btn small primary" type="button">Todo está correcto</button>
           </div>
         </section>
       </div>
@@ -4572,6 +4572,34 @@
       paellaAccessStatus: document.getElementById("paellaAccessStatus"),
       paellaAccessPopupList: document.getElementById("paellaAccessPopupList")
     };
+
+    (function () {
+      var noop = function () {};
+      var noopFalse = function () { return false; };
+      var noopNull = function () { return null; };
+      var noopArr = function () { return []; };
+      Object.keys(els).forEach(function (key) {
+        if (els[key]) return;
+        els[key] = {
+          addEventListener: noop, removeEventListener: noop,
+          classList: { toggle: noop, add: noop, remove: noop, contains: noopFalse },
+          style: {}, dataset: {},
+          setPointerCapture: noop, releasePointerCapture: noop,
+          contains: noopFalse, matches: noopFalse,
+          querySelector: noopNull, querySelectorAll: noopArr, closest: noopNull,
+          focus: noop, blur: noop, click: noop,
+          appendChild: noop, removeChild: noop, insertBefore: noop,
+          getAttribute: noopNull, setAttribute: noop, removeAttribute: noop,
+          textContent: "", value: "", innerHTML: "", innerText: "",
+          checked: false, selectedIndex: -1,
+          offsetWidth: 0, clientWidth: 0, offsetHeight: 0, clientHeight: 0,
+          scrollTop: 0, scrollLeft: 0, scrollWidth: 0, scrollHeight: 0,
+          parentNode: null, parentElement: null, children: [], childNodes: [],
+          firstChild: null, lastChild: null, nextSibling: null, previousSibling: null,
+          _isProxy: true
+        };
+      });
+    })();
 
     function setLoginStatus(text) { els.loginStatus.textContent = text || ""; }
     function setDriveStatus(text) {
