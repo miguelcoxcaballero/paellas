@@ -2895,37 +2895,8 @@
     }
     .ticket-reader-hero {
       display: flex;
-      justify-content: space-between;
-      align-items: start;
-      gap: 12px;
-      padding: 16px 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      background: rgba(255, 249, 232, 0.86);
-    }
-    .ticket-reader-hero-copy {
-      min-width: 0;
-      display: grid;
-      gap: 6px;
-    }
-    .ticket-reader-eyebrow {
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent2);
-    }
-    .ticket-reader-hero-title {
-      font-size: 1.45rem;
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-    }
-    .ticket-reader-hero-text {
-      font-size: 0.9rem;
-      line-height: 1.4;
-      color: var(--muted);
-      max-width: 48ch;
+      align-items: center;
+      padding: 8px 12px;
     }
     .ticket-reader-live-badge {
       flex: 0 0 auto;
@@ -3002,23 +2973,6 @@
       border: 2px dashed rgba(255,255,255,0.25);
       border-radius: 20px;
     }
-    .ticket-reader-camera-hint {
-      position: absolute;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      min-width: max-content;
-      max-width: calc(100% - 24px);
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: rgba(10, 10, 10, 0.62);
-      color: rgba(255,255,255,0.92);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-align: center;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
     .ticket-reader-camera-placeholder {
       display: grid;
       place-items: center;
@@ -3048,16 +3002,10 @@
       opacity: 0.94;
     }
     .ticket-reader-camera-placeholder-title {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.02em;
-    }
-    .ticket-reader-camera-placeholder-text {
-      font-size: 0.92rem;
-      line-height: 1.45;
-      color: rgba(255,255,255,0.76);
-      max-width: 34ch;
     }
     .ticket-reader-stage-camera {
       display: block;
@@ -3068,7 +3016,7 @@
       display: none;
     }
     .ticket-reader-panel {
-      grid-template-rows: auto auto auto minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr);
     }
     .ticket-reader-panel-block {
       display: grid;
@@ -3096,11 +3044,14 @@
     }
     .ticket-reader-status-card {
       display: grid;
-      gap: 6px;
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(185, 90, 0, 0.1);
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(185, 90, 0, 0.08);
       background: rgba(255, 251, 241, 0.88);
+    }
+    .ticket-reader-status-card:empty,
+    .ticket-reader-status-card:not(:has(.ticket-reader-status-text:not(:empty))) {
+      display: none;
     }
     .ticket-reader-status-card[data-tone="good"] {
       background: rgba(232, 250, 238, 0.95);
@@ -3110,35 +3061,13 @@
       background: rgba(255, 241, 241, 0.96);
       border-color: rgba(156, 30, 30, 0.14);
     }
-    .ticket-reader-status-label {
-      font-size: 0.68rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 800;
-    }
     .ticket-reader-status-text {
-      font-size: 0.92rem;
-      line-height: 1.4;
+      font-size: 0.86rem;
+      line-height: 1.35;
       color: var(--ink);
-      min-height: 1.4em;
     }
-    .ticket-reader-results-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      min-width: 0;
-    }
-    .ticket-reader-results-title {
-      font-size: 0.94rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-    }
-    .ticket-reader-results-note {
-      font-size: 0.76rem;
-      color: var(--muted);
-      text-align: right;
+    .ticket-reader-status-text:empty {
+      display: none;
     }
     .ticket-reader-results {
       gap: 10px;
@@ -3152,16 +3081,7 @@
       border: 1px dashed rgba(185, 90, 0, 0.18);
       background: rgba(255, 251, 241, 0.72);
     }
-    .ticket-reader-empty-title {
-      font-size: 0.88rem;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-    .ticket-reader-empty-copy {
-      font-size: 0.8rem;
-      line-height: 1.4;
-      color: var(--muted);
-    }
+    
     .ticket-reader-result {
       gap: 10px;
       padding: 14px;
@@ -3469,9 +3389,8 @@
       .sheet-assistants-list { grid-template-columns: 1fr; }
       .ticket-reader-body { grid-template-columns: 1fr; }
       .ticket-reader-camera-shell { min-height: min(52dvh, 520px); }
-      .ticket-reader-panel { grid-template-rows: auto auto auto minmax(220px, 1fr); }
+      .ticket-reader-panel { grid-template-rows: auto auto minmax(220px, 1fr); }
       .ticket-reader-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .ticket-reader-results-note { text-align: left; }
       .ticket-reader-result-data { grid-template-columns: 1fr; }
       .sheet-person-ticket-grid { grid-template-columns: 1fr 1fr; }
       .sheet-view-toggle { margin-left: 0; width: fit-content; }
@@ -3843,13 +3762,6 @@
         padding: 12px;
         border-radius: 16px;
       }
-      .ticket-reader-hero-title { font-size: 1.12rem; }
-      .ticket-reader-hero-text { font-size: 0.82rem; }
-      .ticket-reader-results-head {
-        display: grid;
-        gap: 4px;
-      }
-      .ticket-reader-results-note { text-align: left; }
       .ticket-reader-actions {
         grid-template-columns: 1fr;
       }
@@ -3946,8 +3858,7 @@
         height: 72px;
         border-radius: 20px;
       }
-      .ticket-reader-camera-placeholder-title { font-size: 1.05rem; }
-      .ticket-reader-camera-placeholder-text { font-size: 0.82rem; }
+      .ticket-reader-camera-placeholder-title { font-size: 0.95rem; }
       .paella-entry-reader-btn { min-height: 66px; padding: 12px; }
       .paella-entry-reader-icon {
         width: 38px;
@@ -4484,19 +4395,14 @@
       <div class="head">
         <div class="modal-copy">
           <div id="ticketReaderTitle" class="title">Lector de entradas</div>
-          <div id="ticketReaderSubtitle" class="meta">Valida entradas por QR o buscando por código, nombre, teléfono o DNI.</div>
+          <div id="ticketReaderSubtitle" class="meta">Escanea QR o busca por nombre, DNI o código.</div>
         </div>
         <button id="ticketReaderCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
       </div>
       <div class="ticket-reader-body">
         <section class="ticket-reader-stage" aria-label="Zona de escaneo">
           <div class="ticket-reader-hero">
-            <div class="ticket-reader-hero-copy">
-              <div class="ticket-reader-eyebrow">Acceso en tiempo real</div>
-              <div class="ticket-reader-hero-title">Escanea o busca y valida en dos pasos</div>
-              <div class="ticket-reader-hero-text">Abre la camara para leer un QR o encuentra a la persona por nombre, telefono, DNI o codigo. Cuando la detectes, revisas sus datos y confirmas.</div>
-            </div>
-            <div id="ticketReaderLiveBadge" class="ticket-reader-live-badge">Camara lista</div>
+            <div id="ticketReaderLiveBadge" class="ticket-reader-live-badge">Inactiva</div>
           </div>
           <div class="ticket-reader-camera-shell">
             <div id="ticketReaderCameraPlaceholder" class="ticket-reader-camera-placeholder">
@@ -4514,8 +4420,7 @@
                     <rect x="11" y="15" width="2" height="2" rx="0.4"></rect>
                   </svg>
                 </div>
-                <div class="ticket-reader-camera-placeholder-title">Escaneo listo cuando quieras</div>
-                <div class="ticket-reader-camera-placeholder-text">Pulsa <strong>Camara</strong> para validar entradas seguidas con el movil, o usa la busqueda manual si prefieres revisar primero.</div>
+                <div class="ticket-reader-camera-placeholder-title">Pulsa Cámara para escanear</div>
               </div>
             </div>
         <div class="ticket-reader-controls ticket-reader-stage-camera" aria-hidden="true">
@@ -4524,8 +4429,8 @@
             <select id="ticketReaderSheetSelectLegacy" class="search"></select>
           </label>
           <label class="ticket-reader-field ticket-reader-search">
-            <span>Buscar o introducir código</span>
-            <input id="ticketReaderSearchInputLegacy" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Código, nombre, teléfono o DNI">
+            <span>Buscar</span>
+            <input id="ticketReaderSearchInputLegacy" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre, DNI, teléfono o código">
           </label>
           <div class="ticket-reader-actions">
             <button id="ticketReaderSearchBtnLegacy" class="btn small primary" type="button">Buscar</button>
@@ -4535,7 +4440,6 @@
             <div id="ticketReaderCameraWrap" class="ticket-reader-camera hidden">
               <video id="ticketReaderVideo" playsinline muted></video>
               <div class="ticket-reader-focus-frame" aria-hidden="true"></div>
-              <div class="ticket-reader-camera-hint">Alinea el QR dentro del marco</div>
             </div>
           </div>
         </section>
@@ -4543,27 +4447,22 @@
           <div class="ticket-reader-panel-block">
             <div class="ticket-reader-controls">
               <label class="ticket-reader-field">
-                <span>Hoja de respuestas</span>
+                <span>Hoja</span>
                 <select id="ticketReaderSheetSelect" class="search"></select>
               </label>
               <label class="ticket-reader-field ticket-reader-search">
-                <span>Buscar o introducir codigo</span>
-                <input id="ticketReaderSearchInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Codigo, nombre, telefono o DNI">
+                <span>Buscar</span>
+                <input id="ticketReaderSearchInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre, DNI, teléfono o código">
               </label>
               <div class="ticket-reader-actions">
                 <button id="ticketReaderSearchBtn" class="btn small primary" type="button">Buscar</button>
-                <button id="ticketReaderCameraBtn" class="btn small" type="button">Camara</button>
+                <button id="ticketReaderCameraBtn" class="btn small" type="button">Cámara</button>
                 <button id="ticketReaderCameraStopBtn" class="btn small hidden" type="button">Detener</button>
               </div>
             </div>
           </div>
           <div id="ticketReaderStatusCard" class="ticket-reader-status-card" data-tone="">
-            <div class="ticket-reader-status-label">Estado</div>
             <div id="ticketReaderStatus" class="ticket-reader-status-text"></div>
-          </div>
-          <div class="ticket-reader-results-head">
-            <div class="ticket-reader-results-title">Coincidencias y revision</div>
-            <div class="ticket-reader-results-note">Una sola coincidencia abre directamente la revision.</div>
           </div>
           <div id="ticketReaderResults" class="ticket-reader-results"></div>
         </section>
@@ -7103,7 +7002,7 @@
         els.ticketReaderCameraPlaceholder.classList.toggle("hidden", active);
       }
       if (els.ticketReaderLiveBadge) {
-        els.ticketReaderLiveBadge.textContent = active ? "Camara activa" : "Camara lista";
+        els.ticketReaderLiveBadge.textContent = active ? "Escaneando\u2026" : "Inactiva";
         els.ticketReaderLiveBadge.classList.toggle("is-live", active);
       }
     }
@@ -7656,10 +7555,10 @@
         state.ticketReader.rows = rows;
         state.ticketReader.sheets = (result.meta && result.meta.sheet && result.meta.sheet.sheets || []).map(function (entry) { return entry.properties || {}; });
         setTicketReaderStatus(
-          model.groups.length ? "Hoja lista. Escanea un QR o usa la busqueda manual." : "La hoja seleccionada no contiene respuestas de paella.",
+          model.groups.length ? "Hoja lista." : "Sin grupos en esta hoja.",
           model.groups.length ? "good" : "error"
         );
-        renderTicketReaderResults([], model.groups.length ? "Escanea un QR o busca por codigo, nombre, telefono o DNI." : "No hay grupos de paella en esta hoja.");
+        renderTicketReaderResults([], model.groups.length ? "" : "No hay grupos de paella en esta hoja.");
         return model;
       }).finally(function () {
         setBusy(els.ticketReaderCard, false);
@@ -7683,12 +7582,13 @@
       els.ticketReaderResults.innerHTML = "";
       const items = Array.isArray(results) ? results : [];
       if (!items.length) {
-        const empty = document.createElement("div");
-        empty.className = "ticket-reader-empty";
-        empty.innerHTML =
-          "<div class='ticket-reader-empty-title'>Sin coincidencias</div>" +
-          "<div class='ticket-reader-empty-copy'>" + escapeHtml(emptyText || "Escanea un QR o usa la busqueda manual para empezar.") + "</div>";
-        els.ticketReaderResults.appendChild(empty);
+        if (emptyText) {
+          const empty = document.createElement("div");
+          empty.className = "meta";
+          empty.style.padding = "12px 0";
+          empty.textContent = emptyText;
+          els.ticketReaderResults.appendChild(empty);
+        }
         return;
       }
       items.forEach(function (person) {
@@ -7747,18 +7647,18 @@
       const results = searchTicketReaderPeople(value);
       renderTicketReaderResults(results, "No se ha encontrado ninguna entrada para ese QR.");
       if (!results.length) {
-        setTicketReaderStatus("No se ha reconocido el QR. Prueba otra vez o usa la busqueda manual.", "error");
+        setTicketReaderStatus("QR no reconocido.", "error");
         return Promise.resolve(false);
       }
       if (results.length > 1) {
         state.ticketReader.resumeCameraAfterReview = false;
         stopTicketReaderCamera();
-        setTicketReaderStatus("Hay varias coincidencias. Elige la persona correcta antes de validar.", "");
+        setTicketReaderStatus("Varias coincidencias.", "");
         return Promise.resolve(true);
       }
       state.ticketReader.resumeCameraAfterReview = fromCamera;
       stopTicketReaderCamera();
-      setTicketReaderStatus("Entrada detectada. Revisa los datos y confirma si todo encaja.", "good");
+      setTicketReaderStatus("Entrada detectada.", "good");
       return markTicketPersonEntered(results[0]).then(function () { return true; });
     }
     function searchTicketReaderPeople(query) {
@@ -7954,7 +7854,7 @@
       els.ticketReaderResults.innerHTML = "";
       els.ticketReaderSearchInput.value = "";
       closeTicketReaderReview();
-      setTicketReaderStatus(candidates.length ? "Elige una hoja y escanea o busca una entrada." : "", "");
+      setTicketReaderStatus("", "");
       syncTicketReaderCameraUi();
       if (!candidates.length) {
         renderTicketReaderResults([], "No hay spreadsheets de respuestas dentro de esta paella.");
@@ -7974,7 +7874,7 @@
     }
     function startTicketReaderCamera() {
       if (!window.BarcodeDetector || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setTicketReaderStatus("Este navegador no permite leer QR con camara aqui. Usa la busqueda manual.", "error");
+        setTicketReaderStatus("Escaner QR no disponible.", "error");
         return Promise.resolve(false);
       }
       stopTicketReaderCamera();
@@ -7991,7 +7891,7 @@
         els.ticketReaderCameraBtn.classList.add("hidden");
         els.ticketReaderCameraStopBtn.classList.remove("hidden");
         syncTicketReaderCameraUi();
-        setTicketReaderStatus("Camara activa. Apunta al QR.", "");
+        setTicketReaderStatus("", "");
         return els.ticketReaderVideo.play().catch(function () {});
       }).then(function () {
         const detector = new BarcodeDetector({ formats: ["qr_code"] });
