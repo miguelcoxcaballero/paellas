@@ -2259,6 +2259,16 @@
       border-color: rgba(190,88,88,0.1);
       color: #a23d3d;
     }
+    .sheet-group-chip.is-progress {
+      background: rgba(220,235,255,0.7);
+      border-color: rgba(80,120,200,0.15);
+      color: #2f5499;
+    }
+    .sheet-group-chip.is-progress-complete {
+      background: rgba(212,247,222,0.8);
+      border-color: rgba(44,149,74,0.2);
+      color: #1c6b34;
+    }
     .sheet-group-summary-side {
       display: inline-flex;
       align-items: center;
@@ -2291,8 +2301,8 @@
     }
     .sheet-group-section-divider {
       height: 1px;
-      background: rgba(185,90,0,0.06);
-      margin: 12px 0;
+      background: rgba(185,90,0,0.07);
+      margin: 14px 0;
     }
     .sheet-group-sections {
       display: grid;
@@ -2331,11 +2341,14 @@
       flex-wrap: wrap;
     }
     .sheet-group-block-title {
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       color: var(--accent2);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.07em;
       font-weight: 700;
+    }
+    .sheet-person-ticket .sheet-group-block-title {
+      color: #3a6abf;
     }
     .sheet-group-block-actions {
       display: flex;
@@ -2496,9 +2509,12 @@
     }
     .sheet-person-ticket {
       display: grid;
-      gap: 6px;
-      padding-top: 6px;
-      border-top: 1px solid rgba(185,90,0,0.05);
+      gap: 8px;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(245,250,255,0.7);
+      border: 1px solid rgba(80,120,200,0.1);
     }
     .sheet-person-ticket-head {
       display: flex;
@@ -2510,7 +2526,7 @@
     .sheet-person-ticket-grid {
       display: grid;
       gap: 6px;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       min-width: 0;
     }
     .sheet-person-ticket-actions {
@@ -2576,9 +2592,9 @@
     .sheet-assistant-summary {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
-      padding: 7px 10px;
+      padding: 8px 10px;
       cursor: pointer;
     }
     .sheet-assistant-summary-main {
@@ -7268,10 +7284,18 @@
       wrap.appendChild(head);
       const grid = document.createElement("div");
       grid.className = "sheet-person-ticket-grid";
+      grid.appendChild(createTicketField("Estado", createSheetGroupSelect(group.id, group.sheetRow, person.statusCol, normalizeEntryStatus(person.status), ["Pendiente", "Emitida", "HA ENTRADO"], { emptyLabel: "Pendiente" })));
       grid.appendChild(createTicketField("Info entrada", createSheetGroupTextInput(group.id, group.sheetRow, person.infoCol, person.info, { placeholder: "Pulsera, menu, observaciones", role: config.rolePrefix + "-entry-info" })));
-      grid.appendChild(createTicketField("Estado entrada", createSheetGroupSelect(group.id, group.sheetRow, person.statusCol, normalizeEntryStatus(person.status), ["Pendiente", "Emitida", "HA ENTRADO"], { emptyLabel: "Pendiente" })));
-      grid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code || "")));
-      grid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt || "")));
+      var extraCols = 0;
+      if (person.code) {
+        grid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code)));
+        extraCols++;
+      }
+      if (person.scannedAt) {
+        grid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt)));
+        extraCols++;
+      }
+      grid.style.gridTemplateColumns = "repeat(" + (2 + extraCols) + ", minmax(0, 1fr))";
       wrap.appendChild(grid);
       return wrap;
     }
@@ -8677,14 +8701,23 @@
         const chips = [
           "<span class='sheet-group-chip'>" + escapeHtml(String(group.attendeeCount)) + " personas</span>"
         ];
+        const hasEntrySystem = ticketPeople.some(function (p) { return p.statusCol >= 0; });
+        if (hasEntrySystem) {
+          const enteredCount = ticketPeople.filter(function (p) { return p.status === "HA ENTRADO"; }).length;
+          const totalCount = ticketPeople.length;
+          const allEntered = enteredCount === totalCount && totalCount > 0;
+          const progressClass = allEntered ? " is-progress-complete" : " is-progress";
+          const progressText = allEntered ? ("✓ " + enteredCount + "/" + totalCount + " han entrado") : (enteredCount + "/" + totalCount + " han entrado");
+          chips.push("<span class='sheet-group-chip" + progressClass + "'>" + escapeHtml(progressText) + "</span>");
+        }
         if (group.payment && group.payment.status) {
           const normalizedStatus = normalizePaymentStatus(group.payment.status);
           const paymentClass = normalizedStatus === "Pagado" ? " is-paid" : normalizedStatus === "Parcial" ? " is-partial" : " is-pending";
           chips.push("<span class='sheet-group-chip" + paymentClass + "'>" + escapeHtml(normalizedStatus) + "</span>");
         }
         if (group.payment && group.payment.amount) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.payment.amount) + " €</span>");
-        if (group.contest && group.contest.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.contest.value) + "</span>");
         if (group.firePoint && group.firePoint.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.firePoint.value) + "</span>");
+        if (group.contest && group.contest.value) chips.push("<span class='sheet-group-chip'>" + escapeHtml(group.contest.value) + "</span>");
         chipsWrap.innerHTML = chips.join("");
         summaryMain.appendChild(chipsWrap);
         summary.appendChild(summaryMain);
@@ -8809,21 +8842,22 @@
             const ticketPerson = ticketPeople.find(function (person) {
               return person.role === "asistente" && String(person.number) === String(assistant.number);
             });
-            const infoText = [
-              assistant.email || assistant.dni || "Pulsa para editar datos",
-              ticketPerson && ticketPerson.info ? ticketPerson.info : ""
-            ].filter(Boolean).join(" · ");
-            const normalizedStatus = ticketPerson && ticketPerson.status ? normalizeEntryStatus(ticketPerson.status) : "";
-            let statusHtml = "";
-            if (normalizedStatus) {
-              const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
-              statusHtml = " · <span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus) + "</span>";
-            }
-            assistantMeta.innerHTML = escapeHtml(infoText) + statusHtml;
+            const contactInfo = assistant.email || assistant.dni || "Pulsa para editar datos";
+            const entryInfo = ticketPerson && ticketPerson.info ? ticketPerson.info : "";
+            const metaText = [contactInfo, entryInfo].filter(Boolean).join(" · ");
+            assistantMeta.textContent = metaText;
             assistantSummaryMain.appendChild(assistantMeta);
             assistantSummary.appendChild(assistantSummaryMain);
             const assistantSummarySide = document.createElement("div");
             assistantSummarySide.className = "sheet-group-summary-side";
+            const normalizedStatus = ticketPerson && ticketPerson.status ? normalizeEntryStatus(ticketPerson.status) : "";
+            if (normalizedStatus && ticketPerson && ticketPerson.statusCol >= 0) {
+              const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
+              const statusChip = document.createElement("span");
+              statusChip.className = "entry-status-chip " + statusClass;
+              statusChip.textContent = normalizedStatus;
+              assistantSummarySide.appendChild(statusChip);
+            }
             const assistantBadge = document.createElement("span");
             assistantBadge.className = "sheet-assistant-badge";
             assistantBadge.textContent = "#" + String(Number(assistant.number) || assistant.number);
