@@ -2077,16 +2077,11 @@
       gap: 8px;
       align-content: start;
     }
-    @keyframes groupCardFadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
     .sheet-groups-banner {
-      animation: groupCardFadeIn 0.18s cubic-bezier(0.2, 0, 0, 1) both;
+      animation: none;
     }
     .sheet-group-card {
-      animation: groupCardFadeIn 0.2s cubic-bezier(0.2, 0, 0, 1) both;
-      animation-delay: calc(var(--i, 0) * 25ms);
+      animation: none;
     }
     .sheet-group-card.no-anim {
       animation: none;
@@ -2117,13 +2112,12 @@
       min-width: 0;
       border-left: 3px solid rgba(185,90,0,0.18);
       transition: box-shadow .15s ease;
-      animation: groupCardFadeIn 0.2s cubic-bezier(0.2, 0, 0, 1) both;
-      animation-delay: calc(var(--i, 0) * 25ms);
+      animation: none;
     }
-    .sheet-groups-stat:nth-child(1) { border-left-color: #3ea35b; animation-delay: 0ms; }
-    .sheet-groups-stat:nth-child(2) { border-left-color: #6a8fcc; animation-delay: 25ms; }
-    .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; animation-delay: 50ms; }
-    .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; animation-delay: 75ms; }
+    .sheet-groups-stat:nth-child(1) { border-left-color: #3ea35b; }
+    .sheet-groups-stat:nth-child(2) { border-left-color: #6a8fcc; }
+    .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; }
+    .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; }
     .sheet-groups-stat:hover {
       box-shadow: 0 2px 10px rgba(104,70,5,0.06);
     }
@@ -6835,6 +6829,7 @@
       els.sheetViewGroupsBtn.disabled = !groupsAvailable;
     }
     function setSpreadsheetViewMode(mode) {
+      const prevMode = state.spreadsheetViewMode === "groups" ? "groups" : "table";
       const nextMode = mode === "groups" ? "groups" : "table";
       if (nextMode === "groups" && !isCurrentSheetPaellaResponseSheet()) {
         state.spreadsheetViewMode = "table";
@@ -6845,9 +6840,13 @@
       syncEditorSurface();
       saveStoredUiSession();
       if (state.spreadsheetViewMode === "groups") {
-        renderSheetGroupsView().then(function () { startGroupsViewPoll(); });
+        if (prevMode !== "groups") {
+          renderSheetGroupsView().then(function () { startGroupsViewPoll(); });
+        } else if (!sheetGroupsPollTimer) {
+          startGroupsViewPoll();
+        }
       } else {
-        stopGroupsViewPoll();
+        if (prevMode === "groups") stopGroupsViewPoll();
       }
     }
     var sheetGroupsPollTimer = 0;
