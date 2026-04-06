@@ -4251,8 +4251,10 @@
       .sheet-assistant-meta {
         white-space: normal;
       }
-      .sheet-assistant-fields {
-        grid-template-columns: 1fr;
+      .sheet-assistant-fields,
+      .sheet-member-detail .sheet-assistant-fields {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 8px;
       }
       .sheet-group-block.responsible .sheet-group-field-list {
         grid-template-columns: 1fr;
@@ -4327,7 +4329,13 @@
       }
       .paired-file-card-title,
       .paired-file-card-meta { display: none; }
-      .sheet-groups-view { padding: 10px; }
+      .sheet-groups-view { 
+        padding: 10px; 
+        height: auto; 
+        overflow: visible; 
+        display: flex; 
+        flex-direction: column; 
+      }
       .sheet-group-card { padding: 0; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
       .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; padding: 6px 8px; font-size: 0.76rem; }
@@ -4393,8 +4401,9 @@
         display: flex; 
         flex-direction: column; 
         padding-top: 10px;
+        padding-bottom: 80px;
       }
-      .editor-head { gap: 8px; flex-shrink: 0; padding-right: 170px; }
+      .editor-head { gap: 8px; flex-shrink: 0; padding-right: 130px; }
       .editor-actions { 
         gap: 6px; 
         position: fixed;
@@ -4403,15 +4412,12 @@
         width: fit-content !important;
         max-width: 90vw;
         z-index: 100;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: 6px 8px;
-        border-radius: 100px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-        border: 1px solid rgba(0,0,0,0.05);
+        background: transparent;
+        padding: 0;
+        border: none;
+        box-shadow: none;
       }
-      .editor-actions .btn { border-color: rgba(0,0,0,0.08); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+      .editor-actions .btn { border-color: rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
       .sheet-bar { flex-wrap: wrap !important; gap: 8px !important; }
       #sheetTabs { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; }
       #sheetTabs::-webkit-scrollbar { display: none; }
@@ -8223,8 +8229,12 @@
         
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text("ENTRADA OFICIAL", 10, 13);
+        
+        let eventName = String(config.eventName || "ENTRADA OFICIAL").trim();
+        if (eventName.length > 32) eventName = eventName.substring(0, 30) + "...";
+        
+        doc.setFontSize(14);
+        doc.text(eventName, 10, 13);
         
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
@@ -8330,7 +8340,8 @@
       return prepareCurrentSheetTicketPeople(group, personFilter).then(function (people) {
         return renderTicketPdfBlob(people, {
           spreadsheetId: state.spreadsheetId,
-          sheetTitle: state.currentSheetTitle
+          sheetTitle: state.currentSheetTitle,
+          eventName: state.fileMeta ? state.fileMeta.title : "ENTRADA"
         }).then(function (blob) {
           downloadBlob(blob, sanitizeExportName(fileName, "entradas") + ".pdf");
           setSheetGroupsStatus("PDF generado.", "good");
