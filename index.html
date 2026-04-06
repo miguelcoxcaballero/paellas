@@ -2073,11 +2073,21 @@
       align-content: start;
       gap: 16px;
       padding: 18px;
+      scroll-padding-top: 16px;
     }
     .sheet-groups-list {
       display: grid;
       gap: 10px;
       align-content: start;
+    }
+    .sheet-groups-list-actions {
+      display: flex;
+      justify-content: center;
+      padding-top: 4px;
+    }
+    .sheet-groups-list-actions .sheet-group-add-btn {
+      min-width: 220px;
+      justify-content: center;
     }
     .sheet-groups-banner {
       animation: none;
@@ -2098,16 +2108,15 @@
       gap: 12px;
       align-content: start;
       position: sticky;
-      top: -18px;
-      z-index: 2;
-      padding: 10px 0 4px;
-      background: linear-gradient(180deg, rgba(255,250,240,0.98) 0%, rgba(255,250,240,0.9) 72%, rgba(255,250,240,0) 100%);
-    }
-    .sheet-groups-toolbar-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
+      top: 0;
+      z-index: 12;
+      padding: 14px;
+      border: 1px solid rgba(185,90,0,0.12);
+      border-radius: 24px;
+      background: rgba(255,253,248,0.98);
+      box-shadow: 0 10px 24px rgba(104,70,5,0.08);
+      isolation: isolate;
+      overflow: hidden;
     }
     .sheet-groups-stats {
       display: grid;
@@ -2161,7 +2170,7 @@
     }
     .sheet-groups-filter {
       display: grid;
-      gap: 4px;
+      gap: 6px;
       min-width: 0;
       flex: 1 1 0;
     }
@@ -2182,7 +2191,7 @@
       color: var(--ink);
       font: inherit;
       font-size: 0.83rem;
-      padding: 10px 12px;
+      padding: 10px 14px;
       outline: none;
       transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
@@ -2192,33 +2201,33 @@
     }
     .sheet-group-card {
       border: 1px solid rgba(185,90,0,0.12);
-      border-radius: 20px;
-      background: #fffdfa;
+      border-radius: 24px;
+      background: #ffffff;
       overflow: hidden;
       min-width: 0;
-      box-shadow: 0 1px 2px rgba(104,70,5,0.06);
+      box-shadow: 0 1px 3px rgba(104,70,5,0.06);
       transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
     }
     .sheet-group-card:hover {
       border-color: rgba(185,90,0,0.16);
-      box-shadow: 0 2px 8px rgba(104,70,5,0.08);
+      box-shadow: 0 3px 10px rgba(104,70,5,0.08);
     }
     .sheet-group-card[open] {
       background: #ffffff;
-      border-color: rgba(185,90,0,0.22);
-      box-shadow: 0 4px 14px rgba(104,70,5,0.1);
+      border-color: rgba(185,90,0,0.2);
+      box-shadow: 0 8px 18px rgba(104,70,5,0.1);
     }
     .sheet-groups-banner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      background: #fffdfa;
+      background: #ffffff;
       color: #5d3a10;
-      border-radius: 20px;
-      padding: 18px 20px;
+      border-radius: 24px;
+      padding: 20px 22px;
       border: 1px solid rgba(185,90,0,0.12);
-      box-shadow: 0 1px 2px rgba(104,70,5,0.05);
+      box-shadow: 0 1px 3px rgba(104,70,5,0.05);
     }
     .sheet-groups-banner-title {
       font-size: 1.22rem;
@@ -2248,12 +2257,12 @@
       gap: 16px;
       padding: 18px 20px;
       cursor: pointer;
-      background: #fffaf2;
+      background: #ffffff;
       transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
       min-width: 0;
     }
     .sheet-group-summary:hover {
-      background: #fff7ea;
+      background: #fffaf2;
     }
     .sheet-group-summary-main {
       min-width: 0;
@@ -2289,9 +2298,9 @@
       min-width: 0;
     }
     .sheet-group-title-large {
-      font-size: 1.08rem;
+      font-size: 1.14rem;
       font-weight: 800;
-      line-height: 1.28;
+      line-height: 1.25;
       min-width: 0;
       word-break: break-word;
       color: #1e1508;
@@ -2317,8 +2326,8 @@
       min-height: 28px;
       padding: 5px 10px;
       border-radius: 999px;
-      background: rgba(255,247,226,0.9);
-      border: 1px solid rgba(185,90,0,0.1);
+      background: rgba(255,247,226,0.72);
+      border: 1px solid rgba(185,90,0,0.12);
       color: #8a5211;
       font-size: 0.68rem;
       font-weight: 700;
@@ -2358,28 +2367,28 @@
       flex: 0 0 auto;
     }
     .sheet-group-chevron {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 999px;
       border: 1px solid rgba(185,90,0,0.14);
-      background: #fffdfa;
+      background: #fffaf2;
       color: #8a5211;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 400;
+      font-size: 1.15rem;
+      font-weight: 500;
       flex: 0 0 auto;
       box-shadow: 0 1px 2px rgba(104,70,5,0.05);
-      transition: background .15s ease, transform .15s cubic-bezier(0.2, 0, 0, 1), border-color .15s ease;
+      transition: background .15s ease, border-color .15s ease, color .15s ease;
     }
-    .sheet-group-chevron::before { content: "v"; }
+    .sheet-group-chevron::before { content: "+"; transform: translateY(-1px); }
     .sheet-group-card[open] > summary .sheet-group-chevron {
-      transform: rotate(180deg);
-      background: rgba(255,240,200,0.95);
+      background: rgba(255,240,200,0.92);
       border-color: rgba(185,90,0,0.28);
     }
-    .sheet-assistant-item[open] .sheet-group-chevron { transform: rotate(180deg); }
+    .sheet-group-card[open] > summary .sheet-group-chevron::before { content: "-"; transform: translateY(-1px); }
+    .sheet-assistant-item[open] .sheet-group-chevron::before { content: "-"; transform: translateY(-1px); }
     .sheet-group-body {
       display: grid;
       gap: 0;
@@ -2399,7 +2408,7 @@
     .sheet-member-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       padding: 14px 20px;
       border-bottom: 1px solid rgba(185,90,0,0.07);
       min-width: 0;
@@ -2441,7 +2450,7 @@
       height: 34px;
       border-radius: 50%;
       border: 1px solid rgba(185,90,0,0.16);
-      background: #fffdfa;
+      background: #ffffff;
       color: #8a5211;
       font-size: 0.84rem;
       font-weight: 800;
@@ -2450,7 +2459,8 @@
       justify-content: center;
       cursor: pointer;
       flex: 0 0 auto;
-      transition: background .15s ease, border-color .15s ease;
+      box-shadow: 0 1px 2px rgba(104,70,5,0.04);
+      transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
     }
     .sheet-member-info-btn:hover {
       background: rgba(255,243,210,0.9);
@@ -2462,7 +2472,7 @@
     }
     .sheet-member-detail {
       padding: 16px 20px 18px;
-      background: #fffaf2;
+      background: #fffdf9;
       border-bottom: 1px solid rgba(185,90,0,0.07);
     }
     .sheet-member-detail.hidden { display: none; }
@@ -2476,7 +2486,7 @@
       gap: 12px;
       padding: 16px 20px 18px;
       border-top: 1px solid rgba(185,90,0,0.08);
-      background: #fffaf2;
+      background: #fffdf8;
     }
     .sheet-group-footer-row {
       display: flex;
@@ -2545,7 +2555,7 @@
       color: var(--ink);
       font: inherit;
       font-size: 0.74rem;
-      font-weight: 700;
+      font-weight: 600;
       padding: 8px 14px;
       cursor: pointer;
       box-shadow: 0 1px 2px rgba(104,70,5,0.05);
@@ -2601,7 +2611,7 @@
       min-width: 0;
       min-height: 42px;
       border: 1px solid rgba(185,90,0,0.16);
-      border-radius: 12px;
+      border-radius: 16px;
       background: #fffdfa;
       color: var(--ink);
       font: inherit;
@@ -2632,7 +2642,7 @@
       min-width: 0;
       min-height: 42px;
       border: 1px solid rgba(185,90,0,0.1);
-      border-radius: 12px;
+      border-radius: 16px;
       background: rgba(255,253,250,0.9);
       color: var(--ink);
       font: inherit;
@@ -2706,9 +2716,10 @@
       gap: 8px;
       margin-top: 8px;
       padding: 14px;
-      border-radius: 16px;
+      border-radius: 18px;
       background: #fbfdff;
       border: 1px solid rgba(80,120,200,0.14);
+      box-shadow: 0 1px 2px rgba(80,120,200,0.05);
     }
     .sheet-person-ticket-head {
       display: flex;
@@ -2770,7 +2781,7 @@
     }
     .sheet-assistant-item {
       border: 1px solid rgba(185,90,0,0.08);
-      border-radius: 16px;
+      border-radius: 18px;
       background: #fffdfa;
       overflow: hidden;
       min-width: 0;
@@ -2799,7 +2810,7 @@
       flex-wrap: wrap;
       padding: 12px 20px 18px;
       border-top: 1px solid rgba(185,90,0,0.08);
-      background: #ffffff;
+      background: #fffdf8;
     }
     .sheet-assistant-summary-main {
       min-width: 0;
@@ -3985,6 +3996,10 @@
         flex: 1 1 0;
         justify-content: center;
       }
+      .sheet-groups-list-actions .sheet-group-add-btn {
+        width: 100%;
+        min-width: 0;
+      }
       .sheet-group-responsible-line,
       .sheet-assistant-name,
       .sheet-assistant-meta {
@@ -4424,9 +4439,6 @@
         <div id="sheetGroupsView" class="sheet-groups-view hidden-panel">
           <div id="sheetGroupsStatus" class="status"></div>
           <div id="sheetGroupsToolbar" class="sheet-groups-toolbar hidden">
-            <div class="sheet-groups-toolbar-actions">
-              <button id="sheetGroupsCreateBtn" class="sheet-group-add-btn" type="button" data-group-action="group-add">+ Nuevo grupo</button>
-            </div>
             <div id="sheetGroupsStats" class="sheet-groups-stats"></div>
             <div class="sheet-groups-filters">
               <label class="sheet-groups-filter">
@@ -5159,7 +5171,6 @@
       sheetGroupsList: document.getElementById("sheetGroupsList"),
       sheetGroupsEmpty: document.getElementById("sheetGroupsEmpty"),
       sheetGroupsToolbar: document.getElementById("sheetGroupsToolbar"),
-      sheetGroupsCreateBtn: document.getElementById("sheetGroupsCreateBtn"),
       sheetGroupsStats: document.getElementById("sheetGroupsStats"),
       sheetGroupsPaymentFilter: document.getElementById("sheetGroupsPaymentFilter"),
       sheetGroupsFireFilter: document.getElementById("sheetGroupsFireFilter"),
@@ -8118,14 +8129,12 @@
       const groups = Array.isArray(model && model.groups) ? model.groups : [];
       const visible = Array.isArray(filteredGroups) ? filteredGroups : groups;
       if (!els.sheetGroupsToolbar || !els.sheetGroupsStats || !els.sheetGroupsPaymentFilter || !els.sheetGroupsFireFilter || !els.sheetGroupsContestFilter) return;
-      const canManageGroups = !!(state.canEdit && state.editorMode === "edit");
       const filtersWrap = els.sheetGroupsToolbar.querySelector(".sheet-groups-filters");
-      if (els.sheetGroupsCreateBtn) els.sheetGroupsCreateBtn.disabled = !canManageGroups;
       const totalAttendees = groups.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
       const filteredAttendees = visible.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
       const totalRevenue = groups.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
       const filteredRevenue = visible.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
-      els.sheetGroupsToolbar.classList.toggle("hidden", !groups.length && !canManageGroups);
+      els.sheetGroupsToolbar.classList.toggle("hidden", !groups.length);
       if (filtersWrap) filtersWrap.classList.toggle("hidden", !groups.length);
       if (!groups.length) {
         els.sheetGroupsStats.innerHTML = "";
@@ -8781,6 +8790,18 @@
       });
     }
     function renderSheetGroupsList(groups, options) {
+      function appendCreateGroupAction() {
+        if (!state.canEdit || state.editorMode !== "edit") return;
+        var actionsWrap = document.createElement("div");
+        actionsWrap.className = "sheet-groups-list-actions";
+        var createBtn = document.createElement("button");
+        createBtn.type = "button";
+        createBtn.className = "sheet-group-add-btn";
+        createBtn.dataset.groupAction = "group-add";
+        createBtn.textContent = "+ Nuevo grupo";
+        actionsWrap.appendChild(createBtn);
+        els.sheetGroupsList.appendChild(actionsWrap);
+      }
       var opts = options || {};
       snapshotSheetGroupsOpenState();
       const scrollParent = els.sheetGroupsView || els.sheetGroupsList.parentElement;
@@ -8796,7 +8817,12 @@
           : "No hay grupos para mostrar en esta hoja.";
         els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
       }
-      if (!filteredGroups.length) return;
+      if (!filteredGroups.length) {
+        appendCreateGroupAction();
+        syncSheetGroupsInteractivity();
+        if (scrollParent && savedScrollTop) scrollParent.scrollTop = savedScrollTop;
+        return;
+      }
       const allGroups = groups || [];
       const totalAttendees = allGroups.reduce(function (s, g) { return s + (g.attendeeCount || 0); }, 0);
       const banner = document.createElement("div");
@@ -9005,6 +9031,7 @@
         card.appendChild(body);
         els.sheetGroupsList.appendChild(card);
       });
+      appendCreateGroupAction();
       syncSheetGroupsInteractivity();
       if (scrollParent && savedScrollTop) scrollParent.scrollTop = savedScrollTop;
     }
