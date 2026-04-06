@@ -2068,9 +2068,7 @@
       scrollbar-gutter: stable;
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
-      background:
-        radial-gradient(circle at top right, rgba(255, 226, 165, 0.22), transparent 28%),
-        linear-gradient(168deg, rgba(255,253,247,0.98) 0%, rgba(255,249,232,0.94) 100%);
+      background: linear-gradient(180deg, rgba(255,252,246,0.98) 0%, rgba(255,249,238,0.95) 100%);
       display: grid;
       align-content: start;
       gap: 14px;
@@ -2103,8 +2101,13 @@
       top: -16px;
       z-index: 2;
       padding: 8px 0 2px;
-      background: linear-gradient(180deg, rgba(255,251,241,0.98) 0%, rgba(255,251,241,0.92) 78%, rgba(255,251,241,0) 100%);
-      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(255,251,241,0.96) 0%, rgba(255,251,241,0.86) 74%, rgba(255,251,241,0) 100%);
+    }
+    .sheet-groups-toolbar-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .sheet-groups-stats {
       display: grid;
@@ -2114,13 +2117,13 @@
     .sheet-groups-stat {
       border: 1px solid rgba(185,90,0,0.08);
       border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,251,244,0.88) 100%);
+      background: rgba(255,255,255,0.94);
       padding: 12px 13px;
       display: grid;
       gap: 3px;
       min-width: 0;
       border-left: 3px solid rgba(185,90,0,0.18);
-      box-shadow: 0 8px 22px rgba(104,70,5,0.04);
+      box-shadow: 0 3px 10px rgba(104,70,5,0.04);
       transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
       animation: none;
     }
@@ -2129,8 +2132,7 @@
     .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; }
     .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; }
     .sheet-groups-stat:hover {
-      box-shadow: 0 12px 28px rgba(104,70,5,0.08);
-      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(104,70,5,0.06);
     }
     .sheet-groups-stat-label {
       font-size: 0.64rem;
@@ -2196,36 +2198,36 @@
     }
     .sheet-group-card:hover {
       border-color: rgba(185,90,0,0.16);
-      box-shadow: 0 10px 24px rgba(104,70,5,0.08);
+      box-shadow: 0 4px 12px rgba(104,70,5,0.06);
     }
     .sheet-group-card[open] {
       background: rgba(255,255,255,0.95);
       border-color: rgba(185,90,0,0.22);
-      box-shadow: 0 16px 36px rgba(104,70,5,0.1);
+      box-shadow: 0 8px 20px rgba(104,70,5,0.08);
     }
     .sheet-groups-banner {
       display: flex;
       align-items: end;
       justify-content: space-between;
       gap: 12px;
-      background: linear-gradient(135deg, #21170a 0%, #4a2f11 100%);
-      color: #f5e9c8;
+      background: rgba(255,247,226,0.96);
+      color: #5d3a10;
       border-radius: 16px;
       padding: 16px 18px;
-      border: 1px solid rgba(255, 221, 164, 0.12);
-      box-shadow: 0 14px 36px rgba(37, 21, 4, 0.18);
+      border: 1px solid rgba(185,90,0,0.12);
+      box-shadow: 0 4px 14px rgba(104,70,5,0.05);
     }
     .sheet-groups-banner-title {
       font-size: 1.22rem;
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.02em;
-      color: #fff5dc;
+      color: #3d2608;
     }
     .sheet-groups-banner-meta {
       font-size: 0.8rem;
       font-weight: 700;
-      color: rgba(245,233,200,0.78);
+      color: rgba(93,58,16,0.72);
       text-align: right;
     }
     .sheet-group-summary,
@@ -2243,12 +2245,12 @@
       gap: 14px;
       padding: 16px 18px;
       cursor: pointer;
-      background: linear-gradient(180deg, rgba(255,250,236,0.96) 0%, rgba(255,246,221,0.92) 100%);
+      background: rgba(255,249,233,0.92);
       transition: background .15s ease, border-color .15s ease;
       min-width: 0;
     }
     .sheet-group-summary:hover {
-      background: linear-gradient(180deg, rgba(255,247,224,0.98) 0%, rgba(255,241,206,0.95) 100%);
+      background: rgba(255,245,220,0.96);
     }
     .sheet-group-summary-main {
       min-width: 0;
@@ -2365,7 +2367,7 @@
       font-size: 0.7rem;
       font-weight: 400;
       flex: 0 0 auto;
-      box-shadow: 0 6px 16px rgba(104,70,5,0.08);
+      box-shadow: 0 2px 8px rgba(104,70,5,0.05);
       transition: background .15s ease, transform .15s cubic-bezier(0.2, 0, 0, 1), border-color .15s ease;
     }
     .sheet-group-chevron::before { content: "v"; }
@@ -2379,7 +2381,7 @@
       display: grid;
       gap: 0;
       padding: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,252,247,0.95) 100%);
+      background: rgba(255,255,255,0.98);
     }
     details[open]:not(.no-anim) > .sheet-group-body {
       animation: groupBodySlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) both;
@@ -2457,7 +2459,7 @@
     }
     .sheet-member-detail {
       padding: 14px 18px 16px;
-      background: linear-gradient(180deg, rgba(251,248,241,0.96) 0%, rgba(248,243,234,0.94) 100%);
+      background: rgba(250,247,240,0.96);
       border-bottom: 1px solid rgba(185,90,0,0.07);
     }
     .sheet-member-detail.hidden { display: none; }
@@ -2471,7 +2473,7 @@
       gap: 12px;
       padding: 14px 18px 16px;
       border-top: 1px solid rgba(185,90,0,0.08);
-      background: linear-gradient(180deg, rgba(255,249,230,0.68) 0%, rgba(255,245,217,0.48) 100%);
+      background: rgba(255,249,232,0.7);
     }
     .sheet-group-footer-row {
       display: flex;
@@ -2553,6 +2555,16 @@
     .sheet-group-add-btn:disabled {
       opacity: 0.48;
       cursor: not-allowed;
+    }
+    .sheet-group-add-btn.danger {
+      border-color: rgba(190,88,88,0.18);
+      color: #9d3f3f;
+      background: rgba(255,246,246,0.96);
+      box-shadow: none;
+    }
+    .sheet-group-add-btn.danger:hover {
+      background: rgba(255,232,232,0.96);
+      border-color: rgba(190,88,88,0.28);
     }
     .sheet-group-field-list {
       display: grid;
@@ -4405,6 +4417,9 @@
         <div id="sheetGroupsView" class="sheet-groups-view hidden-panel">
           <div id="sheetGroupsStatus" class="status"></div>
           <div id="sheetGroupsToolbar" class="sheet-groups-toolbar hidden">
+            <div class="sheet-groups-toolbar-actions">
+              <button id="sheetGroupsCreateBtn" class="sheet-group-add-btn" type="button" data-group-action="group-add">+ Nuevo grupo</button>
+            </div>
             <div id="sheetGroupsStats" class="sheet-groups-stats"></div>
             <div class="sheet-groups-filters">
               <label class="sheet-groups-filter">
@@ -5137,6 +5152,7 @@
       sheetGroupsList: document.getElementById("sheetGroupsList"),
       sheetGroupsEmpty: document.getElementById("sheetGroupsEmpty"),
       sheetGroupsToolbar: document.getElementById("sheetGroupsToolbar"),
+      sheetGroupsCreateBtn: document.getElementById("sheetGroupsCreateBtn"),
       sheetGroupsStats: document.getElementById("sheetGroupsStats"),
       sheetGroupsPaymentFilter: document.getElementById("sheetGroupsPaymentFilter"),
       sheetGroupsFireFilter: document.getElementById("sheetGroupsFireFilter"),
@@ -8095,11 +8111,15 @@
       const groups = Array.isArray(model && model.groups) ? model.groups : [];
       const visible = Array.isArray(filteredGroups) ? filteredGroups : groups;
       if (!els.sheetGroupsToolbar || !els.sheetGroupsStats || !els.sheetGroupsPaymentFilter || !els.sheetGroupsFireFilter || !els.sheetGroupsContestFilter) return;
+      const canManageGroups = !!(state.canEdit && state.editorMode === "edit");
+      const filtersWrap = els.sheetGroupsToolbar.querySelector(".sheet-groups-filters");
+      if (els.sheetGroupsCreateBtn) els.sheetGroupsCreateBtn.disabled = !canManageGroups;
       const totalAttendees = groups.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
       const filteredAttendees = visible.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
       const totalRevenue = groups.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
       const filteredRevenue = visible.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
-      els.sheetGroupsToolbar.classList.toggle("hidden", !groups.length);
+      els.sheetGroupsToolbar.classList.toggle("hidden", !groups.length && !canManageGroups);
+      if (filtersWrap) filtersWrap.classList.toggle("hidden", !groups.length);
       if (!groups.length) {
         els.sheetGroupsStats.innerHTML = "";
         return;
@@ -8152,7 +8172,10 @@
     }
     function sheetGroupsStatusText(model) {
       const groups = Array.isArray(model && model.groups) ? model.groups : [];
-      if (!groups.length) return "Esta hoja no contiene respuestas agrupables.";
+      if (!groups.length) {
+        const header = model && Array.isArray(model.header) ? model.header : [];
+        return isPaellaResponseHeader(header) ? "No hay grupos en esta hoja." : "Esta hoja no contiene respuestas agrupables.";
+      }
       return "";
     }
     function updateSheetGroupsModelCell(row, col, value) {
@@ -8200,6 +8223,137 @@
           return sheet.title === info.title ? Object.assign({}, sheet, { columnCount: requiredCount }) : sheet;
         });
         return requiredCount;
+      }).finally(function () {
+        setBusy(els.editorShell, false);
+      });
+    }
+    function resetSheetGroupsTransientState() {
+      state.sheetGroupsDraftSlots = {};
+      state.sheetGroupsExpanded = {};
+      state.sheetGroupAssistantExpanded = {};
+    }
+    function reloadCurrentSheetGroupsAfterStructureChange(options) {
+      const config = options || {};
+      if (!state.spreadsheetId || !state.currentSheetTitle) return Promise.resolve(false);
+      return loadSpreadsheetMeta(state.spreadsheetId, {
+        preserveDirtyTitle: true
+      }).then(function () {
+        return loadSheet(state.currentSheetTitle, {
+          quiet: true,
+          skipAnim: true,
+          preserveDirty: false
+        });
+      }).then(function () {
+        if (!Number.isFinite(config.openRow) || !config.focusColRole) return true;
+        const groupIndex = Math.max(0, config.openRow - 1);
+        state.sheetGroupsExpanded["group-" + String(groupIndex)] = true;
+        rerenderSheetGroupsFromModel();
+        return true;
+      }).then(function () {
+        if (!Number.isFinite(config.openRow) || !config.focusColRole) return true;
+        requestAnimationFrame(function () {
+          const selector = ".sheet-group-input[data-row='" + String(config.openRow) + "'][data-role='" + String(config.focusColRole).replace(/'/g, "\\'") + "']";
+          const input = document.querySelector(selector);
+          if (input && typeof input.focus === "function") {
+            input.focus();
+            if (typeof input.select === "function") input.select();
+            return;
+          }
+          const card = document.querySelector(".sheet-group-card[data-group-id='group-" + String(Math.max(0, config.openRow - 1)) + "'] > summary");
+          if (card && typeof card.focus === "function") card.focus();
+        });
+        return true;
+      });
+    }
+    function insertManualSheetGroup() {
+      const model = currentSheetGroupsModel();
+      const info = currentSheetInfo();
+      if (!model || !info || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
+      const insertRow = Math.max(1, Array.isArray(model.rows) ? model.rows.length : 1);
+      const responsibleNameCol = model.headerIndex["responsable - nombre completo"];
+      const submittedAtCol = Number.isInteger(model.headerIndex["submittedat"]) ? model.headerIndex["submittedat"] : model.headerIndex["timestamp"];
+      const paymentStatusCol = Number.isInteger(model.headerIndex["pago - estado"]) ? model.headerIndex["pago - estado"] : -1;
+      return flushPendingChanges({ force: true, message: "Guardando antes de crear grupo..." }).then(function (ok) {
+        if (!ok && hasPendingChanges()) throw new Error("No se han podido guardar los cambios pendientes.");
+        setBusy(els.editorShell, true);
+        setSheetGroupsStatus("Creando grupo...", "");
+        return fetchJson(
+          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + ":batchUpdate",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requests: [{
+                insertDimension: {
+                  range: {
+                    sheetId: info.sheetId,
+                    dimension: "ROWS",
+                    startIndex: insertRow,
+                    endIndex: insertRow + 1
+                  },
+                  inheritFromBefore: insertRow > 1
+                }
+              }]
+            })
+          }
+        );
+      }).then(function () {
+        const payloads = [];
+        if (Number.isInteger(responsibleNameCol) && responsibleNameCol >= 0) {
+          payloads.push(buildSheetSingleCellPayload(state.currentSheetTitle, insertRow, responsibleNameCol, "Nuevo grupo"));
+        }
+        if (Number.isInteger(submittedAtCol) && submittedAtCol >= 0) {
+          payloads.push(buildSheetSingleCellPayload(state.currentSheetTitle, insertRow, submittedAtCol, new Date().toLocaleString("es-ES")));
+        }
+        if (Number.isInteger(paymentStatusCol) && paymentStatusCol >= 0) {
+          payloads.push(buildSheetSingleCellPayload(state.currentSheetTitle, insertRow, paymentStatusCol, "Pendiente"));
+        }
+        return writeSpreadsheetCellPayloads(state.spreadsheetId, payloads);
+      }).then(function () {
+        resetSheetGroupsTransientState();
+        return reloadCurrentSheetGroupsAfterStructureChange({
+          openRow: insertRow,
+          focusColRole: "group-title"
+        });
+      }).then(function () {
+        setSheetGroupsStatus("Grupo creado.", "good");
+        return true;
+      }).finally(function () {
+        setBusy(els.editorShell, false);
+      });
+    }
+    function deleteSheetGroup(group) {
+      const info = currentSheetInfo();
+      if (!group || !info || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay un grupo valido para eliminar."));
+      return flushPendingChanges({ force: true, message: "Guardando antes de eliminar grupo..." }).then(function (ok) {
+        if (!ok && hasPendingChanges()) throw new Error("No se han podido guardar los cambios pendientes.");
+        setBusy(els.editorShell, true);
+        setSheetGroupsStatus("Eliminando grupo...", "");
+        return fetchJson(
+          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + ":batchUpdate",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requests: [{
+                deleteDimension: {
+                  range: {
+                    sheetId: info.sheetId,
+                    dimension: "ROWS",
+                    startIndex: group.sheetRow,
+                    endIndex: group.sheetRow + 1
+                  }
+                }
+              }]
+            })
+          }
+        );
+      }).then(function () {
+        resetSheetGroupsTransientState();
+        return reloadCurrentSheetGroupsAfterStructureChange();
+      }).then(function () {
+        setSheetGroupsStatus("Grupo eliminado.", "good");
+        return true;
       }).finally(function () {
         setBusy(els.editorShell, false);
       });
@@ -8376,7 +8530,7 @@
         const hasColumn = Number.isFinite(col) && col >= 0;
         input.disabled = !editing || !hasColumn;
       });
-      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='assistant-add']"), function (button) {
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='assistant-add'], [data-group-action='group-add'], [data-group-action='group-delete']"), function (button) {
         const col = Number(button.dataset.col);
         const requiresColumn = button.dataset.groupAction === "payment-status";
         button.disabled = !editing || (requiresColumn && (!Number.isFinite(col) || col < 0));
@@ -8814,7 +8968,7 @@
         settingsBlock.appendChild(settingsGrid);
         body.appendChild(settingsBlock);
         body.appendChild(memberList);
-        // Actions row BELOW members - only "add member" button
+        // Actions row below members
         if (state.canEdit && state.editorMode === "edit") {
           var actionsRow = document.createElement("div");
           actionsRow.className = "sheet-group-actions-row";
@@ -8832,6 +8986,13 @@
           addAssistantBtn.dataset.groupId = group.id;
           addAssistantBtn.textContent = "+ Integrante";
           actionsRow.appendChild(addAssistantBtn);
+          var deleteGroupBtn = document.createElement("button");
+          deleteGroupBtn.type = "button";
+          deleteGroupBtn.className = "sheet-group-add-btn danger";
+          deleteGroupBtn.dataset.groupAction = "group-delete";
+          deleteGroupBtn.dataset.groupId = group.id;
+          deleteGroupBtn.textContent = "Eliminar grupo";
+          actionsRow.appendChild(deleteGroupBtn);
           body.appendChild(actionsRow);
         }
         card.appendChild(body);
@@ -9911,7 +10072,10 @@
     function openFormDeleteModal(action) {
       if (!action) return;
       state.formDeleteAction = action;
-      if (action.kind === "section") {
+      if (action.modalTitle || action.modalSubtitle) {
+        els.formDeleteModalTitle.textContent = action.modalTitle || "Eliminar";
+        els.formDeleteModalSubtitle.textContent = action.modalSubtitle || "Desliza para confirmar.";
+      } else if (action.kind === "section") {
         els.formDeleteModalTitle.textContent = "Eliminar seccion";
         els.formDeleteModalSubtitle.textContent = "Desliza para eliminar \"" + (action.title || "esta seccion") + "\" y sus preguntas.";
       } else {
@@ -9925,6 +10089,15 @@
       const action = state.formDeleteAction;
       if (!action) return;
       closeFormDeleteModal();
+      if (typeof action.onConfirm === "function") {
+        Promise.resolve().then(function () {
+          return action.onConfirm();
+        }).catch(function (err) {
+          console.error(err);
+          setEditorStatus(messageFromError(err, "No se ha podido completar la eliminacion"), "error");
+        });
+        return;
+      }
       if (action.kind === "section") {
         let deleteCount = 1;
         for (let pointer = action.index + 1; pointer < state.formItems.length; pointer += 1) {
@@ -13422,11 +13595,28 @@
       if (!button) return;
       const action = button.dataset.groupAction;
       if (button.disabled || !state.currentSheetTitle) return;
-      const requiresEdit = action === "payment-status" || action === "assistant-add";
+      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "group-add" || action === "group-delete";
       if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
+      if (action === "group-add") {
+        insertManualSheetGroup().catch(function (err) {
+          console.error(err);
+          setSheetGroupsStatus(messageFromError(err, "No se ha podido crear el grupo"), "error");
+        });
+        return;
+      }
       const groupId = button.dataset.groupId;
       const group = findSheetGroupById(groupId);
       if (!group) return;
+      if (action === "group-delete") {
+        openFormDeleteModal({
+          modalTitle: "Eliminar grupo",
+          modalSubtitle: "Desliza para eliminar \"" + (group.title || "este grupo") + "\".",
+          onConfirm: function () {
+            return deleteSheetGroup(group);
+          }
+        });
+        return;
+      }
       if (action === "payment-status") {
         const row = Number(button.dataset.row);
         let col = Number(button.dataset.col);
