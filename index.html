@@ -2234,11 +2234,11 @@
     }
     .sheet-groups-toolbar {
       display: grid;
-      gap: 12px;
+      gap: 6px;
       align-content: start;
       position: relative;
       z-index: 12;
-      padding: 10px 12px 14px;
+      padding: 6px 8px 10px;
       border: none;
       border-radius: 20px;
       background: transparent;
@@ -2249,20 +2249,20 @@
     .sheet-groups-stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 8px;
+      gap: 4px;
+      padding: 4px;
       background: #ffffff;
-      border-radius: 20px;
+      border-radius: 12px;
       box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
       border: 1px solid rgba(0,0,0,0.02);
     }
     .sheet-groups-stat {
       border: none;
-      border-radius: 14px;
+      border-radius: 8px;
       background: transparent;
-      padding: 14px 15px;
+      padding: 8px 10px;
       display: grid;
-      gap: 4px;
+      gap: 2px;
       min-width: 0;
       box-shadow: none;
       transition: background .15s ease;
@@ -2276,23 +2276,23 @@
       background: #fdfbf7;
     }
     .sheet-groups-stat-label {
-      font-size: 0.64rem;
+      font-size: 0.58rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.06em;
       font-weight: 700;
     }
     .sheet-groups-stat-value {
-      font-size: 1.2rem;
+      font-size: 1.05rem;
       font-weight: 800;
       line-height: 1.15;
       min-width: 0;
       color: var(--ink);
     }
     .sheet-groups-stat-meta {
-      font-size: 0.68rem;
+      font-size: 0.6rem;
       color: var(--muted);
-      line-height: 1.3;
+      line-height: 1.2;
     }
     .sheet-groups-filters {
       display: flex;
@@ -2337,7 +2337,7 @@
       border-radius: 12px;
       background: #ffffff;
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
       min-width: 0;
       transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
@@ -2359,7 +2359,7 @@
         border-radius: 0;
         border-left: none;
         border-right: none;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
         box-shadow: none;
       }
       .sheet-groups-banner {
@@ -4179,7 +4179,7 @@
       .sheet-assistant-item {
         border-radius: 12px;
       }
-      .sheet-groups-stats { grid-template-columns: 1fr; }
+      .sheet-groups-stats { grid-template-columns: 1fr 1fr; }
       .sheet-groups-banner { padding: 14px; }
       .sheet-group-actions-row {
         justify-content: stretch;
@@ -9473,7 +9473,7 @@
       if (Object.prototype.hasOwnProperty.call(state.sheetGroupsExpanded, groupId)) {
         return !!state.sheetGroupsExpanded[groupId];
       }
-      return index === 0;
+      return false;
     }
     function isSheetAssistantExpanded(groupId, assistantNumber, forceOpen) {
       const key = String(groupId || "") + "::" + String(assistantNumber || "");
