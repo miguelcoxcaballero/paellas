@@ -2077,6 +2077,20 @@
       gap: 8px;
       align-content: start;
     }
+    @keyframes groupCardFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .sheet-groups-banner {
+      animation: groupCardFadeIn 0.18s cubic-bezier(0.2, 0, 0, 1) both;
+    }
+    .sheet-group-card {
+      animation: groupCardFadeIn 0.2s cubic-bezier(0.2, 0, 0, 1) both;
+      animation-delay: calc(var(--i, 0) * 25ms);
+    }
+    .sheet-group-card.no-anim {
+      animation: none;
+    }
     .sheet-groups-toolbar {
       display: grid;
       gap: 10px;
@@ -2098,11 +2112,13 @@
       min-width: 0;
       border-left: 3px solid rgba(185,90,0,0.18);
       transition: box-shadow .15s ease;
+      animation: groupCardFadeIn 0.2s cubic-bezier(0.2, 0, 0, 1) both;
+      animation-delay: calc(var(--i, 0) * 25ms);
     }
-    .sheet-groups-stat:nth-child(1) { border-left-color: #3ea35b; }
-    .sheet-groups-stat:nth-child(2) { border-left-color: #6a8fcc; }
-    .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; }
-    .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; }
+    .sheet-groups-stat:nth-child(1) { border-left-color: #3ea35b; animation-delay: 0ms; }
+    .sheet-groups-stat:nth-child(2) { border-left-color: #6a8fcc; animation-delay: 25ms; }
+    .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; animation-delay: 50ms; }
+    .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; animation-delay: 75ms; }
     .sheet-groups-stat:hover {
       box-shadow: 0 2px 10px rgba(104,70,5,0.06);
     }
@@ -2283,13 +2299,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
+      font-size: 0.7rem;
       font-weight: 400;
       flex: 0 0 auto;
-      transition: background .15s ease;
+      transition: background .15s ease, transform .15s cubic-bezier(0.2, 0, 0, 1);
     }
-    .sheet-group-chevron::before { content: "+"; }
-    .sheet-group-card[open] > summary .sheet-group-chevron::before { content: "−"; }
+    .sheet-group-chevron::before { content: "▼"; }
+    .sheet-group-card[open] > summary .sheet-group-chevron { transform: rotate(180deg); }
     .sheet-assistant-item[open] .sheet-group-chevron { transform: rotate(180deg); }
     .sheet-group-body {
       display: grid;
@@ -2297,10 +2313,10 @@
       padding: 0;
     }
     details[open]:not(.no-anim) > .sheet-group-body {
-      animation: groupBodySlideIn 0.18s ease;
+      animation: groupBodySlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) both;
     }
     @keyframes groupBodySlideIn {
-      from { opacity: 0; transform: translateY(-6px); }
+      from { opacity: 0; transform: translateY(-3px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .sheet-member-list {
@@ -2375,9 +2391,9 @@
       border-bottom: 1px solid rgba(185,90,0,0.07);
     }
     .sheet-member-detail.hidden { display: none; }
-    .sheet-member-detail:not(.hidden) { animation: memberDetailSlideIn 0.15s ease; }
+    .sheet-member-detail:not(.hidden) { animation: memberDetailSlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) both; }
     @keyframes memberDetailSlideIn {
-      from { opacity: 0; transform: translateY(-4px); }
+      from { opacity: 0; transform: translateY(-2px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .sheet-group-footer {
@@ -5381,6 +5397,20 @@
         const email = state.currentUser && state.currentUser.emailAddress;
         if (email) localStorage.setItem(AUTH_HINT_EMAIL_KEY, email);
         setLoginStatus("");
+        const snapshot = readStoredUiSession();
+        const hasEditorSession = snapshot && snapshot.view === "editor" && (snapshot.spreadsheetId || snapshot.formId);
+        if (hasEditorSession) {
+          // Restore editor directly without flashing drive home
+          // Load drive content in background so navigation back works
+          Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]).catch(function () {});
+          return restoreStoredUiAfterAuth().then(function (restored) {
+            if (!restored) {
+              // Restore failed — fall back to drive home
+              showView("drive");
+            }
+            return restored;
+          });
+        }
         showView("drive");
         return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]).then(function () {
           return restoreStoredUiAfterAuth();
@@ -6832,8 +6862,10 @@
     }
     function silentPollGroupsView() {
       if (sheetGroupsSilentPollBusy || state.spreadsheetViewMode !== "groups" || !isSpreadsheetDocumentActive()) return;
+      // Only skip poll if user is actively typing in an input within the view
       var active = document.activeElement;
-      if (active && els.sheetGroupsView && els.sheetGroupsView.contains(active)) return;
+      var tag = active ? active.tagName : "";
+      if ((tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") && els.sheetGroupsView && els.sheetGroupsView.contains(active)) return;
       sheetGroupsSilentPollBusy = true;
       var titleAtStart = state.currentSheetTitle;
       fetchCurrentSheetRows().then(function (rows) {
@@ -8503,6 +8535,7 @@
       const banner = document.createElement("div");
       banner.className = "sheet-groups-banner";
       banner.textContent = allGroups.length + " Grupos | " + totalAttendees + " Asistentes";
+      banner.style.setProperty('--i', '0');
       els.sheetGroupsList.appendChild(banner);
       (filteredGroups || []).forEach(function (group, index) {
         const ticketPeople = buildTicketPeopleFromGroup(group);
@@ -8510,6 +8543,7 @@
         const card = document.createElement("details");
         const wasOpen = isSheetGroupExpanded(group.id, index);
         card.className = "sheet-group-card" + (wasOpen ? " no-anim" : "");
+        card.style.setProperty('--i', String(Math.min(index + 1, 12)));
         card.dataset.groupId = group.id;
         card.open = wasOpen;
         card.addEventListener("toggle", function () { card.classList.remove("no-anim"); });
@@ -8621,9 +8655,9 @@
             addMemberRow(tp || null, false, assistant);
           });
         }
-        body.appendChild(memberList);
-        var footer = document.createElement("div");
-        footer.className = "sheet-group-footer";
+        // Settings block ABOVE member list
+        var settingsBlock = document.createElement("div");
+        settingsBlock.className = "sheet-group-footer";
         var paymentRow = document.createElement("div");
         paymentRow.className = "sheet-group-footer-row";
         var paymentLabel = document.createElement("div");
@@ -8646,23 +8680,27 @@
           paymentPills.appendChild(btn);
         });
         paymentRow.appendChild(paymentPills);
-        footer.appendChild(paymentRow);
+        settingsBlock.appendChild(paymentRow);
         var settingsGrid = document.createElement("div");
         settingsGrid.className = "sheet-group-inline-grid triple";
         settingsGrid.appendChild(createSheetGroupField("Punto de fuego", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Sin valor" })));
         settingsGrid.appendChild(createSheetGroupField("Concurso", createSheetGroupSelect(group.id, group.sheetRow, group.contest.col, group.contest.value, ["", "Sí", "No"], { emptyLabel: "Sin valor" })));
         settingsGrid.appendChild(createSheetGroupField("Importe", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.amountCol, group.payment.amount, { placeholder: "0,00", inputMode: "decimal" })));
-        footer.appendChild(settingsGrid);
-        var actionsRow = document.createElement("div");
-        actionsRow.className = "sheet-group-footer-row";
-        var groupPdfBtn = document.createElement("button");
-        groupPdfBtn.type = "button";
-        groupPdfBtn.className = "sheet-group-add-btn";
-        groupPdfBtn.dataset.groupAction = "ticket-pdf-group";
-        groupPdfBtn.dataset.groupId = group.id;
-        groupPdfBtn.textContent = "PDF grupo";
-        actionsRow.appendChild(groupPdfBtn);
+        settingsBlock.appendChild(settingsGrid);
+        body.appendChild(settingsBlock);
+        body.appendChild(memberList);
+        // Actions row BELOW members - only "add member" button
         if (state.canEdit && state.editorMode === "edit") {
+          var actionsRow = document.createElement("div");
+          actionsRow.className = "sheet-group-footer-row";
+          actionsRow.style.padding = "8px 14px";
+          var groupPdfBtn = document.createElement("button");
+          groupPdfBtn.type = "button";
+          groupPdfBtn.className = "sheet-group-add-btn";
+          groupPdfBtn.dataset.groupAction = "ticket-pdf-group";
+          groupPdfBtn.dataset.groupId = group.id;
+          groupPdfBtn.textContent = "PDF grupo";
+          actionsRow.appendChild(groupPdfBtn);
           var addAssistantBtn = document.createElement("button");
           addAssistantBtn.type = "button";
           addAssistantBtn.className = "sheet-group-add-btn";
@@ -8670,9 +8708,8 @@
           addAssistantBtn.dataset.groupId = group.id;
           addAssistantBtn.textContent = "+ Integrante";
           actionsRow.appendChild(addAssistantBtn);
+          body.appendChild(actionsRow);
         }
-        footer.appendChild(actionsRow);
-        body.appendChild(footer);
         card.appendChild(body);
         els.sheetGroupsList.appendChild(card);
       });
