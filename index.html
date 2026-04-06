@@ -2184,13 +2184,14 @@
       height: 100%;
       min-width: 0;
       min-height: 0;
-      overflow: hidden;
+      overflow-y: auto;
       overflow-x: hidden;
+      scrollbar-gutter: stable;
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       background: #fffaf0;
       display: grid;
-      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      grid-template-rows: auto auto auto auto;
       align-content: start;
       gap: 12px;
       padding: 14px;
@@ -2203,12 +2204,11 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      min-height: 0;
+      min-height: auto;
       min-width: 0;
-      overflow-y: auto;
+      overflow-y: visible;
       overflow-x: hidden;
-      scrollbar-gutter: stable;
-      padding-right: 2px;
+      padding-right: 0;
       align-items: stretch;
       align-content: flex-start;
     }
@@ -2365,6 +2365,15 @@
       border-color: rgba(200, 150, 0, 0.15);
       box-shadow: 0 6px 16px rgba(185, 90, 0, 0.05);
     }
+    .sheet-group-card.is-request {
+      background: #f2f7ff;
+      border-color: rgba(74, 119, 196, 0.22);
+    }
+    .sheet-group-card.is-request[open] {
+      background: #eef5ff;
+      border-color: rgba(74, 119, 196, 0.28);
+      box-shadow: 0 4px 12px rgba(74, 119, 196, 0.06);
+    }
     @media (max-width: 600px) {
       .sheet-group-card {
         border-radius: 0;
@@ -2388,6 +2397,9 @@
       }
       .sheet-group-footer {
         padding: 14px 16px;
+      }
+      .sheet-group-footer-row {
+        align-items: stretch;
       }
     }
     .sheet-groups-banner {
@@ -2506,6 +2518,11 @@
       background: rgba(255,223,223,0.9);
       color: #843232;
     }
+    .sheet-group-chip.is-request {
+      background: rgba(219, 234, 255, 0.96);
+      color: #2552a3;
+      border: 1px solid rgba(74, 119, 196, 0.18);
+    }
     .sheet-group-chip.is-progress {
       background: transparent;
       color: rgba(93, 58, 16, 0.7);
@@ -2568,6 +2585,17 @@
     }
     .sheet-group-card[open] > .sheet-group-body {
       display: grid;
+    }
+    .sheet-group-card.is-request > .sheet-group-body,
+    .sheet-group-card.is-request .sheet-member-list {
+      background: #f7fbff;
+    }
+    .sheet-group-card.is-request .sheet-group-index-badge {
+      background: #2d5fb5;
+      color: #ffffff;
+    }
+    .sheet-group-card.is-request .sheet-group-summary-meta {
+      color: rgba(37, 82, 163, 0.72);
     }
     .sheet-member-list {
       background: #faf8f5;
@@ -2872,10 +2900,15 @@
       border-color: rgba(185,120,0,0.22);
       color: #8a5211;
     }
-    .sheet-group-pill.active[data-value="Pendiente"] {
+    .sheet-group-pill.active[data-value="Pendiente de pago"] {
       background: rgba(255,224,224,0.94);
       border-color: rgba(190,88,88,0.22);
       color: #9d3f3f;
+    }
+    .sheet-group-pill.active[data-value="Petición de grupo"] {
+      background: rgba(219,234,255,0.96);
+      border-color: rgba(74,119,196,0.22);
+      color: #2552a3;
     }
     .sheet-group-note {
       font-size: 0.74rem;
@@ -4255,6 +4288,43 @@
         width: 100%;
         min-width: 0;
       }
+      .sheet-group-footer-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .sheet-group-pill-toggle {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+      .sheet-group-pill {
+        width: 100%;
+        min-width: 0;
+        padding-inline: 10px;
+      }
+      .sheet-group-inline-grid,
+      .sheet-group-inline-grid.triple,
+      .sheet-member-detail .sheet-assistant-fields,
+      .sheet-assistant-fields,
+      .sheet-person-ticket-grid {
+        grid-template-columns: 1fr;
+      }
+      .sheet-member-row {
+        flex-wrap: wrap;
+        row-gap: 8px;
+      }
+      .sheet-member-name-text {
+        flex: 1 1 calc(100% - 44px);
+        min-width: 0;
+      }
+      .sheet-member-role-badge,
+      .sheet-member-row .entry-status-chip {
+        margin-left: 44px;
+        max-width: calc(100% - 44px);
+      }
+      .sheet-member-info-btn {
+        margin-left: auto;
+      }
       .sheet-group-responsible-line,
       .sheet-assistant-name,
       .sheet-assistant-meta {
@@ -4262,13 +4332,9 @@
       }
       .sheet-assistant-fields,
       .sheet-member-detail .sheet-assistant-fields {
-        grid-template-columns: 1fr 1fr;
         gap: 12px 8px;
       }
       .sheet-group-block.responsible .sheet-group-field-list {
-        grid-template-columns: 1fr;
-      }
-      .sheet-person-ticket-grid {
         grid-template-columns: 1fr;
       }
       .paella-panel-footer { gap: 8px; }
@@ -4744,7 +4810,7 @@
                   <option value="all">Todos</option>
                   <option value="paid">Pagados</option>
                   <option value="partial">Parciales</option>
-                  <option value="pending">Pendientes</option>
+                  <option value="pending">Petición / pendientes</option>
                 </select>
               </label>
               <label class="sheet-groups-filter">
@@ -5092,7 +5158,8 @@
               <label class="group-create-field">
                 <span>Pago</span>
                 <select id="newGroupWizardPaymentStatus" class="search">
-                  <option value="Pendiente">Pendiente</option>
+                  <option value="Petición de grupo">Petición de grupo</option>
+                  <option value="Pendiente de pago" selected>Pendiente de pago</option>
                   <option value="Parcial">Parcial</option>
                   <option value="Pagado">Pagado</option>
                 </select>
@@ -7550,7 +7617,7 @@
     }
     function captureSheetGroupsFocusState() {
       const focusState = {
-        scrollTop: els.sheetGroupsList ? els.sheetGroupsList.scrollTop : 0
+        scrollTop: els.sheetGroupsView ? els.sheetGroupsView.scrollTop : 0
       };
       if (!els.sheetGroupsView) return focusState;
       const active = document.activeElement;
@@ -7567,8 +7634,8 @@
     }
     function restoreSheetGroupsFocusState(focusState) {
       if (!focusState) return;
-      if (els.sheetGroupsList && typeof focusState.scrollTop === "number") {
-        els.sheetGroupsList.scrollTop = focusState.scrollTop;
+      if (els.sheetGroupsView && typeof focusState.scrollTop === "number") {
+        els.sheetGroupsView.scrollTop = focusState.scrollTop;
       }
       if (!els.sheetGroupsView) return;
       let selector = "";
@@ -7683,13 +7750,30 @@
         chip.textContent = (allIn ? "OK " : "") + enteredCount + "/" + totalCount + " han entrado";
         infoRow.appendChild(chip);
       }
-      if (group.payment && group.payment.status) {
+      if (group && group.payment) {
         const normalizedStatus = normalizePaymentStatus(group.payment.status);
+        const tone = getGroupPaymentStatusTone(normalizedStatus);
         const paymentChip = document.createElement("span");
-        paymentChip.className = "sheet-group-chip " + (normalizedStatus === "Pagado" ? "is-paid" : normalizedStatus === "Parcial" ? "is-partial" : "is-pending");
-        paymentChip.textContent = normalizedStatus;
+        paymentChip.className = "sheet-group-chip" + (tone ? (" " + tone) : "");
+        paymentChip.textContent = formatGroupPaymentStatusLabel(normalizedStatus);
         infoRow.appendChild(paymentChip);
       }
+    }
+    function syncSheetGroupTicketActionState(card, group) {
+      if (!card) return;
+      const canEmit = canEmitTicketsForPaymentStatus(group && group.payment && group.payment.status);
+      const blockedMessage = groupTicketBlockedMessage(group && group.payment && group.payment.status);
+      Array.prototype.forEach.call(card.querySelectorAll("[data-group-action='ticket-pdf-group'], [data-group-action='ticket-pdf-person']"), function (button) {
+        button.disabled = !canEmit;
+        if (canEmit) button.removeAttribute("title");
+        else button.title = blockedMessage;
+      });
+    }
+    function syncSheetGroupCardTone(card, group) {
+      if (!card) return;
+      const normalizedStatus = normalizePaymentStatus(group && group.payment && group.payment.status);
+      card.classList.toggle("is-request", normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST);
+      card.dataset.paymentStatus = normalizedStatus;
     }
     function syncSheetGroupsMemberRow(row, person) {
       if (!row || !person) return;
@@ -7719,6 +7803,7 @@
       card.dataset.groupId = group.id;
       card.dataset.structureSig = buildSheetGroupStructureSignature(group);
       card.style.setProperty('--i', String(Math.min(index + 1, 12)));
+      syncSheetGroupCardTone(card, group);
       const indexBadge = card.querySelector(".sheet-group-index-badge");
       if (indexBadge) indexBadge.textContent = "G" + (index + 1);
       const summaryMeta = card.querySelector(".sheet-group-summary-meta");
@@ -7736,6 +7821,7 @@
         button.dataset.col = String(group.payment && group.payment.statusCol);
         button.classList.toggle("active", normalizedStatus === String(button.dataset.value || ""));
       });
+      syncSheetGroupTicketActionState(card, group);
       const fieldValues = buildSheetGroupFieldValueMap(group);
       const active = document.activeElement;
       Array.prototype.forEach.call(card.querySelectorAll(".sheet-group-input[data-col], .sheet-group-select[data-col], .sheet-group-readonly[data-col]"), function (field) {
@@ -7848,13 +7934,57 @@
         flushPendingSheetGroupsRows();
       }, typeof delay === "number" ? delay : 420);
     }
+    var GROUP_PAYMENT_STATUS_REQUEST = "Petición de grupo";
+    var GROUP_PAYMENT_STATUS_PENDING = "Pendiente de pago";
+    var GROUP_PAYMENT_STATUS_PARTIAL = "Parcial";
+    var GROUP_PAYMENT_STATUS_PAID = "Pagado";
+    var GROUP_PAYMENT_STATUS_OPTIONS = [
+      GROUP_PAYMENT_STATUS_REQUEST,
+      GROUP_PAYMENT_STATUS_PENDING,
+      GROUP_PAYMENT_STATUS_PARTIAL,
+      GROUP_PAYMENT_STATUS_PAID
+    ];
     function normalizePaymentStatus(value) {
       const raw = String(value || "").trim();
       const normalized = normalizeCompareText(raw);
-      if (!normalized || normalized === "pendiente" || normalized === "no") return "Pendiente";
-      if (normalized === "pagado" || normalized === "si") return "Pagado";
-      if (normalized === "parcial" || normalized === "a medias" || normalized === "medio pagado") return "Parcial";
+      if (!normalized || normalized === "peticion" || normalized === "peticion grupo" || normalized === "peticion de grupo" || normalized === "solicitud" || normalized === "solicitud de grupo") {
+        return GROUP_PAYMENT_STATUS_REQUEST;
+      }
+      if (normalized === "pendiente" || normalized === "pendiente pago" || normalized === "pendiente de pago" || normalized === "pago pendiente" || normalized === "no") {
+        return GROUP_PAYMENT_STATUS_PENDING;
+      }
+      if (normalized === "pagado" || normalized === "si") return GROUP_PAYMENT_STATUS_PAID;
+      if (normalized === "parcial" || normalized === "a medias" || normalized === "medio pagado") return GROUP_PAYMENT_STATUS_PARTIAL;
       return raw;
+    }
+    function getGroupPaymentStatusTone(value) {
+      const normalizedStatus = normalizePaymentStatus(value);
+      if (normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST) return "is-request";
+      if (normalizedStatus === GROUP_PAYMENT_STATUS_PENDING) return "is-pending";
+      if (normalizedStatus === GROUP_PAYMENT_STATUS_PARTIAL) return "is-partial";
+      if (normalizedStatus === GROUP_PAYMENT_STATUS_PAID) return "is-paid";
+      return "";
+    }
+    function formatGroupPaymentStatusLabel(value) {
+      const normalizedStatus = normalizePaymentStatus(value);
+      return normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST
+        ? ("\u26A0 " + normalizedStatus)
+        : normalizedStatus;
+    }
+    function isGroupPendingLikeStatus(value) {
+      const normalizedStatus = normalizePaymentStatus(value);
+      return normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST || normalizedStatus === GROUP_PAYMENT_STATUS_PENDING;
+    }
+    function canEmitTicketsForPaymentStatus(value) {
+      const normalizedStatus = normalizePaymentStatus(value);
+      return normalizedStatus === GROUP_PAYMENT_STATUS_PENDING || normalizedStatus === GROUP_PAYMENT_STATUS_PARTIAL || normalizedStatus === GROUP_PAYMENT_STATUS_PAID;
+    }
+    function groupTicketBlockedMessage(value) {
+      const normalizedStatus = normalizePaymentStatus(value);
+      if (normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST) {
+        return "No puedes emitir entradas hasta pasar el grupo a Pendiente de pago.";
+      }
+      return "Este grupo debe estar al menos en Pendiente de pago para emitir entradas.";
     }
     function normalizeFirePointValue(value) {
       const raw = String(value || "").trim();
@@ -8091,6 +8221,7 @@
     }
     function createPersonTicketBlock(group, person, options) {
       const config = options || {};
+      const canEmit = canEmitTicketsForPaymentStatus(group && group.payment && group.payment.status);
       const wrap = document.createElement("div");
       wrap.className = "sheet-person-ticket";
       const head = document.createElement("div");
@@ -8106,6 +8237,8 @@
       pdfBtn.dataset.personRole = person.role;
       pdfBtn.dataset.personNumber = String(person.number || "");
       pdfBtn.textContent = "PDF entrada";
+      pdfBtn.disabled = !canEmit;
+      if (!canEmit) pdfBtn.title = groupTicketBlockedMessage(group && group.payment && group.payment.status);
       actions.appendChild(pdfBtn);
       head.appendChild(actions);
       wrap.appendChild(head);
@@ -8323,6 +8456,10 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 500);
     }
     function prepareCurrentSheetTicketPeople(group, personFilter) {
+      const initialStatus = normalizePaymentStatus(group && group.payment && group.payment.status);
+      if (!canEmitTicketsForPaymentStatus(initialStatus)) {
+        return Promise.reject(new Error(groupTicketBlockedMessage(initialStatus)));
+      }
       const collectPeople = function (resolvedGroup) {
         const allPeople = buildTicketPeopleFromGroup(resolvedGroup, {
           spreadsheetId: state.spreadsheetId,
@@ -8336,11 +8473,19 @@
       }
       return ensureSheetGroupsManagementColumnsForEditing().then(function () {
         const freshGroup = findSheetGroupById(group.id) || group;
+        const freshStatus = normalizePaymentStatus(freshGroup && freshGroup.payment && freshGroup.payment.status);
+        if (!canEmitTicketsForPaymentStatus(freshStatus)) {
+          throw new Error(groupTicketBlockedMessage(freshStatus));
+        }
         const people = collectPeople(freshGroup);
         ensureTicketCodeDraftsForPeople(state.currentSheetTitle, people, {});
         return flushPendingChanges({ force: true, message: "Preparando entradas..." }).then(function () {
           rebuildCurrentSheetGroupsModel();
           const latestGroup = findSheetGroupById(group.id) || freshGroup;
+          const latestStatus = normalizePaymentStatus(latestGroup && latestGroup.payment && latestGroup.payment.status);
+          if (!canEmitTicketsForPaymentStatus(latestStatus)) {
+            throw new Error(groupTicketBlockedMessage(latestStatus));
+          }
           return collectPeople(latestGroup);
         });
       });
@@ -9055,8 +9200,8 @@
         { label: "Asistentes visibles", value: String(filteredAttendees), meta: "Total: " + String(totalAttendees) },
         {
           label: "Pagados",
-          value: String(visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === "Pagado"; }).length),
-          meta: "Pendientes visibles: " + String(visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === "Pendiente"; }).length)
+          value: String(visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === GROUP_PAYMENT_STATUS_PAID; }).length),
+          meta: "Pendientes visibles: " + String(visible.filter(function (group) { return isGroupPendingLikeStatus(group.payment && group.payment.status); }).length)
         }
       ];
       els.sheetGroupsStats.innerHTML = stats.map(function (stat) {
@@ -9073,9 +9218,9 @@
         const paymentStatus = normalizePaymentStatus(group.payment && group.payment.status);
         const fireKey = firePointFilterKey(group.firePoint && group.firePoint.value);
         const contestValue = normalizeYesNoValue(group.contest && group.contest.value);
-        if (filters.payment === "paid" && paymentStatus !== "Pagado") return false;
-        if (filters.payment === "partial" && paymentStatus !== "Parcial") return false;
-        if (filters.payment === "pending" && paymentStatus !== "Pendiente") return false;
+        if (filters.payment === "paid" && paymentStatus !== GROUP_PAYMENT_STATUS_PAID) return false;
+        if (filters.payment === "partial" && paymentStatus !== GROUP_PAYMENT_STATUS_PARTIAL) return false;
+        if (filters.payment === "pending" && !isGroupPendingLikeStatus(paymentStatus)) return false;
         if (filters.fire === "any" && (fireKey === "none" || fireKey === "no")) return false;
         if (filters.fire === "paella" && fireKey !== "paella") return false;
         if (filters.fire === "torra" && fireKey !== "torra") return false;
@@ -9179,7 +9324,7 @@
       if (els.newGroupWizardEmail) els.newGroupWizardEmail.value = "";
       if (els.newGroupWizardPhone) els.newGroupWizardPhone.value = "";
       if (els.newGroupWizardDni) els.newGroupWizardDni.value = "";
-      if (els.newGroupWizardPaymentStatus) els.newGroupWizardPaymentStatus.value = "Pendiente";
+      if (els.newGroupWizardPaymentStatus) els.newGroupWizardPaymentStatus.value = GROUP_PAYMENT_STATUS_PENDING;
       if (els.newGroupWizardAmount) els.newGroupWizardAmount.value = "";
       if (els.newGroupWizardContest) els.newGroupWizardContest.value = "";
       if (els.newGroupWizardFirePoint) els.newGroupWizardFirePoint.value = "";
@@ -9194,7 +9339,7 @@
         email: String(els.newGroupWizardEmail && els.newGroupWizardEmail.value || "").trim(),
         phone: String(els.newGroupWizardPhone && els.newGroupWizardPhone.value || "").trim(),
         dni: String(els.newGroupWizardDni && els.newGroupWizardDni.value || "").trim(),
-        paymentStatus: String(els.newGroupWizardPaymentStatus && els.newGroupWizardPaymentStatus.value || "Pendiente").trim() || "Pendiente",
+        paymentStatus: String(els.newGroupWizardPaymentStatus && els.newGroupWizardPaymentStatus.value || GROUP_PAYMENT_STATUS_PENDING).trim() || GROUP_PAYMENT_STATUS_PENDING,
         amount: String(els.newGroupWizardAmount && els.newGroupWizardAmount.value || "").trim(),
         contest: String(els.newGroupWizardContest && els.newGroupWizardContest.value || "").trim(),
         firePoint: String(els.newGroupWizardFirePoint && els.newGroupWizardFirePoint.value || "").trim(),
@@ -9256,9 +9401,9 @@
       setAt(["Responsable - telefono"], draft.phone);
       setAt(["Responsable - DNI"], draft.dni);
       setAt(["submittedAt", "timestamp"], new Date().toLocaleString("es-ES"));
-      setAt(["Pago - estado"], draft.paymentStatus || "Pendiente");
+      setAt(["Pago - estado"], draft.paymentStatus || GROUP_PAYMENT_STATUS_PENDING);
       setAt(["Pago - importe", "Pago - cantidad", "Pago - euros"], draft.amount);
-      if ((draft.paymentStatus === "Pagado" || draft.paymentStatus === "Parcial") && draft.responsibleName) {
+      if ((draft.paymentStatus === GROUP_PAYMENT_STATUS_PAID || draft.paymentStatus === GROUP_PAYMENT_STATUS_PARTIAL) && draft.responsibleName) {
         setAt(["Pago - quien paga", "Pago - paga"], draft.responsibleName);
       }
       setAt(["Paella - punto de fuego"], draft.firePoint);
@@ -9853,7 +9998,7 @@
       }
       var opts = options || {};
       snapshotSheetGroupsOpenState();
-      const scrollParent = els.sheetGroupsList || els.sheetGroupsView;
+      const scrollParent = els.sheetGroupsView || els.sheetGroupsList;
       const savedScrollTop = scrollParent ? scrollParent.scrollTop : 0;
       els.sheetGroupsList.innerHTML = "";
       if (opts.skipAnim) els.sheetGroupsList.classList.add("skip-anim");
@@ -9891,6 +10036,7 @@
         card.dataset.structureSig = buildSheetGroupStructureSignature(group);
         card.open = wasOpen;
         card.addEventListener("toggle", function () { card.classList.remove("no-anim"); });
+        syncSheetGroupCardTone(card, group);
         const summary = document.createElement("summary");
         summary.className = "sheet-group-summary";
         const indexBadge = document.createElement("div");
@@ -10024,7 +10170,7 @@
         paymentRow.appendChild(paymentLabel);
         var paymentPills = document.createElement("div");
         paymentPills.className = "sheet-group-pill-toggle";
-        ["Pendiente", "Parcial", "Pagado"].forEach(function (statusValue) {
+        GROUP_PAYMENT_STATUS_OPTIONS.forEach(function (statusValue) {
           var btn = document.createElement("button");
           btn.type = "button";
           btn.className = "sheet-group-pill" + (normalizePaymentStatus(group.payment.status) === statusValue ? " active" : "");
@@ -10075,6 +10221,7 @@
           body.appendChild(actionsRow);
         }
         card.appendChild(body);
+        syncSheetGroupTicketActionState(card, group);
         els.sheetGroupsList.appendChild(card);
       });
       appendCreateGroupAction();
