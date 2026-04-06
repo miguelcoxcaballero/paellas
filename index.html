@@ -2333,20 +2333,51 @@
       background: rgba(185,90,0,0.05);
     }
     .sheet-group-card {
-      border: none;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      border-radius: 0;
-      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      background: #ffffff;
       overflow: hidden;
+      margin-bottom: 12px;
       min-width: 0;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .sheet-group-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      transform: translateY(-1px);
     }
     .sheet-group-card:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
     .sheet-group-card[open] {
       background: #faf8f5;
-      border-bottom-color: rgba(0,0,0,0.1);
+      border-color: rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+    }
+    @media (max-width: 600px) {
+      .sheet-group-card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin-bottom: 8px;
+        box-shadow: none;
+      }
+      .sheet-groups-banner {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        padding: 16px;
+      }
+      .sheet-group-summary {
+        padding: 14px 16px;
+        gap: 12px;
+      }
+      .sheet-member-row {
+        padding: 10px 16px;
+      }
+      .sheet-group-footer {
+        padding: 14px 16px;
+      }
     }
     .sheet-groups-banner {
       display: flex;
@@ -3002,44 +3033,65 @@
       max-height: none;
       position: relative;
       border-radius: 0;
+      background: #fdfdfc;
       border: none;
       box-shadow: none;
-      padding: 18px;
-      transform: none;
+      padding: 16px;
+      transform: translateY(20px);
       opacity: 0;
-      transition: opacity .14s ease;
+      transition: opacity .2s ease, transform .2s cubic-bezier(0.2, 0, 0, 1);
     }
     .ticket-reader-floating-close {
       position: absolute;
       top: 14px;
       right: 14px;
       z-index: 20;
-      width: 34px;
-      height: 34px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(185, 90, 0, 0.1);
-      color: var(--ink);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: #1a1a1a;
       display: grid;
       place-items: center;
       padding: 0;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(40, 22, 4, 0.08);
-      transition: background 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      transition: background 0.2s ease, transform 0.2s cubic-bezier(0.2,0,0,1);
     }
     .ticket-reader-floating-close:hover {
       background: #fff;
-      transform: scale(1.05);
+      transform: scale(1.08);
     }
-    #ticketReaderModal.visible .ticket-reader-card { opacity: 1; }
+    #ticketReaderModal.visible .ticket-reader-card { 
+      opacity: 1; 
+      transform: translateY(0);
+    }
     #ticketReaderModal {
       padding: 0;
-      background: rgba(34, 21, 5, 0.42);
+      background: rgba(18, 18, 18, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       place-items: stretch;
-      transition: opacity .18s ease, visibility .18s ease;
+      transition: opacity .2s ease, visibility .2s ease;
+    }
+    @media (min-width: 600px) {
+      .ticket-reader-card {
+        width: 100%;
+        height: auto;
+        max-width: 520px;
+        max-height: 90vh;
+        border-radius: 20px;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.15);
+        padding: 24px;
+      }
+      #ticketReaderModal {
+        place-items: center;
+        padding: 24px;
+      }
     }
     .ticket-reader-body {
       display: grid;
@@ -3080,14 +3132,15 @@
       flex: 0 0 auto;
     }
     .ticket-reader-camera {
-      border: 1px solid rgba(185, 90, 0, 0.1);
-      border-radius: 16px;
-      background: #111;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 18px;
+      background: #000;
       overflow: hidden;
-      min-height: 200px;
+      min-height: 240px;
       display: grid;
       place-items: center;
-      box-shadow: inset 0 2px 12px rgba(0,0,0,0.2);
+      box-shadow: inset 0 4px 20px rgba(0,0,0,0.3);
+      position: relative;
     }
     .ticket-reader-camera video {
       width: 100%;
@@ -8070,49 +8123,90 @@
       const people = Array.isArray(ticketPeople) ? ticketPeople : [];
       if (!people.length) return Promise.reject(new Error("No hay entradas para exportar."));
       const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [105, 148] });
+      
       people.forEach(function (person, index) {
         if (index > 0) doc.addPage([105, 148], "portrait");
         const qrText = buildTicketQrText(config.spreadsheetId, config.sheetTitle, person.sheetRow, person.role, person.number, person.code);
         const qrDataUrl = createQrDataUrl(qrText);
-        doc.setFillColor(255, 248, 214);
+        
+        // Full bleed white background
+        doc.setFillColor(255, 255, 255);
         doc.rect(0, 0, 105, 148, "F");
-        doc.setDrawColor(185, 90, 0);
-        doc.roundedRect(7, 7, 91, 134, 6, 6);
+        
+        // Header (Primary Color)
+        doc.setFillColor(185, 90, 0);
+        doc.rect(0, 0, 105, 26, "F");
+        
+        doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(64, 36, 5);
-        doc.setFontSize(18);
-        doc.text("Entrada paellas.net", 12, 18);
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "normal");
-        doc.text(String(person.groupTitle || "Grupo"), 12, 26);
-        doc.addImage(qrDataUrl, "PNG", 58, 18, 32, 32);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(15);
-        doc.text(String(person.name || "Asistente"), 12, 42, { maxWidth: 40 });
+        doc.setFontSize(16);
+        doc.text("ENTRADA OFICIAL", 10, 13);
+        
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        const lines = [
-          "Rol: " + (person.role === "responsable" ? "Responsable" : ("Integrante " + String(Number(person.number) || person.number))),
-          person.dni ? ("DNI: " + person.dni) : "",
-          person.email ? ("Email: " + person.email) : "",
-          person.phone ? ("Telefono: " + person.phone) : "",
-          person.info ? ("Entrada: " + person.info) : "",
-          "Codigo: " + person.code
-        ].filter(Boolean);
-        let y = 58;
-        lines.forEach(function (line) {
-          const wrapped = doc.splitTextToSize(line, 78);
-          doc.text(wrapped, 12, y);
-          y += wrapped.length * 5;
-        });
+        doc.text("paellas.net", 95, 13, { align: "right" });
+        
+        const roleInGroup = person.role === "responsable" ? "Responsable" : ("Asistente #" + (person.number || ""));
+        const headerSubText = "Grupo: " + String(person.groupTitle || "Sin Grupo").substring(0, 50) + " - " + roleInGroup;
+        
+        doc.setTextColor(255, 230, 200);
+        doc.text(headerSubText, 10, 21, { maxWidth: 85 });
+        
+        // QR Code (Right aligned)
+        doc.addImage(qrDataUrl, "PNG", 64, 34, 32, 32);
+        
+        // Info Section (Left side)
+        let leftY = 38;
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
-        doc.text("Estado: " + normalizeEntryStatus(person.status || "Emitida"), 12, 122);
-        if (person.scannedAt) {
+        doc.setFontSize(16);
+        doc.setTextColor(30, 30, 30);
+        const nameWrapped = doc.splitTextToSize(String(person.name || "Asistente"), 52);
+        doc.text(nameWrapped, 10, leftY);
+        leftY += nameWrapped.length * 6 + 4;
+        
+        // Details List (Below QR / Name bounds)
+        let currentY = Math.max(leftY, 72);
+        
+        const drawField = function(label, value, x, y, valWidth) {
+          doc.setFontSize(7);
+          doc.setTextColor(140, 140, 140);
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(9);
-          doc.text("Ultimo acceso: " + person.scannedAt, 12, 130, { maxWidth: 80 });
+          doc.text(String(label).toUpperCase(), x, y);
+          doc.setFontSize(10);
+          doc.setTextColor(20, 20, 20);
+          doc.setFont("helvetica", "bold");
+          const valStr = String(value || "-");
+          const valWrapped = doc.splitTextToSize(valStr, valWidth || 40);
+          doc.text(valWrapped, x, y + 4.5);
+          return 4.5 + (valWrapped.length * 4.5);
+        };
+        
+        let r1 = drawField("DNI", person.dni, 10, currentY, 85);
+        currentY += r1 + 6;
+        
+        let r2 = drawField("EMAIL", person.email, 10, currentY, 85);
+        currentY += r2 + 6;
+        
+        if (person.phone) {
+          let rPhone = drawField("TELÉFONO", person.phone, 10, currentY, 85);
+          currentY += rPhone + 6;
         }
+        
+        if (person.info) {
+          let rInfo = drawField("TIPO DE ENTRADA / OBSERVACIONES", person.info, 10, currentY, 85);
+          currentY += rInfo + 6;
+        }
+        
+        // Footer message (Replacing old status/code)
+        doc.setDrawColor(230, 230, 230);
+        doc.setLineWidth(0.5);
+        doc.line(10, 134, 95, 134);
+        
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.setFont("helvetica", "normal");
+        doc.text("CÓDIGO INTRANSFERIBLE Y DE UN SOLO USO", 10, 140);
+        
       });
       return Promise.resolve(doc.output("blob"));
     }
