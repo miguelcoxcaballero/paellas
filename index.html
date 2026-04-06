@@ -2238,10 +2238,10 @@
       align-content: start;
       position: relative;
       z-index: 12;
-      padding: 10px 12px 12px;
-      border: 1px solid rgba(185,90,0,0.14);
-      border-radius: 24px;
-      background: #fffdf8;
+      padding: 10px 12px 14px;
+      border: none;
+      border-radius: 20px;
+      background: transparent;
       box-shadow: none;
       isolation: isolate;
       overflow: hidden;
@@ -2249,28 +2249,31 @@
     .sheet-groups-stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+      gap: 8px;
+      padding: 8px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
+      border: 1px solid rgba(0,0,0,0.02);
     }
     .sheet-groups-stat {
-      border: 1px solid rgba(185,90,0,0.1);
-      border-radius: 18px;
-      background: #fffdfa;
+      border: none;
+      border-radius: 14px;
+      background: transparent;
       padding: 14px 15px;
       display: grid;
       gap: 4px;
       min-width: 0;
-      border-left: 4px solid rgba(185,90,0,0.18);
       box-shadow: none;
-      transition: border-color .15s ease, background .15s ease;
+      transition: background .15s ease;
       animation: none;
     }
-    .sheet-groups-stat:nth-child(1) { border-left-color: #3ea35b; }
-    .sheet-groups-stat:nth-child(2) { border-left-color: #6a8fcc; }
-    .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; }
-    .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; }
+    .sheet-groups-stat:nth-child(1) .sheet-groups-stat-value { color: #2c7a41; }
+    .sheet-groups-stat:nth-child(2) .sheet-groups-stat-value { color: #4c6ca6; }
+    .sheet-groups-stat:nth-child(3) .sheet-groups-stat-value { color: #a16222; }
+    .sheet-groups-stat:nth-child(4) .sheet-groups-stat-value { color: #2c7a41; }
     .sheet-groups-stat:hover {
-      background: #fffefb;
-      border-color: rgba(185,90,0,0.14);
+      background: #fdfbf7;
     }
     .sheet-groups-stat-label {
       font-size: 0.64rem;
@@ -2313,36 +2316,38 @@
       width: 100%;
       min-width: 0;
       min-height: 42px;
-      border: 1px solid rgba(185,90,0,0.16);
-      border-radius: 14px;
-      background: #fffdfa;
+      border: none;
+      border-bottom: 2px solid rgba(185,90,0,0.12);
+      border-radius: 12px 12px 4px 4px;
+      background: rgba(185,90,0,0.02);
       color: var(--ink);
       font: inherit;
-      font-size: 0.83rem;
+      font-size: 0.85rem;
+      font-weight: 500;
       padding: 10px 14px;
       outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      transition: border-color .2s ease, background .2s ease;
     }
     .sheet-groups-filter-select:focus {
       border-color: rgba(185,90,0,0.4);
-      box-shadow: 0 0 0 3px rgba(250,205,106,0.18);
+      background: rgba(185,90,0,0.05);
     }
     .sheet-group-card {
-      border: 1px solid rgba(185,90,0,0.12);
-      border-radius: 24px;
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: 20px;
       background: #ffffff;
       overflow: hidden;
       min-width: 0;
-      box-shadow: none;
-      transition: border-color .18s ease, background .18s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      transition: box-shadow .2s ease, transform .2s ease;
     }
     .sheet-group-card:hover {
-      border-color: rgba(185,90,0,0.16);
-      background: #fffefb;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
     }
     .sheet-group-card[open] {
-      background: #fffefb;
-      border-color: rgba(185,90,0,0.18);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      border-color: rgba(0,0,0,0.07);
     }
     .sheet-groups-banner {
       display: flex;
@@ -2351,10 +2356,10 @@
       gap: 14px;
       background: #ffffff;
       color: #5d3a10;
-      border-radius: 24px;
+      border-radius: 20px;
       padding: 20px 22px;
-      border: 1px solid rgba(185,90,0,0.12);
-      box-shadow: none;
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
     }
     .sheet-groups-banner-title {
       font-size: 1.22rem;
@@ -2384,12 +2389,12 @@
       gap: 16px;
       padding: 18px 20px;
       cursor: pointer;
-      background: #ffffff;
-      transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+      background: transparent;
+      transition: background .15s ease;
       min-width: 0;
     }
     .sheet-group-summary:hover {
-      background: #fffaf2;
+      background: rgba(0,0,0,0.02);
     }
     .sheet-group-summary-main {
       min-width: 0;
@@ -2436,6 +2441,7 @@
     .sheet-group-summary-info {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 6px;
       flex-wrap: wrap;
       min-width: 0;
@@ -2451,10 +2457,10 @@
       display: inline-flex;
       align-items: center;
       min-height: 28px;
-      padding: 5px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
       background: rgba(255,247,226,0.72);
-      border: 1px solid rgba(185,90,0,0.12);
+      border: none;
       color: #8a5211;
       font-size: 0.68rem;
       font-weight: 700;
@@ -2462,29 +2468,31 @@
       white-space: nowrap;
     }
     .sheet-group-chip.is-paid {
-      background: rgba(212,247,222,0.7);
-      border-color: rgba(44,149,74,0.12);
-      color: #1c6b34;
+      background: rgba(212,247,222,0.9);
+      color: #175429;
     }
     .sheet-group-chip.is-partial {
-      background: rgba(255,238,188,0.7);
-      border-color: rgba(185,120,0,0.1);
+      background: rgba(255,238,188,0.9);
       color: #8a5211;
     }
     .sheet-group-chip.is-pending {
-      background: rgba(255,223,223,0.7);
-      border-color: rgba(190,88,88,0.1);
-      color: #a23d3d;
+      background: rgba(255,223,223,0.9);
+      color: #843232;
     }
     .sheet-group-chip.is-progress {
-      background: rgba(220,235,255,0.7);
-      border-color: rgba(80,120,200,0.15);
-      color: #2f5499;
+      background: rgba(220,235,255,0.9);
+      color: #27457a;
     }
     .sheet-group-chip.is-progress-complete {
-      background: rgba(212,247,222,0.8);
-      border-color: rgba(44,149,74,0.2);
-      color: #1c6b34;
+      background: rgba(212,247,222,0.9);
+      color: #175429;
+    }
+    .sheet-group-summary-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      min-width: 0;
     }
     .sheet-group-summary-side {
       display: inline-flex;
@@ -2496,26 +2504,32 @@
     .sheet-group-chevron {
       width: 34px;
       height: 34px;
-      border-radius: 999px;
-      border: 1px solid rgba(185,90,0,0.14);
-      background: #fffaf2;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
       color: #8a5211;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.15rem;
-      font-weight: 500;
       flex: 0 0 auto;
       box-shadow: none;
-      transition: background .15s ease, border-color .15s ease, color .15s ease;
+      transition: background .15s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1);
     }
-    .sheet-group-chevron::before { content: "+"; transform: translateY(-1px); }
+    .sheet-group-chevron svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+    .sheet-group-chevron:hover {
+      background: rgba(0,0,0,0.05);
+    }
     .sheet-group-card[open] > summary .sheet-group-chevron {
-      background: rgba(255,240,200,0.92);
-      border-color: rgba(185,90,0,0.28);
+      background: rgba(0,0,0,0.04);
     }
-    .sheet-group-card[open] > summary .sheet-group-chevron::before { content: "-"; transform: translateY(-1px); }
-    .sheet-assistant-item[open] .sheet-group-chevron::before { content: "-"; transform: translateY(-1px); }
+    .sheet-group-card[open] > summary .sheet-group-chevron svg,
+    .sheet-assistant-item[open] .sheet-group-chevron svg {
+      transform: rotate(180deg);
+    }
     .sheet-group-body {
       display: grid;
       gap: 0;
@@ -2529,16 +2543,21 @@
       display: grid;
     }
     .sheet-member-list {
-      border-top: 1px solid rgba(185,90,0,0.08);
+      border-top: 1px solid rgba(0,0,0,0.04);
+      background: #fafafa;
     }
     .sheet-member-row {
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 14px 20px;
-      border-bottom: 1px solid rgba(185,90,0,0.07);
+      border-bottom: 1px solid rgba(0,0,0,0.03);
       min-width: 0;
-      background: #ffffff;
+      background: transparent;
+      transition: background .15s ease;
+    }
+    .sheet-member-row:hover {
+      background: rgba(0,0,0,0.015);
     }
     .sheet-member-row:last-of-type {
       border-bottom: none;
@@ -2572,42 +2591,45 @@
       flex: 0 0 auto;
     }
     .sheet-member-info-btn {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      border: 1px solid rgba(185,90,0,0.16);
-      background: #ffffff;
+      border: none;
+      background: transparent;
       color: #8a5211;
-      font-size: 0.84rem;
-      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex: 0 0 auto;
       box-shadow: none;
-      transition: background .15s ease, border-color .15s ease;
+      transition: background .15s ease, color .15s ease;
+    }
+    .sheet-member-info-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
     }
     .sheet-member-info-btn:hover {
-      background: rgba(255,243,210,0.9);
-      border-color: rgba(185,90,0,0.35);
+      background: rgba(0,0,0,0.05);
+      color: #5d3a10;
     }
     .sheet-member-info-btn.is-open {
-      background: rgba(255,236,190,0.9);
-      border-color: rgba(185,90,0,0.45);
+      background: rgba(0,0,0,0.08);
+      color: #3d2608;
     }
     .sheet-member-detail {
       padding: 16px 20px 18px;
-      background: #fffdf9;
-      border-bottom: 1px solid rgba(185,90,0,0.07);
+      background: #ffffff;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
     }
     .sheet-member-detail.hidden { display: none; }
     .sheet-group-footer {
       display: grid;
       gap: 12px;
       padding: 16px 20px 18px;
-      border-top: 1px solid rgba(185,90,0,0.08);
-      background: #fffdf8;
+      border-top: 1px solid rgba(0,0,0,0.04);
+      background: #ffffff;
     }
     .sheet-group-footer-row {
       display: flex;
@@ -5238,13 +5260,17 @@
         rows: [],
         sheets: [],
         candidates: [],
+        model: null,
         lastScanText: "",
         lastScanAt: 0,
         scanInFlight: false,
         reviewIdentity: null,
         reviewSubmitting: false,
         loadTimer: 0,
-        resumeCameraAfterReview: false
+        resumeCameraAfterReview: false,
+        syncTimer: 0,
+        syncInFlight: false,
+        lastMetaRefreshAt: 0
       },
       formId: "",
       formTitle: "",
@@ -7751,6 +7777,50 @@
         els.ticketReaderLiveBadge.classList.toggle("is-live", active);
       }
     }
+    var TICKET_READER_SYNC_INTERVAL = 2400;
+    var TICKET_READER_META_REFRESH_INTERVAL = 12000;
+    function getTicketReaderSheetInfo(sheetTitle) {
+      const targetTitle = String(sheetTitle || state.ticketReader.sheetTitle || "");
+      return (state.ticketReader.sheets || []).find(function (entry) {
+        return entry && entry.title === targetTitle;
+      }) || null;
+    }
+    function setTicketReaderSheetsFromMeta(meta) {
+      state.ticketReader.sheets = (meta && meta.sheet && meta.sheet.sheets || []).map(function (entry) {
+        return entry.properties || {};
+      });
+      state.ticketReader.lastMetaRefreshAt = Date.now();
+      return state.ticketReader.sheets;
+    }
+    function stopTicketReaderAutoRefresh() {
+      if (state.ticketReader.syncTimer) {
+        clearInterval(state.ticketReader.syncTimer);
+        state.ticketReader.syncTimer = 0;
+      }
+      state.ticketReader.syncInFlight = false;
+    }
+    function startTicketReaderAutoRefresh() {
+      stopTicketReaderAutoRefresh();
+      if (!els.ticketReaderModal || !els.ticketReaderModal.classList.contains("visible")) return;
+      if (!state.ticketReader.spreadsheetId) return;
+      state.ticketReader.syncTimer = setInterval(function () {
+        if (state.ticketReader.syncInFlight || state.ticketReader.loadTimer) return;
+        if (els.ticketReaderReviewOverlay && !els.ticketReaderReviewOverlay.classList.contains("hidden")) return;
+        state.ticketReader.syncInFlight = true;
+        refreshTicketReaderModel({
+          refreshMeta: !state.ticketReader.lastMetaRefreshAt || (Date.now() - state.ticketReader.lastMetaRefreshAt) >= TICKET_READER_META_REFRESH_INTERVAL
+        }).catch(function () {
+        }).finally(function () {
+          state.ticketReader.syncInFlight = false;
+        });
+      }, TICKET_READER_SYNC_INTERVAL);
+    }
+    function isCompactTicketCode(value) {
+      return /^PAE-[A-Z0-9]{4,}$/i.test(String(value || "").trim());
+    }
+    function shouldRetryTicketReaderLookup(query) {
+      return !!decodeTicketPayload(query) || isCompactTicketCode(query);
+    }
     function getResponsibleEntryHeaderLabels() {
       return [
         "Responsable - entrada info",
@@ -7783,16 +7853,7 @@
       return "PAE-" + simpleHash(seed).toUpperCase();
     }
     function buildTicketQrText(spreadsheetId, sheetTitle, groupRow, role, number, code) {
-      return JSON.stringify({
-        app: "paellas.net",
-        kind: "ticket",
-        sid: String(spreadsheetId || ""),
-        sht: String(sheetTitle || ""),
-        row: Number(groupRow) || 0,
-        role: String(role || ""),
-        num: String(number || ""),
-        code: String(code || "")
-      });
+      return String(code || buildTicketCodeForPerson(spreadsheetId, sheetTitle, groupRow, role, number) || "").trim().toUpperCase();
     }
     function buildTicketPeopleFromGroup(group, options) {
       const config = options || {};
@@ -7994,10 +8055,11 @@
       if (!qrious) throw new Error("No se ha cargado el generador de QR.");
       const qr = new qrious({
         value: String(text || ""),
-        size: 460,
-        level: "M",
+        size: 320,
+        level: "L",
+        padding: 20,
         background: "#ffffff",
-        foreground: "#402405"
+        foreground: "#000000"
       });
       return qr.toDataURL("image/png");
     }
@@ -8159,6 +8221,7 @@
     }
     function closeTicketReaderModal() {
       clearTicketReaderLoadTimer();
+      stopTicketReaderAutoRefresh();
       stopTicketReaderCamera();
       state.ticketReader.resumeCameraAfterReview = false;
       closeTicketReaderReview();
@@ -8277,6 +8340,7 @@
     function loadTicketReaderSheet(spreadsheetId, preferredSheetTitle) {
       const targetId = String(spreadsheetId || "").trim();
       if (!targetId) return Promise.reject(new Error("No hay ninguna hoja seleccionada."));
+      stopTicketReaderAutoRefresh();
       closeTicketReaderReview();
       setBusy(els.ticketReaderCard, true);
       setTicketReaderStatus("Cargando hoja de entradas...", "");
@@ -8308,12 +8372,13 @@
         state.ticketReader.sheetTitle = result.sheetInfo.title;
         state.ticketReader.model = model;
         state.ticketReader.rows = rows;
-        state.ticketReader.sheets = (result.meta && result.meta.sheet && result.meta.sheet.sheets || []).map(function (entry) { return entry.properties || {}; });
+        setTicketReaderSheetsFromMeta(result.meta);
         setTicketReaderStatus(
           model.groups.length ? "Hoja lista." : "Sin grupos en esta hoja.",
           model.groups.length ? "good" : "error"
         );
         renderTicketReaderResults([], model.groups.length ? "" : "No hay grupos de paella en esta hoja.");
+        startTicketReaderAutoRefresh();
         return model;
       }).finally(function () {
         setBusy(els.ticketReaderCard, false);
@@ -8376,27 +8441,28 @@
         els.ticketReaderResults.appendChild(card);
       });
     }
-    function handleDetectedTicketValue(rawValue) {
+        function handleDetectedTicketValue(rawValue) {
       const value = String(rawValue || "").trim();
       if (!value) return Promise.resolve(false);
       const fromCamera = !!(state.ticketReader.stream || state.ticketReader.scanTimer);
-      const results = searchTicketReaderPeople(value);
-      if (!results.length) {
-        setTicketReaderStatus("QR no reconocido.", "error");
-        return Promise.resolve(false);
-      }
-      if (results.length > 1) {
-        if (els.ticketReaderSearchInput) els.ticketReaderSearchInput.value = value;
-        renderTicketReaderResults(results, "Múltiples coincidencias");
-        state.ticketReader.resumeCameraAfterReview = false;
+      return searchTicketReaderPeopleLive(value).then(function (results) {
+        if (!results.length) {
+          setTicketReaderStatus("QR no reconocido.", "error");
+          return false;
+        }
+        if (results.length > 1) {
+          if (els.ticketReaderSearchInput) els.ticketReaderSearchInput.value = value;
+          renderTicketReaderResults(results, "Múltiples coincidencias");
+          state.ticketReader.resumeCameraAfterReview = false;
+          stopTicketReaderCamera();
+          setTicketReaderStatus("Varias coincidencias.", "");
+          return true;
+        }
+        state.ticketReader.resumeCameraAfterReview = fromCamera;
         stopTicketReaderCamera();
-        setTicketReaderStatus("Varias coincidencias.", "");
-        return Promise.resolve(true);
-      }
-      state.ticketReader.resumeCameraAfterReview = fromCamera;
-      stopTicketReaderCamera();
-      setTicketReaderStatus("Entrada detectada.", "good");
-      return markTicketPersonEntered(results[0]).then(function () { return true; });
+        setTicketReaderStatus("Entrada detectada.", "good");
+        return markTicketPersonEntered(results[0]).then(function () { return true; });
+      });
     }
     function searchTicketReaderPeople(query) {
       const model = getEffectiveTicketReaderModel();
@@ -8426,27 +8492,52 @@
         return haystack.indexOf(normalized) !== -1 || haystack.includes(normalized);
       });
     }
-    function silentRefreshTicketReaderRows() {
+    function silentRefreshTicketReaderRows(options) {
+      const config = options || {};
       const spreadsheetId = state.ticketReader.spreadsheetId;
-      const sheetTitle = state.ticketReader.sheetTitle;
+      let sheetTitle = state.ticketReader.sheetTitle;
       if (!spreadsheetId || !sheetTitle) return Promise.resolve(null);
-      const sheetInfo = (state.ticketReader.sheets || []).find(function (s) { return s.title === sheetTitle; });
-      const rowCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount) || 1000;
-      const columnCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount) || 50;
-      return fetchSpreadsheetRowsByTitle(spreadsheetId, sheetTitle, rowCount, columnCount)
-        .then(function (rows) {
-          const model = buildPaellaGroupsFromSheetRows(rows, sheetTitle);
-          state.ticketReader.model = model;
-          state.ticketReader.rows = rows;
-          return model;
+      function fetchRowsForSheetInfo(sheetInfo) {
+        const rowCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount) || 1000;
+        const columnCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount) || 50;
+        return fetchSpreadsheetRowsByTitle(spreadsheetId, sheetTitle, rowCount, columnCount)
+          .then(function (rows) {
+            const model = buildPaellaGroupsFromSheetRows(rows, sheetTitle);
+            state.ticketReader.sheetTitle = sheetTitle;
+            state.ticketReader.model = model;
+            state.ticketReader.rows = rows;
+            return model;
+          });
+      }
+      const syncMeta = (config.refreshMeta || !state.ticketReader.sheets.length)
+        ? fetchSpreadsheetDocumentMeta(spreadsheetId).then(function (meta) {
+            const sheets = setTicketReaderSheetsFromMeta(meta);
+            const matchedSheet = sheets.find(function (entry) { return entry && entry.title === sheetTitle; }) || sheets[0] || null;
+            if (matchedSheet && matchedSheet.title) sheetTitle = matchedSheet.title;
+            return matchedSheet;
+          })
+        : Promise.resolve(getTicketReaderSheetInfo(sheetTitle));
+      return syncMeta
+        .then(function (sheetInfo) {
+          return fetchRowsForSheetInfo(sheetInfo);
         });
     }
-    function refreshTicketReaderModel() {
+    function refreshTicketReaderModel(options) {
       if (!state.ticketReader.spreadsheetId) return Promise.resolve(null);
       if (!state.ticketReader.sheetTitle) {
         return loadTicketReaderSheet(state.ticketReader.spreadsheetId);
       }
-      return silentRefreshTicketReaderRows();
+      return silentRefreshTicketReaderRows(options);
+    }
+    function searchTicketReaderPeopleLive(query) {
+      const value = String(query || "").trim();
+      const initialResults = searchTicketReaderPeople(value);
+      if (initialResults.length || !shouldRetryTicketReaderLookup(value)) return Promise.resolve(initialResults);
+      return refreshTicketReaderModel({ refreshMeta: true }).then(function () {
+        return searchTicketReaderPeople(value);
+      }).catch(function () {
+        return initialResults;
+      });
     }
     let sharedScanAudioCtx = null;
     function playScanBeep(type) {
@@ -8640,7 +8731,7 @@
     }
     function markTicketPersonEntered(person) {
       if (!person) return Promise.resolve(false);
-      return silentRefreshTicketReaderRows().then(function () {
+      return silentRefreshTicketReaderRows({ refreshMeta: true }).then(function () {
         openTicketReaderReview(resolveTicketReaderPerson(person) || person);
         return true;
       }).catch(function () {
@@ -9630,11 +9721,19 @@
         const infoRow = document.createElement("div");
         infoRow.className = "sheet-group-summary-info";
         syncSheetGroupsSummaryInfo(infoRow, group);
-        summaryMain.appendChild(infoRow);
+        
+        const summaryRight = document.createElement("div");
+        summaryRight.className = "sheet-group-summary-right";
+        summaryRight.appendChild(infoRow);
+
         summary.appendChild(summaryMain);
-        const chevron = document.createElement("span");
+        
+        const chevron = document.createElement("div");
         chevron.className = "sheet-group-chevron";
-        summary.appendChild(chevron);
+        chevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+        summaryRight.appendChild(chevron);
+        
+        summary.appendChild(summaryRight);
         card.appendChild(summary);
         const body = document.createElement("div");
         body.className = "sheet-group-body";
@@ -9673,7 +9772,7 @@
           var infoBtn = document.createElement("button");
           infoBtn.type = "button";
           infoBtn.className = "sheet-member-info-btn";
-          infoBtn.textContent = "i";
+          infoBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>';
           infoBtn.title = "Ver / editar datos";
           infoBtn.setAttribute("aria-label", "Ver o editar datos");
           row.appendChild(infoBtn);
@@ -14806,8 +14905,9 @@
     if (els.ticketReaderSearchBtn) {
       els.ticketReaderSearchBtn.addEventListener("click", function () {
         const query = String(els.ticketReaderSearchInput.value || "").trim();
-        const results = searchTicketReaderPeople(query);
-        renderTicketReaderResults(results, query ? "Sin coincidencias." : "Introduce un dato para buscar.");
+        searchTicketReaderPeopleLive(query).then(function (results) {
+          renderTicketReaderResults(results, query ? "Sin coincidencias." : "Introduce un dato para buscar.");
+        });
       });
     }
     if (els.ticketReaderSearchInput) {
@@ -14815,8 +14915,9 @@
         if (event.key !== "Enter") return;
         event.preventDefault();
         const query = String(els.ticketReaderSearchInput.value || "").trim();
-        const results = searchTicketReaderPeople(query);
-        renderTicketReaderResults(results, query ? "Sin coincidencias." : "Introduce un dato para buscar.");
+        searchTicketReaderPeopleLive(query).then(function (results) {
+          renderTicketReaderResults(results, query ? "Sin coincidencias." : "Introduce un dato para buscar.");
+        });
       });
     }
     if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.addEventListener("click", startTicketReaderCamera);
@@ -15281,3 +15382,4 @@
   </script>
 </body>
 </html>
+
