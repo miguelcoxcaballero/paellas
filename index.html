@@ -2296,6 +2296,13 @@
       gap: 0;
       padding: 0;
     }
+    details[open]:not(.no-anim) > .sheet-group-body {
+      animation: groupBodySlideIn 0.18s ease;
+    }
+    @keyframes groupBodySlideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .sheet-member-list {
       border-top: 1px solid rgba(185,90,0,0.08);
     }
@@ -2368,6 +2375,11 @@
       border-bottom: 1px solid rgba(185,90,0,0.07);
     }
     .sheet-member-detail.hidden { display: none; }
+    .sheet-member-detail:not(.hidden) { animation: memberDetailSlideIn 0.15s ease; }
+    @keyframes memberDetailSlideIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .sheet-group-footer {
       display: grid;
       gap: 10px;
@@ -8474,6 +8486,8 @@
     }
     function renderSheetGroupsList(groups) {
       snapshotSheetGroupsOpenState();
+      const scrollParent = els.sheetGroupsView || els.sheetGroupsList.parentElement;
+      const savedScrollTop = scrollParent ? scrollParent.scrollTop : 0;
       els.sheetGroupsList.innerHTML = "";
       const filteredGroups = filterSheetGroups(groups || []);
       renderSheetGroupsToolbar(currentSheetGroupsModel() || { groups: groups || [] }, filteredGroups);
@@ -8494,9 +8508,11 @@
         const ticketPeople = buildTicketPeopleFromGroup(group);
         const hasEntrySystem = ticketPeople.some(function (p) { return p.statusCol >= 0; });
         const card = document.createElement("details");
-        card.className = "sheet-group-card";
+        const wasOpen = isSheetGroupExpanded(group.id, index);
+        card.className = "sheet-group-card" + (wasOpen ? " no-anim" : "");
         card.dataset.groupId = group.id;
-        card.open = isSheetGroupExpanded(group.id, index);
+        card.open = wasOpen;
+        card.addEventListener("toggle", function () { card.classList.remove("no-anim"); });
         const summary = document.createElement("summary");
         summary.className = "sheet-group-summary";
         const titleEl = document.createElement("div");
@@ -8661,14 +8677,18 @@
         els.sheetGroupsList.appendChild(card);
       });
       syncSheetGroupsInteractivity();
+      if (scrollParent && savedScrollTop) scrollParent.scrollTop = savedScrollTop;
     }
     function renderSheetGroupsView() {
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups") return Promise.resolve(false);
       const titleAtStart = state.currentSheetTitle;
       const requestId = ++state.sheetGroupLoadToken;
-      setSheetGroupsStatus("Cargando grupos...", "");
-      els.sheetGroupsList.innerHTML = "";
-      els.sheetGroupsEmpty.classList.add("hidden");
+      // Only show loading status when the list has no content yet (first load or sheet switch)
+      if (!els.sheetGroupsList.firstChild) {
+        setSheetGroupsStatus("Cargando grupos...", "");
+        els.sheetGroupsEmpty.classList.add("hidden");
+      }
+      // Do NOT clear the list — keep existing content visible during the fetch
       return fetchCurrentSheetRows().then(function (rows) {
         if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
         state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows));
