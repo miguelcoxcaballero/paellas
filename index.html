@@ -2063,22 +2063,30 @@
       height: 100%;
       min-width: 0;
       min-height: 0;
-      overflow-y: auto;
+      overflow: hidden;
       overflow-x: hidden;
-      scrollbar-gutter: stable;
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       background: #fffaf0;
       display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
       align-content: start;
-      gap: 16px;
-      padding: 18px;
-      scroll-padding-top: 16px;
+      gap: 12px;
+      padding: 14px;
+    }
+    #sheetGroupsStatus:empty {
+      display: none;
+      min-height: 0;
     }
     .sheet-groups-list {
       display: grid;
       gap: 10px;
       align-content: start;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
+      padding-right: 2px;
     }
     .sheet-groups-list-actions {
       display: flex;
@@ -2107,17 +2115,15 @@
       display: grid;
       gap: 12px;
       align-content: start;
-      align-self: start;
-      position: sticky;
-      top: 10px;
+      position: relative;
       z-index: 12;
-      padding: 14px;
+      padding: 10px 12px 12px;
       border: 1px solid rgba(185,90,0,0.12);
       border-radius: 24px;
-      background: rgba(255,253,248,0.98);
+      background: #fffdf8;
       box-shadow: 0 10px 24px rgba(104,70,5,0.08);
       isolation: isolate;
-      overflow: visible;
+      overflow: hidden;
     }
     .sheet-groups-stats {
       display: grid;
@@ -8805,7 +8811,7 @@
       }
       var opts = options || {};
       snapshotSheetGroupsOpenState();
-      const scrollParent = els.sheetGroupsView || els.sheetGroupsList.parentElement;
+      const scrollParent = els.sheetGroupsList || els.sheetGroupsView;
       const savedScrollTop = scrollParent ? scrollParent.scrollTop : 0;
       els.sheetGroupsList.innerHTML = "";
       if (opts.skipAnim) els.sheetGroupsList.classList.add("skip-anim");
