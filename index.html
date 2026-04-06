@@ -2195,7 +2195,7 @@
     .sheet-groups-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
       min-height: 0;
       min-width: 0;
       overflow-y: auto;
@@ -2244,7 +2244,7 @@
       background: transparent;
       box-shadow: none;
       isolation: isolate;
-      overflow: hidden;
+      overflow: visible;
     }
     .sheet-groups-stats {
       display: grid;
@@ -2298,6 +2298,10 @@
       display: flex;
       gap: 8px;
       align-items: end;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .sheet-groups-filter-btn-mobile {
+      display: none;
     }
     .sheet-groups-filter {
       display: grid;
@@ -2337,7 +2341,7 @@
       border-radius: 12px;
       background: #ffffff;
       overflow: hidden;
-      margin-bottom: 6px;
+      margin-bottom: 0;
       min-width: 0;
       transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
@@ -2350,16 +2354,16 @@
       margin-bottom: 0;
     }
     .sheet-group-card[open] {
-      background: #faf8f5;
-      border-color: rgba(0,0,0,0.1);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+      background: #fffdf0;
+      border-color: rgba(200, 150, 0, 0.15);
+      box-shadow: 0 6px 16px rgba(185, 90, 0, 0.05);
     }
     @media (max-width: 600px) {
       .sheet-group-card {
         border-radius: 0;
         border-left: none;
         border-right: none;
-        margin-bottom: 4px;
+        margin-bottom: 0;
         box-shadow: none;
       }
       .sheet-groups-banner {
@@ -4180,6 +4184,55 @@
         border-radius: 12px;
       }
       .sheet-groups-stats { grid-template-columns: 1fr 1fr; }
+      
+      .sheet-groups-toolbar {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .sheet-groups-filter-btn-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        margin-top: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      }
+      .sheet-groups-list {
+        overflow-y: visible;
+        contain: none;
+      }
+      .sheet-groups-filters {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 8px;
+        right: 8px;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border: 1px solid rgba(0,0,0,0.05);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+      .sheet-groups-filters.show {
+        pointer-events: auto;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
       .sheet-groups-banner { padding: 14px; }
       .sheet-group-actions-row {
         justify-content: stretch;
@@ -4334,9 +4387,27 @@
       }
       .share-popup { width: min(400px, 96%); }
       .doc-title { font-size: 1rem; min-height: 32px; }
-      .editor-card { gap: 10px; }
-      .editor-head { gap: 8px; }
-      .editor-actions { gap: 6px; }
+      .editor-card { 
+        gap: 10px; 
+        overflow-y: auto !important; 
+        display: flex; 
+        flex-direction: column; 
+        padding-top: 10px;
+      }
+      .editor-head { gap: 8px; flex-shrink: 0; padding-right: 170px; }
+      .editor-actions { 
+        gap: 6px; 
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 4px;
+        border-radius: 100px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      }
       .form-card { padding: 10px; gap: 6px; }
       .form-card-title { font-size: 0.8rem; }
       .form-question { padding: 8px 10px; gap: 6px; border-radius: 8px; }
@@ -4640,7 +4711,11 @@
           <div id="sheetGroupsStatus" class="status"></div>
           <div id="sheetGroupsToolbar" class="sheet-groups-toolbar hidden">
             <div id="sheetGroupsStats" class="sheet-groups-stats"></div>
-            <div class="sheet-groups-filters">
+            <button id="sheetGroupsFilterToggleMobile" class="sheet-groups-filter-btn-mobile" type="button">
+              Filtros
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            </button>
+            <div id="sheetGroupsFiltersPanel" class="sheet-groups-filters">
               <label class="sheet-groups-filter">
                 <span>Pago</span>
                 <select id="sheetGroupsPaymentFilter" class="sheet-groups-filter-select">
@@ -5477,6 +5552,8 @@
       sheetGroupsList: document.getElementById("sheetGroupsList"),
       sheetGroupsEmpty: document.getElementById("sheetGroupsEmpty"),
       sheetGroupsToolbar: document.getElementById("sheetGroupsToolbar"),
+      sheetGroupsFilterToggleMobile: document.getElementById("sheetGroupsFilterToggleMobile"),
+      sheetGroupsFiltersPanel: document.getElementById("sheetGroupsFiltersPanel"),
       sheetGroupsStats: document.getElementById("sheetGroupsStats"),
       sheetGroupsPaymentFilter: document.getElementById("sheetGroupsPaymentFilter"),
       sheetGroupsFireFilter: document.getElementById("sheetGroupsFireFilter"),
@@ -8937,7 +9014,6 @@
       const totalRevenue = groups.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
       const filteredRevenue = visible.reduce(function (sum, group) { return sum + parseEuroAmount(group.payment && group.payment.amount); }, 0);
       els.sheetGroupsToolbar.classList.toggle("hidden", !groups.length);
-      if (filtersWrap) filtersWrap.classList.toggle("hidden", !groups.length);
       if (!groups.length) {
         els.sheetGroupsStats.innerHTML = "";
         return;
@@ -14921,6 +14997,10 @@
     els.sheetViewGroupsBtn.addEventListener("click", function () {
       setSpreadsheetViewMode("groups");
     });
+    els.sheetGroupsFilterToggleMobile.addEventListener("click", function (event) {
+      els.sheetGroupsFiltersPanel.classList.toggle("show");
+      event.stopPropagation();
+    });
     els.sheetGroupsView.addEventListener("focusin", function () {
       markSheetGroupsInteraction();
     }, true);
@@ -15404,6 +15484,13 @@
       closePresencePopup();
     });
     document.addEventListener("click", function (event) {
+      closePopupMenus(event);
+      if (els.contextMenu && !els.contextMenu.classList.contains("hidden") && !els.contextMenu.contains(event.target)) {
+        els.contextMenu.classList.add("hidden");
+      }
+      if (els.sheetGroupsFiltersPanel && els.sheetGroupsFiltersPanel.classList.contains("show") && !els.sheetGroupsFiltersPanel.contains(event.target)) {
+        els.sheetGroupsFiltersPanel.classList.remove("show");
+      }
       if (state.profileMenuOpen && !els.profileBox.contains(event.target)) closeProfileMenu();
       if (
         state.activeItemMenu &&
