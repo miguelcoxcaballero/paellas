@@ -2091,6 +2091,11 @@
     .sheet-group-card.no-anim {
       animation: none;
     }
+    .skip-anim .sheet-group-card,
+    .skip-anim .sheet-groups-banner,
+    .skip-anim .sheet-groups-stat {
+      animation: none !important;
+    }
     .sheet-groups-toolbar {
       display: grid;
       gap: 10px;
@@ -6875,7 +6880,7 @@
         sheetGroupsLastRowSig = sig;
         var newModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows));
         state.sheetGroupsModel = newModel;
-        renderSheetGroupsList(newModel.groups);
+        renderSheetGroupsList(newModel.groups, { skipAnim: true });
         setSheetGroupsStatus(sheetGroupsStatusText(newModel), newModel.groups.length ? "" : "error");
       }).catch(function () {}).finally(function () {
         sheetGroupsSilentPollBusy = false;
@@ -8516,11 +8521,14 @@
         return false;
       });
     }
-    function renderSheetGroupsList(groups) {
+    function renderSheetGroupsList(groups, options) {
+      var opts = options || {};
       snapshotSheetGroupsOpenState();
       const scrollParent = els.sheetGroupsView || els.sheetGroupsList.parentElement;
       const savedScrollTop = scrollParent ? scrollParent.scrollTop : 0;
       els.sheetGroupsList.innerHTML = "";
+      if (opts.skipAnim) els.sheetGroupsList.classList.add("skip-anim");
+      else els.sheetGroupsList.classList.remove("skip-anim");
       const filteredGroups = filterSheetGroups(groups || []);
       renderSheetGroupsToolbar(currentSheetGroupsModel() || { groups: groups || [] }, filteredGroups);
       if (els.sheetGroupsEmpty) {
@@ -8716,7 +8724,7 @@
       syncSheetGroupsInteractivity();
       if (scrollParent && savedScrollTop) scrollParent.scrollTop = savedScrollTop;
     }
-    function renderSheetGroupsView() {
+    function renderSheetGroupsView(options) {
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups") return Promise.resolve(false);
       const titleAtStart = state.currentSheetTitle;
       const requestId = ++state.sheetGroupLoadToken;
@@ -8735,7 +8743,8 @@
         return ensureHeaders.then(function () {
           if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
           const model = currentSheetGroupsModel() || { groups: [] };
-          renderSheetGroupsList(model.groups);
+          renderSheetGroupsList(model.groups, options);
+          sheetGroupsLastRowSig = JSON.stringify(rows);
           setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
           return true;
         });
@@ -8751,7 +8760,7 @@
     function rerenderSheetGroupsFromModel() {
       const model = currentSheetGroupsModel();
       if (!model || state.spreadsheetViewMode !== "groups") return;
-      renderSheetGroupsList(model.groups);
+      renderSheetGroupsList(model.groups, { skipAnim: true });
       setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
     }
     function setCellValue(sheetTitle, row, col, value) {
@@ -12515,7 +12524,7 @@
           saveStoredUiSession();
           if (!config.skipDirtyState) refreshDirtyState();
           if (state.spreadsheetViewMode === "groups" && isCurrentSheetPaellaResponseSheet()) {
-            return renderSheetGroupsView().then(function () { return true; });
+            return renderSheetGroupsView({ skipAnim: config.quiet || config.skipAnim }).then(function () { return true; });
           }
           return true;
         })
