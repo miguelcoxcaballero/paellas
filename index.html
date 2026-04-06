@@ -82,6 +82,13 @@
     }
     .topbar > *, .row > *, .head > * { min-width: 0; }
     .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .topbar-editor-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
     .brand {
       display: flex;
       align-items: center;
@@ -3882,9 +3889,11 @@
         display: flex;
         flex-wrap: nowrap;
         gap: 8px;
-        width: 100%;
-        justify-content: flex-end;
+        width: auto;
+        justify-content: flex-start;
       }
+      .topbar-actions { gap: 8px; }
+      .topbar-editor-actions { gap: 6px; }
       .doc-title { max-width: 100%; font-size: 1.1rem; }
       .profile-menu { left: auto; right: 0; max-width: min(92vw, 280px); }
       table { width: max(100%, 760px); min-width: 760px; }
@@ -4403,21 +4412,19 @@
         padding-top: 10px;
         padding-bottom: 80px;
       }
-      .editor-head { gap: 8px; flex-shrink: 0; padding-right: 130px; }
+      .editor-head { gap: 8px; flex-shrink: 0; padding-right: 0; }
       .editor-actions { 
-        gap: 6px; 
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        width: fit-content !important;
-        max-width: 90vw;
-        z-index: 100;
+        gap: 6px;
+        position: static;
+        width: auto !important;
+        max-width: 100%;
+        z-index: auto;
         background: transparent;
         padding: 0;
         border: none;
         box-shadow: none;
       }
-      .editor-actions .btn { border-color: rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+      .topbar-editor-actions .btn { border-color: rgba(0,0,0,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
       .sheet-bar { flex-wrap: wrap !important; gap: 8px !important; }
       #sheetTabs { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; }
       #sheetTabs::-webkit-scrollbar { display: none; }
@@ -4530,6 +4537,23 @@
     <header class="topbar">
       <button id="homeBtn" class="brand brand-button" type="button" aria-label="Volver al gestor de archivos"><span>&#129368;</span><span class="brand-name">paellas.net</span></button>
       <div class="topbar-actions">
+        <div id="editorTopbarActions" class="topbar-editor-actions hidden-panel">
+          <button id="openInGoogleBtn" class="btn small btn-icon-sq doc-open-btn hidden-panel" type="button" title="Abrir en Google" aria-label="Abrir en Google">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 3h7v7"></path>
+              <path d="M10 14 21 3"></path>
+              <path d="M21 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            </svg>
+          </button>
+          <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg></button>
+          <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edicion">
+            <span class="mode-toggle-status">
+              <span id="saveIndicator" class="save-indicator paused" aria-hidden="true" title="Modo lectura"></span>
+            </span>
+            <span id="modeToggleLabel" class="mode-toggle-text">Edit</span>
+            <span class="mode-toggle-pill" aria-hidden="true"><span class="mode-toggle-knob"></span></span>
+          </button>
+        </div>
         <div id="profileBox" class="profile-box hidden">
           <button id="profileBtn" class="profile-btn" type="button" aria-label="Menu de cuenta" aria-haspopup="menu" aria-expanded="false">
             <img id="profileAvatar" alt="Perfil" class="hidden">
@@ -4669,21 +4693,6 @@
             </div>
             <div class="editor-actions">
               <div id="presenceAvatars" class="presence-avatars" aria-label="Dispositivos conectados"></div>
-              <button id="openInGoogleBtn" class="btn small btn-icon-sq doc-open-btn hidden-panel" type="button" title="Abrir en Google" aria-label="Abrir en Google">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 3h7v7"></path>
-                  <path d="M10 14 21 3"></path>
-                  <path d="M21 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                </svg>
-              </button>
-              <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg></button>
-              <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edicion">
-                <span class="mode-toggle-status">
-                  <span id="saveIndicator" class="save-indicator paused" aria-hidden="true" title="Modo lectura"></span>
-                </span>
-                <span id="modeToggleLabel" class="mode-toggle-text">Edit</span>
-                <span class="mode-toggle-pill" aria-hidden="true"><span class="mode-toggle-knob"></span></span>
-              </button>
             </div>
           </div>
           <div class="sheet-bar">
@@ -5471,6 +5480,7 @@
       profileBtn: document.getElementById("profileBtn"),
       profileAvatar: document.getElementById("profileAvatar"),
       profileAvatarFallback: document.getElementById("profileAvatarFallback"),
+      editorTopbarActions: document.getElementById("editorTopbarActions"),
       profileMenu: document.getElementById("profileMenu"),
       profileMenuAvatar: document.getElementById("profileMenuAvatar"),
       profileMenuAvatarFallback: document.getElementById("profileMenuAvatarFallback"),
@@ -10597,6 +10607,7 @@
       els.loginView.classList.toggle("hidden", name !== "login");
       els.driveView.classList.toggle("hidden", name !== "drive");
       els.editorView.classList.toggle("hidden", name !== "editor");
+      if (els.editorTopbarActions) els.editorTopbarActions.classList.toggle("hidden-panel", name !== "editor" || !state.accessToken);
       els.profileBox.classList.toggle("hidden", name === "login" || !state.accessToken);
       if (name !== "drive") closeProfileMenu();
       if (name !== "editor") closePresencePopup();
