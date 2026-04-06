@@ -2125,10 +2125,10 @@
       position: relative;
       z-index: 12;
       padding: 10px 12px 12px;
-      border: 1px solid rgba(185,90,0,0.12);
+      border: 1px solid rgba(185,90,0,0.14);
       border-radius: 24px;
       background: #fffdf8;
-      box-shadow: 0 10px 24px rgba(104,70,5,0.08);
+      box-shadow: none;
       isolation: isolate;
       overflow: hidden;
     }
@@ -2146,8 +2146,8 @@
       gap: 4px;
       min-width: 0;
       border-left: 4px solid rgba(185,90,0,0.18);
-      box-shadow: 0 1px 2px rgba(104,70,5,0.05);
-      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      box-shadow: none;
+      transition: border-color .15s ease, background .15s ease;
       animation: none;
     }
     .sheet-groups-stat:nth-child(1) { border-left-color: #3ea35b; }
@@ -2155,8 +2155,8 @@
     .sheet-groups-stat:nth-child(3) { border-left-color: #c9853f; }
     .sheet-groups-stat:nth-child(4) { border-left-color: #3ea35b; }
     .sheet-groups-stat:hover {
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(104,70,5,0.08);
+      background: #fffefb;
+      border-color: rgba(185,90,0,0.14);
     }
     .sheet-groups-stat-label {
       font-size: 0.64rem;
@@ -2219,17 +2219,16 @@
       background: #ffffff;
       overflow: hidden;
       min-width: 0;
-      box-shadow: 0 1px 3px rgba(104,70,5,0.06);
-      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+      box-shadow: none;
+      transition: border-color .18s ease, background .18s ease;
     }
     .sheet-group-card:hover {
       border-color: rgba(185,90,0,0.16);
-      box-shadow: 0 3px 10px rgba(104,70,5,0.08);
+      background: #fffefb;
     }
     .sheet-group-card[open] {
-      background: #ffffff;
-      border-color: rgba(185,90,0,0.2);
-      box-shadow: 0 8px 18px rgba(104,70,5,0.1);
+      background: #fffefb;
+      border-color: rgba(185,90,0,0.18);
     }
     .sheet-groups-banner {
       display: flex;
@@ -2241,7 +2240,7 @@
       border-radius: 24px;
       padding: 20px 22px;
       border: 1px solid rgba(185,90,0,0.12);
-      box-shadow: 0 1px 3px rgba(104,70,5,0.05);
+      box-shadow: none;
     }
     .sheet-groups-banner-title {
       font-size: 1.22rem;
@@ -2393,7 +2392,7 @@
       font-size: 1.15rem;
       font-weight: 500;
       flex: 0 0 auto;
-      box-shadow: 0 1px 2px rgba(104,70,5,0.05);
+      box-shadow: none;
       transition: background .15s ease, border-color .15s ease, color .15s ease;
     }
     .sheet-group-chevron::before { content: "+"; transform: translateY(-1px); }
@@ -2479,8 +2478,8 @@
       justify-content: center;
       cursor: pointer;
       flex: 0 0 auto;
-      box-shadow: 0 1px 2px rgba(104,70,5,0.04);
-      transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+      box-shadow: none;
+      transition: background .15s ease, border-color .15s ease;
     }
     .sheet-member-info-btn:hover {
       background: rgba(255,243,210,0.9);
@@ -2578,13 +2577,12 @@
       font-weight: 600;
       padding: 8px 14px;
       cursor: pointer;
-      box-shadow: 0 1px 2px rgba(104,70,5,0.05);
-      transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+      box-shadow: none;
+      transition: background .15s ease, border-color .15s ease;
     }
     .sheet-group-add-btn:hover {
       background: #fff7ea;
       border-color: rgba(185,90,0,0.22);
-      box-shadow: 0 2px 6px rgba(104,70,5,0.08);
     }
     .sheet-group-add-btn:disabled {
       opacity: 0.48;
@@ -2701,8 +2699,8 @@
       font-size: 0.77rem;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 1px 2px rgba(104,70,5,0.04);
-      transition: border-color .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+      box-shadow: none;
+      transition: border-color .18s ease, background .18s ease, color .18s ease;
     }
     .sheet-group-pill:hover:not(:disabled) {
       background: rgba(255,248,232,0.85);
@@ -2712,19 +2710,16 @@
       background: rgba(212,247,222,0.94);
       border-color: rgba(44,149,74,0.25);
       color: #1f7138;
-      box-shadow: 0 1px 4px rgba(44,149,74,0.1);
     }
     .sheet-group-pill.active[data-value="Parcial"] {
       background: rgba(255,239,192,0.94);
       border-color: rgba(185,120,0,0.22);
       color: #8a5211;
-      box-shadow: 0 1px 4px rgba(185,120,0,0.08);
     }
     .sheet-group-pill.active[data-value="Pendiente"] {
       background: rgba(255,224,224,0.94);
       border-color: rgba(190,88,88,0.22);
       color: #9d3f3f;
-      box-shadow: 0 1px 4px rgba(190,88,88,0.08);
     }
     .sheet-group-note {
       font-size: 0.74rem;
@@ -2739,7 +2734,7 @@
       border-radius: 18px;
       background: #fbfdff;
       border: 1px solid rgba(80,120,200,0.14);
-      box-shadow: 0 1px 2px rgba(80,120,200,0.05);
+      box-shadow: none;
     }
     .sheet-person-ticket-head {
       display: flex;
