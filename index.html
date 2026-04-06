@@ -4776,16 +4776,11 @@
     ]);
     const AUTH_SESSION_KEY = "paellas-auth-session-v2";
     const LEGACY_AUTH_SESSION_KEY = "paellas-auth-session-v1";
+    const AUTH_TOKEN_KEY = "paellas-auth-token-v1";
+    const AUTH_REMEMBER_KEY = "paellas-auth-remember-v1";
+    const AUTH_HINT_EMAIL_KEY = "paellas-auth-hint-email-v1";
     const UI_SESSION_KEY = "paellas-ui-session-v1";
-    const AUTH_REFRESH_MARGIN_MS = 120000;
-    const AUTH_REFRESH_RETRY_MS = 15000;
-    const AUTH_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
     const UI_SESSION_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
-    const AUTH_SILENT_RETRY_COOLDOWN_MS = 90000;
-    const AUTH_POST_INTERACTIVE_REAUTH_SUPPRESS_MS = 45000;
-    const AUTH_RECENT_INTERACTIVE_KEY = "paellas-auth-interactive-at-v1";
-    const AUTH_RECENT_AUTO_AUTH_KEY = "paellas-auth-auto-at-v1";
-    const AUTH_AUTO_AUTH_LOOP_GUARD_MS = 120000;
 
     let presencePingTimer = 0;
     let presenceHeartbeatTimer = 0;
@@ -4908,12 +4903,8 @@
       pickerMode: "sheet",
       newSheetContext: "drive",
       profileMenuOpen: false,
-      tokenRefreshTimer: 0,
-      tokenRequestInFlight: null,
+      tokenRefreshTimer: null,
       sessionRestoreInFlight: null,
-      silentAuthCooldownUntil: 0,
-      lastInteractiveAuthAt: 0,
-      lastAutomaticAuthAt: 0
     };
 
     const els = {
@@ -5197,51 +5188,45 @@
       if (!displayName && !emailAddress && !photoLink) return null;
       return { displayName, emailAddress, photoLink };
     }
-    function readStoredAuthSession() {
+    function loadTokenFromStorage() {
       try {
-        const storageKeys = [AUTH_SESSION_KEY, LEGACY_AUTH_SESSION_KEY];
-        for (let index = 0; index < storageKeys.length; index += 1) {
-          const storageKey = storageKeys[index];
-          const raw = localStorage.getItem(storageKey);
-          if (!raw) continue;
-          const data = JSON.parse(raw);
-          if (!data || typeof data !== "object") continue;
-          const storedUser = normalizeStoredUser(data.user);
-          const session = {
-            accessToken: data.accessToken ? String(data.accessToken) : "",
-            expiresAt: Number(data.expiresAt) || 0,
-            user: storedUser,
-            loginHint: data.loginHint ? String(data.loginHint) : (storedUser && storedUser.emailAddress ? storedUser.emailAddress : ""),
-            updatedAt: Number(data.updatedAt) || 0
-          };
-          const sessionAge = session.updatedAt ? (Date.now() - session.updatedAt) : 0;
-          if (!session.accessToken && !session.user && !session.loginHint) {
-            localStorage.removeItem(storageKey);
-            continue;
+        const raw = localStorage.getItem(AUTH_TOKEN_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.token && parsed.expiry && Date.now() < parsed.expiry - 60000) {
+            state.accessToken = parsed.token;
+            state.accessTokenExpiresAt = parsed.expiry;
+            scheduleTokenRefresh();
+            return true;
           }
-          if (sessionAge > AUTH_SESSION_MAX_AGE_MS) {
-            localStorage.removeItem(storageKey);
-            continue;
-          }
-          if (storageKey !== AUTH_SESSION_KEY) {
-            localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-            localStorage.removeItem(storageKey);
-          }
-          return session;
+          localStorage.removeItem(AUTH_TOKEN_KEY);
         }
-        return null;
-      } catch (err) {
-        console.warn("No se ha podido leer la sesion guardada:", err);
-        return null;
-      }
+        // Migrate from legacy session key
+        const legacyRaw = localStorage.getItem(AUTH_SESSION_KEY) || localStorage.getItem(LEGACY_AUTH_SESSION_KEY);
+        if (legacyRaw) {
+          const data = JSON.parse(legacyRaw);
+          if (data && data.accessToken && data.expiresAt && Date.now() < data.expiresAt - 60000) {
+            state.accessToken = data.accessToken;
+            state.accessTokenExpiresAt = data.expiresAt;
+            if (data.user && data.user.emailAddress) localStorage.setItem(AUTH_HINT_EMAIL_KEY, data.user.emailAddress);
+            saveTokenToStorage(state.accessToken, state.accessTokenExpiresAt);
+            localStorage.setItem(AUTH_REMEMBER_KEY, "1");
+            scheduleTokenRefresh();
+            return true;
+          }
+        }
+        return false;
+      } catch (e) { return false; }
     }
-    function clearStoredAuthSession() {
+    function saveTokenToStorage(token, expiry) {
+      try { localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify({ token: token, expiry: expiry })); } catch (e) {}
+    }
+    function clearTokenStorage() {
       try {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
         localStorage.removeItem(AUTH_SESSION_KEY);
         localStorage.removeItem(LEGACY_AUTH_SESSION_KEY);
-      } catch (err) {
-        console.warn("No se ha podido borrar la sesion guardada:", err);
-      }
+      } catch (e) {}
     }
     function readStoredUiSession() {
       try {
@@ -5323,320 +5308,66 @@
     function currentLinkerDeploymentId() {
       return String(GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID || readStoredLinkerDeploymentId() || "").trim();
     }
-    function writeStoredAuthSessionSnapshot(snapshot) {
-      const data = snapshot && typeof snapshot === "object" ? snapshot : {};
-      const normalizedUser = normalizeStoredUser(data.user);
-      const accessToken = data.accessToken ? String(data.accessToken) : "";
-      const expiresAt = Number(data.expiresAt) || 0;
-      const loginHint = data.loginHint
-        ? String(data.loginHint)
-        : (normalizedUser && normalizedUser.emailAddress ? normalizedUser.emailAddress : "");
-      if (!accessToken && !normalizedUser && !loginHint) {
-        clearStoredAuthSession();
-        return;
-      }
-      try {
-        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
-          accessToken: accessToken,
-          expiresAt: expiresAt,
-          user: normalizedUser,
-          loginHint: loginHint,
-          updatedAt: Date.now()
-        }));
-      } catch (err) {
-        console.warn("No se ha podido guardar la sesion:", err);
-      }
-    }
-    function saveStoredAuthSession(snapshot) {
-      const source = snapshot && typeof snapshot === "object"
-        ? snapshot
-        : {
-            accessToken: state.accessToken || "",
-            expiresAt: state.accessTokenExpiresAt || 0,
-            user: state.currentUser || null,
-            loginHint: getAuthLoginHint()
-          };
-      writeStoredAuthSessionSnapshot(source);
-    }
-    function getAuthLoginHint() {
-      const currentUser = normalizeStoredUser(state.currentUser);
-      if (currentUser && currentUser.emailAddress) return currentUser.emailAddress;
-      const stored = readStoredAuthSession();
-      if (!stored) return "";
-      if (stored.loginHint) return stored.loginHint;
-      return stored.user && stored.user.emailAddress ? stored.user.emailAddress : "";
-    }
-    function readRecentInteractiveAuthAt() {
-      try {
-        return Number(sessionStorage.getItem(AUTH_RECENT_INTERACTIVE_KEY) || 0) || 0;
-      } catch (err) {
-        return 0;
-      }
-    }
-    function markRecentInteractiveAuth() {
-      state.lastInteractiveAuthAt = Date.now();
-      try {
-        sessionStorage.setItem(AUTH_RECENT_INTERACTIVE_KEY, String(state.lastInteractiveAuthAt));
-      } catch (err) {
-      }
-    }
-    function clearRecentInteractiveAuth() {
-      state.lastInteractiveAuthAt = 0;
-      try {
-        sessionStorage.removeItem(AUTH_RECENT_INTERACTIVE_KEY);
-      } catch (err) {
-      }
-    }
-    function recentInteractiveAuthRemainingMs() {
-      return Math.max(0, (Number(state.lastInteractiveAuthAt) || 0) + AUTH_POST_INTERACTIVE_REAUTH_SUPPRESS_MS - Date.now());
-    }
-    function shouldSuppressAutomaticAuth() {
-      return recentInteractiveAuthRemainingMs() > 0;
-    }
-    function readRecentAutomaticAuthAt() {
-      try {
-        return Number(sessionStorage.getItem(AUTH_RECENT_AUTO_AUTH_KEY) || 0) || 0;
-      } catch (err) {
-        return 0;
-      }
-    }
-    function markRecentAutomaticAuth() {
-      state.lastAutomaticAuthAt = Date.now();
-      try {
-        sessionStorage.setItem(AUTH_RECENT_AUTO_AUTH_KEY, String(state.lastAutomaticAuthAt));
-      } catch (err) {
-      }
-    }
-    function clearRecentAutomaticAuth() {
-      state.lastAutomaticAuthAt = 0;
-      try {
-        sessionStorage.removeItem(AUTH_RECENT_AUTO_AUTH_KEY);
-      } catch (err) {
-      }
-    }
-    function recentAutomaticAuthRemainingMs() {
-      return Math.max(0, (Number(state.lastAutomaticAuthAt) || 0) + AUTH_AUTO_AUTH_LOOP_GUARD_MS - Date.now());
-    }
-    function shouldDeferAutomaticAuthLoop() {
-      return recentAutomaticAuthRemainingMs() > 0;
-    }
-    function clearTokenRefreshTimer() {
-      clearTimeout(state.tokenRefreshTimer);
-      state.tokenRefreshTimer = 0;
-    }
-    function silentAuthRetryRemainingMs() {
-      return Math.max(0, Number(state.silentAuthCooldownUntil) - Date.now());
-    }
-    function setSilentAuthCooldown(delayMs) {
-      state.silentAuthCooldownUntil = Date.now() + Math.max(1000, Number(delayMs) || AUTH_SILENT_RETRY_COOLDOWN_MS);
-    }
-    function clearSilentAuthCooldown() {
-      state.silentAuthCooldownUntil = 0;
-    }
-    function hasUsableAccessToken(bufferMs) {
-      const buffer = Math.max(0, Number(bufferMs) || 0);
-      return !!(state.accessToken && state.accessTokenExpiresAt && (Date.now() + buffer) < state.accessTokenExpiresAt);
-    }
-    function clearAccessTokenState(options) {
-      const config = options || {};
-      const storedSession = config.keepStoredSession ? readStoredAuthSession() : null;
-      const preservedUser = config.keepUser
-        ? (state.currentUser || (storedSession ? storedSession.user : null))
-        : (storedSession ? storedSession.user : null);
-      const preservedLoginHint = config.keepLoginHint === false
-        ? ""
-        : (
-            config.loginHint
-              ? String(config.loginHint)
-              : (
-                  (storedSession && storedSession.loginHint)
-                  || (preservedUser && preservedUser.emailAddress)
-                  || ""
-                )
-          );
-      clearTokenRefreshTimer();
-      state.tokenRequestInFlight = null;
+    function clearAccessTokenState() {
+      if (state.tokenRefreshTimer) { clearTimeout(state.tokenRefreshTimer); state.tokenRefreshTimer = null; }
       state.accessToken = "";
       state.accessTokenExpiresAt = 0;
-      state.currentUser = preservedUser || null;
-      if (config.keepStoredSession) {
-        writeStoredAuthSessionSnapshot({
-          accessToken: config.preserveStoredToken === false ? "" : (storedSession && storedSession.accessToken ? storedSession.accessToken : ""),
-          expiresAt: config.preserveStoredToken === false ? 0 : (storedSession && storedSession.expiresAt ? storedSession.expiresAt : 0),
-          user: preservedUser || null,
-          loginHint: preservedLoginHint
-        });
-      } else {
-        clearStoredAuthSession();
-      }
+      clearTokenStorage();
     }
-    function applyAccessTokenResponse(response) {
-      const expiresInSeconds = Math.max(60, Number(response && response.expires_in) || 3600);
-      state.accessToken = response && response.access_token ? String(response.access_token) : "";
-      state.accessTokenExpiresAt = state.accessToken ? (Date.now() + expiresInSeconds * 1000) : 0;
-      clearSilentAuthCooldown();
-      saveStoredAuthSession();
-      scheduleTokenRefresh();
-    }
-    function scheduleTokenRefresh(retryDelayMs) {
-      clearTokenRefreshTimer();
-      const retryDelay = Math.max(1000, Number(retryDelayMs) || 0);
-      if (!state.accessToken || !state.accessTokenExpiresAt) {
-        if (!retryDelay || !getAuthLoginHint() || shouldDeferAutomaticAuthLoop()) return;
-        const silentCooldown = silentAuthRetryRemainingMs();
-        state.tokenRefreshTimer = window.setTimeout(function () {
-          if (shouldDeferAutomaticAuthLoop()) return;
-          restoreGoogleSessionSilently().catch(function (err) {
-            console.warn("No se ha podido reactivar la sesion en segundo plano:", err);
-            clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-            renderProfileMenu();
-            if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
-          });
-        }, Math.max(retryDelay, silentCooldown));
-        return;
-      }
-      const refreshIn = Math.max(
-        retryDelay || Math.max(1000, state.accessTokenExpiresAt - Date.now() - AUTH_REFRESH_MARGIN_MS),
-        silentAuthRetryRemainingMs()
-      );
-      state.tokenRefreshTimer = window.setTimeout(function () {
-        if (shouldDeferAutomaticAuthLoop()) return;
-        refreshAccessTokenSilently().catch(function (err) {
-          console.warn("No se ha podido renovar el token en segundo plano:", err);
-          if (hasUsableAccessToken(0)) {
-            scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
-            return;
-          }
-          clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-          renderProfileMenu();
-          if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
-          if (!els.loginView.classList.contains("hidden")) setLoginStatus("Reconectando con Google...");
-        });
+    function scheduleTokenRefresh() {
+      if (state.tokenRefreshTimer) { clearTimeout(state.tokenRefreshTimer); state.tokenRefreshTimer = null; }
+      const refreshIn = state.accessTokenExpiresAt - Date.now() - 5 * 60 * 1000;
+      if (refreshIn <= 0) return;
+      state.tokenRefreshTimer = setTimeout(function () {
+        ensureAccessToken(false).catch(function () {});
       }, refreshIn);
     }
-    function requestGoogleAccessToken(config) {
+    function ensureAccessToken(interactive) {
+      if (state.accessToken && state.accessTokenExpiresAt && Date.now() < state.accessTokenExpiresAt - 60000) {
+        return Promise.resolve(state.accessToken);
+      }
       if (!state.tokenClient) {
         return Promise.reject(new Error("Google Auth aun no esta listo."));
       }
-      if (state.tokenRequestInFlight) {
-        return state.tokenRequestInFlight;
-      }
-      const requestConfig = Object.assign({}, config || {});
-      const isInteractiveRequest = requestConfig.prompt !== "none";
-      if (!Object.prototype.hasOwnProperty.call(requestConfig, "scope")) {
-        requestConfig.scope = GOOGLE_SCOPE;
-      }
-      if (requestConfig.prompt === "") {
-        delete requestConfig.prompt;
-      }
-      if (requestConfig.prompt !== "none") {
-        clearSilentAuthCooldown();
-      }
-      if (!requestConfig.login_hint) {
-        const loginHint = getAuthLoginHint();
-        if (loginHint) requestConfig.login_hint = loginHint;
-      }
-      if (!isInteractiveRequest) {
-        markRecentAutomaticAuth();
-      }
-      state.tokenRequestInFlight = new Promise(function (resolve, reject) {
-        let settled = false;
-        function cleanup() {
-          state.tokenRequestInFlight = null;
-          state.tokenClient.callback = function () {};
-          state.tokenClient.error_callback = function () {};
-        }
-        state.tokenClient.callback = function (response) {
-          if (settled) return;
-          settled = true;
-          cleanup();
-          if (!response || response.error || !response.access_token) {
-            reject(new Error((response && (response.error_description || response.error || response.error_subtype)) || "Error de autenticacion"));
+      return new Promise(function (resolve, reject) {
+        state.tokenClient.callback = function (resp) {
+          if (!resp || resp.error || !resp.access_token) {
+            reject(new Error((resp && (resp.error_description || resp.error)) || "Error de autenticacion"));
             return;
           }
-          if (isInteractiveRequest) {
-            markRecentInteractiveAuth();
-          }
-          resolve(response);
+          state.accessToken = resp.access_token;
+          state.accessTokenExpiresAt = Date.now() + (Math.max(60, Number(resp.expires_in) || 3600)) * 1000;
+          saveTokenToStorage(state.accessToken, state.accessTokenExpiresAt);
+          localStorage.setItem(AUTH_REMEMBER_KEY, "1");
+          const email = (state.currentUser && state.currentUser.emailAddress)
+            || localStorage.getItem(AUTH_HINT_EMAIL_KEY);
+          if (email) localStorage.setItem(AUTH_HINT_EMAIL_KEY, email);
+          scheduleTokenRefresh();
+          renderProfileMenu();
+          resolve(state.accessToken);
         };
-        state.tokenClient.error_callback = function (err) {
-          if (settled) return;
-          settled = true;
-          cleanup();
-          reject(new Error((err && (err.message || err.type)) || "Error de autenticacion"));
-        };
+        const opts = {};
+        if (interactive) {
+          opts.prompt = "consent";
+        } else {
+          opts.prompt = "none";
+          const email = (state.currentUser && state.currentUser.emailAddress)
+            || localStorage.getItem(AUTH_HINT_EMAIL_KEY);
+          if (email) opts.login_hint = email;
+        }
         try {
-          state.tokenClient.requestAccessToken(requestConfig);
+          state.tokenClient.requestAccessToken(opts);
         } catch (err) {
-          if (settled) return;
-          settled = true;
-          cleanup();
           reject(err);
         }
       });
-      return state.tokenRequestInFlight;
     }
-    function refreshAccessTokenSilently() {
-      return requestGoogleAccessToken({ prompt: "none" }).then(function (response) {
-        applyAccessTokenResponse(response);
-        return state.accessToken;
-      });
-    }
-    function restoreGoogleSessionSilently() {
-      if (hasUsableAccessToken(AUTH_REFRESH_MARGIN_MS)) {
-        return Promise.resolve(state.accessToken);
-      }
-      if (!state.tokenClient) {
-        return Promise.reject(new Error("Google Auth aun no esta listo."));
-      }
-      if (shouldDeferAutomaticAuthLoop()) {
-        return Promise.reject(new Error("Auto OAuth pausado para evitar un bucle de reautenticacion."));
-      }
-      if (shouldSuppressAutomaticAuth()) {
-        return Promise.reject(new Error("Reconexion automatica suprimida tras un login reciente."));
-      }
-      if (silentAuthRetryRemainingMs() > 0) {
-        return Promise.reject(new Error("Reconexion automatica en espera."));
-      }
-      return requestGoogleAccessToken({ prompt: "none" }).then(function (response) {
-        applyAccessTokenResponse(response);
-        return state.accessToken;
-      }).catch(function (err) {
-        setSilentAuthCooldown();
-        throw err;
-      });
-    }
-    function ensureValidAccessToken(options) {
-      const config = options || {};
-      if (hasUsableAccessToken(AUTH_REFRESH_MARGIN_MS)) {
-        return Promise.resolve(state.accessToken);
-      }
-      if (config.allowCurrentToken && hasUsableAccessToken(0)) {
-        scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
-        return Promise.resolve(state.accessToken);
-      }
-      if (!state.tokenClient) {
-        return state.accessToken ? Promise.resolve(state.accessToken) : Promise.reject(new Error("Sin sesion activa."));
-      }
-      if (!state.accessToken && shouldSuppressAutomaticAuth()) {
-        return Promise.reject(new Error("Reconexion automatica suprimida tras un login reciente."));
-      }
-      return restoreGoogleSessionSilently().catch(function (err) {
-        if (hasUsableAccessToken(0)) {
-          scheduleTokenRefresh(Math.min(AUTH_REFRESH_RETRY_MS, Math.max(1000, state.accessTokenExpiresAt - Date.now())));
-          return state.accessToken;
-        }
-        clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-        renderProfileMenu();
-        if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
-        throw err;
-      });
-    }
-    function openAuthenticatedDrive(options) {
-      return ensureValidAccessToken(options).then(function () {
+    function openAuthenticatedDrive() {
+      return ensureAccessToken(false).then(function () {
         return loadProfile();
       }).then(function () {
-        clearRecentAutomaticAuth();
+        const email = state.currentUser && state.currentUser.emailAddress;
+        if (email) localStorage.setItem(AUTH_HINT_EMAIL_KEY, email);
         setLoginStatus("");
         showView("drive");
         return Promise.all([loadFolder("root"), loadSharedDocs(), loadPaellas(), loadDireccion()]).then(function () {
@@ -5715,52 +5446,25 @@
       return Promise.resolve(false);
     }
     function restoreStoredSession() {
-      if (state.sessionRestoreInFlight) {
-        return state.sessionRestoreInFlight;
-      }
-      const stored = readStoredAuthSession();
-      if (!stored) {
-        return Promise.resolve(false);
-      }
-      state.currentUser = stored.user || null;
-      state.accessToken = stored.accessToken || "";
-      state.accessTokenExpiresAt = stored.expiresAt || 0;
-      renderProfileMenu();
+      if (state.sessionRestoreInFlight) return state.sessionRestoreInFlight;
       setLoginStatus("Recuperando sesion...");
-      if (hasUsableAccessToken(0)) {
-        scheduleTokenRefresh();
-      }
-      if (!hasUsableAccessToken(0) && shouldDeferAutomaticAuthLoop()) {
-        const waitMs = Math.max(600, recentAutomaticAuthRemainingMs() + 120);
-        showView("login");
-        setLoginStatus("Recuperando sesion...");
-        state.sessionRestoreInFlight = new Promise(function (resolve) {
-          setTimeout(function () {
-            state.sessionRestoreInFlight = null;
-            restoreStoredSession().then(resolve);
-          }, waitMs);
-        });
+      const hasToken = loadTokenFromStorage();
+      if (hasToken || localStorage.getItem(AUTH_REMEMBER_KEY) === "1") {
+        state.sessionRestoreInFlight = openAuthenticatedDrive()
+          .then(function () { return true; })
+          .catch(function (err) {
+            console.warn("No se ha podido restaurar la sesion guardada:", err);
+            clearAccessTokenState();
+            renderProfileMenu();
+            showView("login");
+            setLoginStatus("No se pudo restaurar la sesion automaticamente. Pulsa Iniciar sesion.");
+            return false;
+          })
+          .finally(function () { state.sessionRestoreInFlight = null; });
         return state.sessionRestoreInFlight;
       }
-      const allowCurrentStoredToken = hasUsableAccessToken(0);
-      const restoreWork = allowCurrentStoredToken
-        ? Promise.resolve()
-        : restoreGoogleSessionSilently();
-      state.sessionRestoreInFlight = restoreWork.then(function () {
-        return openAuthenticatedDrive({ allowCurrentToken: allowCurrentStoredToken });
-      }).then(function () {
-        return true;
-      }).catch(function (err) {
-        console.warn("No se ha podido restaurar la sesion guardada:", err);
-        clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-        renderProfileMenu();
-        showView("login");
-        setLoginStatus("No se pudo restaurar la sesion automaticamente. Pulsa Iniciar sesion.");
-        return false;
-      }).finally(function () {
-        state.sessionRestoreInFlight = null;
-      });
-      return state.sessionRestoreInFlight;
+      setLoginStatus("");
+      return Promise.resolve(false);
     }
     function formatSavedTime(timestamp) {
       if (!timestamp) return "";
@@ -10155,34 +9859,16 @@
       state.activeItemMenu = { el: menu, anchor: anchorEl, itemId: item.id };
       positionItemActionMenu(anchorEl, menu);
     }
-    async function authFetch(url, options) {
+    async function authFetch(url, options, _retried) {
       const init = Object.assign({}, options || {});
-      const skipAuthRefresh = !!init._skipAuthRefresh;
-      delete init._skipAuthRefresh;
-      if (!skipAuthRefresh) {
-        await ensureValidAccessToken();
-      }
+      await ensureAccessToken(false);
       init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
-      let res = await fetch(url, init);
-      if (!res.ok && !skipAuthRefresh && (res.status === 401 || res.status === 403)) {
-        try {
-          if (shouldSuppressAutomaticAuth()) {
-            throw new Error("Reconexion automatica suprimida tras un login reciente.");
-          }
-          if (shouldDeferAutomaticAuthLoop()) {
-            throw new Error("Auto OAuth pausado para evitar un bucle de reautenticacion.");
-          }
-          clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-          await restoreGoogleSessionSilently();
-          init.headers = Object.assign({}, init.headers || {}, { Authorization: "Bearer " + state.accessToken });
-          res = await fetch(url, init);
-        } catch (err) {
-          if (!hasUsableAccessToken(0)) {
-            clearAccessTokenState({ keepUser: true, keepStoredSession: true });
-            if (!shouldDeferAutomaticAuthLoop()) scheduleTokenRefresh(AUTH_REFRESH_RETRY_MS);
-            renderProfileMenu();
-          }
-        }
+      const res = await fetch(url, init);
+      if (res.status === 401 && !_retried) {
+        state.accessToken = "";
+        state.accessTokenExpiresAt = 0;
+        clearTokenStorage();
+        return authFetch(url, options, true);
       }
       if (!res.ok) {
         const text = await res.text().catch(function () { return ""; });
@@ -12522,8 +12208,9 @@
     function loadProfile() {
       return fetchJson("https://www.googleapis.com/drive/v3/about?fields=user(displayName,emailAddress,photoLink)").then(function (data) {
         state.currentUser = data.user || null;
+        const email = state.currentUser && state.currentUser.emailAddress;
+        if (email) localStorage.setItem(AUTH_HINT_EMAIL_KEY, email);
         renderProfileMenu();
-        saveStoredAuthSession();
       });
     }
     function loadFolder(folderId) {
@@ -13681,14 +13368,11 @@
         setTimeout(initGoogle, 200);
         return;
       }
-      state.lastInteractiveAuthAt = readRecentInteractiveAuthAt();
-      state.lastAutomaticAuthAt = readRecentAutomaticAuthAt();
       state.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPE,
         include_granted_scopes: true,
-        callback: function () {},
-        error_callback: function () {}
+        callback: function () {}
       });
       restoreStoredSession();
     }
@@ -13699,8 +13383,9 @@
         return;
       }
       setLoginStatus("");
-      requestGoogleAccessToken({ prompt: "" }).then(function (response) {
-        applyAccessTokenResponse(response);
+      state.accessToken = "";
+      state.accessTokenExpiresAt = 0;
+      ensureAccessToken(true).then(function () {
         return openAuthenticatedDrive();
       }).catch(function (err) {
         console.error(err);
@@ -13784,9 +13469,7 @@
         state.pickerMode = "sheet";
         state.newSheetContext = "drive";
         state.sessionRestoreInFlight = null;
-        state.silentAuthCooldownUntil = 0;
-        clearRecentInteractiveAuth();
-        clearRecentAutomaticAuth();
+        localStorage.removeItem(AUTH_REMEMBER_KEY);
         els.searchInput.value = "";
         els.itemsGrid.innerHTML = "";
         els.paellasGrid.innerHTML = "";
