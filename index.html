@@ -2079,10 +2079,11 @@
       min-height: 0;
     }
     .sheet-groups-list {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
-      align-content: start;
       min-height: 0;
+      min-width: 0;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-gutter: stable;
@@ -2401,6 +2402,12 @@
       gap: 0;
       padding: 0;
       background: #ffffff;
+    }
+    .sheet-group-card:not([open]) > .sheet-group-body {
+      display: none;
+    }
+    .sheet-group-card[open] > .sheet-group-body {
+      display: grid;
     }
     details[open]:not(.no-anim) > .sheet-group-body {
       animation: groupBodySlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) both;
