@@ -2333,21 +2333,20 @@
       background: rgba(185,90,0,0.05);
     }
     .sheet-group-card {
-      border: 1px solid rgba(0,0,0,0.04);
-      border-radius: 20px;
-      background: #ffffff;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-radius: 0;
+      background: transparent;
       overflow: hidden;
       min-width: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      transition: box-shadow .2s ease, transform .2s ease;
+      transition: background 0.2s ease;
     }
-    .sheet-group-card:hover {
-      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-      transform: translateY(-1px);
+    .sheet-group-card:last-child {
+      border-bottom: none;
     }
     .sheet-group-card[open] {
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      border-color: rgba(0,0,0,0.07);
+      background: #faf8f5;
+      border-bottom-color: rgba(0,0,0,0.1);
     }
     .sheet-groups-banner {
       display: flex;
@@ -2358,6 +2357,7 @@
       color: #5d3a10;
       border-radius: 20px;
       padding: 20px 22px;
+      margin-bottom: 8px;
       border: 1px solid rgba(0,0,0,0.04);
       box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
     }
@@ -2383,88 +2383,73 @@
       display: none;
     }
     .sheet-group-summary {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       align-items: center;
       gap: 16px;
       padding: 18px 20px;
       cursor: pointer;
       background: transparent;
-      transition: background .15s ease;
       min-width: 0;
-    }
-    .sheet-group-summary:hover {
-      background: rgba(0,0,0,0.02);
     }
     .sheet-group-summary-main {
       min-width: 0;
-      display: grid;
-      gap: 8px;
-    }
-    .sheet-group-summary-top {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      min-width: 0;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      gap: 2px;
     }
     .sheet-group-index-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 26px;
-      padding: 0 10px;
-      border-radius: 999px;
-      background: rgba(92, 55, 8, 0.06);
-      border: 1px solid rgba(185,90,0,0.1);
-      color: #7a4a15;
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 50%;
+      background: #3d2608;
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0;
     }
     .sheet-group-summary-meta {
-      font-size: 0.76rem;
-      font-weight: 600;
-      color: rgba(81, 54, 18, 0.72);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(93, 58, 16, 0.6);
       min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sheet-group-title-large {
-      font-size: 1.14rem;
-      font-weight: 800;
-      line-height: 1.25;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.2;
       min-width: 0;
-      word-break: break-word;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       color: #1e1508;
-      letter-spacing: -0.02em;
     }
     .sheet-group-summary-info {
       display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 6px;
-      flex-wrap: wrap;
-      min-width: 0;
-    }
-    .sheet-group-chips {
-      display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-end;
       gap: 4px;
-      flex-wrap: wrap;
-      justify-content: flex-start;
+      flex-wrap: nowrap;
+      min-width: 0;
     }
     .sheet-group-chip {
       display: inline-flex;
       align-items: center;
-      min-height: 28px;
-      padding: 5px 12px;
-      border-radius: 999px;
-      background: rgba(255,247,226,0.72);
-      border: none;
-      color: #8a5211;
-      font-size: 0.68rem;
+      min-height: 24px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.04);
+      color: #3d2608;
+      font-size: 0.72rem;
       font-weight: 700;
-      line-height: 1;
       white-space: nowrap;
     }
     .sheet-group-chip.is-paid {
@@ -2480,12 +2465,14 @@
       color: #843232;
     }
     .sheet-group-chip.is-progress {
-      background: rgba(220,235,255,0.9);
-      color: #27457a;
+      background: transparent;
+      color: rgba(93, 58, 16, 0.7);
+      padding: 0;
     }
     .sheet-group-chip.is-progress-complete {
-      background: rgba(212,247,222,0.9);
+      background: transparent;
       color: #175429;
+      padding: 0;
     }
     .sheet-group-summary-right {
       display: flex;
@@ -2494,26 +2481,24 @@
       gap: 12px;
       min-width: 0;
     }
-    .sheet-group-summary-side {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      align-self: start;
-      flex: 0 0 auto;
-    }
     .sheet-group-chevron {
-      width: 34px;
-      height: 34px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      border: none;
       background: transparent;
-      color: #8a5211;
+      color: rgba(0,0,0,0.3);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
-      box-shadow: none;
-      transition: background .15s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.2s ease;
+    }
+    .sheet-group-card:hover .sheet-group-chevron {
+      color: rgba(0,0,0,0.6);
+    }
+    .sheet-group-card[open] .sheet-group-chevron {
+      transform: rotate(90deg);
+      color: #1e1508;
     }
     .sheet-group-chevron svg {
       width: 22px;
@@ -2543,36 +2528,41 @@
       display: grid;
     }
     .sheet-member-list {
-      border-top: 1px solid rgba(0,0,0,0.04);
-      background: #fafafa;
+      background: #faf8f5;
     }
     .sheet-member-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 14px 20px;
+      gap: 12px;
+      padding: 12px 20px;
       border-bottom: 1px solid rgba(0,0,0,0.03);
       min-width: 0;
       background: transparent;
       transition: background .15s ease;
     }
     .sheet-member-row:hover {
-      background: rgba(0,0,0,0.015);
+      background: rgba(0,0,0,0.02);
     }
     .sheet-member-row:last-of-type {
       border-bottom: none;
     }
     .sheet-member-num {
-      font-size: 0.72rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      border-radius: 50%;
+      background: #eeebe5;
+      color: #5d3a10;
+      font-size: 0.75rem;
       font-weight: 700;
-      color: var(--muted);
-      flex: 0 0 auto;
-      min-width: 22px;
-      text-align: right;
     }
     .sheet-member-name-text {
       font-size: 0.9rem;
-      font-weight: 700;
+      font-weight: 600;
+      color: #1e1508;
       flex: 1 1 0;
       min-width: 0;
       overflow: hidden;
@@ -2580,14 +2570,14 @@
       white-space: nowrap;
     }
     .sheet-member-role-badge {
-      background: #c97820;
-      color: #fff;
+      background: rgba(201, 120, 32, 0.1);
+      color: #c97820;
       font-size: 0.58rem;
       font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 999px;
+      padding: 4px 8px;
+      border-radius: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
       flex: 0 0 auto;
     }
     .sheet-member-info-btn {
@@ -2596,7 +2586,7 @@
       border-radius: 50%;
       border: none;
       background: transparent;
-      color: #8a5211;
+      color: rgba(0,0,0,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2612,24 +2602,24 @@
     }
     .sheet-member-info-btn:hover {
       background: rgba(0,0,0,0.05);
-      color: #5d3a10;
+      color: rgba(0,0,0,0.7);
     }
     .sheet-member-info-btn.is-open {
-      background: rgba(0,0,0,0.08);
+      background: transparent;
       color: #3d2608;
     }
     .sheet-member-detail {
       padding: 16px 20px 18px;
-      background: #ffffff;
+      background: #fdfdfc;
       border-bottom: 1px solid rgba(0,0,0,0.03);
     }
     .sheet-member-detail.hidden { display: none; }
     .sheet-group-footer {
       display: grid;
-      gap: 12px;
-      padding: 16px 20px 18px;
-      border-top: 1px solid rgba(0,0,0,0.04);
-      background: #ffffff;
+      gap: 16px;
+      padding: 16px 20px 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: #faf8f5;
     }
     .sheet-group-footer-row {
       display: flex;
@@ -2672,55 +2662,55 @@
       flex-wrap: wrap;
     }
     .sheet-group-block-title {
-      font-size: 0.67rem;
-      color: var(--accent2);
+      font-size: 0.68rem;
+      color: #837a6b;
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.06em;
       font-weight: 700;
     }
     .sheet-person-ticket .sheet-group-block-title {
-      color: #3a6abf;
+      color: #5f7aab;
     }
     .sheet-group-block-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .sheet-group-add-btn {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      min-height: 38px;
-      border: 1px solid rgba(185,90,0,0.14);
-      border-radius: 999px;
-      background: #fffdfa;
-      color: var(--ink);
+      gap: 6px;
+      min-height: 36px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #443c33;
       font: inherit;
-      font-size: 0.74rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      padding: 8px 14px;
+      padding: 6px 14px;
       cursor: pointer;
-      box-shadow: none;
-      transition: background .15s ease, border-color .15s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .sheet-group-add-btn:hover {
-      background: #fff7ea;
-      border-color: rgba(185,90,0,0.22);
+      background: #fdfdfc;
+      border-color: rgba(0,0,0,0.2);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .sheet-group-add-btn:disabled {
-      opacity: 0.48;
+      opacity: 0.5;
       cursor: not-allowed;
     }
     .sheet-group-add-btn.danger {
-      border-color: rgba(190,88,88,0.18);
-      color: #9d3f3f;
-      background: rgba(255,246,246,0.96);
-      box-shadow: none;
+      border-color: rgba(220,53,69,0.2);
+      color: #c92a2a;
+      background: #fffafa;
     }
     .sheet-group-add-btn.danger:hover {
-      background: rgba(255,232,232,0.96);
-      border-color: rgba(190,88,88,0.28);
+      background: #fff0f0;
+      border-color: rgba(220,53,69,0.3);
     }
     .sheet-group-field-list {
       display: grid;
@@ -2751,45 +2741,45 @@
     .sheet-group-select {
       width: 100%;
       min-width: 0;
-      min-height: 42px;
-      border: 1px solid rgba(185,90,0,0.16);
-      border-radius: 16px;
-      background: #fffdfa;
-      color: var(--ink);
+      min-height: 40px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1e1508;
       font: inherit;
-      font-size: 0.84rem;
-      padding: 10px 12px;
+      font-size: 0.85rem;
+      padding: 8px 12px;
       outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
     .sheet-group-input:focus,
     .sheet-group-select:focus {
-      border-color: rgba(185,90,0,0.4);
-      box-shadow: 0 0 0 3px rgba(250,205,106,0.18);
-      background: #fff;
+      border-color: #f7a82b;
+      box-shadow: 0 0 0 3px rgba(247, 168, 43, 0.15);
+      background: #ffffff;
     }
     .sheet-group-input.is-dirty,
     .sheet-group-select.is-dirty {
-      border-color: rgba(218,133,7,0.5);
-      background: rgba(255,250,235,0.98);
+      border-color: rgba(247,168,43,0.4);
+      background: rgba(247,168,43,0.03);
     }
     .sheet-group-input:disabled,
     .sheet-group-select:disabled {
       opacity: 0.7;
       cursor: not-allowed;
-      background: rgba(255,255,255,0.6);
+      background: #f7f7f7;
     }
     .sheet-group-readonly {
       width: 100%;
       min-width: 0;
-      min-height: 42px;
-      border: 1px solid rgba(185,90,0,0.1);
-      border-radius: 16px;
-      background: rgba(255,253,250,0.9);
-      color: var(--ink);
+      min-height: 40px;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 8px;
+      background: #fafafa;
+      color: #1e1508;
       font: inherit;
-      font-size: 0.84rem;
-      padding: 10px 12px;
+      font-size: 0.85rem;
+      padding: 8px 12px;
       outline: none;
     }
     .sheet-group-inline-grid {
@@ -2813,22 +2803,22 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(185,90,0,0.12);
-      background: #fffdfa;
-      color: var(--ink);
+      min-height: 32px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: #ffffff;
+      color: #443c33;
       font: inherit;
-      font-size: 0.77rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: none;
-      transition: border-color .18s ease, background .18s ease, color .18s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.015);
+      transition: border-color .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
     }
     .sheet-group-pill:hover:not(:disabled) {
-      background: rgba(255,248,232,0.85);
-      border-color: rgba(185,90,0,0.2);
+      background: #fdfdfc;
+      border-color: rgba(0,0,0,0.2);
     }
     .sheet-group-pill.active[data-value="Pagado"] {
       background: rgba(212,247,222,0.94);
@@ -2854,10 +2844,10 @@
       display: grid;
       gap: 8px;
       margin-top: 8px;
-      padding: 14px;
-      border-radius: 18px;
-      background: #fbfdff;
-      border: 1px solid rgba(80,120,200,0.14);
+      padding: 12px;
+      border-radius: 12px;
+      background: #f8f9fa;
+      border: 1px solid rgba(0,0,0,0.06);
       box-shadow: none;
     }
     .sheet-person-ticket-head {
@@ -2884,26 +2874,32 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(185,90,0,0.14);
-      background: #fffdfa;
-      color: var(--ink);
+      min-height: 32px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: #ffffff;
+      color: #443c33;
       font: inherit;
-      font-size: 0.74rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background .15s ease, border-color .15s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.015);
+      transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
     }
     .sheet-person-ticket-btn:hover {
-      background: rgba(255,243,210,0.85);
-      border-color: rgba(185,90,0,0.2);
+      background: #fdfdfc;
+      border-color: rgba(0,0,0,0.2);
     }
     .sheet-person-ticket-btn.primary {
-      background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%);
-      color: #fff8eb;
+      background: #1a73e8;
+      color: #ffffff;
       border-color: transparent;
+      box-shadow: 0 1px 2px rgba(26,115,232,0.15);
+    }
+    .sheet-person-ticket-btn.primary:hover {
+      background: #1557b0;
+      box-shadow: 0 1px 3px rgba(26,115,232,0.25);
     }
     .sheet-person-ticket-btn:disabled {
       opacity: 0.5;
@@ -9699,25 +9695,25 @@
         card.addEventListener("toggle", function () { card.classList.remove("no-anim"); });
         const summary = document.createElement("summary");
         summary.className = "sheet-group-summary";
+        const indexBadge = document.createElement("div");
+        indexBadge.className = "sheet-group-index-badge";
+        indexBadge.textContent = String(index + 1);
+        summary.appendChild(indexBadge);
+        
         const summaryMain = document.createElement("div");
         summaryMain.className = "sheet-group-summary-main";
-        const summaryTop = document.createElement("div");
-        summaryTop.className = "sheet-group-summary-top";
-        const indexBadge = document.createElement("span");
-        indexBadge.className = "sheet-group-index-badge";
-        indexBadge.textContent = "G" + (index + 1);
-        summaryTop.appendChild(indexBadge);
-        const summaryMeta = document.createElement("div");
-        summaryMeta.className = "sheet-group-summary-meta";
-        const attendeeCount = group.attendeeCount || ticketPeople.length || 0;
-        const leadName = group.responsible && group.responsible.name ? group.responsible.name : "Sin responsable";
-        summaryMeta.textContent = attendeeCount + " personas | " + leadName;
-        summaryTop.appendChild(summaryMeta);
-        summaryMain.appendChild(summaryTop);
+        
         const titleEl = document.createElement("div");
         titleEl.className = "sheet-group-title-large";
         titleEl.textContent = group.title || ("Grupo " + (index + 1));
         summaryMain.appendChild(titleEl);
+
+        const summaryMeta = document.createElement("div");
+        summaryMeta.className = "sheet-group-summary-meta";
+        const attendeeCount = group.attendeeCount || ticketPeople.length || 0;
+        const leadName = group.responsible && group.responsible.name ? group.responsible.name : "Sin responsable";
+        summaryMeta.textContent = attendeeCount + " personas • " + leadName;
+        summaryMain.appendChild(summaryMeta);
         const infoRow = document.createElement("div");
         infoRow.className = "sheet-group-summary-info";
         syncSheetGroupsSummaryInfo(infoRow, group);
