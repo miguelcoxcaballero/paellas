@@ -783,6 +783,12 @@
       display: grid;
       place-items: center;
     }
+    .doc-open-btn {
+      opacity: 0.78;
+    }
+    .doc-open-btn:hover {
+      opacity: 1;
+    }
     .share-popup {
       width: min(400px, 90%);
       background: var(--paper);
@@ -845,6 +851,107 @@
     }
     .modal-overlay.visible .modal-card { transform: scale(1); }
     .modal-copy { display: grid; gap: 6px; }
+    .group-create-modal {
+      width: min(680px, 100%);
+    }
+    .group-create-shell {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 14px;
+      overflow: hidden;
+    }
+    .group-create-progress {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .group-create-progress-item {
+      display: grid;
+      gap: 3px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(185,90,0,0.12);
+      background: rgba(255,252,244,0.9);
+    }
+    .group-create-progress-item.active {
+      border-color: rgba(185,90,0,0.24);
+      background: #fff7ea;
+    }
+    .group-create-progress-kicker {
+      font-size: 0.64rem;
+      font-weight: 800;
+      color: rgba(122,74,21,0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .group-create-progress-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .group-create-step-wrap {
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .group-create-step {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .group-create-step-head {
+      display: grid;
+      gap: 4px;
+    }
+    .group-create-step-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .group-create-step-meta {
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .group-create-grid {
+      display: grid;
+      gap: 10px 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .group-create-grid.compact {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .group-create-field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .group-create-field.full {
+      grid-column: 1 / -1;
+    }
+    .group-create-field > span {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .group-create-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .group-create-actions-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
     .picker-shell {
       min-height: 0;
       display: grid;
@@ -2012,6 +2119,13 @@
       font-weight: 600;
       padding: 2px 0;
     }
+    #editorView.mode-switching,
+    #editorView.mode-switching *,
+    #editorView.mode-switching *::before,
+    #editorView.mode-switching *::after {
+      transition: none !important;
+      animation: none !important;
+    }
     #editorView.read-only .doc-title { cursor: default; background: transparent; }
     #editorView.read-only .cell { cursor: default; color: var(--muted); background: rgba(0,0,0,0.02); }
     .sheet-wrap {
@@ -2414,13 +2528,6 @@
     .sheet-group-card[open] > .sheet-group-body {
       display: grid;
     }
-    details[open]:not(.no-anim) > .sheet-group-body {
-      animation: groupBodySlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) both;
-    }
-    @keyframes groupBodySlideIn {
-      from { opacity: 0; transform: translateY(-3px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
     .sheet-member-list {
       border-top: 1px solid rgba(185,90,0,0.08);
     }
@@ -2495,11 +2602,6 @@
       border-bottom: 1px solid rgba(185,90,0,0.07);
     }
     .sheet-member-detail.hidden { display: none; }
-    .sheet-member-detail:not(.hidden) { animation: memberDetailSlideIn 0.15s cubic-bezier(0.2, 0, 0, 1) both; }
-    @keyframes memberDetailSlideIn {
-      from { opacity: 0; transform: translateY(-2px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
     .sheet-group-footer {
       display: grid;
       gap: 12px;
@@ -3764,6 +3866,11 @@
         padding: 24px 20px 20px;
         animation: slideUpBottomSheet 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
       }
+      .group-create-grid,
+      .group-create-grid.compact,
+      .group-create-progress {
+        grid-template-columns: 1fr;
+      }
       @keyframes slideUpBottomSheet {
         from { transform: translateY(100%); }
         to { transform: translateY(0); }
@@ -4407,6 +4514,13 @@
             </div>
             <div class="editor-actions">
               <div id="presenceAvatars" class="presence-avatars" aria-label="Dispositivos conectados"></div>
+              <button id="openInGoogleBtn" class="btn small btn-icon-sq doc-open-btn hidden-panel" type="button" title="Abrir en Google" aria-label="Abrir en Google">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 3h7v7"></path>
+                  <path d="M10 14 21 3"></path>
+                  <path d="M21 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                </svg>
+              </button>
               <button id="shareDocBtn" class="btn small btn-icon-sq" type="button" aria-label="Compartir"><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg></button>
               <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edicion">
                 <span class="mode-toggle-status">
@@ -4751,6 +4865,107 @@
       </div>
       <div class="row modal-actions">
         <button id="formLinkModalCancelBtn" class="btn small" type="button">Cancelar</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="newGroupWizardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="newGroupWizardTitle">
+    <section id="newGroupWizardCard" class="card modal-card group-create-modal">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="newGroupWizardTitle" class="title">Nuevo grupo</div>
+          <div class="meta">Crea un grupo manual con sus datos iniciales antes de insertarlo en la hoja.</div>
+        </div>
+        <button id="newGroupWizardCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="group-create-shell">
+        <div class="group-create-progress">
+          <div id="newGroupWizardProgress1" class="group-create-progress-item active">
+            <div class="group-create-progress-kicker">Paso 1</div>
+            <div class="group-create-progress-title">Responsable</div>
+          </div>
+          <div id="newGroupWizardProgress2" class="group-create-progress-item">
+            <div class="group-create-progress-kicker">Paso 2</div>
+            <div class="group-create-progress-title">Configuración</div>
+          </div>
+        </div>
+        <div id="newGroupWizardStatus" class="status"></div>
+        <div class="group-create-step-wrap">
+          <div id="newGroupWizardStep1" class="group-create-step">
+            <div class="group-create-step-head">
+              <div class="group-create-step-title">Datos del responsable</div>
+              <div class="group-create-step-meta">El nombre visible del grupo se tomará del responsable. Después podrás editar cualquier campo desde la vista de grupos.</div>
+            </div>
+            <div class="group-create-grid">
+              <label class="group-create-field full">
+                <span>Responsable</span>
+                <input id="newGroupWizardName" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre del responsable">
+              </label>
+              <label class="group-create-field">
+                <span>Email</span>
+                <input id="newGroupWizardEmail" class="search" type="email" autocomplete="off" spellcheck="false" placeholder="correo@upv.es">
+              </label>
+              <label class="group-create-field">
+                <span>Teléfono</span>
+                <input id="newGroupWizardPhone" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="600123123">
+              </label>
+              <label class="group-create-field">
+                <span>DNI</span>
+                <input id="newGroupWizardDni" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="12345678A">
+              </label>
+            </div>
+          </div>
+          <div id="newGroupWizardStep2" class="group-create-step hidden-panel">
+            <div class="group-create-step-head">
+              <div class="group-create-step-title">Configuración inicial</div>
+              <div class="group-create-step-meta">Estos valores son opcionales. Si los dejas vacíos, podrás completarlos después sin coste.</div>
+            </div>
+            <div class="group-create-grid compact">
+              <label class="group-create-field">
+                <span>Pago</span>
+                <select id="newGroupWizardPaymentStatus" class="search">
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Parcial">Parcial</option>
+                  <option value="Pagado">Pagado</option>
+                </select>
+              </label>
+              <label class="group-create-field">
+                <span>Importe</span>
+                <input id="newGroupWizardAmount" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="0,00">
+              </label>
+              <label class="group-create-field">
+                <span>Concurso</span>
+                <select id="newGroupWizardContest" class="search">
+                  <option value="">Sin valor</option>
+                  <option value="Sí">Sí</option>
+                  <option value="No">No</option>
+                </select>
+              </label>
+              <label class="group-create-field full">
+                <span>Punto de fuego</span>
+                <select id="newGroupWizardFirePoint" class="search">
+                  <option value="">Sin valor</option>
+                  <option value="🥘 Sí, para paella">🥘 Sí, para paella</option>
+                  <option value="🔥 Sí, para torrá">🔥 Sí, para torrá</option>
+                  <option value="🤝 Comparto punto de fuego con otro grupo">🤝 Comparto punto de fuego con otro grupo</option>
+                  <option value="❌ No">❌ No</option>
+                </select>
+              </label>
+              <label id="newGroupWizardSharedLeadField" class="group-create-field full hidden-panel">
+                <span>Grupo compartido con</span>
+                <input id="newGroupWizardSharedLead" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre del responsable del otro grupo">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group-create-actions">
+        <button id="newGroupWizardCancelBtn" class="btn small" type="button">Cancelar</button>
+        <div class="group-create-actions-right">
+          <button id="newGroupWizardBackBtn" class="btn small hidden-panel" type="button">Atrás</button>
+          <button id="newGroupWizardNextBtn" class="btn small" type="button">Siguiente</button>
+          <button id="newGroupWizardCreateBtn" class="btn primary hidden-panel" type="button">Crear grupo</button>
+        </div>
       </div>
     </section>
   </div>
@@ -5155,6 +5370,7 @@
       editorShell: document.getElementById("editorShell"),
       editorTitle: document.getElementById("editorTitle"),
       saveIndicator: document.getElementById("saveIndicator"),
+      openInGoogleBtn: document.getElementById("openInGoogleBtn"),
       presenceAvatars: document.getElementById("presenceAvatars"),
       presencePopup: document.getElementById("presencePopup"),
       presencePopupList: document.getElementById("presencePopupList"),
@@ -5279,6 +5495,28 @@
       formLinkModalEmpty: document.getElementById("formLinkModalEmpty"),
       formLinkModalCloseBtn: document.getElementById("formLinkModalCloseBtn"),
       formLinkModalCancelBtn: document.getElementById("formLinkModalCancelBtn"),
+      newGroupWizardModal: document.getElementById("newGroupWizardModal"),
+      newGroupWizardCard: document.getElementById("newGroupWizardCard"),
+      newGroupWizardStatus: document.getElementById("newGroupWizardStatus"),
+      newGroupWizardCloseBtn: document.getElementById("newGroupWizardCloseBtn"),
+      newGroupWizardCancelBtn: document.getElementById("newGroupWizardCancelBtn"),
+      newGroupWizardBackBtn: document.getElementById("newGroupWizardBackBtn"),
+      newGroupWizardNextBtn: document.getElementById("newGroupWizardNextBtn"),
+      newGroupWizardCreateBtn: document.getElementById("newGroupWizardCreateBtn"),
+      newGroupWizardProgress1: document.getElementById("newGroupWizardProgress1"),
+      newGroupWizardProgress2: document.getElementById("newGroupWizardProgress2"),
+      newGroupWizardStep1: document.getElementById("newGroupWizardStep1"),
+      newGroupWizardStep2: document.getElementById("newGroupWizardStep2"),
+      newGroupWizardName: document.getElementById("newGroupWizardName"),
+      newGroupWizardEmail: document.getElementById("newGroupWizardEmail"),
+      newGroupWizardPhone: document.getElementById("newGroupWizardPhone"),
+      newGroupWizardDni: document.getElementById("newGroupWizardDni"),
+      newGroupWizardPaymentStatus: document.getElementById("newGroupWizardPaymentStatus"),
+      newGroupWizardAmount: document.getElementById("newGroupWizardAmount"),
+      newGroupWizardContest: document.getElementById("newGroupWizardContest"),
+      newGroupWizardFirePoint: document.getElementById("newGroupWizardFirePoint"),
+      newGroupWizardSharedLeadField: document.getElementById("newGroupWizardSharedLeadField"),
+      newGroupWizardSharedLead: document.getElementById("newGroupWizardSharedLead"),
       shareModal: document.getElementById("shareModal"),
       shareModalCard: document.getElementById("shareModalCard"),
       shareEmailInput: document.getElementById("shareEmailInput"),
@@ -5791,6 +6029,34 @@
     }
     function currentDriveMimeType() {
       return isFormDocumentActive() ? DRIVE_FORM_MIME : DRIVE_SPREADSHEET_MIME;
+    }
+    function currentGoogleDocumentUrl() {
+      if (isFormDocumentActive() && state.formId) {
+        return "https://docs.google.com/forms/d/" + encodeURIComponent(state.formId) + "/edit";
+      }
+      if (isSpreadsheetDocumentActive() && state.spreadsheetId) {
+        var info = currentSheetInfo();
+        var url = "https://docs.google.com/spreadsheets/d/" + encodeURIComponent(state.spreadsheetId) + "/edit";
+        if (info && Number.isFinite(info.sheetId)) url += "#gid=" + String(info.sheetId);
+        return url;
+      }
+      return "";
+    }
+    function syncOpenInGoogleButton() {
+      if (!els.openInGoogleBtn) return;
+      var url = currentGoogleDocumentUrl();
+      var isForm = isFormDocumentActive();
+      var label = isForm ? "Abrir en Google Forms" : "Abrir en Google Sheets";
+      els.openInGoogleBtn.classList.toggle("hidden-panel", !url);
+      els.openInGoogleBtn.disabled = !url;
+      els.openInGoogleBtn.title = label;
+      els.openInGoogleBtn.setAttribute("aria-label", label);
+    }
+    function openCurrentDocumentInGoogle() {
+      var url = currentGoogleDocumentUrl();
+      if (!url) return false;
+      window.open(url, "_blank", "noopener,noreferrer");
+      return true;
     }
     function currentTitle() {
       if (isFormDocumentActive()) {
@@ -7000,24 +7266,29 @@
     var sheetGroupsPollTimer = 0;
     var sheetGroupsSilentPollBusy = false;
     var sheetGroupsLastRowSig = "";
+    var sheetGroupsPendingRows = null;
+    var sheetGroupsPendingSig = "";
+    var sheetGroupsUiRefreshTimer = 0;
+    var sheetGroupsPendingApplyTimer = 0;
+    var sheetGroupsInteractionUntil = 0;
+    var SHEET_GROUPS_INTERACTION_HOLD_MS = 900;
     var GROUPS_VIEW_POLL_INTERVAL = 4000;
     function startGroupsViewPoll() {
       stopGroupsViewPoll();
       if (!isSpreadsheetDocumentActive()) return;
+      clearPendingSheetGroupsLiveUpdate();
       sheetGroupsLastRowSig = "";
       sheetGroupsPollTimer = setInterval(silentPollGroupsView, GROUPS_VIEW_POLL_INTERVAL);
     }
     function stopGroupsViewPoll() {
-      if (!sheetGroupsPollTimer) return;
-      clearInterval(sheetGroupsPollTimer);
-      sheetGroupsPollTimer = 0;
+      if (sheetGroupsPollTimer) {
+        clearInterval(sheetGroupsPollTimer);
+        sheetGroupsPollTimer = 0;
+      }
+      clearPendingSheetGroupsLiveUpdate();
     }
     function silentPollGroupsView() {
       if (sheetGroupsSilentPollBusy || state.spreadsheetViewMode !== "groups" || !isSpreadsheetDocumentActive()) return;
-      // Only skip poll if user is actively typing in an input within the view
-      var active = document.activeElement;
-      var tag = active ? active.tagName : "";
-      if ((tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") && els.sheetGroupsView && els.sheetGroupsView.contains(active)) return;
       sheetGroupsSilentPollBusy = true;
       var titleAtStart = state.currentSheetTitle;
       fetchCurrentSheetRows().then(function (rows) {
@@ -7025,10 +7296,15 @@
         var sig = JSON.stringify(rows);
         if (sig === sheetGroupsLastRowSig) return;
         sheetGroupsLastRowSig = sig;
-        var newModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows));
-        state.sheetGroupsModel = newModel;
-        renderSheetGroupsList(newModel.groups, { skipAnim: true });
-        setSheetGroupsStatus(sheetGroupsStatusText(newModel), newModel.groups.length ? "" : "error");
+        if (isSheetGroupsInteractionLocked()) {
+          sheetGroupsPendingRows = cloneSheetRows(rows);
+          sheetGroupsPendingSig = sig;
+          schedulePendingSheetGroupsRowsApply();
+          return;
+        }
+        state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows));
+        applySheetGroupsModelToView(state.sheetGroupsModel, { skipAnim: true, preserveFocus: true });
+        setSheetGroupsStatus(sheetGroupsStatusText(state.sheetGroupsModel), state.sheetGroupsModel.groups.length ? "" : "error");
       }).catch(function () {}).finally(function () {
         sheetGroupsSilentPollBusy = false;
       });
@@ -7067,6 +7343,335 @@
       if (!state.sheetGroupsModel) return null;
       if (state.sheetGroupsModel.sheetTitle !== state.currentSheetTitle) return null;
       return state.sheetGroupsModel;
+    }
+    function clearPendingSheetGroupsLiveUpdate() {
+      sheetGroupsPendingRows = null;
+      sheetGroupsPendingSig = "";
+      sheetGroupsInteractionUntil = 0;
+      if (sheetGroupsUiRefreshTimer) {
+        clearTimeout(sheetGroupsUiRefreshTimer);
+        sheetGroupsUiRefreshTimer = 0;
+      }
+      if (sheetGroupsPendingApplyTimer) {
+        clearTimeout(sheetGroupsPendingApplyTimer);
+        sheetGroupsPendingApplyTimer = 0;
+      }
+    }
+    function hasPendingSheetChangesForTitle(title) {
+      const dirty = title ? state.sheetDirtyCells[title] : null;
+      return !!(dirty && dirty.size);
+    }
+    function markSheetGroupsInteraction(duration) {
+      sheetGroupsInteractionUntil = Math.max(
+        sheetGroupsInteractionUntil,
+        Date.now() + (typeof duration === "number" ? duration : SHEET_GROUPS_INTERACTION_HOLD_MS)
+      );
+    }
+    function isSheetGroupsInteractionLocked() {
+      if (state.spreadsheetViewMode !== "groups" || !isSpreadsheetDocumentActive()) return false;
+      if (state.saveInFlight || state.saveQueued) return true;
+      if (hasPendingSheetChangesForTitle(state.currentSheetTitle)) return true;
+      return Date.now() < sheetGroupsInteractionUntil;
+    }
+    function captureSheetGroupsFocusState() {
+      const focusState = {
+        scrollTop: els.sheetGroupsList ? els.sheetGroupsList.scrollTop : 0
+      };
+      if (!els.sheetGroupsView) return focusState;
+      const active = document.activeElement;
+      if (!active || !els.sheetGroupsView.contains(active)) return focusState;
+      focusState.tagName = String(active.tagName || "");
+      focusState.groupId = active.dataset ? String(active.dataset.groupId || "") : "";
+      focusState.row = active.dataset ? String(active.dataset.row || "") : "";
+      focusState.col = active.dataset ? String(active.dataset.col || "") : "";
+      focusState.action = active.dataset ? String(active.dataset.groupAction || "") : "";
+      focusState.valueAttr = active.dataset ? String(active.dataset.value || "") : "";
+      focusState.selectionStart = typeof active.selectionStart === "number" ? active.selectionStart : null;
+      focusState.selectionEnd = typeof active.selectionEnd === "number" ? active.selectionEnd : null;
+      return focusState;
+    }
+    function restoreSheetGroupsFocusState(focusState) {
+      if (!focusState) return;
+      if (els.sheetGroupsList && typeof focusState.scrollTop === "number") {
+        els.sheetGroupsList.scrollTop = focusState.scrollTop;
+      }
+      if (!els.sheetGroupsView) return;
+      let selector = "";
+      let target = null;
+      if (focusState.row !== undefined && focusState.row !== "" && focusState.col !== undefined && focusState.col !== "") {
+        selector = "[data-row='" + String(focusState.row).replace(/'/g, "\\'") + "'][data-col='" + String(focusState.col).replace(/'/g, "\\'") + "']";
+        target = els.sheetGroupsView.querySelector(selector);
+      }
+      if (!target && focusState.action) {
+        selector = "[data-group-action='" + String(focusState.action).replace(/'/g, "\\'") + "']";
+        if (focusState.groupId) selector += "[data-group-id='" + String(focusState.groupId).replace(/'/g, "\\'") + "']";
+        if (focusState.valueAttr) selector += "[data-value='" + String(focusState.valueAttr).replace(/'/g, "\\'") + "']";
+        target = els.sheetGroupsView.querySelector(selector);
+      }
+      if (!target && focusState.groupId) {
+        target = els.sheetGroupsView.querySelector(".sheet-group-card[data-group-id='" + String(focusState.groupId).replace(/'/g, "\\'") + "'] .sheet-group-summary");
+      }
+      if (!target || typeof target.focus !== "function") return;
+      target.focus({ preventScroll: true });
+      if ((focusState.tagName === "INPUT" || focusState.tagName === "TEXTAREA") &&
+          typeof focusState.selectionStart === "number" &&
+          typeof target.setSelectionRange === "function") {
+        target.setSelectionRange(focusState.selectionStart, focusState.selectionEnd == null ? focusState.selectionStart : focusState.selectionEnd);
+      }
+    }
+    function ensureSheetGroupSelectOption(select, value) {
+      if (!select || select.tagName !== "SELECT") return;
+      const normalized = String(value || "");
+      const hasOption = Array.prototype.some.call(select.options || [], function (option) {
+        return String(option.value || "") === normalized;
+      });
+      if (hasOption) return;
+      const option = document.createElement("option");
+      option.value = normalized;
+      option.textContent = normalized || "Sin valor";
+      select.appendChild(option);
+    }
+    function buildSheetGroupStructureSignature(group) {
+      const ticketPeople = buildTicketPeopleFromGroup(group, { includeDraftSlots: true });
+      return JSON.stringify({
+        visibleAssistants: getVisibleAssistantSlots(group).map(function (slot) { return String(slot.number || ""); }),
+        people: ticketPeople.map(function (person) {
+          return [
+            person.role,
+            String(person.number || ""),
+            Number.isFinite(person.infoCol) && person.infoCol >= 0 ? 1 : 0,
+            Number.isFinite(person.statusCol) && person.statusCol >= 0 ? 1 : 0,
+            Number.isFinite(person.codeCol) && person.codeCol >= 0 ? 1 : 0,
+            Number.isFinite(person.scannedAtCol) && person.scannedAtCol >= 0 ? 1 : 0
+          ].join(":");
+        }),
+        showEditActions: state.canEdit && state.editorMode === "edit" ? 1 : 0
+      });
+    }
+    function canPatchSheetGroupsList(model) {
+      const filteredGroups = filterSheetGroups(model && model.groups || []);
+      if (!els.sheetGroupsList || !filteredGroups.length) return false;
+      if (!els.sheetGroupsList.querySelector(".sheet-groups-banner")) return false;
+      const cards = Array.prototype.filter.call(
+        els.sheetGroupsList.querySelectorAll(".sheet-group-card[data-group-id]"),
+        function (card) { return card.parentNode === els.sheetGroupsList; }
+      );
+      if (cards.length !== filteredGroups.length) return false;
+      const needsActionRow = state.canEdit && state.editorMode === "edit";
+      if (!!els.sheetGroupsList.querySelector(".sheet-groups-list-actions") !== needsActionRow) return false;
+      for (let index = 0; index < filteredGroups.length; index += 1) {
+        const group = filteredGroups[index];
+        const card = cards[index];
+        if (!card || String(card.dataset.groupId || "") !== String(group.id || "")) return false;
+        if (String(card.dataset.structureSig || "") !== buildSheetGroupStructureSignature(group)) return false;
+      }
+      return true;
+    }
+    function buildSheetGroupFieldValueMap(group) {
+      const values = {};
+      function setValue(col, value) {
+        if (!Number.isFinite(col) || col < 0) return;
+        values[String(col)] = value == null ? "" : String(value);
+      }
+      if (!group) return values;
+      setValue(group.responsible && group.responsible.nameCol, group.responsible && group.responsible.name);
+      setValue(group.responsible && group.responsible.emailCol, group.responsible && group.responsible.email);
+      setValue(group.responsible && group.responsible.dniCol, group.responsible && group.responsible.dni);
+      setValue(group.responsible && group.responsible.phoneCol, group.responsible && group.responsible.phone);
+      setValue(group.firePoint && group.firePoint.col, group.firePoint && group.firePoint.value);
+      setValue(group.contest && group.contest.col, group.contest && group.contest.value);
+      setValue(group.payment && group.payment.amountCol, group.payment && group.payment.amount);
+      (group.assistantSlots || []).forEach(function (assistant) {
+        setValue(assistant && assistant.nameCol, assistant && assistant.name);
+        setValue(assistant && assistant.dniCol, assistant && assistant.dni);
+        setValue(assistant && assistant.emailCol, assistant && assistant.email);
+      });
+      buildTicketPeopleFromGroup(group, { includeDraftSlots: true }).forEach(function (person) {
+        setValue(person.infoCol, person.info);
+        setValue(person.statusCol, normalizeEntryStatus(person.status));
+        setValue(person.codeCol, person.code);
+        setValue(person.scannedAtCol, person.scannedAt);
+      });
+      return values;
+    }
+    function syncSheetGroupsSummaryInfo(infoRow, group) {
+      if (!infoRow) return;
+      infoRow.innerHTML = "";
+      const ticketPeople = buildTicketPeopleFromGroup(group);
+      const hasEntrySystem = ticketPeople.some(function (person) { return person.statusCol >= 0; });
+      if (hasEntrySystem) {
+        const enteredCount = ticketPeople.filter(function (person) { return person.status === "HA ENTRADO"; }).length;
+        const totalCount = ticketPeople.length;
+        const allIn = enteredCount === totalCount && totalCount > 0;
+        const chip = document.createElement("span");
+        chip.className = "sheet-group-chip " + (allIn ? "is-progress-complete" : "is-progress");
+        chip.textContent = (allIn ? "OK " : "") + enteredCount + "/" + totalCount + " han entrado";
+        infoRow.appendChild(chip);
+      }
+      if (group.payment && group.payment.status) {
+        const normalizedStatus = normalizePaymentStatus(group.payment.status);
+        const paymentChip = document.createElement("span");
+        paymentChip.className = "sheet-group-chip " + (normalizedStatus === "Pagado" ? "is-paid" : normalizedStatus === "Parcial" ? "is-partial" : "is-pending");
+        paymentChip.textContent = normalizedStatus;
+        infoRow.appendChild(paymentChip);
+      }
+    }
+    function syncSheetGroupsMemberRow(row, person) {
+      if (!row || !person) return;
+      const nameEl = row.querySelector(".sheet-member-name-text");
+      if (nameEl) nameEl.textContent = person.name || "Integrante";
+      const numEl = row.querySelector(".sheet-member-num");
+      if (numEl) numEl.textContent = (Number(person.number) || person.number || "?") + "#";
+      let statusChip = row.querySelector(".entry-status-chip");
+      const normalizedStatus = person.status ? normalizeEntryStatus(person.status) : "";
+      const hasTicket = Number.isFinite(person.statusCol) && person.statusCol >= 0;
+      if (!hasTicket || !normalizedStatus) {
+        if (statusChip) statusChip.remove();
+        return;
+      }
+      if (!statusChip) {
+        statusChip = document.createElement("span");
+        const infoBtn = row.querySelector(".sheet-member-info-btn");
+        if (infoBtn && infoBtn.parentNode === row) row.insertBefore(statusChip, infoBtn);
+        else row.appendChild(statusChip);
+      }
+      const tone = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
+      statusChip.className = "entry-status-chip " + tone;
+      statusChip.textContent = normalizedStatus;
+    }
+    function syncRenderedSheetGroupCard(card, group, index) {
+      if (!card || !group) return;
+      card.dataset.groupId = group.id;
+      card.dataset.structureSig = buildSheetGroupStructureSignature(group);
+      card.style.setProperty('--i', String(Math.min(index + 1, 12)));
+      const indexBadge = card.querySelector(".sheet-group-index-badge");
+      if (indexBadge) indexBadge.textContent = "G" + (index + 1);
+      const summaryMeta = card.querySelector(".sheet-group-summary-meta");
+      if (summaryMeta) {
+        const attendeeCount = group.attendeeCount || 0;
+        const leadName = group.responsible && group.responsible.name ? group.responsible.name : "Sin responsable";
+        summaryMeta.textContent = attendeeCount + " personas | " + leadName;
+      }
+      const titleEl = card.querySelector(".sheet-group-title-large");
+      if (titleEl) titleEl.textContent = group.title || ("Grupo " + (index + 1));
+      syncSheetGroupsSummaryInfo(card.querySelector(".sheet-group-summary-info"), group);
+      Array.prototype.forEach.call(card.querySelectorAll(".sheet-group-pill[data-group-action='payment-status']"), function (button) {
+        const normalizedStatus = normalizePaymentStatus(group.payment && group.payment.status);
+        button.dataset.row = String(group.sheetRow);
+        button.dataset.col = String(group.payment && group.payment.statusCol);
+        button.classList.toggle("active", normalizedStatus === String(button.dataset.value || ""));
+      });
+      const fieldValues = buildSheetGroupFieldValueMap(group);
+      const active = document.activeElement;
+      Array.prototype.forEach.call(card.querySelectorAll(".sheet-group-input[data-col], .sheet-group-select[data-col], .sheet-group-readonly[data-col]"), function (field) {
+        const row = Number(field.dataset.row);
+        const col = Number(field.dataset.col);
+        const nextValue = Object.prototype.hasOwnProperty.call(fieldValues, String(col)) ? fieldValues[String(col)] : "";
+        const isFocusedField = field === active;
+        if (field.tagName === "SELECT") ensureSheetGroupSelectOption(field, nextValue);
+        if (!isFocusedField && String(field.value || "") !== nextValue) {
+          field.value = nextValue;
+        }
+        if (field.classList.contains("sheet-group-input") || field.classList.contains("sheet-group-select")) {
+          field.classList.toggle("is-dirty", Number.isFinite(row) && Number.isFinite(col) && isCellDirty(state.currentSheetTitle, row, col));
+          field.disabled = !(state.canEdit && state.editorMode === "edit" && Number.isFinite(col) && col >= 0);
+        }
+      });
+      const peopleByKey = {};
+      const assistantSlotsByNumber = {};
+      (group.assistantSlots || []).forEach(function (assistant) {
+        assistantSlotsByNumber[String(assistant && assistant.number || "")] = assistant;
+      });
+      buildTicketPeopleFromGroup(group).forEach(function (person) {
+        peopleByKey[person.role + "::" + String(person.number || "")] = person;
+      });
+      Array.prototype.forEach.call(card.querySelectorAll(".sheet-member-row[data-person-role][data-person-number]"), function (row) {
+        const personRole = String(row.dataset.personRole || "");
+        const personNumber = String(row.dataset.personNumber || "");
+        const assistantSlot = assistantSlotsByNumber[personNumber];
+        const fallbackName = personRole === "responsable"
+          ? (group.responsible && group.responsible.name)
+          : (assistantSlot && assistantSlot.name);
+        const person = peopleByKey[personRole + "::" + personNumber] || {
+          role: personRole,
+          number: personNumber,
+          name: fallbackName || (personRole === "responsable" ? "Responsable" : ("Integrante " + (Number(personNumber) || personNumber || ""))),
+          status: "",
+          statusCol: -1
+        };
+        syncSheetGroupsMemberRow(row, person);
+      });
+    }
+    function applySheetGroupsModelToView(model, options) {
+      const opts = options || {};
+      const safeModel = model || { groups: [], header: [] };
+      const focusState = opts.preserveFocus ? captureSheetGroupsFocusState() : null;
+      if (opts.forceRender || !canPatchSheetGroupsList(safeModel)) {
+        renderSheetGroupsList(safeModel.groups || [], { skipAnim: !!opts.skipAnim });
+      } else {
+        const groups = Array.isArray(safeModel.groups) ? safeModel.groups : [];
+        const filteredGroups = filterSheetGroups(groups);
+        renderSheetGroupsToolbar(safeModel, filteredGroups);
+        if (els.sheetGroupsEmpty) {
+          els.sheetGroupsEmpty.textContent = groups.length && !filteredGroups.length
+            ? "No hay grupos que cumplan los filtros actuales."
+            : "No hay grupos para mostrar en esta hoja.";
+          els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
+        }
+        const bannerMeta = els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner-meta") : null;
+        if (bannerMeta) {
+          const totalAttendees = groups.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
+          bannerMeta.textContent = String(groups.length) + " grupos | " + String(totalAttendees) + " asistentes";
+        }
+        filteredGroups.forEach(function (group, index) {
+          const card = els.sheetGroupsList.querySelector(".sheet-group-card[data-group-id='" + String(group.id).replace(/'/g, "\\'") + "']");
+          if (card) syncRenderedSheetGroupCard(card, group, index);
+        });
+        syncSheetGroupsInteractivity();
+      }
+      if (focusState) {
+        requestAnimationFrame(function () {
+          restoreSheetGroupsFocusState(focusState);
+        });
+      }
+    }
+    function flushSheetGroupsModelUiRefresh() {
+      sheetGroupsUiRefreshTimer = 0;
+      if (state.spreadsheetViewMode !== "groups") return false;
+      const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+      if (!model) return false;
+      applySheetGroupsModelToView(model, { skipAnim: true, preserveFocus: true });
+      setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
+      if (sheetGroupsPendingRows) schedulePendingSheetGroupsRowsApply(320);
+      return true;
+    }
+    function scheduleSheetGroupsModelUiRefresh(delay) {
+      if (state.spreadsheetViewMode !== "groups") return;
+      if (sheetGroupsUiRefreshTimer) clearTimeout(sheetGroupsUiRefreshTimer);
+      sheetGroupsUiRefreshTimer = setTimeout(flushSheetGroupsModelUiRefresh, typeof delay === "number" ? delay : 120);
+    }
+    function flushPendingSheetGroupsRows() {
+      if (!sheetGroupsPendingRows || state.spreadsheetViewMode !== "groups" || !isSpreadsheetDocumentActive()) return false;
+      if (isSheetGroupsInteractionLocked()) {
+        schedulePendingSheetGroupsRowsApply(320);
+        return false;
+      }
+      const rows = cloneSheetRows(sheetGroupsPendingRows);
+      const sig = sheetGroupsPendingSig;
+      sheetGroupsPendingRows = null;
+      sheetGroupsPendingSig = "";
+      state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(state.currentSheetTitle, rows));
+      applySheetGroupsModelToView(state.sheetGroupsModel, { skipAnim: true, preserveFocus: true });
+      if (sig) sheetGroupsLastRowSig = sig;
+      setSheetGroupsStatus(sheetGroupsStatusText(state.sheetGroupsModel), state.sheetGroupsModel.groups.length ? "" : "error");
+      return true;
+    }
+    function schedulePendingSheetGroupsRowsApply(delay) {
+      if (sheetGroupsPendingApplyTimer) clearTimeout(sheetGroupsPendingApplyTimer);
+      sheetGroupsPendingApplyTimer = setTimeout(function () {
+        sheetGroupsPendingApplyTimer = 0;
+        flushPendingSheetGroupsRows();
+      }, typeof delay === "number" ? delay : 420);
     }
     function normalizePaymentStatus(value) {
       const raw = String(value || "").trim();
@@ -7254,12 +7859,14 @@
         return item && item.mimeType === DRIVE_SPREADSHEET_MIME;
       });
     }
-    function createSheetGroupReadonlyInput(value) {
+    function createSheetGroupReadonlyInput(value, options) {
       const input = document.createElement("input");
       input.type = "text";
       input.className = "sheet-group-readonly";
       input.readOnly = true;
       input.value = value || "";
+      if (options && Number.isFinite(options.row)) input.dataset.row = String(options.row);
+      if (options && Number.isFinite(options.col)) input.dataset.col = String(options.col);
       return input;
     }
     function createTicketField(labelText, inputEl) {
@@ -7298,11 +7905,11 @@
       grid.appendChild(createTicketField("Info entrada", createSheetGroupTextInput(group.id, group.sheetRow, person.infoCol, person.info, { placeholder: "Pulsera, menu, observaciones", role: config.rolePrefix + "-entry-info" })));
       var extraCols = 0;
       if (person.code) {
-        grid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code)));
+        grid.appendChild(createTicketField("Codigo", createSheetGroupReadonlyInput(person.code, { row: group.sheetRow, col: person.codeCol })));
         extraCols++;
       }
       if (person.scannedAt) {
-        grid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt)));
+        grid.appendChild(createTicketField("Escaneado", createSheetGroupReadonlyInput(person.scannedAt, { row: group.sheetRow, col: person.scannedAtCol })));
         extraCols++;
       }
       grid.style.gridTemplateColumns = "repeat(" + (2 + extraCols) + ", minmax(0, 1fr))";
@@ -8007,8 +8614,7 @@
           setTicketReaderStatus("Entrada validada.", "good");
           closeTicketReaderReview();
           return refreshTicketReaderModel().then(function () {
-            const refreshed = findReaderPersonByIdentity(state.ticketReader.model, state.ticketReader.spreadsheetId, { code: latest.code, row: latest.sheetRow, role: latest.role, number: latest.number });
-            renderTicketReaderResults(refreshed ? [refreshed] : [], "Entrada validada.");
+            renderTicketReaderResults([], "");
             return true;
           });
         });
@@ -8258,6 +8864,148 @@
         setBusy(els.editorShell, false);
       });
     }
+    var newGroupWizardStep = 0;
+    var newGroupWizardSubmitting = false;
+    function setNewGroupWizardStatus(text, tone) {
+      setStatusOnElement(els.newGroupWizardStatus, text, tone);
+    }
+    function syncNewGroupWizardSharedLeadVisibility() {
+      const isShared = String(els.newGroupWizardFirePoint && els.newGroupWizardFirePoint.value || "").indexOf("Comparto") !== -1;
+      if (els.newGroupWizardSharedLeadField) {
+        els.newGroupWizardSharedLeadField.classList.toggle("hidden-panel", !isShared);
+      }
+      if (!isShared && els.newGroupWizardSharedLead) els.newGroupWizardSharedLead.value = "";
+    }
+    function syncNewGroupWizardUi() {
+      const onSecondStep = newGroupWizardStep === 1;
+      if (els.newGroupWizardStep1) els.newGroupWizardStep1.classList.toggle("hidden-panel", onSecondStep);
+      if (els.newGroupWizardStep2) els.newGroupWizardStep2.classList.toggle("hidden-panel", !onSecondStep);
+      if (els.newGroupWizardProgress1) els.newGroupWizardProgress1.classList.toggle("active", !onSecondStep);
+      if (els.newGroupWizardProgress2) els.newGroupWizardProgress2.classList.toggle("active", onSecondStep);
+      if (els.newGroupWizardBackBtn) els.newGroupWizardBackBtn.classList.toggle("hidden-panel", !onSecondStep);
+      if (els.newGroupWizardNextBtn) els.newGroupWizardNextBtn.classList.toggle("hidden-panel", onSecondStep);
+      if (els.newGroupWizardCreateBtn) els.newGroupWizardCreateBtn.classList.toggle("hidden-panel", !onSecondStep);
+      syncNewGroupWizardSharedLeadVisibility();
+    }
+    function resetNewGroupWizard() {
+      newGroupWizardStep = 0;
+      newGroupWizardSubmitting = false;
+      if (els.newGroupWizardName) els.newGroupWizardName.value = "";
+      if (els.newGroupWizardEmail) els.newGroupWizardEmail.value = "";
+      if (els.newGroupWizardPhone) els.newGroupWizardPhone.value = "";
+      if (els.newGroupWizardDni) els.newGroupWizardDni.value = "";
+      if (els.newGroupWizardPaymentStatus) els.newGroupWizardPaymentStatus.value = "Pendiente";
+      if (els.newGroupWizardAmount) els.newGroupWizardAmount.value = "";
+      if (els.newGroupWizardContest) els.newGroupWizardContest.value = "";
+      if (els.newGroupWizardFirePoint) els.newGroupWizardFirePoint.value = "";
+      if (els.newGroupWizardSharedLead) els.newGroupWizardSharedLead.value = "";
+      if (els.newGroupWizardCard) setBusy(els.newGroupWizardCard, false);
+      setNewGroupWizardStatus("", "");
+      syncNewGroupWizardUi();
+    }
+    function readNewGroupWizardDraft() {
+      return {
+        responsibleName: String(els.newGroupWizardName && els.newGroupWizardName.value || "").trim(),
+        email: String(els.newGroupWizardEmail && els.newGroupWizardEmail.value || "").trim(),
+        phone: String(els.newGroupWizardPhone && els.newGroupWizardPhone.value || "").trim(),
+        dni: String(els.newGroupWizardDni && els.newGroupWizardDni.value || "").trim(),
+        paymentStatus: String(els.newGroupWizardPaymentStatus && els.newGroupWizardPaymentStatus.value || "Pendiente").trim() || "Pendiente",
+        amount: String(els.newGroupWizardAmount && els.newGroupWizardAmount.value || "").trim(),
+        contest: String(els.newGroupWizardContest && els.newGroupWizardContest.value || "").trim(),
+        firePoint: String(els.newGroupWizardFirePoint && els.newGroupWizardFirePoint.value || "").trim(),
+        sharedLead: String(els.newGroupWizardSharedLead && els.newGroupWizardSharedLead.value || "").trim()
+      };
+    }
+    function validateNewGroupWizardStep(step) {
+      const draft = readNewGroupWizardDraft();
+      if (step === 0 && !draft.responsibleName) {
+        setNewGroupWizardStatus("Introduce al menos el nombre del responsable.", "error");
+        if (els.newGroupWizardName && typeof els.newGroupWizardName.focus === "function") els.newGroupWizardName.focus();
+        return false;
+      }
+      if (step === 1 && draft.firePoint.indexOf("Comparto") !== -1 && !draft.sharedLead) {
+        setNewGroupWizardStatus("Indica con qué responsable comparte el punto de fuego.", "error");
+        if (els.newGroupWizardSharedLead && typeof els.newGroupWizardSharedLead.focus === "function") els.newGroupWizardSharedLead.focus();
+        return false;
+      }
+      setNewGroupWizardStatus("", "");
+      return true;
+    }
+    function openNewGroupWizard() {
+      const model = currentSheetGroupsModel();
+      if (!model || !state.spreadsheetId || !state.currentSheetTitle) {
+        setSheetGroupsStatus("No hay una hoja de grupos activa.", "error");
+        return false;
+      }
+      resetNewGroupWizard();
+      if (els.newGroupWizardModal) els.newGroupWizardModal.classList.add("visible");
+      requestAnimationFrame(function () {
+        if (els.newGroupWizardName && typeof els.newGroupWizardName.focus === "function") els.newGroupWizardName.focus();
+      });
+      return true;
+    }
+    function closeNewGroupWizard(force) {
+      if (newGroupWizardSubmitting && !force) return false;
+      if (els.newGroupWizardModal) els.newGroupWizardModal.classList.remove("visible");
+      resetNewGroupWizard();
+      return true;
+    }
+    function firstSheetHeaderIndex(model, labels) {
+      const source = model && model.headerIndex ? model.headerIndex : {};
+      for (var i = 0; i < (labels || []).length; i += 1) {
+        const key = normalizeCompareText(labels[i]);
+        if (Number.isInteger(source[key])) return source[key];
+      }
+      return -1;
+    }
+    function buildNewGroupRowValues(model, draft) {
+      const valuesByCol = {};
+      function setAt(labels, value) {
+        const col = firstSheetHeaderIndex(model, labels);
+        const nextValue = String(value || "").trim();
+        if (!Number.isInteger(col) || col < 0 || !nextValue) return;
+        valuesByCol[col] = nextValue;
+      }
+      setAt(["Responsable - nombre completo"], draft.responsibleName);
+      setAt(["Responsable - email UPV", "Responsable - email", "email"], draft.email);
+      setAt(["Responsable - telefono"], draft.phone);
+      setAt(["Responsable - DNI"], draft.dni);
+      setAt(["submittedAt", "timestamp"], new Date().toLocaleString("es-ES"));
+      setAt(["Pago - estado"], draft.paymentStatus || "Pendiente");
+      setAt(["Pago - importe", "Pago - cantidad", "Pago - euros"], draft.amount);
+      if ((draft.paymentStatus === "Pagado" || draft.paymentStatus === "Parcial") && draft.responsibleName) {
+        setAt(["Pago - quien paga", "Pago - paga"], draft.responsibleName);
+      }
+      setAt(["Paella - punto de fuego"], draft.firePoint);
+      setAt(["Paella - responsable del otro grupo"], draft.sharedLead);
+      setAt(["Paella - participa en concurso"], draft.contest);
+      const columns = Object.keys(valuesByCol).map(function (key) { return Number(key); }).filter(Number.isFinite);
+      const rowLength = Math.max(model && Array.isArray(model.header) ? model.header.length : 0, columns.length ? (Math.max.apply(null, columns) + 1) : 0);
+      const rowValues = new Array(Math.max(1, rowLength)).fill("");
+      columns.forEach(function (col) {
+        rowValues[col] = valuesByCol[col];
+      });
+      while (rowValues.length > 1 && !String(rowValues[rowValues.length - 1] || "").trim()) rowValues.pop();
+      return rowValues;
+    }
+    function applyNewGroupLocally(model, rowValues, insertRow) {
+      const nextRows = cloneSheetRows(model && model.rows ? model.rows : []);
+      nextRows.push(rowValues.slice());
+      ensureSheetState(state.currentSheetTitle);
+      rowValues.forEach(function (value, col) {
+        setCellValue(state.currentSheetTitle, insertRow, col, value);
+        if (state.sheetDirtyCells[state.currentSheetTitle]) state.sheetDirtyCells[state.currentSheetTitle].delete(cellKey(insertRow, col));
+      });
+      state.spreadsheetSheets = state.spreadsheetSheets.map(function (sheet) {
+        if (sheet.title !== state.currentSheetTitle) return sheet;
+        return Object.assign({}, sheet, {
+          rowCount: Math.max(Number(sheet.rowCount) || 0, nextRows.length)
+        });
+      });
+      sheetGroupsLastRowSig = JSON.stringify(nextRows);
+      state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(nextRows, state.currentSheetTitle);
+      return state.sheetGroupsModel;
+    }
     function resetSheetGroupsTransientState() {
       state.sheetGroupsDraftSlots = {};
       state.sheetGroupsExpanded = {};
@@ -8296,61 +9044,62 @@
         return true;
       });
     }
-    function insertManualSheetGroup() {
+    function insertManualSheetGroup(draft) {
       const model = currentSheetGroupsModel();
-      const info = currentSheetInfo();
-      if (!model || !info || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
+      if (!model || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
+      const normalizedDraft = draft || {};
       const insertRow = Math.max(1, Array.isArray(model.rows) ? model.rows.length : 1);
-      const responsibleNameCol = model.headerIndex["responsable - nombre completo"];
-      const submittedAtCol = Number.isInteger(model.headerIndex["submittedat"]) ? model.headerIndex["submittedat"] : model.headerIndex["timestamp"];
-      const paymentStatusCol = Number.isInteger(model.headerIndex["pago - estado"]) ? model.headerIndex["pago - estado"] : -1;
+      const rowValues = buildNewGroupRowValues(model, normalizedDraft);
       return flushPendingChanges({ force: true, message: "Guardando antes de crear grupo..." }).then(function (ok) {
         if (!ok && hasPendingChanges()) throw new Error("No se han podido guardar los cambios pendientes.");
-        setBusy(els.editorShell, true);
+        newGroupWizardSubmitting = true;
+        if (els.newGroupWizardCard) setBusy(els.newGroupWizardCard, true);
+        setNewGroupWizardStatus("Creando grupo...", "");
         setSheetGroupsStatus("Creando grupo...", "");
         return fetchJson(
-          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) + ":batchUpdate",
+          "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) +
+          "/values/" + encodeURIComponent(quoteSheetTitle(state.currentSheetTitle) + "!A1") +
+          ":append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              requests: [{
-                insertDimension: {
-                  range: {
-                    sheetId: info.sheetId,
-                    dimension: "ROWS",
-                    startIndex: insertRow,
-                    endIndex: insertRow + 1
-                  },
-                  inheritFromBefore: insertRow > 1
-                }
-              }]
+              majorDimension: "ROWS",
+              values: [rowValues]
             })
           }
         );
       }).then(function () {
-        const payloads = [];
-        if (Number.isInteger(responsibleNameCol) && responsibleNameCol >= 0) {
-          payloads.push(buildSheetSingleCellPayload(state.currentSheetTitle, insertRow, responsibleNameCol, "Nuevo grupo"));
-        }
-        if (Number.isInteger(submittedAtCol) && submittedAtCol >= 0) {
-          payloads.push(buildSheetSingleCellPayload(state.currentSheetTitle, insertRow, submittedAtCol, new Date().toLocaleString("es-ES")));
-        }
-        if (Number.isInteger(paymentStatusCol) && paymentStatusCol >= 0) {
-          payloads.push(buildSheetSingleCellPayload(state.currentSheetTitle, insertRow, paymentStatusCol, "Pendiente"));
-        }
-        return writeSpreadsheetCellPayloads(state.spreadsheetId, payloads);
-      }).then(function () {
-        resetSheetGroupsTransientState();
-        return reloadCurrentSheetGroupsAfterStructureChange({
-          openRow: insertRow,
-          focusColRole: "group-title"
+        snapshotSheetGroupsOpenState();
+        const nextModel = applyNewGroupLocally(model, rowValues, insertRow);
+        const newGroupId = nextModel && Array.isArray(nextModel.groups) && nextModel.groups.length
+          ? nextModel.groups[nextModel.groups.length - 1].id
+          : ("group-" + String(Math.max(0, insertRow - 1)));
+        state.sheetGroupsExpanded[newGroupId] = true;
+        rerenderSheetGroupsFromModel();
+        closeNewGroupWizard(true);
+        setSheetGroupsStatus(
+          filterSheetGroups(nextModel && nextModel.groups || []).some(function (group) { return group.id === newGroupId; })
+            ? "Grupo creado."
+            : "Grupo creado, pero los filtros actuales lo ocultan.",
+          "good"
+        );
+        requestAnimationFrame(function () {
+          const card = document.querySelector(".sheet-group-card[data-group-id='" + String(newGroupId).replace(/'/g, "\\'") + "']");
+          if (card && typeof card.scrollIntoView === "function") {
+            card.scrollIntoView({ block: "nearest" });
+          }
         });
-      }).then(function () {
-        setSheetGroupsStatus("Grupo creado.", "good");
         return true;
+      }).catch(function (err) {
+        console.error(err);
+        newGroupWizardSubmitting = false;
+        if (els.newGroupWizardCard) setBusy(els.newGroupWizardCard, false);
+        setNewGroupWizardStatus(messageFromError(err, "No se ha podido crear el grupo"), "error");
+        throw err;
       }).finally(function () {
-        setBusy(els.editorShell, false);
+        newGroupWizardSubmitting = false;
+        if (els.newGroupWizardCard) setBusy(els.newGroupWizardCard, false);
       });
     }
     function deleteSheetGroup(group) {
@@ -8849,12 +9598,12 @@
       els.sheetGroupsList.appendChild(banner);
       (filteredGroups || []).forEach(function (group, index) {
         const ticketPeople = buildTicketPeopleFromGroup(group);
-        const hasEntrySystem = ticketPeople.some(function (p) { return p.statusCol >= 0; });
         const card = document.createElement("details");
         const wasOpen = isSheetGroupExpanded(group.id, index);
         card.className = "sheet-group-card" + (wasOpen ? " no-anim" : "");
         card.style.setProperty('--i', String(Math.min(index + 1, 12)));
         card.dataset.groupId = group.id;
+        card.dataset.structureSig = buildSheetGroupStructureSignature(group);
         card.open = wasOpen;
         card.addEventListener("toggle", function () { card.classList.remove("no-anim"); });
         const summary = document.createElement("summary");
@@ -8880,22 +9629,7 @@
         summaryMain.appendChild(titleEl);
         const infoRow = document.createElement("div");
         infoRow.className = "sheet-group-summary-info";
-        if (hasEntrySystem) {
-          const enteredCount = ticketPeople.filter(function (p) { return p.status === "HA ENTRADO"; }).length;
-          const totalCount = ticketPeople.length;
-          const allIn = enteredCount === totalCount && totalCount > 0;
-          const chip = document.createElement("span");
-          chip.className = "sheet-group-chip " + (allIn ? "is-progress-complete" : "is-progress");
-          chip.textContent = (allIn ? "OK " : "") + enteredCount + "/" + totalCount + " han entrado";
-          infoRow.appendChild(chip);
-        }
-        if (group.payment && group.payment.status) {
-          const ns = normalizePaymentStatus(group.payment.status);
-          const pchip = document.createElement("span");
-          pchip.className = "sheet-group-chip " + (ns === "Pagado" ? "is-paid" : ns === "Parcial" ? "is-partial" : "is-pending");
-          pchip.textContent = ns;
-          infoRow.appendChild(pchip);
-        }
+        syncSheetGroupsSummaryInfo(infoRow, group);
         summaryMain.appendChild(infoRow);
         summary.appendChild(summaryMain);
         const chevron = document.createElement("span");
@@ -8913,6 +9647,8 @@
           var hasTicket = person && person.statusCol >= 0;
           var row = document.createElement("div");
           row.className = "sheet-member-row";
+          row.dataset.personRole = isResponsable ? "responsable" : "asistente";
+          row.dataset.personNumber = String(isResponsable ? "01" : (person && person.number ? person.number : (assistant && assistant.number ? assistant.number : "")));
           var numEl = document.createElement("span");
           numEl.className = "sheet-member-num";
           numEl.textContent = memberNum + "#";
@@ -8944,6 +9680,8 @@
           memberList.appendChild(row);
           var detail = document.createElement("div");
           detail.className = "sheet-member-detail hidden";
+          detail.dataset.personRole = row.dataset.personRole;
+          detail.dataset.personNumber = row.dataset.personNumber;
           var detailFields = document.createElement("div");
           detailFields.className = "sheet-assistant-fields";
           if (isResponsable) {
@@ -9054,6 +9792,7 @@
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups") return Promise.resolve(false);
       const titleAtStart = state.currentSheetTitle;
       const requestId = ++state.sheetGroupLoadToken;
+      clearPendingSheetGroupsLiveUpdate();
       // Only show loading status when the list has no content yet (first load or sheet switch)
       if (!els.sheetGroupsList.firstChild) {
         setSheetGroupsStatus("Cargando grupos...", "");
@@ -9069,7 +9808,7 @@
         return ensureHeaders.then(function () {
           if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
           const model = currentSheetGroupsModel() || { groups: [] };
-          renderSheetGroupsList(model.groups, options);
+          applySheetGroupsModelToView(model, Object.assign({ preserveFocus: true }, options || {}));
           sheetGroupsLastRowSig = JSON.stringify(rows);
           setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
           return true;
@@ -9086,7 +9825,7 @@
     function rerenderSheetGroupsFromModel() {
       const model = currentSheetGroupsModel();
       if (!model || state.spreadsheetViewMode !== "groups") return;
-      renderSheetGroupsList(model.groups, { skipAnim: true });
+      applySheetGroupsModelToView(model, { skipAnim: true, preserveFocus: true });
       setSheetGroupsStatus(sheetGroupsStatusText(model), model.groups.length ? "" : "error");
     }
     function setCellValue(sheetTitle, row, col, value) {
@@ -9444,8 +10183,13 @@
       els.paellaAccessPopup.classList.add("hidden");
       els.paellaAccessAvatars.classList.remove("popup-open");
     }
+    var editorModeSwitchReleaseTimer = 0;
     function applyEditorMode() {
       const editing = state.editorMode === "edit" && state.canEdit;
+      if (els.editorView) {
+        els.editorView.classList.add("mode-switching");
+        if (editorModeSwitchReleaseTimer) clearTimeout(editorModeSwitchReleaseTimer);
+      }
       els.editorView.classList.toggle("read-only", !editing);
       els.modeToggleBtn.classList.toggle("is-editing", editing);
       els.modeToggleBtn.setAttribute("aria-pressed", editing ? "true" : "false");
@@ -9472,6 +10216,10 @@
       syncEditorSurface();
       syncSheetGroupsInteractivity();
       refreshDirtyState();
+      editorModeSwitchReleaseTimer = setTimeout(function () {
+        if (els.editorView) els.editorView.classList.remove("mode-switching");
+        editorModeSwitchReleaseTimer = 0;
+      }, 60);
     }
     function queueAutosave(delay) {
       clearTimeout(state.saveTimer);
@@ -11580,6 +12328,7 @@
       els.sheetViewToggle.classList.toggle("hidden-panel", formMode || !isCurrentSheetPaellaResponseSheet());
       els.formToolbar.classList.toggle("hidden-panel", !formMode);
       els.formEditor.classList.toggle("hidden-panel", !formMode);
+      syncOpenInGoogleButton();
       if (formMode) {
         els.formDescriptionInput.value = state.formDescription || "";
         renderFormQuestions();
@@ -12825,6 +13574,7 @@
       const config = options || {};
       const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === title; });
       if (!info) return Promise.resolve();
+      clearPendingSheetGroupsLiveUpdate();
       if (state.currentSheetTitle && state.currentSheetTitle !== title) {
         state.sheetGroupsModel = null;
         state.sheetGroupsDraftSlots = {};
@@ -13384,6 +14134,10 @@
         deferRemotePull(remoteMetaHint || null);
         return Promise.resolve(false);
       }
+      if (isSpreadsheetDocumentActive() && state.spreadsheetViewMode === "groups" && isSheetGroupsInteractionLocked()) {
+        deferRemotePull(remoteMetaHint || null);
+        return Promise.resolve(false);
+      }
       state.collabPullInProgress = true;
       if (!config.quiet) {
         setSaveState("syncing", "Sincronizando...");
@@ -13570,6 +14324,9 @@
         .finally(function () {
           state.saveInFlight = false;
           setBusy(els.editorShell, false);
+          if (state.spreadsheetViewMode === "groups") {
+            schedulePendingSheetGroupsRowsApply(120);
+          }
           if (state.saveQueued) {
             state.saveQueued = false;
             queueAutosave(220);
@@ -13610,47 +14367,24 @@
       const target = event.target;
       if (!target || (!target.classList.contains("sheet-group-input") && !target.classList.contains("sheet-group-select"))) return;
       if (state.editorMode !== "edit" || !state.canEdit || !state.currentSheetTitle) return;
+      markSheetGroupsInteraction();
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
       if (!Number.isFinite(row) || !Number.isFinite(col) || col < 0) return;
       applySheetGroupCellDraft(state.currentSheetTitle, row, col, target.value, { delay: 450 });
       target.classList.add("is-dirty");
-      if (target.dataset.role === "group-title") {
-        const card = target.closest(".sheet-group-card");
-        const titleEl = card ? card.querySelector(".sheet-group-title") : null;
-        if (titleEl) titleEl.textContent = String(target.value || "").trim() || "Grupo";
-        const responsibleLineEl = card ? card.querySelector(".sheet-group-responsible-line") : null;
-        if (responsibleLineEl) responsibleLineEl.textContent = String(target.value || "").trim() || "Sin responsable";
-      }
-      if (target.dataset.role === "assistant-name" || target.dataset.role === "assistant-email" || target.dataset.role === "assistant-dni") {
-        const assistantItem = target.closest(".sheet-assistant-item");
-        if (assistantItem) {
-          const nameInput = assistantItem.querySelector(".sheet-group-input[data-role='assistant-name']");
-          const emailInput = assistantItem.querySelector(".sheet-group-input[data-role='assistant-email']");
-          const dniInput = assistantItem.querySelector(".sheet-group-input[data-role='assistant-dni']");
-          const nameEl = assistantItem.querySelector(".sheet-assistant-name");
-          const metaEl = assistantItem.querySelector(".sheet-assistant-meta");
-          if (nameEl) nameEl.textContent = String(nameInput && nameInput.value || "").trim() || "Integrante";
-          if (metaEl) metaEl.textContent = String(emailInput && emailInput.value || "").trim() || String(dniInput && dniInput.value || "").trim() || "Pulsa para editar los datos";
-        }
-      }
-      if (target.classList.contains("sheet-group-select")) {
-        rebuildCurrentSheetGroupsModel();
-        rerenderSheetGroupsFromModel();
-      }
+      scheduleSheetGroupsModelUiRefresh(target.classList.contains("sheet-group-select") ? 0 : 120);
     }
     function handleSheetGroupsActionClick(event) {
       const button = event.target.closest("[data-group-action]");
       if (!button) return;
       const action = button.dataset.groupAction;
       if (button.disabled || !state.currentSheetTitle) return;
+      markSheetGroupsInteraction(520);
       const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "group-add" || action === "group-delete";
       if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
       if (action === "group-add") {
-        insertManualSheetGroup().catch(function (err) {
-          console.error(err);
-          setSheetGroupsStatus(messageFromError(err, "No se ha podido crear el grupo"), "error");
-        });
+        openNewGroupWizard();
         return;
       }
       const groupId = button.dataset.groupId;
@@ -13681,7 +14415,7 @@
           if (!Number.isFinite(col) || col < 0) return;
           applySheetGroupCellDraft(state.currentSheetTitle, row, col, nextValue, { delay: 250 });
           rebuildCurrentSheetGroupsModel();
-          rerenderSheetGroupsFromModel();
+          applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
         }).catch(function (err) {
           console.error(err);
           setSheetGroupsStatus(messageFromError(err, "No se ha podido actualizar el estado de pago"), "error");
@@ -13709,7 +14443,7 @@
           state.sheetGroupsExpanded[groupId] = true;
           state.sheetGroupAssistantExpanded[groupId + "::" + slot.number] = true;
           rebuildCurrentSheetGroupsModel();
-          rerenderSheetGroupsFromModel();
+          applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
           setSheetGroupsStatus("Integrante listo para editar.", "good");
           requestAnimationFrame(function () {
             const selector = ".sheet-group-card[data-group-id='" + String(groupId).replace(/'/g, "\\'") + "'] .sheet-group-input[data-col='" + String(slot.nameCol) + "']";
@@ -13991,18 +14725,57 @@
       showView("drive");
     });
     els.modeToggleBtn.addEventListener("click", toggleEditorMode);
+    if (els.openInGoogleBtn) els.openInGoogleBtn.addEventListener("click", openCurrentDocumentInGoogle);
     els.sheetViewTableBtn.addEventListener("click", function () {
       setSpreadsheetViewMode("table");
     });
     els.sheetViewGroupsBtn.addEventListener("click", function () {
       setSpreadsheetViewMode("groups");
     });
+    els.sheetGroupsView.addEventListener("focusin", function () {
+      markSheetGroupsInteraction();
+    }, true);
+    els.sheetGroupsView.addEventListener("focusout", function () {
+      schedulePendingSheetGroupsRowsApply(120);
+    }, true);
     els.sheetGroupsView.addEventListener("input", handleSheetGroupsFieldInput);
     els.sheetGroupsView.addEventListener("change", handleSheetGroupsFieldInput);
     els.sheetGroupsView.addEventListener("click", handleSheetGroupsActionClick);
     if (els.sheetGroupsPaymentFilter) els.sheetGroupsPaymentFilter.addEventListener("change", handleSheetGroupsFilterChange);
     if (els.sheetGroupsFireFilter) els.sheetGroupsFireFilter.addEventListener("change", handleSheetGroupsFilterChange);
     if (els.sheetGroupsContestFilter) els.sheetGroupsContestFilter.addEventListener("change", handleSheetGroupsFilterChange);
+    if (els.newGroupWizardCloseBtn) els.newGroupWizardCloseBtn.addEventListener("click", closeNewGroupWizard);
+    if (els.newGroupWizardCancelBtn) els.newGroupWizardCancelBtn.addEventListener("click", closeNewGroupWizard);
+    if (els.newGroupWizardBackBtn) {
+      els.newGroupWizardBackBtn.addEventListener("click", function () {
+        if (newGroupWizardSubmitting) return;
+        newGroupWizardStep = 0;
+        setNewGroupWizardStatus("", "");
+        syncNewGroupWizardUi();
+      });
+    }
+    if (els.newGroupWizardNextBtn) {
+      els.newGroupWizardNextBtn.addEventListener("click", function () {
+        if (newGroupWizardSubmitting || !validateNewGroupWizardStep(0)) return;
+        newGroupWizardStep = 1;
+        syncNewGroupWizardUi();
+      });
+    }
+    if (els.newGroupWizardCreateBtn) {
+      els.newGroupWizardCreateBtn.addEventListener("click", function () {
+        if (newGroupWizardSubmitting || !validateNewGroupWizardStep(1)) return;
+        insertManualSheetGroup(readNewGroupWizardDraft()).catch(function (err) {
+          console.error(err);
+          setSheetGroupsStatus(messageFromError(err, "No se ha podido crear el grupo"), "error");
+        });
+      });
+    }
+    if (els.newGroupWizardFirePoint) els.newGroupWizardFirePoint.addEventListener("change", syncNewGroupWizardSharedLeadVisibility);
+    if (els.newGroupWizardModal) {
+      els.newGroupWizardModal.addEventListener("click", function (event) {
+        if (event.target === els.newGroupWizardModal) closeNewGroupWizard();
+      });
+    }
     if (els.ticketReaderCloseBtn) els.ticketReaderCloseBtn.addEventListener("click", closeTicketReaderModal);
     if (els.ticketReaderFooterCloseBtn) els.ticketReaderFooterCloseBtn.addEventListener("click", closeTicketReaderModal);
     if (els.ticketReaderReviewCloseBtn) els.ticketReaderReviewCloseBtn.addEventListener("click", closeTicketReaderReview);
