@@ -2460,6 +2460,69 @@
       width: 100%;
       min-width: 0;
     }
+    .sheet-groups-banner-pricing {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .sheet-groups-banner-price-row {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      min-width: 0;
+    }
+    .sheet-groups-banner-price-field {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sheet-groups-banner-price-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(93,58,16,0.5);
+    }
+    .sheet-groups-banner-price-input {
+      width: 100%;
+      min-width: 0;
+    }
+    .sheet-groups-banner-price-apply {
+      appearance: none;
+      border: 1px solid rgba(143,102,41,0.28);
+      background: #f6edd4;
+      color: #5d3a10;
+      border-radius: 12px;
+      height: 36px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+      flex: 0 0 auto;
+    }
+    .sheet-groups-banner-price-apply:hover:not(:disabled) {
+      background: #f2e3bd;
+      border-color: rgba(143,102,41,0.4);
+    }
+    .sheet-groups-banner-price-apply:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+    .sheet-groups-banner-price-summary {
+      min-height: 1em;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(93,58,16,0.55);
+    }
+    .sheet-groups-banner-price-summary.is-error {
+      color: #a14b3b;
+    }
     .sheet-groups-section {
       border-radius: 0;
       overflow: visible;
@@ -4471,6 +4534,28 @@
         padding: 6px 10px;
         font-size: 0.78rem;
       }
+      .sheet-groups-banner-pricing {
+        gap: 4px;
+      }
+      .sheet-groups-banner-price-row {
+        gap: 6px;
+      }
+      .sheet-groups-banner-price-label {
+        font-size: 0.58rem;
+      }
+      .sheet-groups-banner-price-input {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+      }
+      .sheet-groups-banner-price-apply {
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-size: 0.72rem;
+      }
+      .sheet-groups-banner-price-summary {
+        font-size: 0.64rem;
+      }
       .sheet-group-actions-row {
         justify-content: stretch;
         padding: 6px;
@@ -4923,6 +5008,11 @@
       .sheet-groups-banner-title,
       .sheet-groups-banner-meta { font-size: 0.62rem; }
       .sheet-groups-banner-search { padding: 5px 8px; font-size: 0.74rem; }
+      .sheet-groups-banner-price-row { gap: 4px; }
+      .sheet-groups-banner-price-label { font-size: 0.53rem; }
+      .sheet-groups-banner-price-input { padding: 5px 8px; font-size: 0.72rem; }
+      .sheet-groups-banner-price-apply { height: 28px; padding: 0 8px; border-radius: 9px; font-size: 0.66rem; }
+      .sheet-groups-banner-price-summary { font-size: 0.58rem; }
       .sheet-groups-list { padding: 0 4px calc(4px + var(--viewport-bottom-offset)); }
       .sheet-groups-section-summary { padding: 2px 0 3px; margin-bottom: 2px; }
       .sheet-groups-section-label,
@@ -5880,6 +5970,7 @@
       sheetGroupsExpanded: {},
       sheetGroupAssistantExpanded: {},
       sheetGroupsSectionExpanded: {},
+      sheetGroupsBulkPrice: "",
       sheetGroupsFilters: {
         payment: "all",
         fire: "all",
@@ -6070,6 +6161,8 @@
       sheetGroupsFireFilter: document.getElementById("sheetGroupsFireFilter"),
       sheetGroupsContestFilter: document.getElementById("sheetGroupsContestFilter"),
       sheetGroupsSearchInput: null,
+      sheetGroupsBulkPriceInput: null,
+      sheetGroupsBulkPriceSummary: null,
       formEditor: document.getElementById("formEditor"),
       formViewSwitch: document.getElementById("formViewSwitch"),
       formViewMainBtn: document.getElementById("formViewMainBtn"),
@@ -8594,11 +8687,31 @@
       markSheetGroupsInteraction(420);
       rerenderSheetGroupsFromModel();
     }
+    function handleSheetGroupsBulkPriceInput(event) {
+      const input = event && event.target;
+      if (!input) return;
+      state.sheetGroupsBulkPrice = String(input.value || "");
+      const model = currentSheetGroupsModel();
+      syncSheetGroupsBulkPriceBannerControls(
+        els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner") : null,
+        model && model.groups || [],
+        model
+      );
+    }
+    function handleSheetGroupsBulkPriceKeydown(event) {
+      if (!event || event.key !== "Enter") return;
+      const button = els.sheetGroupsList ? els.sheetGroupsList.querySelector("#sheetGroupsBannerPriceApplyBtn") : null;
+      if (!button || button.disabled) return;
+      event.preventDefault();
+      button.click();
+    }
     function syncSheetGroupsBanner(groups) {
       const allGroups = Array.isArray(groups) ? groups : [];
       const banner = els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner") : null;
       if (!banner) {
         els.sheetGroupsSearchInput = null;
+        els.sheetGroupsBulkPriceInput = null;
+        els.sheetGroupsBulkPriceSummary = null;
         return null;
       }
       const meta = banner.querySelector(".sheet-groups-banner-meta");
@@ -8616,6 +8729,7 @@
       } else {
         els.sheetGroupsSearchInput = null;
       }
+      syncSheetGroupsBulkPriceBannerControls(banner, allGroups, currentSheetGroupsModel());
       return banner;
     }
     function syncSheetGroupsSummaryInfo(infoRow, group) {
@@ -10033,7 +10147,27 @@
         return false;
       });
     }
+    function tryParseEuroAmount(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return null;
+      let normalized = raw.replace(/\s+/g, "").replace(/\u20ac/g, "").replace(/â‚¬/g, "");
+      if (normalized.indexOf(",") !== -1 && normalized.indexOf(".") !== -1) {
+        normalized = normalized.replace(/\./g, "").replace(",", ".");
+      } else if (normalized.indexOf(",") !== -1) {
+        normalized = normalized.replace(",", ".");
+      } else {
+        const dotParts = normalized.split(".");
+        if (dotParts.length > 2) {
+          const decimal = dotParts.pop();
+          normalized = dotParts.join("") + "." + decimal;
+        }
+      }
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
     function parseEuroAmount(value) {
+      const parsed = tryParseEuroAmount(value);
+      return parsed == null ? 0 : parsed;
       const raw = String(value || "").trim();
       if (!raw) return 0;
       let normalized = raw.replace(/\s+/g, "").replace(/€/g, "");
@@ -10048,12 +10182,73 @@
           normalized = dotParts.join("") + "." + decimal;
         }
       }
-      const parsed = Number(normalized);
-      return Number.isFinite(parsed) ? parsed : 0;
+      const legacyParsed = Number(normalized);
+      return Number.isFinite(legacyParsed) ? legacyParsed : 0;
     }
     function formatEuroAmount(value) {
       const number = Number(value) || 0;
       return number.toLocaleString("es-ES", { style: "currency", currency: "EUR" });
+    }
+    function formatEuroCellAmount(value) {
+      const number = Number(value) || 0;
+      return number.toFixed(2).replace(".", ",");
+    }
+    function sheetGroupsBulkPriceSummaryText(groups, rawValue, model) {
+      const allGroups = Array.isArray(groups) ? groups : [];
+      if (!allGroups.length) return "";
+      if (model && model.syntheticHeader) {
+        return "Solo lectura: el recalculo masivo requiere una hoja con cabeceras reales.";
+      }
+      if (!state.canEdit || state.editorMode !== "edit") {
+        return "Pasa a modo edicion para recalcular el importe de toda la hoja.";
+      }
+      const raw = String(rawValue || "").trim();
+      if (!raw) {
+        return "Introduce un precio por persona para recalcular todos los importes.";
+      }
+      const perHead = tryParseEuroAmount(raw);
+      if (perHead == null || perHead < 0) {
+        return "Introduce un precio por persona valido.";
+      }
+      const totalAttendees = allGroups.reduce(function (sum, group) {
+        return sum + (Number(group && group.attendeeCount) || 0);
+      }, 0);
+      return formatEuroAmount(perHead) + " por persona · " + String(totalAttendees) + " asistentes · " + formatEuroAmount(perHead * totalAttendees) + " total";
+    }
+    function syncSheetGroupsBulkPriceBannerControls(banner, groups, model) {
+      if (!banner) {
+        els.sheetGroupsBulkPriceInput = null;
+        els.sheetGroupsBulkPriceSummary = null;
+        return null;
+      }
+      const input = banner.querySelector("#sheetGroupsBannerPriceInput");
+      const summary = banner.querySelector(".sheet-groups-banner-price-summary");
+      const applyButton = banner.querySelector("#sheetGroupsBannerPriceApplyBtn");
+      const nextValue = String(state.sheetGroupsBulkPrice || "");
+      const parsed = tryParseEuroAmount(nextValue);
+      const editing = state.canEdit && state.editorMode === "edit" && !(model && model.syntheticHeader);
+      if (input) {
+        if (document.activeElement !== input && input.value !== nextValue) input.value = nextValue;
+        input.disabled = !editing;
+        els.sheetGroupsBulkPriceInput = input;
+      } else {
+        els.sheetGroupsBulkPriceInput = null;
+      }
+      if (summary) {
+        summary.textContent = sheetGroupsBulkPriceSummaryText(groups, nextValue, model);
+        summary.classList.toggle("is-error", !!String(nextValue || "").trim() && (parsed == null || parsed < 0));
+        els.sheetGroupsBulkPriceSummary = summary;
+      } else {
+        els.sheetGroupsBulkPriceSummary = null;
+      }
+      if (applyButton) {
+        applyButton.disabled = !editing || !Array.isArray(groups) || !groups.length || parsed == null || parsed < 0;
+      }
+      return {
+        input: input || null,
+        summary: summary || null,
+        applyButton: applyButton || null
+      };
     }
     function renderSheetGroupsToolbar(model, filteredGroups) {
       const groups = Array.isArray(model && model.groups) ? model.groups : [];
@@ -10149,6 +10344,61 @@
       if (state.spreadsheetViewMode !== "groups") renderGrid();
       refreshDirtyState();
       queueAutosave(options && typeof options.delay === "number" ? options.delay : 500);
+    }
+    function applySheetGroupsBulkPrice(rawValue) {
+      const model = currentSheetGroupsModel();
+      if (!model || !Array.isArray(model.groups) || !model.groups.length || !state.currentSheetTitle) {
+        setSheetGroupsStatus("No hay grupos activos para recalcular importes.", "error");
+        return Promise.resolve(false);
+      }
+      if (model.syntheticHeader) {
+        setSheetGroupsStatus("La hoja esta en solo lectura. No se pueden recalcular importes aqui.", "error");
+        return Promise.resolve(false);
+      }
+      const parsedPerHead = tryParseEuroAmount(rawValue);
+      if (parsedPerHead == null || parsedPerHead < 0) {
+        setSheetGroupsStatus("Introduce un precio por persona valido.", "error");
+        if (els.sheetGroupsBulkPriceInput && typeof els.sheetGroupsBulkPriceInput.focus === "function") {
+          els.sheetGroupsBulkPriceInput.focus();
+          els.sheetGroupsBulkPriceInput.select();
+        }
+        return Promise.resolve(false);
+      }
+      state.sheetGroupsBulkPrice = formatEuroCellAmount(parsedPerHead);
+      setSheetGroupsStatus("Recalculando importes...", "");
+      return ensurePaellaManagementHeaders().then(function () {
+        const refreshed = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+        const groups = Array.isArray(refreshed && refreshed.groups) ? refreshed.groups : [];
+        let updatedCount = 0;
+        let skippedCount = 0;
+        let totalAmount = 0;
+        groups.forEach(function (group) {
+          const row = Number(group && group.sheetRow);
+          const col = Number(group && group.payment && group.payment.amountCol);
+          if (!Number.isFinite(row) || row < 0 || !Number.isFinite(col) || col < 0) {
+            skippedCount += 1;
+            return;
+          }
+          const attendeeCount = Math.max(0, Number(group && group.attendeeCount) || 0);
+          const totalForGroup = parsedPerHead * attendeeCount;
+          applySheetGroupCellDraft(state.currentSheetTitle, row, col, formatEuroCellAmount(totalForGroup), { delay: 700 });
+          updatedCount += 1;
+          totalAmount += totalForGroup;
+        });
+        const nextModel = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+        applySheetGroupsModelToView(nextModel, { skipAnim: true, preserveFocus: true });
+        if (!updatedCount) {
+          setSheetGroupsStatus("No se ha encontrado ninguna columna de importe para actualizar.", "error");
+          return false;
+        }
+        const skippedText = skippedCount ? (" · " + skippedCount + " omitidos") : "";
+        setSheetGroupsStatus("Importes actualizados: " + updatedCount + " grupos · " + formatEuroAmount(totalAmount) + " total" + skippedText + ".", "good");
+        return true;
+      }).catch(function (err) {
+        console.error(err);
+        setSheetGroupsStatus(messageFromError(err, "No se han podido recalcular los importes"), "error");
+        return false;
+      });
     }
     function ensureCurrentSheetColumnCount(requiredCount) {
       const info = currentSheetInfo();
@@ -10833,11 +11083,19 @@
         const hasColumn = Number.isFinite(col) && col >= 0;
         input.disabled = !editing || !hasColumn;
       });
-      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='member-menu'], [data-group-action='assistant-add'], [data-group-action='assistant-remove'], [data-group-action='make-responsible'], [data-group-action='group-add'], [data-group-action='group-delete']"), function (button) {
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='member-menu'], [data-group-action='assistant-add'], [data-group-action='assistant-remove'], [data-group-action='make-responsible'], [data-group-action='group-add'], [data-group-action='group-delete'], [data-group-action='bulk-apply-price']"), function (button) {
         const col = Number(button.dataset.col);
         const requiresColumn = button.dataset.groupAction === "payment-status";
         button.disabled = !editing || (requiresColumn && (!Number.isFinite(col) || col < 0));
       });
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-groups-banner-price-input"), function (input) {
+        input.disabled = !editing;
+      });
+      syncSheetGroupsBulkPriceBannerControls(
+        els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner") : null,
+        model && model.groups || [],
+        model
+      );
     }
     function ensureSheetGroupsManagementColumnsForEditing() {
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups" || !isCurrentSheetPaellaResponseSheet()) {
@@ -11124,6 +11382,13 @@
         let bannerMeta = banner.querySelector(".sheet-groups-banner-meta");
         let searchWrap = banner.querySelector(".sheet-groups-banner-search-wrap");
         let searchInput = banner.querySelector("#sheetGroupsBannerSearchInput");
+        let pricingWrap = banner.querySelector(".sheet-groups-banner-pricing");
+        let priceRow = banner.querySelector(".sheet-groups-banner-price-row");
+        let priceField = banner.querySelector(".sheet-groups-banner-price-field");
+        let priceLabel = banner.querySelector(".sheet-groups-banner-price-label");
+        let priceInput = banner.querySelector("#sheetGroupsBannerPriceInput");
+        let priceApplyBtn = banner.querySelector("#sheetGroupsBannerPriceApplyBtn");
+        let priceSummary = banner.querySelector(".sheet-groups-banner-price-summary");
         banner.className = "sheet-groups-banner";
         if (!bannerTop) {
           bannerTop = document.createElement("div");
@@ -11155,11 +11420,59 @@
           searchInput.addEventListener("input", handleSheetGroupsSearchInput);
           searchWrap.appendChild(searchInput);
         }
+        if (!pricingWrap) {
+          pricingWrap = document.createElement("div");
+          pricingWrap.className = "sheet-groups-banner-pricing";
+          banner.appendChild(pricingWrap);
+        }
+        if (!priceRow) {
+          priceRow = document.createElement("div");
+          priceRow.className = "sheet-groups-banner-price-row";
+          pricingWrap.appendChild(priceRow);
+        }
+        if (!priceField) {
+          priceField = document.createElement("label");
+          priceField.className = "sheet-groups-banner-price-field";
+          priceRow.appendChild(priceField);
+        }
+        if (!priceLabel) {
+          priceLabel = document.createElement("span");
+          priceLabel.className = "sheet-groups-banner-price-label";
+          priceField.appendChild(priceLabel);
+        }
+        if (!priceInput) {
+          priceInput = document.createElement("input");
+          priceInput.id = "sheetGroupsBannerPriceInput";
+          priceInput.className = "search sheet-groups-banner-price-input";
+          priceInput.type = "text";
+          priceInput.inputMode = "decimal";
+          priceInput.autocomplete = "off";
+          priceInput.spellcheck = false;
+          priceInput.addEventListener("input", handleSheetGroupsBulkPriceInput);
+          priceInput.addEventListener("keydown", handleSheetGroupsBulkPriceKeydown);
+          priceField.appendChild(priceInput);
+        }
+        if (!priceApplyBtn) {
+          priceApplyBtn = document.createElement("button");
+          priceApplyBtn.id = "sheetGroupsBannerPriceApplyBtn";
+          priceApplyBtn.type = "button";
+          priceApplyBtn.className = "sheet-groups-banner-price-apply";
+          priceApplyBtn.dataset.groupAction = "bulk-apply-price";
+          priceRow.appendChild(priceApplyBtn);
+        }
+        if (!priceSummary) {
+          priceSummary = document.createElement("div");
+          priceSummary.className = "sheet-groups-banner-price-summary";
+          pricingWrap.appendChild(priceSummary);
+        }
         bannerTitle.textContent = "Vista de grupos";
         bannerMeta.textContent = String(allGroups.length) + " grupos | " + String(totalAttendees) + " asistentes";
         searchInput.placeholder = "Buscar por nombre, integrante, teléfono, DNI o cualquier dato";
         searchInput.autocomplete = "off";
         searchInput.spellcheck = false;
+        priceLabel.textContent = "Precio por cabeza";
+        priceInput.placeholder = "0,00";
+        priceApplyBtn.textContent = "Aplicar";
         if (document.activeElement !== searchInput) {
           searchInput.value = String(state.sheetGroupsFilters && state.sheetGroupsFilters.search || "");
         }
@@ -11168,11 +11481,14 @@
           els.sheetGroupsList.insertBefore(banner, els.sheetGroupsList.firstChild || null);
         }
         els.sheetGroupsSearchInput = searchInput;
+        syncSheetGroupsBulkPriceBannerControls(banner, allGroups, currentSheetGroupsModel() || { groups: allGroups });
       } else {
         if (existingBanner && existingBanner.parentNode === els.sheetGroupsList) {
           els.sheetGroupsList.removeChild(existingBanner);
         }
         els.sheetGroupsSearchInput = null;
+        els.sheetGroupsBulkPriceInput = null;
+        els.sheetGroupsBulkPriceSummary = null;
       }
       if (els.sheetGroupsEmpty) {
         els.sheetGroupsEmpty.textContent = sheetGroupsEmptyStateText(allGroups, filteredGroups);
@@ -16153,10 +16469,14 @@
       const action = button.dataset.groupAction;
       if (button.disabled || !state.currentSheetTitle) return;
       markSheetGroupsInteraction(520);
-      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "make-responsible" || action === "group-add" || action === "group-delete";
+      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "make-responsible" || action === "group-add" || action === "group-delete" || action === "bulk-apply-price";
       if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
       if (action === "group-add") {
         openNewGroupWizard();
+        return;
+      }
+      if (action === "bulk-apply-price") {
+        applySheetGroupsBulkPrice(els.sheetGroupsBulkPriceInput ? els.sheetGroupsBulkPriceInput.value : state.sheetGroupsBulkPrice);
         return;
       }
       const groupId = button.dataset.groupId;
