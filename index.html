@@ -7586,6 +7586,7 @@
         }
       } else {
         if (prevMode === "groups") stopGroupsViewPoll();
+        renderGrid();
       }
     }
     var sheetGroupsPollTimer = 0;
@@ -12178,8 +12179,8 @@
     }
     function computeWindow(info, includeLoadBuffer) {
       const wrap = els.sheetWrap;
-      const width = Math.max(320, wrap ? wrap.clientWidth : 960);
-      const height = Math.max(240, wrap ? wrap.clientHeight : 520);
+      const width = Math.max(320, (wrap && wrap.clientWidth > 0) ? wrap.clientWidth : (window.innerWidth || 960));
+      const height = Math.max(240, (wrap && wrap.clientHeight > 0) ? wrap.clientHeight : (window.innerHeight || 520));
       const startRow = Math.max(0, Math.floor((wrap ? wrap.scrollTop : 0) / CELL_HEIGHT) - (includeLoadBuffer ? LOAD_BUFFER_ROWS : VIEW_BUFFER_ROWS));
       const startCol = Math.max(0, Math.floor((wrap ? wrap.scrollLeft : 0) / CELL_WIDTH) - (includeLoadBuffer ? LOAD_BUFFER_COLS : VIEW_BUFFER_COLS));
       const rows = Math.max(4, Math.ceil(height / CELL_HEIGHT) + 1 + (includeLoadBuffer ? LOAD_BUFFER_ROWS * 2 : VIEW_BUFFER_ROWS * 2));
@@ -14025,7 +14026,7 @@
     function renderGrid() {
       const info = currentSheetInfo();
       if (!info) { els.sheetGrid.innerHTML = ""; return; }
-      const view = clampWindow(info, state.sheetWindow[info.title] || computeWindow(info, false));
+      const view = computeWindow(info, false);
       state.sheetWindow[info.title] = view;
       const totalWidth = HEADER_WIDTH + (info.columnCount * CELL_WIDTH);
       const totalHeight = HEADER_HEIGHT + (info.rowCount * CELL_HEIGHT);
@@ -15976,6 +15977,7 @@
       if (state.activeItemMenu) closeItemActionMenu();
       if (!els.presencePopup.classList.contains("hidden")) positionPresencePopup();
       if (!els.paellaAccessPopup.classList.contains("hidden")) positionPopupToAnchor(els.paellaAccessPopup, els.paellaAccessAvatars);
+      if (state.spreadsheetViewMode !== "groups" && isSpreadsheetDocumentActive()) renderGrid();
     });
     window.addEventListener("scroll", function () {
       if (state.activeItemMenu) closeItemActionMenu();
