@@ -934,6 +934,14 @@
       gap: 6px;
       min-width: 0;
     }
+    .group-create-field.is-invalid > span {
+      color: #c4472a;
+    }
+    .group-create-field.is-invalid .search {
+      border-color: rgba(196,71,42,0.55);
+      background: rgba(255, 244, 241, 0.96);
+      box-shadow: 0 0 0 3px rgba(196,71,42,0.12);
+    }
     .group-create-field.full {
       grid-column: 1 / -1;
     }
@@ -958,6 +966,9 @@
       gap: 8px;
       flex-wrap: wrap;
       margin-left: auto;
+    }
+    .group-create-progress.single-step {
+      grid-template-columns: minmax(0, 1fr);
     }
     .picker-shell {
       min-height: 0;
@@ -2723,66 +2734,58 @@
       letter-spacing: 0.04em;
       flex: 0 0 auto;
     }
-    .sheet-member-info-btn {
+    .sheet-member-actions {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+    .sheet-member-actions .item-more-btn {
       width: 32px;
       height: 32px;
+      min-width: 32px;
       border-radius: 50%;
-      border: none;
       background: transparent;
       color: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex: 0 0 auto;
       box-shadow: none;
-      transition: background .15s ease, color .15s ease;
     }
-    .sheet-member-info-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-    .sheet-member-info-btn:hover {
+    .sheet-member-actions .item-more-btn:hover,
+    .sheet-member-actions .item-more-btn[aria-expanded="true"] {
       background: rgba(0,0,0,0.05);
       color: rgba(0,0,0,0.7);
+      transform: none;
     }
-    .sheet-member-info-btn.is-open {
+    .sheet-member-toggle-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
       background: transparent;
+      color: rgba(61,38,8,0.72);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      margin-left: auto;
+      transition: background .15s ease, color .15s ease;
+    }
+    .sheet-member-actions + .sheet-member-toggle-btn {
+      margin-left: 0;
+    }
+    .sheet-member-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      transition: transform .2s ease;
+    }
+    .sheet-member-toggle-btn:hover {
+      background: rgba(0,0,0,0.05);
       color: #3d2608;
     }
-    .sheet-member-promote-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: rgba(160,118,20,0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex: 0 0 auto;
-      transition: background .15s ease, color .15s ease;
+    .sheet-member-toggle-btn.is-open svg {
+      transform: rotate(180deg);
     }
-    .sheet-member-promote-btn svg { fill: currentColor; }
-    .sheet-member-promote-btn:hover { background: rgba(160,118,20,0.09); color: rgba(125,90,10,0.95); }
-    .sheet-member-remove-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: rgba(180,40,30,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex: 0 0 auto;
-      transition: background .15s ease, color .15s ease;
-    }
-    .sheet-member-remove-btn svg { fill: currentColor; }
-    .sheet-member-remove-btn:hover { background: rgba(180,40,30,0.08); color: rgba(180,40,30,0.9); }
     .sheet-member-detail {
       padding: 16px 20px 18px;
       background: #fdfdfc;
@@ -4427,8 +4430,11 @@
         margin-left: 44px;
         max-width: calc(100% - 44px);
       }
-      .sheet-member-info-btn {
+      .sheet-member-actions {
         margin-left: auto;
+      }
+      .sheet-member-actions + .sheet-member-toggle-btn {
+        margin-left: 0;
       }
       .sheet-group-responsible-line,
       .sheet-assistant-name,
@@ -5350,6 +5356,59 @@
     </section>
   </div>
 
+  <div id="promoteResponsibleWizardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="promoteResponsibleWizardTitle">
+    <section id="promoteResponsibleWizardCard" class="card modal-card group-create-modal">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="promoteResponsibleWizardTitle" class="title">Cambiar responsable</div>
+          <div class="meta">Completa los datos del nuevo responsable antes de aplicar el cambio.</div>
+        </div>
+        <button id="promoteResponsibleWizardCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="group-create-shell">
+        <div class="group-create-progress single-step">
+          <div class="group-create-progress-item active">
+            <div class="group-create-progress-kicker">Paso único</div>
+            <div class="group-create-progress-title">Nuevo responsable</div>
+          </div>
+        </div>
+        <div id="promoteResponsibleWizardStatus" class="status"></div>
+        <div class="group-create-step-wrap">
+          <div class="group-create-step">
+            <div class="group-create-step-head">
+              <div class="group-create-step-title">Datos del nuevo responsable</div>
+              <div id="promoteResponsibleWizardSummary" class="group-create-step-meta">Rellena los campos marcados en rojo para completar el cambio. El teléfono se guardará en la ficha del responsable.</div>
+            </div>
+            <div class="group-create-grid">
+              <label id="promoteResponsibleWizardNameField" class="group-create-field full">
+                <span>Responsable</span>
+                <input id="promoteResponsibleWizardName" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre del responsable">
+              </label>
+              <label id="promoteResponsibleWizardEmailField" class="group-create-field">
+                <span>Email</span>
+                <input id="promoteResponsibleWizardEmail" class="search" type="email" autocomplete="off" spellcheck="false" placeholder="correo@upv.es">
+              </label>
+              <label id="promoteResponsibleWizardPhoneField" class="group-create-field">
+                <span>Teléfono</span>
+                <input id="promoteResponsibleWizardPhone" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="600123123">
+              </label>
+              <label id="promoteResponsibleWizardDniField" class="group-create-field">
+                <span>DNI</span>
+                <input id="promoteResponsibleWizardDni" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="12345678A">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group-create-actions">
+        <button id="promoteResponsibleWizardCancelBtn" class="btn small" type="button">Cancelar</button>
+        <div class="group-create-actions-right">
+          <button id="promoteResponsibleWizardConfirmBtn" class="btn primary" type="button">Hacer responsable</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div id="shareModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
     <div id="shareModalCard" class="share-popup">
       <div class="share-popup-header">
@@ -5908,6 +5967,22 @@
       newGroupWizardFirePoint: document.getElementById("newGroupWizardFirePoint"),
       newGroupWizardSharedLeadField: document.getElementById("newGroupWizardSharedLeadField"),
       newGroupWizardSharedLead: document.getElementById("newGroupWizardSharedLead"),
+      promoteResponsibleWizardModal: document.getElementById("promoteResponsibleWizardModal"),
+      promoteResponsibleWizardCard: document.getElementById("promoteResponsibleWizardCard"),
+      promoteResponsibleWizardTitle: document.getElementById("promoteResponsibleWizardTitle"),
+      promoteResponsibleWizardSummary: document.getElementById("promoteResponsibleWizardSummary"),
+      promoteResponsibleWizardStatus: document.getElementById("promoteResponsibleWizardStatus"),
+      promoteResponsibleWizardCloseBtn: document.getElementById("promoteResponsibleWizardCloseBtn"),
+      promoteResponsibleWizardCancelBtn: document.getElementById("promoteResponsibleWizardCancelBtn"),
+      promoteResponsibleWizardConfirmBtn: document.getElementById("promoteResponsibleWizardConfirmBtn"),
+      promoteResponsibleWizardNameField: document.getElementById("promoteResponsibleWizardNameField"),
+      promoteResponsibleWizardName: document.getElementById("promoteResponsibleWizardName"),
+      promoteResponsibleWizardEmailField: document.getElementById("promoteResponsibleWizardEmailField"),
+      promoteResponsibleWizardEmail: document.getElementById("promoteResponsibleWizardEmail"),
+      promoteResponsibleWizardPhoneField: document.getElementById("promoteResponsibleWizardPhoneField"),
+      promoteResponsibleWizardPhone: document.getElementById("promoteResponsibleWizardPhone"),
+      promoteResponsibleWizardDniField: document.getElementById("promoteResponsibleWizardDniField"),
+      promoteResponsibleWizardDni: document.getElementById("promoteResponsibleWizardDni"),
       shareModal: document.getElementById("shareModal"),
       shareModalCard: document.getElementById("shareModalCard"),
       shareEmailInput: document.getElementById("shareEmailInput"),
@@ -7809,8 +7884,11 @@
           var detail = card.querySelector(".sheet-member-detail[data-person-role='" + esc(d.personRole) + "'][data-person-number='" + esc(d.personNumber) + "']");
           if (!detail) return;
           detail.classList.remove("hidden");
-          var infoBtn = card.querySelector(".sheet-member-row[data-person-role='" + esc(d.personRole) + "'][data-person-number='" + esc(d.personNumber) + "'] .sheet-member-info-btn");
-          if (infoBtn) infoBtn.classList.add("is-open");
+          var toggleBtn = card.querySelector(".sheet-member-row[data-person-role='" + esc(d.personRole) + "'][data-person-number='" + esc(d.personNumber) + "'] .sheet-member-toggle-btn");
+          if (toggleBtn) {
+            toggleBtn.classList.add("is-open");
+            toggleBtn.setAttribute("aria-expanded", "true");
+          }
         });
       }
       let selector = "";
@@ -8039,6 +8117,8 @@
       if (nameEl) nameEl.textContent = person.name || "Integrante";
       const numEl = row.querySelector(".sheet-member-num");
       if (numEl) numEl.textContent = (Number(person.number) || person.number || "?") + "#";
+      const menuBtn = row.querySelector(".sheet-member-actions .item-more-btn");
+      if (menuBtn) menuBtn.setAttribute("aria-label", "Opciones de " + (person.name || "este integrante"));
       let statusChip = row.querySelector(".entry-status-chip");
       const normalizedStatus = person.status ? normalizeEntryStatus(person.status) : "";
       const hasTicket = Number.isFinite(person.statusCol) && person.statusCol >= 0;
@@ -8048,8 +8128,8 @@
       }
       if (!statusChip) {
         statusChip = document.createElement("span");
-        const infoBtn = row.querySelector(".sheet-member-info-btn");
-        if (infoBtn && infoBtn.parentNode === row) row.insertBefore(statusChip, infoBtn);
+        const actionAnchor = row.querySelector(".sheet-member-actions, .sheet-member-toggle-btn");
+        if (actionAnchor && actionAnchor.parentNode === row) row.insertBefore(statusChip, actionAnchor);
         else row.appendChild(statusChip);
       }
       const tone = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
@@ -9544,8 +9624,146 @@
     }
     var newGroupWizardStep = 0;
     var newGroupWizardSubmitting = false;
+    var promoteResponsibleWizardSubmitting = false;
+    var promoteResponsibleWizardAction = null;
     function setNewGroupWizardStatus(text, tone) {
       setStatusOnElement(els.newGroupWizardStatus, text, tone);
+    }
+    function setPromoteResponsibleWizardStatus(text, tone) {
+      setStatusOnElement(els.promoteResponsibleWizardStatus, text, tone);
+    }
+    function setGroupCreateFieldInvalid(fieldEl, inputEl, invalid) {
+      if (fieldEl) fieldEl.classList.toggle("is-invalid", !!invalid);
+      if (inputEl) inputEl.setAttribute("aria-invalid", invalid ? "true" : "false");
+    }
+    function promoteResponsibleWizardFieldDefs() {
+      return [
+        { key: "name", field: els.promoteResponsibleWizardNameField, input: els.promoteResponsibleWizardName },
+        { key: "email", field: els.promoteResponsibleWizardEmailField, input: els.promoteResponsibleWizardEmail },
+        { key: "phone", field: els.promoteResponsibleWizardPhoneField, input: els.promoteResponsibleWizardPhone },
+        { key: "dni", field: els.promoteResponsibleWizardDniField, input: els.promoteResponsibleWizardDni }
+      ];
+    }
+    function readPromoteResponsibleWizardDraft() {
+      return {
+        name: String(els.promoteResponsibleWizardName && els.promoteResponsibleWizardName.value || "").trim(),
+        email: String(els.promoteResponsibleWizardEmail && els.promoteResponsibleWizardEmail.value || "").trim(),
+        phone: String(els.promoteResponsibleWizardPhone && els.promoteResponsibleWizardPhone.value || "").trim(),
+        dni: String(els.promoteResponsibleWizardDni && els.promoteResponsibleWizardDni.value || "").trim()
+      };
+    }
+    function syncPromoteResponsibleWizardInvalidState() {
+      const draft = readPromoteResponsibleWizardDraft();
+      promoteResponsibleWizardFieldDefs().forEach(function (entry) {
+        setGroupCreateFieldInvalid(entry.field, entry.input, !String(draft[entry.key] || "").trim());
+      });
+      return draft;
+    }
+    function resetPromoteResponsibleWizard() {
+      promoteResponsibleWizardSubmitting = false;
+      promoteResponsibleWizardAction = null;
+      if (els.promoteResponsibleWizardName) els.promoteResponsibleWizardName.value = "";
+      if (els.promoteResponsibleWizardEmail) els.promoteResponsibleWizardEmail.value = "";
+      if (els.promoteResponsibleWizardPhone) els.promoteResponsibleWizardPhone.value = "";
+      if (els.promoteResponsibleWizardDni) els.promoteResponsibleWizardDni.value = "";
+      if (els.promoteResponsibleWizardSummary) {
+        els.promoteResponsibleWizardSummary.textContent = "Rellena los campos marcados en rojo para completar el cambio. El teléfono se guardará en la ficha del responsable.";
+      }
+      if (els.promoteResponsibleWizardCard) setBusy(els.promoteResponsibleWizardCard, false);
+      setPromoteResponsibleWizardStatus("", "");
+      promoteResponsibleWizardFieldDefs().forEach(function (entry) {
+        setGroupCreateFieldInvalid(entry.field, entry.input, false);
+      });
+    }
+    function validatePromoteResponsibleWizard() {
+      const draft = syncPromoteResponsibleWizardInvalidState();
+      const missing = promoteResponsibleWizardFieldDefs().filter(function (entry) {
+        return !String(draft[entry.key] || "").trim();
+      });
+      if (missing.length) {
+        setPromoteResponsibleWizardStatus("Completa los campos marcados en rojo antes de cambiar el responsable.", "error");
+        const firstInput = missing[0] && missing[0].input;
+        if (firstInput && typeof firstInput.focus === "function") firstInput.focus();
+        return false;
+      }
+      setPromoteResponsibleWizardStatus("", "");
+      return true;
+    }
+    function openPromoteResponsibleWizard(groupId, assistantNumber) {
+      const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+      if (!model || !state.spreadsheetId || !state.currentSheetTitle) {
+        setSheetGroupsStatus("No hay una hoja de grupos activa.", "error");
+        return false;
+      }
+      const group = findGroupByIdInModel(model, groupId);
+      if (!group) {
+        setSheetGroupsStatus("No se ha encontrado el grupo.", "error");
+        return false;
+      }
+      const assistantSlot = (group.assistantSlots || []).find(function (slot) {
+        return String(slot && slot.number || "") === String(assistantNumber || "");
+      });
+      if (!assistantSlot || !assistantSlot.filled) {
+        setSheetGroupsStatus("No se ha encontrado el asistente seleccionado.", "error");
+        return false;
+      }
+      closeItemActionMenu();
+      resetPromoteResponsibleWizard();
+      promoteResponsibleWizardAction = {
+        groupId: group.id,
+        assistantNumber: String(assistantSlot.number || ""),
+        groupTitle: group.title || "",
+        previousResponsibleName: group.responsible && group.responsible.name ? group.responsible.name : "Responsable actual"
+      };
+      if (els.promoteResponsibleWizardName) els.promoteResponsibleWizardName.value = assistantSlot.name || "";
+      if (els.promoteResponsibleWizardEmail) els.promoteResponsibleWizardEmail.value = assistantSlot.email || "";
+      if (els.promoteResponsibleWizardPhone) els.promoteResponsibleWizardPhone.value = "";
+      if (els.promoteResponsibleWizardDni) els.promoteResponsibleWizardDni.value = assistantSlot.dni || "";
+      if (els.promoteResponsibleWizardTitle) {
+        els.promoteResponsibleWizardTitle.textContent = "Cambiar responsable";
+      }
+      if (els.promoteResponsibleWizardSummary) {
+        els.promoteResponsibleWizardSummary.textContent =
+          "\"" + (assistantSlot.name || ("Integrante " + assistantSlot.number)) + "\" pasará a ser responsable y \"" +
+          promoteResponsibleWizardAction.previousResponsibleName + "\" quedará como integrante #" + String(Number(assistantSlot.number) || assistantSlot.number || "") + ". Indica también el teléfono del nuevo responsable.";
+      }
+      syncPromoteResponsibleWizardInvalidState();
+      if (els.promoteResponsibleWizardModal) els.promoteResponsibleWizardModal.classList.add("visible");
+      requestAnimationFrame(function () {
+        const firstMissing = promoteResponsibleWizardFieldDefs().find(function (entry) {
+          return entry.field && entry.field.classList.contains("is-invalid");
+        });
+        const target = firstMissing && firstMissing.input ? firstMissing.input : els.promoteResponsibleWizardName;
+        if (target && typeof target.focus === "function") target.focus();
+      });
+      return true;
+    }
+    function closePromoteResponsibleWizard(force) {
+      if (promoteResponsibleWizardSubmitting && !force) return false;
+      if (els.promoteResponsibleWizardModal) els.promoteResponsibleWizardModal.classList.remove("visible");
+      resetPromoteResponsibleWizard();
+      return true;
+    }
+    function submitPromoteResponsibleWizard() {
+      if (promoteResponsibleWizardSubmitting) return Promise.resolve(false);
+      if (!promoteResponsibleWizardAction) return Promise.reject(new Error("No hay ningun cambio de responsable pendiente."));
+      if (!validatePromoteResponsibleWizard()) return Promise.resolve(false);
+      const draft = readPromoteResponsibleWizardDraft();
+      promoteResponsibleWizardSubmitting = true;
+      if (els.promoteResponsibleWizardCard) setBusy(els.promoteResponsibleWizardCard, true);
+      setPromoteResponsibleWizardStatus("Cambiando responsable...", "");
+      return promoteAssistantToResponsible(promoteResponsibleWizardAction.groupId, promoteResponsibleWizardAction.assistantNumber, draft)
+        .then(function (result) {
+          if (result) closePromoteResponsibleWizard(true);
+          return result;
+        })
+        .catch(function (err) {
+          console.error(err);
+          if (els.promoteResponsibleWizardCard) setBusy(els.promoteResponsibleWizardCard, false);
+          promoteResponsibleWizardSubmitting = false;
+          setPromoteResponsibleWizardStatus(messageFromError(err, "No se ha podido cambiar el responsable"), "error");
+          throw err;
+        });
     }
     function syncNewGroupWizardSharedLeadVisibility() {
       const isShared = String(els.newGroupWizardFirePoint && els.newGroupWizardFirePoint.value || "").indexOf("Comparto") !== -1;
@@ -9901,57 +10119,37 @@
         };
       });
     }
-    function buildGroupResponsibleSwapPairs(group, assistantSlot) {
-      const responsibleEntry = group && group.responsible ? group.responsible.entry : null;
+    function buildGroupResponsiblePromotionAssignments(group, assistantSlot, draft) {
+      const responsible = group && group.responsible ? group.responsible : null;
+      const responsibleEntry = responsible ? responsible.entry : null;
       const assistantEntry = assistantSlot ? assistantSlot.entry : null;
-      return [
-        {
-          leftCol: group && group.responsible ? group.responsible.nameCol : -1,
-          leftValue: group && group.responsible ? group.responsible.name : "",
-          rightCol: assistantSlot ? assistantSlot.nameCol : -1,
-          rightValue: assistantSlot ? assistantSlot.name : ""
-        },
-        {
-          leftCol: group && group.responsible ? group.responsible.emailCol : -1,
-          leftValue: group && group.responsible ? group.responsible.email : "",
-          rightCol: assistantSlot ? assistantSlot.emailCol : -1,
-          rightValue: assistantSlot ? assistantSlot.email : ""
-        },
-        {
-          leftCol: group && group.responsible ? group.responsible.dniCol : -1,
-          leftValue: group && group.responsible ? group.responsible.dni : "",
-          rightCol: assistantSlot ? assistantSlot.dniCol : -1,
-          rightValue: assistantSlot ? assistantSlot.dni : ""
-        },
-        {
-          leftCol: responsibleEntry ? responsibleEntry.infoCol : -1,
-          leftValue: responsibleEntry ? responsibleEntry.info : "",
-          rightCol: assistantEntry ? assistantEntry.infoCol : -1,
-          rightValue: assistantEntry ? assistantEntry.info : ""
-        },
-        {
-          leftCol: responsibleEntry ? responsibleEntry.statusCol : -1,
-          leftValue: responsibleEntry ? normalizeEntryStatus(responsibleEntry.status) : "",
-          rightCol: assistantEntry ? assistantEntry.statusCol : -1,
-          rightValue: assistantEntry ? normalizeEntryStatus(assistantEntry.status) : ""
-        },
-        {
-          leftCol: responsibleEntry ? responsibleEntry.codeCol : -1,
-          leftValue: responsibleEntry ? responsibleEntry.code : "",
-          rightCol: assistantEntry ? assistantEntry.codeCol : -1,
-          rightValue: assistantEntry ? assistantEntry.code : ""
-        },
-        {
-          leftCol: responsibleEntry ? responsibleEntry.scannedAtCol : -1,
-          leftValue: responsibleEntry ? responsibleEntry.scannedAt : "",
-          rightCol: assistantEntry ? assistantEntry.scannedAtCol : -1,
-          rightValue: assistantEntry ? assistantEntry.scannedAt : ""
-        }
-      ].filter(function (pair) {
-        return Number.isFinite(pair.leftCol) && pair.leftCol >= 0 && Number.isFinite(pair.rightCol) && pair.rightCol >= 0;
-      });
+      const nextDraft = draft || {};
+      const assignments = [];
+      function push(col, value) {
+        if (!Number.isFinite(col) || col < 0) return;
+        assignments.push({
+          col: col,
+          value: value == null ? "" : String(value)
+        });
+      }
+      push(responsible && responsible.nameCol, nextDraft.name);
+      push(responsible && responsible.emailCol, nextDraft.email);
+      push(responsible && responsible.dniCol, nextDraft.dni);
+      push(responsible && responsible.phoneCol, nextDraft.phone);
+      push(assistantSlot && assistantSlot.nameCol, responsible && responsible.name);
+      push(assistantSlot && assistantSlot.emailCol, responsible && responsible.email);
+      push(assistantSlot && assistantSlot.dniCol, responsible && responsible.dni);
+      push(responsibleEntry && responsibleEntry.infoCol, assistantEntry && assistantEntry.info);
+      push(responsibleEntry && responsibleEntry.statusCol, assistantEntry ? normalizeEntryStatus(assistantEntry.status) : "");
+      push(responsibleEntry && responsibleEntry.codeCol, assistantEntry && assistantEntry.code);
+      push(responsibleEntry && responsibleEntry.scannedAtCol, assistantEntry && assistantEntry.scannedAt);
+      push(assistantEntry && assistantEntry.infoCol, responsibleEntry && responsibleEntry.info);
+      push(assistantEntry && assistantEntry.statusCol, responsibleEntry ? normalizeEntryStatus(responsibleEntry.status) : "");
+      push(assistantEntry && assistantEntry.codeCol, responsibleEntry && responsibleEntry.code);
+      push(assistantEntry && assistantEntry.scannedAtCol, responsibleEntry && responsibleEntry.scannedAt);
+      return assignments;
     }
-    function promoteAssistantToResponsible(groupId, assistantNumber) {
+    function promoteAssistantToResponsible(groupId, assistantNumber, draft) {
       if (!state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
       setSheetGroupsStatus("Cambiando responsable...", "");
       return ensureAllCurrentEntryHeaders().then(function () {
@@ -9964,17 +10162,16 @@
         if (!assistantSlot || !assistantSlot.filled) {
           throw new Error("No se ha encontrado el integrante seleccionado.");
         }
-        const swaps = buildGroupResponsibleSwapPairs(group, assistantSlot);
-        if (!swaps.length) throw new Error("Faltan columnas para cambiar el responsable.");
-        swaps.forEach(function (swap) {
-          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, swap.leftCol, swap.rightValue, { delay: 0 });
-          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, swap.rightCol, swap.leftValue, { delay: 0 });
+        const assignments = buildGroupResponsiblePromotionAssignments(group, assistantSlot, draft);
+        if (!assignments.length) throw new Error("Faltan columnas para cambiar el responsable.");
+        assignments.forEach(function (assignment) {
+          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, assignment.col, assignment.value, { delay: 0 });
         });
         state.sheetGroupsExpanded[groupId] = true;
         rebuildCurrentSheetGroupsModel();
         applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
-        const nextLeadName = assistantSlot.name || ("Integrante " + assistantNumber);
-        setSheetGroupsStatus("Responsable actualizado a \"" + nextLeadName + "\". Revisa el telefono si hace falta.", "good");
+        const nextLeadName = draft && draft.name ? draft.name : (assistantSlot.name || ("Integrante " + assistantNumber));
+        setSheetGroupsStatus("Responsable actualizado a \"" + nextLeadName + "\".", "good");
         return true;
       });
     }
@@ -10072,7 +10269,7 @@
         const hasColumn = Number.isFinite(col) && col >= 0;
         input.disabled = !editing || !hasColumn;
       });
-      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='assistant-add'], [data-group-action='assistant-remove'], [data-group-action='make-responsible'], [data-group-action='group-add'], [data-group-action='group-delete']"), function (button) {
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='member-menu'], [data-group-action='assistant-add'], [data-group-action='assistant-remove'], [data-group-action='make-responsible'], [data-group-action='group-add'], [data-group-action='group-delete']"), function (button) {
         const col = Number(button.dataset.col);
         const requiresColumn = button.dataset.groupAction === "payment-status";
         button.disabled = !editing || (requiresColumn && (!Number.isFinite(col) || col < 0));
@@ -10527,35 +10724,41 @@
             statusChip.textContent = normalizedStatus;
             row.appendChild(statusChip);
           }
-          var infoBtn = document.createElement("button");
-          infoBtn.type = "button";
-          infoBtn.className = "sheet-member-info-btn";
-          infoBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>';
-          infoBtn.title = "Ver / editar datos";
-          infoBtn.setAttribute("aria-label", "Ver o editar datos");
-          row.appendChild(infoBtn);
           if (!isResponsable && state.canEdit && state.editorMode === "edit") {
-            var promoteBtn = document.createElement("button");
-            promoteBtn.type = "button";
-            promoteBtn.className = "sheet-member-promote-btn";
-            promoteBtn.dataset.groupAction = "make-responsible";
-            promoteBtn.dataset.groupId = group.id;
-            promoteBtn.dataset.assistantNumber = String(assistant ? assistant.number : (person && person.number ? person.number : ""));
-            promoteBtn.title = "Hacer responsable";
-            promoteBtn.setAttribute("aria-label", "Hacer responsable");
-            promoteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 1L9 9H2l6 4.5L5.5 21 12 17l6.5 4L16 13.5 22 9h-7z"/></svg>';
-            row.appendChild(promoteBtn);
-            var removeBtn = document.createElement("button");
-            removeBtn.type = "button";
-            removeBtn.className = "sheet-member-remove-btn";
-            removeBtn.dataset.groupAction = "assistant-remove";
-            removeBtn.dataset.groupId = group.id;
-            removeBtn.dataset.assistantNumber = String(assistant ? assistant.number : (person && person.number ? person.number : ""));
-            removeBtn.title = "Eliminar integrante";
-            removeBtn.setAttribute("aria-label", "Eliminar integrante");
-            removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
-            row.appendChild(removeBtn);
+            var actionsWrap = document.createElement("div");
+            actionsWrap.className = "sheet-member-actions";
+            actionsWrap.innerHTML = itemMenuButtonMarkup("Opciones de " + memberName);
+            var actionsBtn = actionsWrap.firstChild;
+            actionsBtn.dataset.groupAction = "member-menu";
+            actionsBtn.dataset.groupId = group.id;
+            actionsBtn.dataset.assistantNumber = String(assistant ? assistant.number : (person && person.number ? person.number : ""));
+            actionsBtn.setAttribute("aria-haspopup", "menu");
+            actionsBtn.setAttribute("aria-expanded", "false");
+            actionsBtn.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              var assistantNumber = assistant ? assistant.number : (person && person.number ? person.number : "");
+              var menuId = buildSheetMemberActionMenuId(group.id, assistantNumber);
+              if (state.activeItemMenu && state.activeItemMenu.itemId === menuId) {
+                closeItemActionMenu();
+                return;
+              }
+              closeItemActionMenu();
+              openSheetMemberActionMenu(group.id, assistantNumber, actionsBtn);
+            });
+            actionsBtn.addEventListener("pointerdown", function (e) {
+              e.stopPropagation();
+            });
+            row.appendChild(actionsWrap);
           }
+          var toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "sheet-member-toggle-btn";
+          toggleBtn.title = "Ver / editar datos";
+          toggleBtn.setAttribute("aria-label", "Ver o editar datos");
+          toggleBtn.setAttribute("aria-expanded", "false");
+          toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+          row.appendChild(toggleBtn);
           memberList.appendChild(row);
           var detail = document.createElement("div");
           detail.className = "sheet-member-detail hidden";
@@ -10578,11 +10781,12 @@
             detail.appendChild(createPersonTicketBlock(group, person, { rolePrefix: isResponsable ? "responsable" : "assistant" }));
           }
           memberList.appendChild(detail);
-          infoBtn.addEventListener("click", function (e) {
+          toggleBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             var isOpen = !detail.classList.contains("hidden");
             detail.classList.toggle("hidden", isOpen);
-            infoBtn.classList.toggle("is-open", !isOpen);
+            toggleBtn.classList.toggle("is-open", !isOpen);
+            toggleBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
           });
         }
         addMemberRow(ticketPeople[0] || null, true, null);
@@ -11341,6 +11545,9 @@
     }
     function closeItemActionMenu() {
       if (!state.activeItemMenu) return;
+      if (state.activeItemMenu.anchor && typeof state.activeItemMenu.anchor.setAttribute === "function") {
+        state.activeItemMenu.anchor.setAttribute("aria-expanded", "false");
+      }
       if (state.activeItemMenu.el && state.activeItemMenu.el.parentNode) {
         state.activeItemMenu.el.parentNode.removeChild(state.activeItemMenu.el);
       }
@@ -11892,8 +12099,86 @@
         menu.appendChild(btn);
       });
       document.body.appendChild(menu);
+      if (typeof anchorEl.setAttribute === "function") anchorEl.setAttribute("aria-expanded", "true");
       state.activeItemMenu = { el: menu, anchor: anchorEl, itemId: item.id };
       positionItemActionMenu(anchorEl, menu);
+    }
+    function buildSheetMemberActionMenuId(groupId, assistantNumber) {
+      return String(groupId || "") + "::assistant::" + String(assistantNumber || "");
+    }
+    function openSheetAssistantRemoveDialog(group, assistantNumber) {
+      const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+      const freshGroup = group && group.id ? (findGroupByIdInModel(model, group.id) || group) : null;
+      const groupId = freshGroup && freshGroup.id ? freshGroup.id : "";
+      const slot = (freshGroup && freshGroup.assistantSlots || []).find(function (s) {
+        return String(s && s.number || "") === String(assistantNumber || "");
+      });
+      if (!slot) return false;
+      const assistantName = slot.name || ("Integrante " + assistantNumber);
+      openFormDeleteModal({
+        modalTitle: "Eliminar asistente",
+        modalSubtitle: "Desliza para eliminar a \"" + assistantName + "\" del grupo.",
+        onConfirm: function () {
+          var colsToClear = [slot.nameCol, slot.dniCol, slot.emailCol];
+          if (slot.entry) colsToClear = colsToClear.concat([slot.entry.infoCol, slot.entry.statusCol, slot.entry.codeCol, slot.entry.scannedAtCol]);
+          colsToClear.forEach(function (col) {
+            if (Number.isFinite(col) && col >= 0) {
+              applySheetGroupCellDraft(state.currentSheetTitle, freshGroup.sheetRow, col, "", { delay: 0 });
+            }
+          });
+          if (state.sheetGroupsDraftSlots[groupId]) {
+            state.sheetGroupsDraftSlots[groupId] = state.sheetGroupsDraftSlots[groupId].filter(function (n) { return n !== assistantNumber; });
+          }
+          rebuildCurrentSheetGroupsModel();
+          applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
+          setSheetGroupsStatus("Asistente eliminado.", "good");
+          return Promise.resolve(true);
+        }
+      });
+      return true;
+    }
+    function openSheetMemberActionMenu(groupId, assistantNumber, anchorEl) {
+      if (!groupId || !assistantNumber || !anchorEl) return false;
+      const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+      const group = findGroupByIdInModel(model, groupId);
+      if (!group) return false;
+      const assistantSlot = (group.assistantSlots || []).find(function (slot) {
+        return String(slot && slot.number || "") === String(assistantNumber || "");
+      });
+      if (!assistantSlot || !assistantSlot.filled) return false;
+      const menuId = buildSheetMemberActionMenuId(group.id, assistantNumber);
+      const menu = document.createElement("div");
+      menu.className = "item-action-menu";
+      menu.addEventListener("click", function (event) { event.stopPropagation(); });
+      menu.addEventListener("pointerdown", function (event) { event.stopPropagation(); });
+      [
+        {
+          label: "Hacer responsable",
+          action: function () { openPromoteResponsibleWizard(group.id, assistantNumber); }
+        },
+        {
+          label: "Eliminar asistente",
+          danger: true,
+          action: function () { openSheetAssistantRemoveDialog(group, assistantNumber); }
+        }
+      ].forEach(function (entry) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = entry.label;
+        if (entry.danger) btn.classList.add("danger");
+        btn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          closeItemActionMenu();
+          entry.action();
+        });
+        menu.appendChild(btn);
+      });
+      document.body.appendChild(menu);
+      if (typeof anchorEl.setAttribute === "function") anchorEl.setAttribute("aria-expanded", "true");
+      state.activeItemMenu = { el: menu, anchor: anchorEl, itemId: menuId };
+      positionItemActionMenu(anchorEl, menu);
+      return true;
     }
     async function authFetch(url, options, _retried) {
       const init = Object.assign({}, options || {});
@@ -15323,10 +15608,7 @@
       }
       if (action === "make-responsible") {
         const assistantNumber = String(button.dataset.assistantNumber || "");
-        promoteAssistantToResponsible(groupId, assistantNumber).catch(function (err) {
-          console.error(err);
-          setSheetGroupsStatus(messageFromError(err, "No se ha podido cambiar el responsable"), "error");
-        });
+        openPromoteResponsibleWizard(groupId, assistantNumber);
         return;
       }
       if (action === "assistant-add") {
@@ -15352,29 +15634,7 @@
       }
       if (action === "assistant-remove") {
         const assistantNumber = String(button.dataset.assistantNumber || "");
-        const slot = (group.assistantSlots || []).find(function (s) { return String(s.number) === assistantNumber; });
-        if (!slot) return;
-        const assistantName = slot.name || ("Integrante " + assistantNumber);
-        openFormDeleteModal({
-          modalTitle: "Eliminar integrante",
-          modalSubtitle: "Desliza para eliminar a \"" + assistantName + "\" del grupo.",
-          onConfirm: function () {
-            var colsToClear = [slot.nameCol, slot.dniCol, slot.emailCol];
-            if (slot.entry) colsToClear = colsToClear.concat([slot.entry.infoCol, slot.entry.statusCol, slot.entry.codeCol, slot.entry.scannedAtCol]);
-            colsToClear.forEach(function (col) {
-              if (Number.isFinite(col) && col >= 0) {
-                applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, col, "", { delay: 0 });
-              }
-            });
-            if (state.sheetGroupsDraftSlots[groupId]) {
-              state.sheetGroupsDraftSlots[groupId] = state.sheetGroupsDraftSlots[groupId].filter(function (n) { return n !== assistantNumber; });
-            }
-            rebuildCurrentSheetGroupsModel();
-            applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
-            setSheetGroupsStatus("Integrante eliminado.", "good");
-            return Promise.resolve(true);
-          }
-        });
+        openSheetAssistantRemoveDialog(group, assistantNumber);
         return;
       }
     }
@@ -15711,6 +15971,36 @@
     if (els.newGroupWizardModal) {
       els.newGroupWizardModal.addEventListener("click", function (event) {
         if (event.target === els.newGroupWizardModal) closeNewGroupWizard();
+      });
+    }
+    if (els.promoteResponsibleWizardCloseBtn) els.promoteResponsibleWizardCloseBtn.addEventListener("click", closePromoteResponsibleWizard);
+    if (els.promoteResponsibleWizardCancelBtn) els.promoteResponsibleWizardCancelBtn.addEventListener("click", closePromoteResponsibleWizard);
+    if (els.promoteResponsibleWizardConfirmBtn) {
+      els.promoteResponsibleWizardConfirmBtn.addEventListener("click", function () {
+        submitPromoteResponsibleWizard().catch(function () {});
+      });
+    }
+    promoteResponsibleWizardFieldDefs().forEach(function (entry) {
+      if (!entry.input) return;
+      entry.input.addEventListener("input", function () {
+        const draft = syncPromoteResponsibleWizardInvalidState();
+        const hasMissing = promoteResponsibleWizardFieldDefs().some(function (fieldDef) {
+          return !String(draft[fieldDef.key] || "").trim();
+        });
+        if (!hasMissing) setPromoteResponsibleWizardStatus("", "");
+        else if (els.promoteResponsibleWizardStatus && els.promoteResponsibleWizardStatus.dataset.tone === "error") {
+          setPromoteResponsibleWizardStatus("Completa los campos marcados en rojo antes de cambiar el responsable.", "error");
+        }
+      });
+      entry.input.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        submitPromoteResponsibleWizard().catch(function () {});
+      });
+    });
+    if (els.promoteResponsibleWizardModal) {
+      els.promoteResponsibleWizardModal.addEventListener("click", function (event) {
+        if (event.target === els.promoteResponsibleWizardModal) closePromoteResponsibleWizard();
       });
     }
     if (els.ticketReaderCloseBtn) els.ticketReaderCloseBtn.addEventListener("click", closeTicketReaderModal);
@@ -16199,6 +16489,7 @@
         closeMoveModal();
         closeTrashModal();
         closeFormLinkModal();
+        closePromoteResponsibleWizard();
       }
     });
     window.addEventListener("resize", function () {
