@@ -26,6 +26,8 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
+      --app-height: 100vh;
+      --viewport-bottom-offset: 0px;
     }
     * {
       box-sizing: border-box;
@@ -44,7 +46,7 @@
     html, body { height: 100%; overflow: hidden; }
     body {
       margin: 0;
-      min-height: 100%;
+      min-height: var(--app-height);
       font-family: Georgia, "Times New Roman", serif;
       color: var(--ink);
       background:
@@ -58,7 +60,8 @@
     .hidden { display: none !important; }
     .app {
       width: min(1200px, 100vw);
-      height: 100vh;
+      height: var(--app-height);
+      min-height: var(--app-height);
       margin: 0 auto;
       padding: 0;
       display: grid;
@@ -2173,6 +2176,8 @@
       min-width: 0;
       min-height: 0;
       overflow: auto;
+      padding-bottom: var(--viewport-bottom-offset);
+      scroll-padding-bottom: calc(12px + var(--viewport-bottom-offset));
       border: 1px solid var(--line);
       border-radius: var(--radius-md);
       background: var(--bg2);
@@ -2240,7 +2245,7 @@
       min-width: 0;
       overflow-y: visible;
       overflow-x: hidden;
-      padding: 0 12px 12px;
+      padding: 0 12px calc(12px + var(--viewport-bottom-offset));
       align-items: stretch;
       align-content: flex-start;
     }
@@ -3951,7 +3956,7 @@
       flex: 1 1 0;
       min-height: 0;
       overflow: auto;
-      padding: 16px 20px;
+      padding: 16px 20px calc(16px + var(--viewport-bottom-offset));
       display: grid;
       gap: 20px;
       align-content: start;
@@ -4144,7 +4149,7 @@
       }
       .paired-file-card { overflow: hidden; }
       .drive-header { padding: 8px 12px; }
-      .drive-scroll { padding: 10px 12px; gap: 12px; }
+      .drive-scroll { padding: 10px 12px calc(12px + var(--viewport-bottom-offset)); gap: 12px; }
       .drive-scroll.paella-focus {
         overflow: auto;
         align-content: start;
@@ -4343,7 +4348,7 @@
       .sheet-groups-filter-btn-mobile {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         gap: 8px;
         background: #ffffff;
         border: 1px solid rgba(0,0,0,0.1);
@@ -4354,7 +4359,15 @@
         cursor: pointer;
         margin-top: 8px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        transition: border-color .16s ease, background .16s ease, color .16s ease;
       }
+      .sheet-groups-filter-btn-mobile svg { transition: transform .18s ease; }
+      .sheet-groups-filter-btn-mobile.is-open {
+        background: #fff7ea;
+        border-color: rgba(185,90,0,0.22);
+        color: #7a4a15;
+      }
+      .sheet-groups-filter-btn-mobile.is-open svg { transform: rotate(180deg); }
       .sheet-groups-list {
         min-height: 0;
         overflow-y: auto;
@@ -4363,26 +4376,47 @@
       }
       .sheet-groups-filters {
         position: absolute;
-        top: calc(100% + 4px);
-        left: 8px;
-        right: 8px;
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        border: 1px solid rgba(0,0,0,0.05);
+        top: calc(100% + 2px);
+        left: 0;
+        right: 0;
+        background: rgba(255,255,255,0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+        border: 1px solid rgba(0,0,0,0.06);
         z-index: 100;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 10px;
+        max-height: min(46vh, 240px);
+        overflow: auto;
         pointer-events: none;
         opacity: 0;
-        transform: translateY(-5px);
+        visibility: hidden;
+        transform: translateY(-4px) scale(0.985);
       }
       .sheet-groups-filters.show {
         pointer-events: auto;
         opacity: 1;
-        transform: translateY(0);
+        visibility: visible;
+        transform: translateY(0) scale(1);
+      }
+      .sheet-groups-filters .sheet-groups-filter {
+        gap: 4px;
+      }
+      .sheet-groups-filters .sheet-groups-filter:nth-child(3) {
+        grid-column: 1 / -1;
+      }
+      .sheet-groups-filters .sheet-groups-filter span {
+        font-size: 0.56rem;
+        letter-spacing: 0.08em;
+      }
+      .sheet-groups-filters .sheet-groups-filter-select {
+        min-height: 36px;
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        border-radius: 10px 10px 4px 4px;
       }
       
       .sheet-groups-banner {
@@ -4552,7 +4586,7 @@
       .sheet-view-toggle-btn { flex: 1 1 0; min-width: 0; padding: 6px 8px; font-size: 0.76rem; }
       .item-more-btn { width: 32px; height: 32px; min-width: 32px; }
       .drive-header { padding: 8px 10px; }
-      .drive-scroll { padding: 8px 10px 14px; gap: 10px; }
+      .drive-scroll { padding: 8px 10px calc(14px + var(--viewport-bottom-offset)); gap: 10px; }
       .drive-section-card,
       .paella-panel {
         padding: 10px;
@@ -4729,7 +4763,7 @@
         padding: 5px 10px;
         font-size: 0.74rem;
       }
-      .sheet-groups-list { padding: 0 6px 6px; }
+      .sheet-groups-list { padding: 0 6px calc(6px + var(--viewport-bottom-offset)); }
       .sheet-groups-section { margin-top: 4px; }
       .sheet-groups-section-summary { padding: 3px 0 4px; margin-bottom: 3px; }
       .sheet-groups-section-label { font-size: 0.64rem; }
@@ -4795,7 +4829,7 @@
     @media (max-width: 400px) {
       .topbar { padding: 6px 8px; }
       .drive-header { padding: 6px 8px; }
-      .drive-scroll { padding: 6px 8px 12px; gap: 8px; }
+      .drive-scroll { padding: 6px 8px calc(12px + var(--viewport-bottom-offset)); gap: 8px; }
       .drive-section-card,
       .paella-panel { padding: 8px; }
       .grid, .paella-grid { gap: 4px; }
@@ -4841,11 +4875,22 @@
       .sheet-groups-stat { padding: 3px 4px; }
       .sheet-groups-stat-value { font-size: 0.66rem; }
       .sheet-groups-filter-btn-mobile { min-height: 30px; padding: 4px 8px; font-size: 0.7rem; }
+      .sheet-groups-filters {
+        padding: 8px;
+        gap: 6px 8px;
+        max-height: min(48vh, 220px);
+      }
+      .sheet-groups-filters .sheet-groups-filter span { font-size: 0.5rem; }
+      .sheet-groups-filters .sheet-groups-filter-select {
+        min-height: 32px;
+        padding: 5px 8px;
+        font-size: 0.72rem;
+      }
       .sheet-groups-banner { padding: 4px 5px 3px; gap: 3px; }
       .sheet-groups-banner-title,
       .sheet-groups-banner-meta { font-size: 0.62rem; }
       .sheet-groups-banner-search { padding: 5px 8px; font-size: 0.74rem; }
-      .sheet-groups-list { padding: 0 4px 4px; }
+      .sheet-groups-list { padding: 0 4px calc(4px + var(--viewport-bottom-offset)); }
       .sheet-groups-section-summary { padding: 2px 0 3px; margin-bottom: 2px; }
       .sheet-groups-section-label,
       .sheet-groups-section-count { font-size: 0.58rem; }
@@ -5084,7 +5129,7 @@
           <div id="sheetGroupsStatus" class="status"></div>
           <div id="sheetGroupsToolbar" class="sheet-groups-toolbar hidden">
             <div id="sheetGroupsStats" class="sheet-groups-stats"></div>
-            <button id="sheetGroupsFilterToggleMobile" class="sheet-groups-filter-btn-mobile" type="button">
+            <button id="sheetGroupsFilterToggleMobile" class="sheet-groups-filter-btn-mobile" type="button" aria-expanded="false" aria-controls="sheetGroupsFiltersPanel">
               Filtros
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
             </button>
@@ -6185,6 +6230,33 @@
       });
     })();
 
+    let viewportMetricsRaf = 0;
+    function syncViewportMetrics() {
+      viewportMetricsRaf = 0;
+      const viewport = window.visualViewport;
+      const viewportHeight = Math.max(
+        1,
+        Math.round(
+          (viewport && viewport.height) ||
+          window.innerHeight ||
+          document.documentElement.clientHeight ||
+          0
+        )
+      );
+      const offsetTop = Math.max(0, Math.round((viewport && viewport.offsetTop) || 0));
+      const layoutHeight = Math.max(
+        viewportHeight,
+        Math.round(window.innerHeight || document.documentElement.clientHeight || viewportHeight)
+      );
+      const bottomOffset = Math.max(0, layoutHeight - viewportHeight - offsetTop);
+      document.documentElement.style.setProperty("--app-height", viewportHeight + "px");
+      document.documentElement.style.setProperty("--viewport-bottom-offset", bottomOffset + "px");
+    }
+    function scheduleViewportMetricsSync() {
+      if (viewportMetricsRaf) cancelAnimationFrame(viewportMetricsRaf);
+      viewportMetricsRaf = requestAnimationFrame(syncViewportMetrics);
+    }
+
     function setLoginStatus(text) { els.loginStatus.textContent = text || ""; }
     function setDriveStatus(text) {
       els.driveStatus.textContent = text || "";
@@ -6614,6 +6686,83 @@
         .toLowerCase()
         .replace(/\s+/g, " ")
         .trim();
+    }
+    function normalizeHeaderMatchKey(value) {
+      return normalizeCompareText(value)
+        .replace(/[^a-z0-9]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    function normalizeEmailLikeValue(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const compact = raw.replace(/\s+/g, "");
+      const exactMatch = compact.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+      if (exactMatch) return exactMatch[0];
+      const looseMatch = raw.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+      return looseMatch ? looseMatch[0].replace(/\s+/g, "") : raw;
+    }
+    function looksLikeEmailValue(value) {
+      const normalized = normalizeEmailLikeValue(value);
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized);
+    }
+    function looksLikePhoneValue(value) {
+      const raw = String(value || "").trim();
+      if (!raw || raw.indexOf("@") !== -1) return false;
+      const digits = raw.replace(/\D/g, "");
+      return digits.length >= 8 && digits.length <= 15;
+    }
+    function looksLikeDocumentValue(value) {
+      const raw = String(value || "").trim().replace(/\s+/g, "");
+      if (!raw || raw.indexOf("@") !== -1) return false;
+      return /^[a-z0-9-]{5,20}$/i.test(raw);
+    }
+    function looksLikeTimestampValue(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return false;
+      if (/^\d{1,2}\/\d{1,2}\/\d{2,4}(?:[ ,]+\d{1,2}:\d{2}(?::\d{2})?)?$/.test(raw)) return true;
+      const parsed = Date.parse(raw);
+      return !Number.isNaN(parsed) && /[:/.-]/.test(raw);
+    }
+    function looksLikeYesNoChoice(value) {
+      const normalized = normalizeCompareText(value);
+      return normalized === "si" || normalized === "sí" || normalized === "no";
+    }
+    function looksLikeFirePointChoice(value) {
+      const normalized = normalizeCompareText(value);
+      return !!normalized && (
+        normalized === "si" ||
+        normalized === "sí" ||
+        normalized === "no" ||
+        normalized === "x" ||
+        normalized.indexOf("paella") !== -1 ||
+        normalized.indexOf("torra") !== -1 ||
+        normalized.indexOf("barbacoa") !== -1 ||
+        normalized.indexOf("comparto") !== -1 ||
+        normalized.indexOf("otro grupo") !== -1
+      );
+    }
+    function looksLikePaellaConsentValue(value) {
+      const normalized = normalizeCompareText(value);
+      return normalized === "acepta" || normalized === "acepto";
+    }
+    function normalizeParsedPersonFields(person) {
+      if (!person) return person;
+      person.name = String(person.name || "").trim();
+      person.dni = String(person.dni || "").trim();
+      person.email = normalizeEmailLikeValue(person.email);
+      if (looksLikeEmailValue(person.dni) && (!looksLikeEmailValue(person.email) || looksLikeDocumentValue(person.email))) {
+        const swappedDni = String(person.email || "").trim();
+        person.email = normalizeEmailLikeValue(person.dni);
+        person.dni = swappedDni;
+      } else if (!person.email && looksLikeEmailValue(person.dni)) {
+        person.email = normalizeEmailLikeValue(person.dni);
+        person.dni = "";
+      } else if (!person.dni && person.email && !looksLikeEmailValue(person.email) && looksLikeDocumentValue(person.email)) {
+        person.dni = String(person.email || "").trim();
+        person.email = "";
+      }
+      return person;
     }
     function isFormDocumentActive() {
       return state.activeDocumentType === "form";
@@ -7816,18 +7965,210 @@
       }
       return header;
     }
-    function isPaellaResponseHeader(headerValues) {
-      const normalized = (headerValues || []).map(normalizeCompareText);
-      const hasResponsibleName = normalized.indexOf("responsable - nombre completo") !== -1;
-      const hasResponsibleEmail = normalized.indexOf("responsable - email upv") !== -1 || normalized.indexOf("responsable - email") !== -1;
-      const hasAssistant = normalized.some(function (value) {
-        return /^asistente \d{2} - /.test(value);
+    function getLoadedSheetPreviewRows(title, rowLimit, colLimit) {
+      const sheetTitle = title || state.currentSheetTitle || "";
+      const info = state.spreadsheetSheets.find(function (sheet) { return sheet.title === sheetTitle; }) || null;
+      const maxRows = Math.max(1, Math.min(Number(rowLimit) || 3, info ? info.rowCount : 3));
+      const maxCols = Math.max(1, Math.min(Number(colLimit) || 64, info ? info.columnCount : 64));
+      const rows = [];
+      for (let row = 0; row < maxRows; row += 1) {
+        const values = [];
+        for (let col = 0; col < maxCols; col += 1) {
+          values.push(getCellValue(sheetTitle, row, col));
+        }
+        rows.push(values);
+      }
+      return rows;
+    }
+    function assignPaellaHeaderIndex(target, key, index) {
+      if (!target || !key || !Number.isInteger(index) || index < 0) return;
+      if (!Number.isInteger(target[key])) target[key] = index;
+    }
+    function resolvePaellaAssistantFieldKey(matchKey) {
+      if (!matchKey) return "";
+      if (matchKey === "nombre" || matchKey === "nombre completo" || matchKey === "nombre y apellidos") return "nameCol";
+      if (matchKey === "dni" || matchKey === "nie" || matchKey.indexOf("documento") !== -1 || matchKey.indexOf("pasaporte") !== -1) return "dniCol";
+      if (matchKey === "email" || matchKey === "email upv" || matchKey.indexOf("correo") !== -1) return "emailCol";
+      if (matchKey.indexOf("entrada info") !== -1 || matchKey.indexOf("info entrada") !== -1) return "entryInfoCol";
+      if (matchKey.indexOf("entrada estado") !== -1 || matchKey.indexOf("estado entrada") !== -1) return "entryStatusCol";
+      if (matchKey.indexOf("entrada codigo") !== -1 || matchKey.indexOf("codigo entrada") !== -1) return "entryCodeCol";
+      if (matchKey.indexOf("entrada escaneado") !== -1 || matchKey.indexOf("escaneado entrada") !== -1) return "entryScannedAtCol";
+      return "";
+    }
+    function buildPaellaHeaderAssignments(headerValues) {
+      const header = (headerValues || []).map(function (value) { return String(value || "").trim(); });
+      const headerIndex = {};
+      const assistantColumns = {};
+      header.forEach(function (label, index) {
+        const normalized = normalizeCompareText(label);
+        const matchKey = normalizeHeaderMatchKey(label);
+        if (!matchKey) return;
+        assignPaellaHeaderIndex(headerIndex, normalized, index);
+        const assistantMatch = /^asistente (\d{1,2}) (.+)$/.exec(matchKey);
+        if (assistantMatch) {
+          const assistantNumber = formatPaellaAssistantNumber(assistantMatch[1]);
+          const assistantField = resolvePaellaAssistantFieldKey(assistantMatch[2]);
+          if (!assistantField) return;
+          if (!assistantColumns[assistantNumber]) assistantColumns[assistantNumber] = {};
+          assistantColumns[assistantNumber][assistantField] = index;
+          if (assistantField === "nameCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - nombre completo", index);
+          if (assistantField === "dniCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - dni", index);
+          if (assistantField === "emailCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - email upv", index);
+          if (assistantField === "entryInfoCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - entrada info", index);
+          if (assistantField === "entryStatusCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - entrada estado", index);
+          if (assistantField === "entryCodeCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - entrada codigo", index);
+          if (assistantField === "entryScannedAtCol") assignPaellaHeaderIndex(headerIndex, "asistente " + assistantNumber + " - entrada escaneado a", index);
+          return;
+        }
+        if (matchKey === "timestamp") assignPaellaHeaderIndex(headerIndex, "timestamp", index);
+        if (matchKey === "submittedat" || matchKey === "submitted at" || matchKey.indexOf("fecha envio") !== -1 || matchKey.indexOf("fecha de envio") !== -1) {
+          assignPaellaHeaderIndex(headerIndex, "submittedat", index);
+        }
+        if (matchKey === "responseid" || matchKey === "response id") assignPaellaHeaderIndex(headerIndex, "responseid", index);
+        if (matchKey === "email" || matchKey === "email upv" || matchKey.indexOf("correo") !== -1) assignPaellaHeaderIndex(headerIndex, "email", index);
+        if (matchKey.indexOf("pago estado") !== -1 || matchKey.indexOf("estado pago") !== -1) assignPaellaHeaderIndex(headerIndex, "pago - estado", index);
+        if (matchKey.indexOf("quien paga") !== -1 || matchKey.indexOf("paga") !== -1) assignPaellaHeaderIndex(headerIndex, "pago - quien paga", index);
+        if (matchKey.indexOf("importe") !== -1 || matchKey.indexOf("cantidad") !== -1 || matchKey.indexOf("euros") !== -1) assignPaellaHeaderIndex(headerIndex, "pago - importe", index);
+        if (matchKey.indexOf("punto fuego") !== -1) assignPaellaHeaderIndex(headerIndex, "paella - punto de fuego", index);
+        if (matchKey.indexOf("otro grupo") !== -1 || matchKey.indexOf("grupo compartido") !== -1) assignPaellaHeaderIndex(headerIndex, "paella - responsable del otro grupo", index);
+        if (matchKey.indexOf("concurso") !== -1) assignPaellaHeaderIndex(headerIndex, "paella - participa en concurso", index);
+        if (matchKey.indexOf("responsable") !== -1) {
+          if (matchKey.indexOf("entrada info") !== -1 || matchKey.indexOf("info entrada") !== -1) assignPaellaHeaderIndex(headerIndex, "responsable - entrada info", index);
+          else if (matchKey.indexOf("entrada estado") !== -1 || matchKey.indexOf("estado entrada") !== -1) assignPaellaHeaderIndex(headerIndex, "responsable - entrada estado", index);
+          else if (matchKey.indexOf("entrada codigo") !== -1 || matchKey.indexOf("codigo entrada") !== -1) assignPaellaHeaderIndex(headerIndex, "responsable - entrada codigo", index);
+          else if (matchKey.indexOf("entrada escaneado") !== -1 || matchKey.indexOf("escaneado entrada") !== -1) assignPaellaHeaderIndex(headerIndex, "responsable - entrada escaneado a", index);
+          else if (matchKey.indexOf("telefono") !== -1 || matchKey.indexOf("movil") !== -1 || matchKey.indexOf("celular") !== -1) assignPaellaHeaderIndex(headerIndex, "responsable - telefono", index);
+          else if (matchKey.indexOf("dni") !== -1 || matchKey.indexOf("nie") !== -1 || matchKey.indexOf("documento") !== -1 || matchKey.indexOf("pasaporte") !== -1) assignPaellaHeaderIndex(headerIndex, "responsable - dni", index);
+          else if (matchKey.indexOf("email") !== -1 || matchKey.indexOf("correo") !== -1) {
+            assignPaellaHeaderIndex(headerIndex, "responsable - email upv", index);
+            assignPaellaHeaderIndex(headerIndex, "responsable - email", index);
+          } else if (matchKey.indexOf("nombre") !== -1) {
+            assignPaellaHeaderIndex(headerIndex, "responsable - nombre completo", index);
+          }
+          return;
+        }
+        if (matchKey === "nombre" || matchKey === "nombre completo" || matchKey === "nombre y apellidos") {
+          assignPaellaHeaderIndex(headerIndex, "responsable - nombre completo", index);
+        } else if (matchKey === "telefono" || matchKey === "movil" || matchKey === "numero de telefono") {
+          assignPaellaHeaderIndex(headerIndex, "responsable - telefono", index);
+        } else if (matchKey === "dni" || matchKey === "nie" || matchKey.indexOf("pasaporte") !== -1) {
+          assignPaellaHeaderIndex(headerIndex, "responsable - dni", index);
+        }
       });
-      return hasResponsibleName && (hasResponsibleEmail || hasAssistant);
+      const assistantNumbers = Object.keys(assistantColumns).filter(function (assistantNumber) {
+        const fields = assistantColumns[assistantNumber] || {};
+        return Number.isInteger(fields.nameCol) || Number.isInteger(fields.dniCol) || Number.isInteger(fields.emailCol);
+      });
+      return {
+        recognized: Number.isInteger(headerIndex["responsable - nombre completo"]) && (
+          Number.isInteger(headerIndex["responsable - email upv"]) ||
+          Number.isInteger(headerIndex["responsable - email"]) ||
+          Number.isInteger(headerIndex["email"]) ||
+          assistantNumbers.length > 0
+        ),
+        headerIndex: headerIndex,
+        assistantColumns: assistantColumns
+      };
+    }
+    function buildSyntheticPaellaHeader(columnCount, assistantSlots) {
+      const safeSlots = Math.max(0, Math.min(16, Number(assistantSlots) || 0));
+      const totalCols = Math.max(Number(columnCount) || 0, 9 + (safeSlots * 3));
+      const header = new Array(Math.max(9, totalCols)).fill("");
+      header[0] = "submittedAt";
+      header[1] = "Responsable - nombre completo";
+      header[2] = "Responsable - email UPV";
+      header[3] = "Responsable - DNI";
+      header[4] = "Responsable - telefono";
+      header[5] = "Paella - punto de fuego";
+      header[6] = "Paella - responsable del otro grupo";
+      header[7] = "Paella - participa en concurso";
+      header[8] = "Paella - numero asistentes";
+      for (let index = 0; index < safeSlots; index += 1) {
+        const number = formatPaellaAssistantNumber(index + 1);
+        const baseCol = 9 + (index * 3);
+        if (baseCol < header.length) header[baseCol] = "Asistente " + number + " - nombre completo";
+        if (baseCol + 1 < header.length) header[baseCol + 1] = "Asistente " + number + " - DNI";
+        if (baseCol + 2 < header.length) header[baseCol + 2] = "Asistente " + number + " - email UPV";
+      }
+      return header;
+    }
+    function scorePaellaDataRow(values) {
+      const row = Array.isArray(values) ? values : [];
+      let score = 0;
+      if (looksLikeTimestampValue(row[0])) score += 2;
+      if (row[1] && !looksLikeEmailValue(row[1]) && !looksLikePhoneValue(row[1])) score += 1;
+      if (looksLikeEmailValue(row[2])) score += 2;
+      if (looksLikeDocumentValue(row[3])) score += 1;
+      if (looksLikePhoneValue(row[4])) score += 1;
+      if (looksLikeFirePointChoice(row[5])) score += 1;
+      if (looksLikeYesNoChoice(row[7])) score += 1;
+      if (/^\d{1,2}$/.test(String(row[8] || "").trim())) score += 2;
+      if (row.slice(9).some(Boolean)) score += 1;
+      if (row.slice(-2).filter(looksLikePaellaConsentValue).length) score += 1;
+      return score;
+    }
+    function inferPaellaStructureFromRows(rows) {
+      const preparedRows = (rows || []).map(function (row) {
+        return Array.isArray(row) ? row.map(function (value) { return String(value || "").trim(); }) : [];
+      });
+      let bestRowIndex = -1;
+      let bestScore = 0;
+      preparedRows.slice(0, 6).forEach(function (row, index) {
+        if (!row.some(Boolean)) return;
+        const score = scorePaellaDataRow(row);
+        if (score > bestScore) {
+          bestScore = score;
+          bestRowIndex = index;
+        }
+      });
+      if (bestRowIndex < 0 || bestScore < 7) return null;
+      const dataRows = preparedRows.slice(bestRowIndex).filter(function (row) {
+        return row.some(Boolean);
+      });
+      if (!dataRows.length) return null;
+      let maxCols = 0;
+      let maxAssistantCount = 0;
+      dataRows.slice(0, 12).forEach(function (row) {
+        maxCols = Math.max(maxCols, row.length);
+        const count = Number(String(row[8] || "").trim());
+        if (Number.isFinite(count)) maxAssistantCount = Math.max(maxAssistantCount, count);
+      });
+      const assistantSlots = Math.max(1, Math.min(16, Math.max(maxAssistantCount, Math.floor(Math.max(0, maxCols - 9) / 3))));
+      const header = buildSyntheticPaellaHeader(maxCols, assistantSlots);
+      const assignments = buildPaellaHeaderAssignments(header);
+      if (!assignments.recognized) return null;
+      return {
+        recognized: true,
+        header: header,
+        headerIndex: assignments.headerIndex,
+        assistantColumns: assignments.assistantColumns,
+        rowOffset: bestRowIndex,
+        syntheticHeader: true
+      };
+    }
+    function resolvePaellaSheetStructure(rows) {
+      const sheetRows = Array.isArray(rows) ? rows : [];
+      if (!sheetRows.length) return null;
+      const header = (sheetRows[0] || []).map(function (value) { return String(value || "").trim(); });
+      const headerAssignments = buildPaellaHeaderAssignments(header);
+      if (headerAssignments.recognized) {
+        return {
+          recognized: true,
+          header: header,
+          headerIndex: headerAssignments.headerIndex,
+          assistantColumns: headerAssignments.assistantColumns,
+          rowOffset: 1,
+          syntheticHeader: false
+        };
+      }
+      return inferPaellaStructureFromRows(sheetRows);
+    }
+    function isPaellaResponseHeader(headerValues) {
+      return !!(buildPaellaHeaderAssignments(headerValues) || {}).recognized;
     }
     function isCurrentSheetPaellaResponseSheet() {
       if (!isSpreadsheetDocumentActive() || !state.currentSheetTitle) return false;
-      return isPaellaResponseHeader(getLoadedSheetHeaderValues(state.currentSheetTitle, 26));
+      return !!resolvePaellaSheetStructure(getLoadedSheetPreviewRows(state.currentSheetTitle, 3, 64));
     }
     function syncSheetViewToggle() {
       const spreadsheetMode = isSpreadsheetDocumentActive();
@@ -9671,6 +10012,17 @@
         return "<div class='sheet-groups-stat'><div class='sheet-groups-stat-value'>" + escapeHtml(val) + "</div></div>";
       }).join("");
     }
+    function setSheetGroupsFiltersOpen(open) {
+      const nextOpen = !!open;
+      if (els.sheetGroupsFiltersPanel) {
+        els.sheetGroupsFiltersPanel.classList.toggle("show", nextOpen);
+      }
+      if (els.sheetGroupsFilterToggleMobile) {
+        els.sheetGroupsFilterToggleMobile.classList.toggle("is-open", nextOpen);
+        els.sheetGroupsFilterToggleMobile.setAttribute("aria-expanded", nextOpen ? "true" : "false");
+      }
+      return nextOpen;
+    }
     function filterSheetGroups(groups) {
       const filters = state.sheetGroupsFilters || {};
       return (groups || []).filter(function (group) {
@@ -9696,14 +10048,17 @@
       state.sheetGroupsFilters.payment = els.sheetGroupsPaymentFilter ? (els.sheetGroupsPaymentFilter.value || "all") : "all";
       state.sheetGroupsFilters.fire = els.sheetGroupsFireFilter ? (els.sheetGroupsFireFilter.value || "all") : "all";
       state.sheetGroupsFilters.contest = els.sheetGroupsContestFilter ? (els.sheetGroupsContestFilter.value || "all") : "all";
+      if (window.innerWidth <= 640) setSheetGroupsFiltersOpen(false);
       markSheetGroupsInteraction(320);
       rerenderSheetGroupsFromModel();
     }
     function sheetGroupsStatusText(model) {
       const groups = Array.isArray(model && model.groups) ? model.groups : [];
+      if (groups.length && model && model.syntheticHeader) {
+        return "Vista solo lectura: la estructura se ha inferido porque la hoja no sigue la plantilla.";
+      }
       if (!groups.length) {
-        const header = model && Array.isArray(model.header) ? model.header : [];
-        return isPaellaResponseHeader(header) ? "No hay grupos en esta hoja." : "Esta hoja no contiene respuestas agrupables.";
+        return model && model.isPaellaSheet ? "No hay grupos en esta hoja." : "Esta hoja no contiene respuestas agrupables.";
       }
       return "";
     }
@@ -10173,6 +10528,9 @@
       const info = currentSheetInfo();
       const model = currentSheetGroupsModel();
       if (!info || !model) return Promise.reject(new Error("No hay una hoja de grupos activa."));
+      if (model.syntheticHeader) {
+        return Promise.reject(new Error("La hoja no tiene cabeceras compatibles. Esta vista solo permite lectura."));
+      }
       const assignments = {};
       let nextCol = Math.max(info.columnCount, model.header.length);
       (headerLabels || []).forEach(function (label) {
@@ -10396,7 +10754,8 @@
       return false;
     }
     function syncSheetGroupsInteractivity() {
-      const editing = state.editorMode === "edit" && state.canEdit;
+      const model = currentSheetGroupsModel();
+      const editing = state.editorMode === "edit" && state.canEdit && !(model && model.syntheticHeader);
       if (!els.sheetGroupsView || state.spreadsheetViewMode !== "groups") return;
       Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-input, .sheet-group-select"), function (input) {
         const col = Number(input.dataset.col);
@@ -10411,6 +10770,11 @@
     }
     function ensureSheetGroupsManagementColumnsForEditing() {
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "groups" || !isCurrentSheetPaellaResponseSheet()) {
+        return Promise.resolve(false);
+      }
+      const model = currentSheetGroupsModel();
+      if (model && model.syntheticHeader) {
+        syncSheetGroupsInteractivity();
         return Promise.resolve(false);
       }
       return ensurePaellaManagementHeaders().then(function (changedPayment) {
@@ -10441,35 +10805,30 @@
         headerIndex: {},
         assistantColumns: {},
         groups: [],
-        hasPaymentColumns: false
+        hasPaymentColumns: false,
+        isPaellaSheet: false,
+        syntheticHeader: false,
+        rowOffset: 1
       };
-      if (sheetRows.length < 2) return baseModel;
-      const header = sheetRows[0].map(function (value) { return String(value || "").trim(); });
+      if (!sheetRows.length) return baseModel;
+      const structure = resolvePaellaSheetStructure(sheetRows);
+      if (!structure || !structure.recognized) return baseModel;
+      const maxColCount = sheetRows.reduce(function (maxValue, row) {
+        return Math.max(maxValue, Array.isArray(row) ? row.length : 0);
+      }, 0);
+      const header = (structure.header || []).slice();
+      while (header.length < maxColCount) header.push("");
       baseModel.header = header;
-      if (!isPaellaResponseHeader(header)) return baseModel;
+      baseModel.headerIndex = Object.assign({}, structure.headerIndex || {});
+      baseModel.assistantColumns = Object.assign({}, structure.assistantColumns || {});
+      baseModel.isPaellaSheet = true;
+      baseModel.syntheticHeader = !!structure.syntheticHeader;
+      baseModel.rowOffset = Number.isInteger(structure.rowOffset) ? structure.rowOffset : 1;
       function valueAt(values, index) {
         return Number.isInteger(index) && index >= 0 ? String(values[index] || "").trim() : "";
       }
-      const normalizedHeader = header.map(normalizeCompareText);
-      const headerIndex = {};
-      normalizedHeader.forEach(function (value, index) {
-        if (!(value in headerIndex)) headerIndex[value] = index;
-      });
-      baseModel.headerIndex = headerIndex;
-      const assistantColumnMap = {};
-      normalizedHeader.forEach(function (value, index) {
-        const match = /^asistente (\d{2}) - (nombre completo|dni|email upv|entrada info|entrada estado|entrada codigo|entrada escaneado a)$/.exec(value);
-        if (!match) return;
-        if (!assistantColumnMap[match[1]]) assistantColumnMap[match[1]] = {};
-        if (match[2] === "nombre completo") assistantColumnMap[match[1]].nameCol = index;
-        if (match[2] === "dni") assistantColumnMap[match[1]].dniCol = index;
-        if (match[2] === "email upv") assistantColumnMap[match[1]].emailCol = index;
-        if (match[2] === "entrada info") assistantColumnMap[match[1]].entryInfoCol = index;
-        if (match[2] === "entrada estado") assistantColumnMap[match[1]].entryStatusCol = index;
-        if (match[2] === "entrada codigo") assistantColumnMap[match[1]].entryCodeCol = index;
-        if (match[2] === "entrada escaneado a") assistantColumnMap[match[1]].entryScannedAtCol = index;
-      });
-      baseModel.assistantColumns = assistantColumnMap;
+      const headerIndex = baseModel.headerIndex;
+      const assistantColumnMap = baseModel.assistantColumns;
       const assistantNumbers = Object.keys(assistantColumnMap).sort();
       const paymentStatusCol = Number.isInteger(headerIndex["pago - estado"]) ? headerIndex["pago - estado"] : -1;
       const paymentPayerCol = Number.isInteger(headerIndex["pago - quien paga"])
@@ -10481,7 +10840,12 @@
           ? headerIndex["pago - cantidad"]
           : (Number.isInteger(headerIndex["pago - euros"]) ? headerIndex["pago - euros"] : -1));
       baseModel.hasPaymentColumns = paymentStatusCol >= 0 && paymentPayerCol >= 0 && paymentAmountCol >= 0;
-      baseModel.groups = sheetRows.slice(1).map(function (row, rowIndex) {
+      const responsibleEmailCol = Number.isInteger(headerIndex["responsable - email upv"])
+        ? headerIndex["responsable - email upv"]
+        : (Number.isInteger(headerIndex["responsable - email"])
+          ? headerIndex["responsable - email"]
+          : headerIndex["email"]);
+      baseModel.groups = sheetRows.slice(baseModel.rowOffset).map(function (row, rowIndex) {
         const values = header.map(function (_, index) { return String(row[index] || "").trim(); });
         if (!values.some(Boolean)) return null;
         const responsible = {
@@ -10490,7 +10854,7 @@
           dni: valueAt(values, headerIndex["responsable - dni"]),
           phone: valueAt(values, headerIndex["responsable - telefono"]),
           nameCol: headerIndex["responsable - nombre completo"],
-          emailCol: Number.isInteger(headerIndex["responsable - email upv"]) ? headerIndex["responsable - email upv"] : headerIndex["responsable - email"],
+          emailCol: responsibleEmailCol,
           dniCol: headerIndex["responsable - dni"],
           phoneCol: headerIndex["responsable - telefono"],
           entry: {
@@ -10504,6 +10868,7 @@
             scannedAtCol: headerIndex["responsable - entrada escaneado a"]
           }
         };
+        normalizeParsedPersonFields(responsible);
         const assistantSlots = assistantNumbers.map(function (assistantNumber) {
           const assistantFields = assistantColumnMap[assistantNumber] || {};
           const slot = {
@@ -10525,6 +10890,7 @@
               scannedAtCol: assistantFields.entryScannedAtCol
             }
           };
+          normalizeParsedPersonFields(slot);
           slot.filled = !!(slot.name || slot.dni || slot.email);
           return slot;
         });
@@ -10537,8 +10903,8 @@
         const firePointValue = normalizeFirePointValue(valueAt(values, headerIndex["paella - punto de fuego"]));
         const contestValue = normalizeYesNoValue(valueAt(values, headerIndex["paella - participa en concurso"]));
         const group = {
-          id: "group-" + rowIndex,
-          sheetRow: rowIndex + 1,
+          id: "group-" + (baseModel.rowOffset + rowIndex),
+          sheetRow: baseModel.rowOffset + rowIndex,
           title: responsible.name || responsible.email || (paymentStatus === GROUP_PAYMENT_STATUS_REQUEST ? GROUP_PAYMENT_STATUS_REQUEST : ("Grupo " + (rowIndex + 1))),
           submittedAt: submittedAt,
           responseId: valueAt(values, headerIndex["responseid"]),
@@ -16060,7 +16426,7 @@
       setSpreadsheetViewMode("groups");
     });
     els.sheetGroupsFilterToggleMobile.addEventListener("click", function (event) {
-      els.sheetGroupsFiltersPanel.classList.toggle("show");
+      setSheetGroupsFiltersOpen(!els.sheetGroupsFiltersPanel.classList.contains("show"));
       event.stopPropagation();
     });
     els.sheetGroupsView.addEventListener("focusin", function () {
@@ -16581,7 +16947,7 @@
         els.contextMenu.classList.add("hidden");
       }
       if (els.sheetGroupsFiltersPanel && els.sheetGroupsFiltersPanel.classList.contains("show") && !els.sheetGroupsFiltersPanel.contains(event.target)) {
-        els.sheetGroupsFiltersPanel.classList.remove("show");
+        setSheetGroupsFiltersOpen(false);
       }
       if (state.profileMenuOpen && !els.profileBox.contains(event.target)) closeProfileMenu();
       if (
@@ -16618,6 +16984,7 @@
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
         closeItemActionMenu();
+        setSheetGroupsFiltersOpen(false);
         closePresencePopup();
         closePaellaAccessPopup();
         closeMoveModal();
@@ -16627,22 +16994,33 @@
       }
     });
     window.addEventListener("resize", function () {
+      scheduleViewportMetricsSync();
       if (state.activeItemMenu) closeItemActionMenu();
+      if (els.sheetGroupsFiltersPanel && els.sheetGroupsFiltersPanel.classList.contains("show")) setSheetGroupsFiltersOpen(false);
       if (!els.presencePopup.classList.contains("hidden")) positionPresencePopup();
       if (!els.paellaAccessPopup.classList.contains("hidden")) positionPopupToAnchor(els.paellaAccessPopup, els.paellaAccessAvatars);
       if (state.spreadsheetViewMode !== "groups" && isSpreadsheetDocumentActive()) renderGrid();
     });
+    window.addEventListener("orientationchange", function () {
+      setTimeout(scheduleViewportMetricsSync, 80);
+    });
     window.addEventListener("scroll", function () {
       if (state.activeItemMenu) closeItemActionMenu();
     }, true);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", scheduleViewportMetricsSync);
+      window.visualViewport.addEventListener("scroll", scheduleViewportMetricsSync);
+    }
     function handleSessionPageExit() {
       saveStoredUiSession();
       stopGroupsViewPoll(); stopCollabPolling();
       closePresencePopup();
       clearPresence();
     }
+    window.addEventListener("pageshow", scheduleViewportMetricsSync);
     window.addEventListener("pagehide", handleSessionPageExit);
     window.addEventListener("beforeunload", handleSessionPageExit);
+    scheduleViewportMetricsSync();
 
     configurePickerMode("sheet");
     renderBreadcrumbs();
