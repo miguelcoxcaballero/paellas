@@ -6746,6 +6746,14 @@
       const normalized = normalizeCompareText(value);
       return normalized === "acepta" || normalized === "acepto";
     }
+    function toDisplayTitleCase(value) {
+      const raw = String(value || "").trim().replace(/\s+/g, " ");
+      if (!raw) return "";
+      const lower = raw.toLocaleLowerCase("es-ES");
+      return lower.replace(/(^|[\s\-'"(])([^\s\-'"(])/g, function (_, prefix, char) {
+        return prefix + char.toLocaleUpperCase("es-ES");
+      });
+    }
     function normalizeParsedPersonFields(person) {
       if (!person) return person;
       person.name = String(person.name || "").trim();
@@ -6762,6 +6770,9 @@
         person.dni = String(person.email || "").trim();
         person.email = "";
       }
+      person.name = toDisplayTitleCase(person.name);
+      person.dni = String(person.dni || "").trim().toLocaleUpperCase("es-ES");
+      person.email = String(person.email || "").trim().toLocaleLowerCase("es-ES");
       return person;
     }
     function isFormDocumentActive() {
@@ -8030,7 +8041,9 @@
         if (matchKey.indexOf("pago estado") !== -1 || matchKey.indexOf("estado pago") !== -1) assignPaellaHeaderIndex(headerIndex, "pago - estado", index);
         if (matchKey.indexOf("quien paga") !== -1 || matchKey.indexOf("paga") !== -1) assignPaellaHeaderIndex(headerIndex, "pago - quien paga", index);
         if (matchKey.indexOf("importe") !== -1 || matchKey.indexOf("cantidad") !== -1 || matchKey.indexOf("euros") !== -1) assignPaellaHeaderIndex(headerIndex, "pago - importe", index);
-        if (matchKey.indexOf("punto fuego") !== -1) assignPaellaHeaderIndex(headerIndex, "paella - punto de fuego", index);
+        if (/punto(?: de)? fuego/.test(matchKey) || matchKey.indexOf("tipo fuego") !== -1) {
+          assignPaellaHeaderIndex(headerIndex, "paella - punto de fuego", index);
+        }
         if (matchKey.indexOf("otro grupo") !== -1 || matchKey.indexOf("grupo compartido") !== -1) assignPaellaHeaderIndex(headerIndex, "paella - responsable del otro grupo", index);
         if (matchKey.indexOf("concurso") !== -1) assignPaellaHeaderIndex(headerIndex, "paella - participa en concurso", index);
         if (matchKey.indexOf("responsable") !== -1) {
@@ -8473,9 +8486,24 @@
       if (!indexBadge) return;
       const normalizedStatus = normalizePaymentStatus(group && group.payment && group.payment.status);
       const isRequest = normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST;
-      indexBadge.textContent = isRequest ? "\u26A0" : ("G" + String(index + 1));
-      indexBadge.classList.toggle("is-request", isRequest);
-      indexBadge.title = isRequest ? GROUP_PAYMENT_STATUS_REQUEST : ("Grupo " + String(index + 1));
+      const fireKey = firePointFilterKey(group && group.firePoint && group.firePoint.value);
+      const fireIcon = fireKey === "paella"
+        ? "\ud83e\udd58"
+        : (fireKey === "torra"
+          ? "\ud83d\udd25"
+          : (fireKey === "shared"
+            ? "\ud83e\udd1d"
+            : "\u274c"));
+      const groupNumber = String(index + 1);
+      indexBadge.textContent = fireIcon + groupNumber;
+      indexBadge.classList.remove("is-request");
+      indexBadge.title = "Grupo " + groupNumber + " · " + (
+        fireKey === "paella"
+          ? "Paella"
+          : (fireKey === "torra"
+            ? "Torrà"
+            : (fireKey === "shared" ? "Comparte punto de fuego" : "Sin punto de fuego"))
+      ) + (isRequest ? (" · " + GROUP_PAYMENT_STATUS_REQUEST) : "");
     }
     function buildSheetGroupSearchIndex(group, rawValues) {
       const values = Array.isArray(rawValues) ? rawValues : [];
@@ -11035,7 +11063,12 @@
       snapshotSheetGroupsOpenState();
       const scrollParent = els.sheetGroupsView || els.sheetGroupsList;
       const savedScrollTop = scrollParent ? scrollParent.scrollTop : 0;
-      els.sheetGroupsList.innerHTML = "";
+      const existingBanner = els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner") : null;
+      if (els.sheetGroupsList) {
+        Array.prototype.slice.call(els.sheetGroupsList.children || []).forEach(function (child) {
+          if (child !== existingBanner) els.sheetGroupsList.removeChild(child);
+        });
+      }
       if (opts.skipAnim) els.sheetGroupsList.classList.add("skip-anim");
       else els.sheetGroupsList.classList.remove("skip-anim");
       const filteredGroups = filterSheetGroups(groups || []);
@@ -11043,36 +11076,60 @@
       const allGroups = groups || [];
       if (allGroups.length) {
         const totalAttendees = allGroups.reduce(function (s, g) { return s + (g.attendeeCount || 0); }, 0);
-        const banner = document.createElement("div");
-        const bannerTop = document.createElement("div");
-        const bannerTitle = document.createElement("div");
-        const bannerMeta = document.createElement("div");
-        const searchWrap = document.createElement("div");
-        const searchInput = document.createElement("input");
+        const banner = existingBanner || document.createElement("div");
+        let bannerTop = banner.querySelector(".sheet-groups-banner-top");
+        let bannerTitle = banner.querySelector(".sheet-groups-banner-title");
+        let bannerMeta = banner.querySelector(".sheet-groups-banner-meta");
+        let searchWrap = banner.querySelector(".sheet-groups-banner-search-wrap");
+        let searchInput = banner.querySelector("#sheetGroupsBannerSearchInput");
         banner.className = "sheet-groups-banner";
-        bannerTop.className = "sheet-groups-banner-top";
-        bannerTitle.className = "sheet-groups-banner-title";
+        if (!bannerTop) {
+          bannerTop = document.createElement("div");
+          bannerTop.className = "sheet-groups-banner-top";
+          banner.appendChild(bannerTop);
+        }
+        if (!bannerTitle) {
+          bannerTitle = document.createElement("div");
+          bannerTitle.className = "sheet-groups-banner-title";
+          bannerTop.appendChild(bannerTitle);
+        }
+        if (!bannerMeta) {
+          bannerMeta = document.createElement("div");
+          bannerMeta.className = "sheet-groups-banner-meta";
+          bannerTop.appendChild(bannerMeta);
+        }
+        if (!searchWrap) {
+          searchWrap = document.createElement("div");
+          searchWrap.className = "sheet-groups-banner-search-wrap";
+          banner.appendChild(searchWrap);
+        }
+        if (!searchInput) {
+          searchInput = document.createElement("input");
+          searchInput.id = "sheetGroupsBannerSearchInput";
+          searchInput.className = "search sheet-groups-banner-search";
+          searchInput.type = "search";
+          searchInput.autocomplete = "off";
+          searchInput.spellcheck = false;
+          searchInput.addEventListener("input", handleSheetGroupsSearchInput);
+          searchWrap.appendChild(searchInput);
+        }
         bannerTitle.textContent = "Vista de grupos";
-        bannerMeta.className = "sheet-groups-banner-meta";
         bannerMeta.textContent = String(allGroups.length) + " grupos | " + String(totalAttendees) + " asistentes";
-        bannerTop.appendChild(bannerTitle);
-        bannerTop.appendChild(bannerMeta);
-        searchWrap.className = "sheet-groups-banner-search-wrap";
-        searchInput.id = "sheetGroupsBannerSearchInput";
-        searchInput.className = "search sheet-groups-banner-search";
-        searchInput.type = "search";
         searchInput.placeholder = "Buscar por nombre, integrante, teléfono, DNI o cualquier dato";
         searchInput.autocomplete = "off";
         searchInput.spellcheck = false;
-        searchInput.value = String(state.sheetGroupsFilters && state.sheetGroupsFilters.search || "");
-        searchInput.addEventListener("input", handleSheetGroupsSearchInput);
-        searchWrap.appendChild(searchInput);
-        banner.appendChild(bannerTop);
-        banner.appendChild(searchWrap);
+        if (document.activeElement !== searchInput) {
+          searchInput.value = String(state.sheetGroupsFilters && state.sheetGroupsFilters.search || "");
+        }
         banner.style.setProperty('--i', '0');
-        els.sheetGroupsList.appendChild(banner);
+        if (banner.parentNode !== els.sheetGroupsList) {
+          els.sheetGroupsList.insertBefore(banner, els.sheetGroupsList.firstChild || null);
+        }
         els.sheetGroupsSearchInput = searchInput;
       } else {
+        if (existingBanner && existingBanner.parentNode === els.sheetGroupsList) {
+          els.sheetGroupsList.removeChild(existingBanner);
+        }
         els.sheetGroupsSearchInput = null;
       }
       if (els.sheetGroupsEmpty) {
