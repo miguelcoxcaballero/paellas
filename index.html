@@ -8004,10 +8004,11 @@
         const matchKey = normalizeHeaderMatchKey(label);
         if (!matchKey) return;
         assignPaellaHeaderIndex(headerIndex, normalized, index);
-        const assistantMatch = /^asistente (\d{1,2}) (.+)$/.exec(matchKey);
-        if (assistantMatch) {
-          const assistantNumber = formatPaellaAssistantNumber(assistantMatch[1]);
-          const assistantField = resolvePaellaAssistantFieldKey(assistantMatch[2]);
+        const assistantPrefixMatch = /^asistente (\d{1,2}) (.+)$/.exec(matchKey);
+        const assistantSuffixMatch = /^(.+?) asistente (\d{1,2})$/.exec(matchKey);
+        if (assistantPrefixMatch || assistantSuffixMatch) {
+          const assistantNumber = formatPaellaAssistantNumber(assistantPrefixMatch ? assistantPrefixMatch[1] : assistantSuffixMatch[2]);
+          const assistantField = resolvePaellaAssistantFieldKey(assistantPrefixMatch ? assistantPrefixMatch[2] : assistantSuffixMatch[1]);
           if (!assistantField) return;
           if (!assistantColumns[assistantNumber]) assistantColumns[assistantNumber] = {};
           assistantColumns[assistantNumber][assistantField] = index;
