@@ -2548,6 +2548,11 @@
       border-radius: 50%;
       background: #3d2608;
       color: #ffffff;
+      font-size: 0.68rem;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
       overflow: hidden;
       isolation: isolate;
     }
@@ -4796,7 +4801,7 @@
       .sheet-groups-section-count { font-size: 0.62rem; }
       .sheet-group-summary { padding: 4px 2px; gap: 6px; }
       .sheet-group-summary-main { gap: 2px; }
-      .sheet-group-index-badge { width: 24px; height: 24px; flex: 0 0 24px; border-radius: 8px; }
+      .sheet-group-index-badge { width: 24px; height: 24px; flex: 0 0 24px; border-radius: 8px; font-size: 0.57rem; }
       .sheet-group-index-badge-num { font-size: 0.61rem; transform: translate(1px, 1px); }
       .sheet-group-index-badge-icon { top: 2px; left: 2px; width: 9px; height: 9px; font-size: 0.38rem; }
       .sheet-group-title-large { font-size: 0.8rem; line-height: 1.15; }
@@ -4923,7 +4928,7 @@
       .sheet-groups-section-label,
       .sheet-groups-section-count { font-size: 0.58rem; }
       .sheet-group-summary { padding: 3px 1px; gap: 5px; }
-      .sheet-group-index-badge { width: 22px; height: 22px; flex-basis: 22px; }
+      .sheet-group-index-badge { width: 22px; height: 22px; flex-basis: 22px; font-size: 0.53rem; }
       .sheet-group-index-badge-num { font-size: 0.56rem; transform: translate(1px, 1px); }
       .sheet-group-index-badge-icon { top: 2px; left: 2px; width: 8px; height: 8px; font-size: 0.34rem; }
       .sheet-group-title-large { font-size: 0.74rem; }
@@ -8512,33 +8517,27 @@
       });
       return values;
     }
-    function setSheetGroupIndexBadge(indexBadge, group, index) {
-      if (!indexBadge) return;
-      const normalizedStatus = normalizePaymentStatus(group && group.payment && group.payment.status);
-      const isRequest = normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST;
+    function getSheetGroupFirePointIcon(group) {
       const fireKey = firePointFilterKey(group && group.firePoint && group.firePoint.value);
-      const fireIcon = fireKey === "paella"
+      return fireKey === "paella"
         ? "\ud83e\udd58"
         : (fireKey === "torra"
           ? "\ud83d\udd25"
           : (fireKey === "shared"
             ? "\ud83e\udd1d"
             : "\u274c"));
+    }
+    function getSheetGroupDisplayTitle(group, index) {
+      const baseTitle = group && group.title ? group.title : ("Grupo " + (index + 1));
+      return getSheetGroupFirePointIcon(group) + " " + baseTitle;
+    }
+    function setSheetGroupIndexBadge(indexBadge, group, index) {
+      if (!indexBadge) return;
+      const normalizedStatus = normalizePaymentStatus(group && group.payment && group.payment.status);
+      const isRequest = normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST;
+      const fireKey = firePointFilterKey(group && group.firePoint && group.firePoint.value);
       const groupNumber = String(index + 1);
-      let iconNode = indexBadge.querySelector(".sheet-group-index-badge-icon");
-      let numNode = indexBadge.querySelector(".sheet-group-index-badge-num");
-      if (!iconNode || !numNode) {
-        indexBadge.textContent = "";
-        iconNode = document.createElement("span");
-        iconNode.className = "sheet-group-index-badge-icon";
-        iconNode.setAttribute("aria-hidden", "true");
-        numNode = document.createElement("span");
-        numNode.className = "sheet-group-index-badge-num";
-        indexBadge.appendChild(iconNode);
-        indexBadge.appendChild(numNode);
-      }
-      iconNode.textContent = fireIcon;
-      numNode.textContent = groupNumber;
+      indexBadge.textContent = "G" + groupNumber;
       indexBadge.classList.toggle("is-request", isRequest);
       indexBadge.title = "Grupo " + groupNumber + " · " + (
         fireKey === "paella"
@@ -8698,7 +8697,7 @@
         summaryMeta.textContent = attendeeCount + " personas | " + leadName;
       }
       const titleEl = card.querySelector(".sheet-group-title-large");
-      if (titleEl) titleEl.textContent = group.title || ("Grupo " + (index + 1));
+      if (titleEl) titleEl.textContent = getSheetGroupDisplayTitle(group, index);
       syncSheetGroupsSummaryInfo(card.querySelector(".sheet-group-summary-info"), group);
       Array.prototype.forEach.call(card.querySelectorAll(".sheet-group-pill[data-group-action='payment-status']"), function (button) {
         const normalizedStatus = normalizePaymentStatus(group.payment && group.payment.status);
@@ -11265,7 +11264,7 @@
         
         const titleEl = document.createElement("div");
         titleEl.className = "sheet-group-title-large";
-        titleEl.textContent = group.title || ("Grupo " + (index + 1));
+        titleEl.textContent = getSheetGroupDisplayTitle(group, index);
         summaryMain.appendChild(titleEl);
 
         const summaryMeta = document.createElement("div");
