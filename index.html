@@ -7751,9 +7751,21 @@
     }
     function captureSheetGroupsFocusState() {
       const focusState = {
-        scrollTop: els.sheetGroupsView ? els.sheetGroupsView.scrollTop : 0
+        scrollTop: els.sheetGroupsView ? els.sheetGroupsView.scrollTop : 0,
+        openDetails: []
       };
       if (!els.sheetGroupsView) return focusState;
+      Array.prototype.forEach.call(
+        els.sheetGroupsView.querySelectorAll(".sheet-member-detail:not(.hidden)"),
+        function (detail) {
+          var card = detail.closest(".sheet-group-card");
+          if (card) focusState.openDetails.push({
+            groupId: String(card.dataset.groupId || ""),
+            personRole: String(detail.dataset.personRole || ""),
+            personNumber: String(detail.dataset.personNumber || "")
+          });
+        }
+      );
       const active = document.activeElement;
       if (!active || !els.sheetGroupsView.contains(active)) return focusState;
       focusState.elementId = active.id ? String(active.id) : "";
@@ -7773,6 +7785,18 @@
         els.sheetGroupsView.scrollTop = focusState.scrollTop;
       }
       if (!els.sheetGroupsView) return;
+      if (focusState.openDetails && focusState.openDetails.length) {
+        focusState.openDetails.forEach(function (d) {
+          var esc = function (s) { return String(s || "").replace(/'/g, "\\'"); };
+          var card = els.sheetGroupsView.querySelector(".sheet-group-card[data-group-id='" + esc(d.groupId) + "']");
+          if (!card) return;
+          var detail = card.querySelector(".sheet-member-detail[data-person-role='" + esc(d.personRole) + "'][data-person-number='" + esc(d.personNumber) + "']");
+          if (!detail) return;
+          detail.classList.remove("hidden");
+          var infoBtn = card.querySelector(".sheet-member-row[data-person-role='" + esc(d.personRole) + "'][data-person-number='" + esc(d.personNumber) + "'] .sheet-member-info-btn");
+          if (infoBtn) infoBtn.classList.add("is-open");
+        });
+      }
       let selector = "";
       let target = null;
       if (focusState.elementId) {
@@ -9879,7 +9903,7 @@
       input.value = value || "";
       input.placeholder = options && options.placeholder ? options.placeholder : "";
       if (options && options.inputMode) input.inputMode = options.inputMode;
-      input.disabled = !state.canEdit || !hasColumn;
+      input.disabled = !state.canEdit || state.editorMode !== "edit" || !hasColumn;
       input.dataset.groupId = groupId;
       input.dataset.row = String(row);
       input.dataset.col = String(col);
@@ -9890,7 +9914,7 @@
       const select = document.createElement("select");
       const hasColumn = Number.isFinite(col) && col >= 0;
       select.className = "sheet-group-select" + (hasColumn && isCellDirty(state.currentSheetTitle, row, col) ? " is-dirty" : "");
-      select.disabled = !state.canEdit || !hasColumn;
+      select.disabled = !state.canEdit || state.editorMode !== "edit" || !hasColumn;
       select.dataset.groupId = groupId;
       select.dataset.row = String(row);
       select.dataset.col = String(col);
@@ -9948,7 +9972,7 @@
       return false;
     }
     function syncSheetGroupsInteractivity() {
-      const editing = state.canEdit;
+      const editing = state.editorMode === "edit" && state.canEdit;
       if (!els.sheetGroupsView || state.spreadsheetViewMode !== "groups") return;
       Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-input, .sheet-group-select"), function (input) {
         const col = Number(input.dataset.col);
@@ -10205,7 +10229,7 @@
     }
     function renderSheetGroupsList(groups, options) {
       function appendCreateGroupAction() {
-        if (!state.canEdit) return;
+        if (!state.canEdit || state.editorMode !== "edit") return;
         var actionsWrap = document.createElement("div");
         actionsWrap.className = "sheet-groups-list-actions";
         var createBtn = document.createElement("button");
@@ -10417,7 +10441,7 @@
           infoBtn.title = "Ver / editar datos";
           infoBtn.setAttribute("aria-label", "Ver o editar datos");
           row.appendChild(infoBtn);
-          if (!isResponsable && state.canEdit) {
+          if (!isResponsable && state.canEdit && state.editorMode === "edit") {
             var removeBtn = document.createElement("button");
             removeBtn.type = "button";
             removeBtn.className = "sheet-member-remove-btn";
@@ -10492,7 +10516,7 @@
           btn.dataset.row = String(group.sheetRow);
           btn.dataset.col = String(group.payment.statusCol);
           btn.dataset.value = statusValue;
-          btn.disabled = !state.canEdit;
+          btn.disabled = !state.canEdit || state.editorMode !== "edit";
           btn.textContent = statusValue;
           paymentPills.appendChild(btn);
         });
@@ -10507,7 +10531,7 @@
         body.appendChild(settingsBlock);
         body.appendChild(memberList);
         // Actions row below members
-        if (state.canEdit) {
+        if (state.canEdit && state.editorMode === "edit") {
           var actionsRow = document.createElement("div");
           actionsRow.className = "sheet-group-actions-row";
           var groupPdfBtn = document.createElement("button");
@@ -10558,7 +10582,7 @@
       return fetchCurrentSheetRows().then(function (rows) {
         if (requestId !== state.sheetGroupLoadToken || titleAtStart !== state.currentSheetTitle) return false;
         state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows));
-        const ensureHeaders = (!state.sheetGroupsModel.hasPaymentColumns && state.canEdit)
+        const ensureHeaders = (!state.sheetGroupsModel.hasPaymentColumns && state.canEdit && state.editorMode === "edit")
           ? ensurePaellaManagementHeaders()
           : Promise.resolve(false);
         return ensureHeaders.then(function () {
@@ -15126,7 +15150,7 @@
     function handleSheetGroupsFieldInput(event) {
       const target = event.target;
       if (!target || (!target.classList.contains("sheet-group-input") && !target.classList.contains("sheet-group-select"))) return;
-      if (!state.canEdit || !state.currentSheetTitle) return;
+      if (state.editorMode !== "edit" || !state.canEdit || !state.currentSheetTitle) return;
       markSheetGroupsInteraction();
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
@@ -15142,7 +15166,7 @@
       if (button.disabled || !state.currentSheetTitle) return;
       markSheetGroupsInteraction(520);
       const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "group-add" || action === "group-delete";
-      if (requiresEdit && !state.canEdit) return;
+      if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
       if (action === "group-add") {
         openNewGroupWizard();
         return;
