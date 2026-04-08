@@ -10979,7 +10979,7 @@
     }
     function queueAutosave(delay) {
       clearTimeout(state.saveTimer);
-      if (state.editorMode !== "edit" || !hasPendingChanges()) {
+      if (!state.canEdit || !hasPendingChanges()) {
         refreshDirtyState();
         return;
       }
@@ -15028,7 +15028,7 @@
         refreshDirtyState();
         return Promise.resolve(true);
       }
-      if (state.editorMode !== "edit" && !config.force) {
+      if (!state.canEdit && !config.force) {
         refreshDirtyState();
         return Promise.resolve(false);
       }
@@ -15219,19 +15219,27 @@
         const assistantNumber = String(button.dataset.assistantNumber || "");
         const slot = (group.assistantSlots || []).find(function (s) { return String(s.number) === assistantNumber; });
         if (!slot) return;
-        var colsToClear = [slot.nameCol, slot.dniCol, slot.emailCol];
-        if (slot.entry) colsToClear = colsToClear.concat([slot.entry.infoCol, slot.entry.statusCol, slot.entry.codeCol, slot.entry.scannedAtCol]);
-        colsToClear.forEach(function (col) {
-          if (Number.isFinite(col) && col >= 0) {
-            applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, col, "", { delay: 0 });
+        const assistantName = slot.name || ("Integrante " + assistantNumber);
+        openFormDeleteModal({
+          modalTitle: "Eliminar integrante",
+          modalSubtitle: "Desliza para eliminar a \"" + assistantName + "\" del grupo.",
+          onConfirm: function () {
+            var colsToClear = [slot.nameCol, slot.dniCol, slot.emailCol];
+            if (slot.entry) colsToClear = colsToClear.concat([slot.entry.infoCol, slot.entry.statusCol, slot.entry.codeCol, slot.entry.scannedAtCol]);
+            colsToClear.forEach(function (col) {
+              if (Number.isFinite(col) && col >= 0) {
+                applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, col, "", { delay: 0 });
+              }
+            });
+            if (state.sheetGroupsDraftSlots[groupId]) {
+              state.sheetGroupsDraftSlots[groupId] = state.sheetGroupsDraftSlots[groupId].filter(function (n) { return n !== assistantNumber; });
+            }
+            rebuildCurrentSheetGroupsModel();
+            applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
+            setSheetGroupsStatus("Integrante eliminado.", "good");
+            return Promise.resolve(true);
           }
         });
-        if (state.sheetGroupsDraftSlots[groupId]) {
-          state.sheetGroupsDraftSlots[groupId] = state.sheetGroupsDraftSlots[groupId].filter(function (n) { return n !== assistantNumber; });
-        }
-        rebuildCurrentSheetGroupsModel();
-        applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
-        setSheetGroupsStatus("Integrante eliminado.", "good");
         return;
       }
     }
@@ -15505,10 +15513,12 @@
       showView("drive");
     });
     els.editorBackBtn.addEventListener("click", function () {
+      var hadPaellaFolder = state.activePaellaStack && state.activePaellaStack.length > 0;
+      var hadDireccionFolder = state.activeDireccionStack && state.activeDireccionStack.length > 0;
       returnToDrive().then(function (ok) {
         if (ok !== false) {
-          closePaellaFolderView();
-          closeDireccionFolderView();
+          if (!hadPaellaFolder) closePaellaFolderView();
+          if (!hadDireccionFolder) closeDireccionFolderView();
         }
       });
     });
