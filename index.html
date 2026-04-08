@@ -9359,17 +9359,17 @@
       var paidCount = visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === GROUP_PAYMENT_STATUS_PAID; }).length;
       var pendingCount = visible.filter(function (group) { return isGroupPendingLikeStatus(group.payment && group.payment.status); }).length;
       var formatShort = function (v) { return (Number(v) || 0).toLocaleString("es-ES", { maximumFractionDigits: 2 }) + "\u20ac"; };
-      const stats = [
-        { label: "Recaudado", value: formatShort(filteredRevenue) + "/" + formatShort(totalRevenue), meta: "" },
-        { label: "Grupos", value: String(visible.length) + (visible.length !== groups.length ? "/" + String(groups.length) : ""), meta: "" },
-        { label: "Asistentes", value: String(filteredAttendees) + (filteredAttendees !== totalAttendees ? "/" + String(totalAttendees) : ""), meta: "" },
-        { label: "Pagados", value: String(paidCount) + "/" + String(visible.length), meta: String(pendingCount) + " pendientes" }
+      var groupsValue = String(visible.length) + (visible.length !== groups.length ? "/" + String(groups.length) : "") + " Grupos";
+      var attendeesValue = String(filteredAttendees) + (filteredAttendees !== totalAttendees ? "/" + String(totalAttendees) : "") + " Asistentes";
+      var stats = [
+        { label: "", value: formatShort(filteredRevenue) + "/" + formatShort(totalRevenue) },
+        { label: "", value: groupsValue },
+        { label: "", value: attendeesValue },
+        { label: "", value: String(paidCount) + "/" + String(visible.length) + " ✓" }
       ];
       els.sheetGroupsStats.innerHTML = stats.map(function (stat) {
         return "<div class='sheet-groups-stat'>" +
-          "<div class='sheet-groups-stat-label'>" + escapeHtml(stat.label) + "</div>" +
           "<div class='sheet-groups-stat-value'>" + escapeHtml(stat.value) + "</div>" +
-          (stat.meta ? "<div class='sheet-groups-stat-meta'>" + escapeHtml(stat.meta) + "</div>" : "") +
         "</div>";
       }).join("");
     }
