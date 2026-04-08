@@ -2751,6 +2751,22 @@
       background: transparent;
       color: #3d2608;
     }
+    .sheet-member-promote-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: rgba(160,118,20,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: background .15s ease, color .15s ease;
+    }
+    .sheet-member-promote-btn svg { fill: currentColor; }
+    .sheet-member-promote-btn:hover { background: rgba(160,118,20,0.09); color: rgba(125,90,10,0.95); }
     .sheet-member-remove-btn {
       width: 28px;
       height: 28px;
@@ -9885,6 +9901,83 @@
         };
       });
     }
+    function buildGroupResponsibleSwapPairs(group, assistantSlot) {
+      const responsibleEntry = group && group.responsible ? group.responsible.entry : null;
+      const assistantEntry = assistantSlot ? assistantSlot.entry : null;
+      return [
+        {
+          leftCol: group && group.responsible ? group.responsible.nameCol : -1,
+          leftValue: group && group.responsible ? group.responsible.name : "",
+          rightCol: assistantSlot ? assistantSlot.nameCol : -1,
+          rightValue: assistantSlot ? assistantSlot.name : ""
+        },
+        {
+          leftCol: group && group.responsible ? group.responsible.emailCol : -1,
+          leftValue: group && group.responsible ? group.responsible.email : "",
+          rightCol: assistantSlot ? assistantSlot.emailCol : -1,
+          rightValue: assistantSlot ? assistantSlot.email : ""
+        },
+        {
+          leftCol: group && group.responsible ? group.responsible.dniCol : -1,
+          leftValue: group && group.responsible ? group.responsible.dni : "",
+          rightCol: assistantSlot ? assistantSlot.dniCol : -1,
+          rightValue: assistantSlot ? assistantSlot.dni : ""
+        },
+        {
+          leftCol: responsibleEntry ? responsibleEntry.infoCol : -1,
+          leftValue: responsibleEntry ? responsibleEntry.info : "",
+          rightCol: assistantEntry ? assistantEntry.infoCol : -1,
+          rightValue: assistantEntry ? assistantEntry.info : ""
+        },
+        {
+          leftCol: responsibleEntry ? responsibleEntry.statusCol : -1,
+          leftValue: responsibleEntry ? normalizeEntryStatus(responsibleEntry.status) : "",
+          rightCol: assistantEntry ? assistantEntry.statusCol : -1,
+          rightValue: assistantEntry ? normalizeEntryStatus(assistantEntry.status) : ""
+        },
+        {
+          leftCol: responsibleEntry ? responsibleEntry.codeCol : -1,
+          leftValue: responsibleEntry ? responsibleEntry.code : "",
+          rightCol: assistantEntry ? assistantEntry.codeCol : -1,
+          rightValue: assistantEntry ? assistantEntry.code : ""
+        },
+        {
+          leftCol: responsibleEntry ? responsibleEntry.scannedAtCol : -1,
+          leftValue: responsibleEntry ? responsibleEntry.scannedAt : "",
+          rightCol: assistantEntry ? assistantEntry.scannedAtCol : -1,
+          rightValue: assistantEntry ? assistantEntry.scannedAt : ""
+        }
+      ].filter(function (pair) {
+        return Number.isFinite(pair.leftCol) && pair.leftCol >= 0 && Number.isFinite(pair.rightCol) && pair.rightCol >= 0;
+      });
+    }
+    function promoteAssistantToResponsible(groupId, assistantNumber) {
+      if (!state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
+      setSheetGroupsStatus("Cambiando responsable...", "");
+      return ensureAllCurrentEntryHeaders().then(function () {
+        const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+        const group = findGroupByIdInModel(model, groupId);
+        if (!group) throw new Error("No se ha encontrado el grupo.");
+        const assistantSlot = (group.assistantSlots || []).find(function (slot) {
+          return String(slot && slot.number || "") === String(assistantNumber || "");
+        });
+        if (!assistantSlot || !assistantSlot.filled) {
+          throw new Error("No se ha encontrado el integrante seleccionado.");
+        }
+        const swaps = buildGroupResponsibleSwapPairs(group, assistantSlot);
+        if (!swaps.length) throw new Error("Faltan columnas para cambiar el responsable.");
+        swaps.forEach(function (swap) {
+          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, swap.leftCol, swap.rightValue, { delay: 0 });
+          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, swap.rightCol, swap.leftValue, { delay: 0 });
+        });
+        state.sheetGroupsExpanded[groupId] = true;
+        rebuildCurrentSheetGroupsModel();
+        applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
+        const nextLeadName = assistantSlot.name || ("Integrante " + assistantNumber);
+        setSheetGroupsStatus("Responsable actualizado a \"" + nextLeadName + "\". Revisa el telefono si hace falta.", "good");
+        return true;
+      });
+    }
     function createSheetGroupField(labelText, inputEl) {
       const wrap = document.createElement("label");
       wrap.className = "sheet-group-field";
@@ -9979,7 +10072,7 @@
         const hasColumn = Number.isFinite(col) && col >= 0;
         input.disabled = !editing || !hasColumn;
       });
-      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='assistant-add'], [data-group-action='assistant-remove'], [data-group-action='group-add'], [data-group-action='group-delete']"), function (button) {
+      Array.prototype.forEach.call(els.sheetGroupsView.querySelectorAll(".sheet-group-pill, [data-group-action='assistant-add'], [data-group-action='assistant-remove'], [data-group-action='make-responsible'], [data-group-action='group-add'], [data-group-action='group-delete']"), function (button) {
         const col = Number(button.dataset.col);
         const requiresColumn = button.dataset.groupAction === "payment-status";
         button.disabled = !editing || (requiresColumn && (!Number.isFinite(col) || col < 0));
@@ -10442,6 +10535,16 @@
           infoBtn.setAttribute("aria-label", "Ver o editar datos");
           row.appendChild(infoBtn);
           if (!isResponsable && state.canEdit && state.editorMode === "edit") {
+            var promoteBtn = document.createElement("button");
+            promoteBtn.type = "button";
+            promoteBtn.className = "sheet-member-promote-btn";
+            promoteBtn.dataset.groupAction = "make-responsible";
+            promoteBtn.dataset.groupId = group.id;
+            promoteBtn.dataset.assistantNumber = String(assistant ? assistant.number : (person && person.number ? person.number : ""));
+            promoteBtn.title = "Hacer responsable";
+            promoteBtn.setAttribute("aria-label", "Hacer responsable");
+            promoteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 1L9 9H2l6 4.5L5.5 21 12 17l6.5 4L16 13.5 22 9h-7z"/></svg>';
+            row.appendChild(promoteBtn);
             var removeBtn = document.createElement("button");
             removeBtn.type = "button";
             removeBtn.className = "sheet-member-remove-btn";
@@ -15165,7 +15268,7 @@
       const action = button.dataset.groupAction;
       if (button.disabled || !state.currentSheetTitle) return;
       markSheetGroupsInteraction(520);
-      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "group-add" || action === "group-delete";
+      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "make-responsible" || action === "group-add" || action === "group-delete";
       if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
       if (action === "group-add") {
         openNewGroupWizard();
@@ -15216,6 +15319,14 @@
         exportTicketPdfForCurrentGroup(group, function (person) {
           return person.role === role && String(person.number) === number;
         }, (group.title || "entrada") + " " + (role === "responsable" ? "responsable" : ("integrante " + number)));
+        return;
+      }
+      if (action === "make-responsible") {
+        const assistantNumber = String(button.dataset.assistantNumber || "");
+        promoteAssistantToResponsible(groupId, assistantNumber).catch(function (err) {
+          console.error(err);
+          setSheetGroupsStatus(messageFromError(err, "No se ha podido cambiar el responsable"), "error");
+        });
         return;
       }
       if (action === "assistant-add") {
@@ -16117,4 +16228,3 @@
   </script>
 </body>
 </html>
-
