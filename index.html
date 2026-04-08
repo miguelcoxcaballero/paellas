@@ -6319,7 +6319,16 @@
     function setPaellaAccessStatus(text, tone) { setStatusOnElement(els.paellaAccessStatus, text, tone); }
     function setFormSyncStatus(text, tone) { setStatusOnElement(els.formSyncStatus, text, tone); }
     function setFormLinkStatus(text, tone) { setStatusOnElement(els.formLinkModalStatus, text, tone); }
-    function setSheetGroupsStatus(text, tone) { setStatusOnElement(els.sheetGroupsStatus, text, tone); }
+    var sheetGroupsStatusClearTimer = 0;
+    function setSheetGroupsStatus(text, tone) {
+      clearTimeout(sheetGroupsStatusClearTimer);
+      setStatusOnElement(els.sheetGroupsStatus, text, tone);
+      if (tone === "good" || (text && tone !== "error")) {
+        sheetGroupsStatusClearTimer = setTimeout(function () {
+          setStatusOnElement(els.sheetGroupsStatus, "", "");
+        }, 2200);
+      }
+    }
     function setAppDialogStatus(text, tone) { setStatusOnElement(els.appDialogStatus, text, tone); }
     function setBusy(el, on) { el.classList.toggle("loading", !!on); }
     function currentNewSheetType() {
