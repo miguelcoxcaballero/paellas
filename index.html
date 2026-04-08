@@ -1161,9 +1161,30 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 14px;
+      gap: 10px;
       min-width: 0;
     }
+    .editor-back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+      margin-top: 2px;
+    }
+    .editor-back-btn:hover {
+      background: rgba(185, 90, 0, 0.08);
+      color: var(--accent);
+      border-color: rgba(185, 90, 0, 0.25);
+    }
+    .editor-back-btn svg { fill: currentColor; display: block; }
     .editor-title-side {
       display: flex;
       align-items: flex-start;
@@ -2346,7 +2367,7 @@
     }
     .sheet-group-card {
       border: none;
-      border-top: 1px solid rgba(0,0,0,0.07);
+      border-top: 1px solid rgba(0,0,0,0.06);
       border-radius: 0;
       background: transparent;
       overflow: visible;
@@ -2487,8 +2508,8 @@
     .sheet-group-summary {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 12px 4px;
+      gap: 10px;
+      padding: 7px 4px;
       cursor: pointer;
       background: transparent;
       min-width: 0;
@@ -2499,28 +2520,28 @@
       flex-direction: column;
       justify-content: center;
       flex: 1;
-      gap: 2px;
+      gap: 1px;
     }
     .sheet-group-index-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
       border-radius: 50%;
       background: #3d2608;
       color: #ffffff;
-      font-size: 0.85rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0;
     }
     .sheet-group-index-badge.is-request {
-      font-size: 1rem;
+      font-size: 0.88rem;
       font-weight: 800;
     }
     .sheet-group-summary-meta {
-      font-size: 0.8rem;
+      font-size: 0.74rem;
       font-weight: 500;
       color: rgba(93, 58, 16, 0.6);
       min-width: 0;
@@ -2529,7 +2550,7 @@
       text-overflow: ellipsis;
     }
     .sheet-group-title-large {
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       font-weight: 700;
       line-height: 1.2;
       min-width: 0;
@@ -2542,19 +2563,19 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 4px;
+      gap: 3px;
       flex-wrap: nowrap;
       min-width: 0;
     }
     .sheet-group-chip {
       display: inline-flex;
       align-items: center;
-      min-height: 24px;
-      padding: 0 10px;
-      border-radius: 6px;
+      min-height: 20px;
+      padding: 0 8px;
+      border-radius: 5px;
       background: rgba(0,0,0,0.04);
       color: #3d2608;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -2593,8 +2614,8 @@
       min-width: 0;
     }
     .sheet-group-chevron {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       background: transparent;
       color: rgba(0,0,0,0.3);
@@ -2612,8 +2633,8 @@
       color: #1e1508;
     }
     .sheet-group-chevron svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       fill: currentColor;
     }
     .sheet-group-chevron:hover {
@@ -2629,7 +2650,7 @@
     .sheet-group-body {
       display: grid;
       gap: 0;
-      padding: 0 0 0 56px;
+      padding: 0 0 0 40px;
       background: transparent;
     }
     .sheet-group-card:not([open]) > .sheet-group-body {
@@ -4605,6 +4626,36 @@
       .confirm-slider { height: 44px; }
       .item-action-menu { min-width: min(220px, calc(100vw - 24px)); }
       .item-action-menu button { padding: 10px 12px; min-height: 40px; font-size: 0.86rem; }
+
+      /* ── Groups view mobile: reduce all chrome above groups ─────── */
+      #editorShell { padding: 8px 10px; gap: 6px; }
+      .editor-head { gap: 6px; }
+      .doc-title { font-size: 1rem; min-height: 30px; padding: 3px 6px; }
+      .sheet-bar { gap: 4px; }
+      .tab, .crumb { padding: 5px 10px; font-size: 0.8rem; }
+      .sheet-view-toggle { padding: 3px; gap: 3px; }
+      .sheet-view-toggle-btn { padding: 4px 10px; font-size: 0.75rem; min-width: 0; }
+      #editorView > .card:last-child { padding: 0 0 0; }
+      .sheet-groups-toolbar { padding: 6px 10px 8px; gap: 4px; border-bottom-width: 1px; }
+      .sheet-groups-stats { gap: 2px; padding: 2px; }
+      .sheet-groups-stat { padding: 5px 8px; gap: 1px; }
+      .sheet-groups-stat-value { font-size: 0.82rem; }
+      .sheet-groups-filter-btn-mobile { margin-top: 4px; padding: 6px 14px; font-size: 0.8rem; }
+      .sheet-groups-banner { padding: 8px 10px 6px; gap: 6px; }
+      .sheet-groups-list { padding: 0 8px 8px; }
+      .sheet-groups-section { margin-top: 6px; }
+      .sheet-groups-section-summary { padding: 4px 0 5px; margin-bottom: 4px; }
+      .sheet-groups-section-label { font-size: 0.68rem; }
+      .sheet-groups-section-count { font-size: 0.68rem; }
+      .sheet-group-summary { padding: 6px 4px; gap: 8px; }
+      .sheet-group-index-badge { width: 26px; height: 26px; flex: 0 0 26px; font-size: 0.68rem; }
+      .sheet-group-title-large { font-size: 0.88rem; }
+      .sheet-group-summary-meta { font-size: 0.7rem; }
+      .sheet-group-body { padding-left: 34px; }
+      .sheet-group-chip { font-size: 0.68rem; min-height: 20px; padding: 0 7px; }
+      .sheet-group-chevron { width: 22px; height: 22px; }
+      .sheet-group-body { padding-left: 42px; }
+      .sheet-member-row { padding: 6px 4px 6px 0; gap: 8px; }
     }
     @media (max-width: 400px) {
       .topbar { padding: 6px 8px; }
@@ -4647,6 +4698,13 @@
       .search { padding: 7px 10px; font-size: 0.82rem; }
       .btn.small, .sheet-tool-btn { min-height: 36px; padding: 5px 10px; font-size: 0.78rem; }
       .paella-create-btn { min-height: 34px; font-size: 0.78rem; }
+      /* Groups view extreme compact */
+      #editorShell { padding: 6px 8px; gap: 4px; }
+      .sheet-groups-toolbar { padding: 4px 8px 6px; }
+      .sheet-groups-stat { padding: 4px 6px; }
+      .sheet-groups-stat-value { font-size: 0.78rem; }
+      .sheet-groups-banner { padding: 6px 8px 4px; }
+      .sheet-groups-list { padding: 0 6px 6px; }
     }
   </style>
 </head>
@@ -4804,6 +4862,9 @@
       <section id="editorShell" class="card editor-card">
         <div class="editor-head">
           <div class="editor-head-top">
+            <button id="editorBackBtn" class="editor-back-btn" type="button" aria-label="Volver atrás" title="Volver atrás">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
             <div class="editor-title-side">
               <div class="editor-doc">
                 <div id="editorTitle" class="doc-title" role="textbox" aria-label="Nombre del archivo" contenteditable="true" spellcheck="false">Hoja</div>
@@ -5663,6 +5724,7 @@
       driveShell: document.getElementById("driveShell"),
       editorShell: document.getElementById("editorShell"),
       editorTitle: document.getElementById("editorTitle"),
+      editorBackBtn: document.getElementById("editorBackBtn"),
       saveIndicator: document.getElementById("saveIndicator"),
       openInGoogleBtn: document.getElementById("openInGoogleBtn"),
       presenceAvatars: document.getElementById("presenceAvatars"),
@@ -15394,6 +15456,14 @@
       closePaellaFolderView();
       closeDireccionFolderView();
       showView("drive");
+    });
+    els.editorBackBtn.addEventListener("click", function () {
+      returnToDrive().then(function (ok) {
+        if (ok !== false) {
+          closePaellaFolderView();
+          closeDireccionFolderView();
+        }
+      });
     });
     els.modeToggleBtn.addEventListener("click", toggleEditorMode);
     if (els.openInGoogleBtn) els.openInGoogleBtn.addEventListener("click", openCurrentDocumentInGoogle);
