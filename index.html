@@ -2193,8 +2193,8 @@
       display: grid;
       grid-template-rows: auto auto auto auto;
       align-content: start;
-      gap: 12px;
-      padding: 14px;
+      gap: 0;
+      padding: 0;
     }
     #sheetGroupsStatus:empty {
       display: none;
@@ -2203,12 +2203,12 @@
     .sheet-groups-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 0;
       min-height: auto;
       min-width: 0;
       overflow-y: visible;
       overflow-x: hidden;
-      padding-right: 0;
+      padding: 0 12px 12px;
       align-items: stretch;
       align-content: flex-start;
     }
@@ -2219,7 +2219,7 @@
     .sheet-groups-list-actions {
       display: flex;
       justify-content: center;
-      padding-top: 4px;
+      padding-top: 12px;
     }
     .sheet-groups-list-actions .sheet-group-add-btn {
       min-width: 220px;
@@ -2245,9 +2245,10 @@
       align-content: start;
       position: relative;
       z-index: 12;
-      padding: 6px 8px 10px;
+      padding: 10px 12px 10px;
       border: none;
-      border-radius: 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      border-radius: 0;
       background: transparent;
       box-shadow: none;
       isolation: isolate;
@@ -2344,49 +2345,30 @@
       background: rgba(185,90,0,0.05);
     }
     .sheet-group-card {
-      border: 1px solid rgba(0,0,0,0.06);
-      border-radius: 12px;
-      background: #ffffff;
-      overflow: hidden;
+      border: none;
+      border-top: 1px solid rgba(0,0,0,0.07);
+      border-radius: 0;
+      background: transparent;
+      overflow: visible;
       margin-bottom: 0;
       min-width: 0;
-      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      transition: background 0.15s ease;
+      box-shadow: none;
     }
-    .sheet-group-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      transform: translateY(-1px);
-    }
-    .sheet-group-card:last-child {
-      margin-bottom: 0;
-    }
+    .sheet-group-card:first-child { border-top: none; }
+    .sheet-group-card:hover { background: rgba(255,255,255,0.7); }
     .sheet-group-card[open] {
-      background: #fffdf0;
-      border-color: rgba(200, 150, 0, 0.15);
-      box-shadow: 0 6px 16px rgba(185, 90, 0, 0.05);
+      background: rgba(255,253,240,0.9);
     }
-    .sheet-group-card.is-request {
-      background: #f2f7ff;
-      border-color: rgba(74, 119, 196, 0.22);
-    }
-    .sheet-group-card.is-request[open] {
-      background: #eef5ff;
-      border-color: rgba(74, 119, 196, 0.28);
-      box-shadow: 0 4px 12px rgba(74, 119, 196, 0.06);
-    }
+    .sheet-group-card.is-request { background: transparent; }
+    .sheet-group-card.is-request:hover { background: rgba(240,246,255,0.7); }
+    .sheet-group-card.is-request[open] { background: rgba(238,245,255,0.8); }
     @media (max-width: 600px) {
       .sheet-group-card {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
         margin-bottom: 0;
-        box-shadow: none;
       }
       .sheet-groups-banner {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        padding: 16px;
+        padding: 12px 12px 8px;
       }
       .sheet-group-summary {
         padding: 14px 16px;
@@ -2404,14 +2386,14 @@
     }
     .sheet-groups-banner {
       display: grid;
-      gap: 12px;
-      background: #ffffff;
+      gap: 8px;
+      background: transparent;
       color: #5d3a10;
-      border-radius: 20px;
-      padding: 20px 22px;
-      margin-bottom: 8px;
-      border: 1px solid rgba(0,0,0,0.04);
-      box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
+      border-radius: 0;
+      padding: 14px 12px 10px;
+      margin-bottom: 0;
+      border: none;
+      box-shadow: none;
     }
     .sheet-groups-banner-top {
       display: flex;
@@ -2421,16 +2403,16 @@
       min-width: 0;
     }
     .sheet-groups-banner-title {
-      font-size: 1.22rem;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      color: #3d2608;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(93,58,16,0.55);
     }
     .sheet-groups-banner-meta {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: rgba(93,58,16,0.72);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(93,58,16,0.45);
       text-align: right;
     }
     .sheet-groups-banner-search-wrap {
@@ -2442,28 +2424,35 @@
       min-width: 0;
     }
     .sheet-groups-section {
-      border-radius: 14px;
-      overflow: hidden;
+      border-radius: 0;
+      overflow: visible;
+      background: transparent;
+      border: none;
+      margin-top: 10px;
     }
+    .sheet-groups-section:first-child { margin-top: 0; }
     .sheet-groups-section-summary {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
+      gap: 8px;
+      padding: 6px 0 8px;
       cursor: pointer;
       list-style: none;
       user-select: none;
+      border-bottom: 2px solid currentColor;
+      margin-bottom: 8px;
     }
     .sheet-groups-section-summary::-webkit-details-marker { display: none; }
     .sheet-groups-section-label {
       flex: 1;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
     .sheet-groups-section-count {
-      font-size: 0.76rem;
-      font-weight: 500;
+      font-size: 0.72rem;
+      font-weight: 600;
       opacity: 0.7;
       white-space: nowrap;
     }
@@ -2471,32 +2460,15 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding: 0 8px 10px;
+      padding: 0;
     }
-    .sheet-groups-section.request-section {
-      background: rgba(219, 234, 255, 0.55);
-      border: 1px solid rgba(74, 119, 196, 0.22);
-    }
-    .sheet-groups-section.request-section .sheet-groups-section-summary {
-      color: #1d4da0;
-    }
-    .sheet-groups-section.pending-section {
-      background: rgba(255, 238, 188, 0.4);
-      border: 1px solid rgba(185, 90, 0, 0.18);
-    }
-    .sheet-groups-section.pending-section .sheet-groups-section-summary {
-      color: #7a4500;
-    }
-    .sheet-groups-section.paid-section {
-      background: rgba(212, 247, 222, 0.4);
-      border: 1px solid rgba(45, 124, 45, 0.18);
-    }
-    .sheet-groups-section.paid-section .sheet-groups-section-summary {
-      color: #175429;
-    }
+    .sheet-groups-section.request-section .sheet-groups-section-summary { color: #4a77c4; }
+    .sheet-groups-section.pending-section .sheet-groups-section-summary { color: #a16222; }
+    .sheet-groups-section.paid-section .sheet-groups-section-summary { color: #2d7c2d; }
     .sheet-groups-section .sheet-groups-section-summary .sheet-group-chevron {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
+      color: currentColor;
     }
     .sheet-groups-section[open] .sheet-groups-section-summary .sheet-group-chevron svg {
       transform: rotate(180deg);
@@ -2516,7 +2488,7 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 18px 20px;
+      padding: 12px 4px;
       cursor: pointer;
       background: transparent;
       min-width: 0;
@@ -2657,8 +2629,8 @@
     .sheet-group-body {
       display: grid;
       gap: 0;
-      padding: 0;
-      background: #ffffff;
+      padding: 0 0 0 56px;
+      background: transparent;
     }
     .sheet-group-card:not([open]) > .sheet-group-body {
       display: none;
@@ -2678,13 +2650,13 @@
       color: rgba(37, 82, 163, 0.72);
     }
     .sheet-member-list {
-      background: #faf8f5;
+      background: transparent;
     }
     .sheet-member-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 20px;
+      padding: 8px 4px 8px 0;
       border-bottom: 1px solid rgba(0,0,0,0.03);
       min-width: 0;
       background: transparent;
@@ -2766,10 +2738,10 @@
     .sheet-member-detail.hidden { display: none; }
     .sheet-group-footer {
       display: grid;
-      gap: 16px;
-      padding: 16px 20px 20px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      background: #faf8f5;
+      gap: 12px;
+      padding: 10px 4px 14px 0;
+      border-bottom: none;
+      background: transparent;
     }
     .sheet-group-footer-row {
       display: flex;
