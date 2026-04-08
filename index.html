@@ -2255,7 +2255,7 @@
     }
     .sheet-groups-stats {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 4px;
       padding: 4px;
       background: #ffffff;
@@ -9359,18 +9359,12 @@
       var paidCount = visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === GROUP_PAYMENT_STATUS_PAID; }).length;
       var pendingCount = visible.filter(function (group) { return isGroupPendingLikeStatus(group.payment && group.payment.status); }).length;
       var formatShort = function (v) { return (Number(v) || 0).toLocaleString("es-ES", { maximumFractionDigits: 2 }) + "\u20ac"; };
+      var paidValue = String(paidCount) + "/" + String(visible.length) + " \u2713 (" + formatShort(filteredRevenue) + "/" + formatShort(totalRevenue) + ")";
       var groupsValue = String(visible.length) + (visible.length !== groups.length ? "/" + String(groups.length) : "") + " Grupos";
       var attendeesValue = String(filteredAttendees) + (filteredAttendees !== totalAttendees ? "/" + String(totalAttendees) : "") + " Asistentes";
-      var stats = [
-        { label: "", value: formatShort(filteredRevenue) + "/" + formatShort(totalRevenue) },
-        { label: "", value: groupsValue },
-        { label: "", value: attendeesValue },
-        { label: "", value: String(paidCount) + "/" + String(visible.length) + " ✓" }
-      ];
-      els.sheetGroupsStats.innerHTML = stats.map(function (stat) {
-        return "<div class='sheet-groups-stat'>" +
-          "<div class='sheet-groups-stat-value'>" + escapeHtml(stat.value) + "</div>" +
-        "</div>";
+      var stats = [paidValue, groupsValue, attendeesValue];
+      els.sheetGroupsStats.innerHTML = stats.map(function (val) {
+        return "<div class='sheet-groups-stat'><div class='sheet-groups-stat-value'>" + escapeHtml(val) + "</div></div>";
       }).join("");
     }
     function filterSheetGroups(groups) {
