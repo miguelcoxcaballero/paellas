@@ -4321,13 +4321,13 @@
       .paired-item-kind { font-size: 0.62rem; padding: 2px 6px; }
       .sheet-group-summary,
       .sheet-assistant-summary {
-        padding: 10px;
+        padding: 8px;
       }
       .sheet-group-summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
       .sheet-group-body {
-        padding: 0 10px 10px;
+        padding: 0 8px 8px;
       }
       .sheet-group-card,
       .sheet-assistant-item {
@@ -4356,7 +4356,9 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.03);
       }
       .sheet-groups-list {
-        overflow-y: visible;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
         contain: none;
       }
       .sheet-groups-filters {
@@ -4383,10 +4385,31 @@
         transform: translateY(0);
       }
       
-      .sheet-groups-banner { padding: 14px; }
+      .sheet-groups-banner {
+        padding: 6px 8px 4px;
+        gap: 4px;
+      }
+      .sheet-groups-banner-top {
+        flex-direction: row;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .sheet-groups-banner-title,
+      .sheet-groups-banner-meta {
+        font-size: 0.68rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sheet-groups-banner-search {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+      }
       .sheet-group-actions-row {
         justify-content: stretch;
-        padding: 10px;
+        padding: 6px;
+        gap: 6px;
       }
       .sheet-group-actions-row .sheet-group-add-btn {
         flex: 1 1 0;
@@ -4419,7 +4442,7 @@
       }
       .sheet-member-row {
         flex-wrap: wrap;
-        row-gap: 8px;
+        row-gap: 4px;
       }
       .sheet-member-name-text {
         flex: 1 1 calc(100% - 44px);
@@ -4443,7 +4466,7 @@
       }
       .sheet-assistant-fields,
       .sheet-member-detail .sheet-assistant-fields {
-        gap: 12px 8px;
+        gap: 8px 6px;
       }
       .sheet-group-block.responsible .sheet-group-field-list {
         grid-template-columns: 1fr;
@@ -4515,12 +4538,14 @@
       }
       .paired-file-card-title,
       .paired-file-card-meta { display: none; }
-      .sheet-groups-view { 
-        padding: 10px; 
-        height: auto; 
-        overflow: visible; 
-        display: flex; 
-        flex-direction: column; 
+      .sheet-groups-view {
+        padding: 0;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        align-content: stretch;
       }
       .sheet-group-card { padding: 0; }
       .sheet-view-toggle { width: 100%; justify-content: stretch; }
@@ -4674,26 +4699,98 @@
       .sheet-view-toggle { padding: 3px; gap: 3px; }
       .sheet-view-toggle-btn { padding: 4px 10px; font-size: 0.75rem; min-width: 0; }
       #editorView > .card:last-child { padding: 0 0 0; }
-      .sheet-groups-toolbar { padding: 6px 10px 8px; gap: 4px; border-bottom-width: 1px; }
-      .sheet-groups-stats { gap: 2px; padding: 2px; }
-      .sheet-groups-stat { padding: 5px 8px; gap: 1px; }
-      .sheet-groups-stat-value { font-size: 0.82rem; }
-      .sheet-groups-filter-btn-mobile { margin-top: 4px; padding: 6px 14px; font-size: 0.8rem; }
-      .sheet-groups-banner { padding: 8px 10px 6px; gap: 6px; }
-      .sheet-groups-list { padding: 0 8px 8px; }
-      .sheet-groups-section { margin-top: 6px; }
-      .sheet-groups-section-summary { padding: 4px 0 5px; margin-bottom: 4px; }
-      .sheet-groups-section-label { font-size: 0.68rem; }
-      .sheet-groups-section-count { font-size: 0.68rem; }
-      .sheet-group-summary { padding: 6px 4px; gap: 8px; }
-      .sheet-group-index-badge { width: 26px; height: 26px; flex: 0 0 26px; font-size: 0.68rem; }
-      .sheet-group-title-large { font-size: 0.88rem; }
-      .sheet-group-summary-meta { font-size: 0.7rem; }
-      .sheet-group-body { padding-left: 34px; }
-      .sheet-group-chip { font-size: 0.68rem; min-height: 20px; padding: 0 7px; }
-      .sheet-group-chevron { width: 22px; height: 22px; }
-      .sheet-group-body { padding-left: 42px; }
-      .sheet-member-row { padding: 6px 4px 6px 0; gap: 8px; }
+      #sheetGroupsStatus {
+        min-height: 18px;
+        padding: 2px 6px 0;
+        font-size: 0.72rem;
+      }
+      .sheet-groups-toolbar {
+        padding: 4px 6px 6px;
+        gap: 3px;
+        border-bottom-width: 1px;
+      }
+      .sheet-groups-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        padding: 1px;
+        border-radius: 10px;
+      }
+      .sheet-groups-stat { padding: 4px 5px; gap: 0; }
+      .sheet-groups-stat-value {
+        font-size: 0.72rem;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sheet-groups-filter-btn-mobile {
+        margin-top: 2px;
+        min-height: 32px;
+        padding: 5px 10px;
+        font-size: 0.74rem;
+      }
+      .sheet-groups-list { padding: 0 6px 6px; }
+      .sheet-groups-section { margin-top: 4px; }
+      .sheet-groups-section-summary { padding: 3px 0 4px; margin-bottom: 3px; }
+      .sheet-groups-section-label { font-size: 0.64rem; }
+      .sheet-groups-section-count { font-size: 0.62rem; }
+      .sheet-group-summary { padding: 4px 2px; gap: 6px; }
+      .sheet-group-summary-main { gap: 2px; }
+      .sheet-group-index-badge { width: 22px; height: 22px; flex: 0 0 22px; font-size: 0.6rem; border-radius: 7px; }
+      .sheet-group-title-large { font-size: 0.8rem; line-height: 1.15; }
+      .sheet-group-summary-meta { font-size: 0.62rem; line-height: 1.2; }
+      .sheet-group-summary-info { gap: 3px; }
+      .sheet-group-chip { font-size: 0.62rem; min-height: 18px; padding: 0 6px; }
+      .sheet-group-chevron { width: 20px; height: 20px; }
+      .sheet-group-body { padding: 0 4px 4px 30px; }
+      .sheet-member-row { padding: 4px 2px 4px 0; gap: 6px; }
+      .sheet-member-num { width: 24px; height: 24px; flex: 0 0 24px; font-size: 0.64rem; }
+      .sheet-member-name-text { font-size: 0.78rem; }
+      .sheet-member-role-badge,
+      .sheet-member-row .entry-status-chip {
+        margin-left: 30px;
+        max-width: calc(100% - 30px);
+        font-size: 0.54rem;
+        padding: 3px 6px;
+      }
+      .sheet-member-actions .item-more-btn { width: 28px; height: 28px; min-width: 28px; }
+      .sheet-member-toggle-btn { width: 24px; height: 24px; }
+      .sheet-member-toggle-btn svg { width: 16px; height: 16px; }
+      .sheet-member-detail { padding: 8px 10px 10px; }
+      .sheet-group-footer {
+        padding: 8px 10px 10px;
+        gap: 8px;
+      }
+      .sheet-group-footer-row { gap: 5px; }
+      .sheet-group-field-label { font-size: 0.56rem; }
+      .sheet-group-input,
+      .sheet-group-select,
+      .sheet-group-readonly {
+        min-height: 34px;
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        border-radius: 7px;
+      }
+      .sheet-person-ticket {
+        gap: 6px;
+        margin-top: 6px;
+        padding: 8px;
+        border-radius: 10px;
+      }
+      .sheet-group-pill {
+        min-height: 28px;
+        padding-inline: 8px;
+        font-size: 0.72rem;
+      }
+      .sheet-group-add-btn {
+        min-height: 30px;
+        padding: 5px 10px;
+        font-size: 0.74rem;
+        border-radius: 7px;
+      }
+      .sheet-groups-list-actions {
+        padding-top: 6px;
+      }
     }
     @media (max-width: 400px) {
       .topbar { padding: 6px 8px; }
@@ -4738,11 +4835,48 @@
       .paella-create-btn { min-height: 34px; font-size: 0.78rem; }
       /* Groups view extreme compact */
       #editorShell { padding: 6px 8px; gap: 4px; }
-      .sheet-groups-toolbar { padding: 4px 8px 6px; }
-      .sheet-groups-stat { padding: 4px 6px; }
-      .sheet-groups-stat-value { font-size: 0.78rem; }
-      .sheet-groups-banner { padding: 6px 8px 4px; }
-      .sheet-groups-list { padding: 0 6px 6px; }
+      #sheetGroupsStatus { padding: 1px 4px 0; font-size: 0.68rem; min-height: 16px; }
+      .sheet-groups-toolbar { padding: 3px 4px 5px; gap: 2px; }
+      .sheet-groups-stats { border-radius: 8px; }
+      .sheet-groups-stat { padding: 3px 4px; }
+      .sheet-groups-stat-value { font-size: 0.66rem; }
+      .sheet-groups-filter-btn-mobile { min-height: 30px; padding: 4px 8px; font-size: 0.7rem; }
+      .sheet-groups-banner { padding: 4px 5px 3px; gap: 3px; }
+      .sheet-groups-banner-title,
+      .sheet-groups-banner-meta { font-size: 0.62rem; }
+      .sheet-groups-banner-search { padding: 5px 8px; font-size: 0.74rem; }
+      .sheet-groups-list { padding: 0 4px 4px; }
+      .sheet-groups-section-summary { padding: 2px 0 3px; margin-bottom: 2px; }
+      .sheet-groups-section-label,
+      .sheet-groups-section-count { font-size: 0.58rem; }
+      .sheet-group-summary { padding: 3px 1px; gap: 5px; }
+      .sheet-group-index-badge { width: 20px; height: 20px; flex-basis: 20px; font-size: 0.56rem; }
+      .sheet-group-title-large { font-size: 0.74rem; }
+      .sheet-group-summary-meta { font-size: 0.58rem; }
+      .sheet-group-chip { font-size: 0.58rem; min-height: 17px; padding: 0 5px; }
+      .sheet-group-chevron { width: 18px; height: 18px; }
+      .sheet-group-body { padding: 0 3px 3px 26px; }
+      .sheet-member-row { padding: 3px 1px 3px 0; gap: 5px; }
+      .sheet-member-num { width: 22px; height: 22px; flex-basis: 22px; font-size: 0.6rem; }
+      .sheet-member-name-text { font-size: 0.72rem; }
+      .sheet-member-role-badge,
+      .sheet-member-row .entry-status-chip {
+        margin-left: 27px;
+        max-width: calc(100% - 27px);
+        font-size: 0.5rem;
+        padding: 2px 5px;
+      }
+      .sheet-member-actions .item-more-btn { width: 26px; height: 26px; min-width: 26px; }
+      .sheet-member-toggle-btn { width: 22px; height: 22px; }
+      .sheet-member-detail { padding: 7px 8px 8px; }
+      .sheet-group-footer { padding: 7px 8px 8px; gap: 7px; }
+      .sheet-group-field-label { font-size: 0.52rem; }
+      .sheet-group-input,
+      .sheet-group-select,
+      .sheet-group-readonly { min-height: 32px; padding: 5px 8px; font-size: 0.74rem; }
+      .sheet-person-ticket { gap: 5px; margin-top: 5px; padding: 7px; }
+      .sheet-group-pill { min-height: 26px; font-size: 0.68rem; padding-inline: 6px; }
+      .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
 </head>
