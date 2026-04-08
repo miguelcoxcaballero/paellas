@@ -2403,10 +2403,8 @@
       }
     }
     .sheet-groups-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
+      display: grid;
+      gap: 12px;
       background: #ffffff;
       color: #5d3a10;
       border-radius: 20px;
@@ -2414,6 +2412,13 @@
       margin-bottom: 8px;
       border: 1px solid rgba(0,0,0,0.04);
       box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
+    }
+    .sheet-groups-banner-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-width: 0;
     }
     .sheet-groups-banner-title {
       font-size: 1.22rem;
@@ -2427,6 +2432,77 @@
       font-weight: 700;
       color: rgba(93,58,16,0.72);
       text-align: right;
+    }
+    .sheet-groups-banner-search-wrap {
+      width: 100%;
+      min-width: 0;
+    }
+    .sheet-groups-banner-search {
+      width: 100%;
+      min-width: 0;
+    }
+    .sheet-groups-section {
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .sheet-groups-section-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .sheet-groups-section-summary::-webkit-details-marker { display: none; }
+    .sheet-groups-section-label {
+      flex: 1;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .sheet-groups-section-count {
+      font-size: 0.76rem;
+      font-weight: 500;
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+    .sheet-groups-section-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 8px 10px;
+    }
+    .sheet-groups-section.request-section {
+      background: rgba(219, 234, 255, 0.55);
+      border: 1px solid rgba(74, 119, 196, 0.22);
+    }
+    .sheet-groups-section.request-section .sheet-groups-section-summary {
+      color: #1d4da0;
+    }
+    .sheet-groups-section.pending-section {
+      background: rgba(255, 238, 188, 0.4);
+      border: 1px solid rgba(185, 90, 0, 0.18);
+    }
+    .sheet-groups-section.pending-section .sheet-groups-section-summary {
+      color: #7a4500;
+    }
+    .sheet-groups-section.paid-section {
+      background: rgba(212, 247, 222, 0.4);
+      border: 1px solid rgba(45, 124, 45, 0.18);
+    }
+    .sheet-groups-section.paid-section .sheet-groups-section-summary {
+      color: #175429;
+    }
+    .sheet-groups-section .sheet-groups-section-summary .sheet-group-chevron {
+      width: 22px;
+      height: 22px;
+    }
+    .sheet-groups-section[open] .sheet-groups-section-summary .sheet-group-chevron svg {
+      transform: rotate(180deg);
+    }
+    .skip-anim .sheet-groups-section {
+      animation: none !important;
     }
     .sheet-group-summary,
     .sheet-assistant-summary {
@@ -2466,6 +2542,10 @@
       font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 0;
+    }
+    .sheet-group-index-badge.is-request {
+      font-size: 1rem;
+      font-weight: 800;
     }
     .sheet-group-summary-meta {
       font-size: 0.8rem;
@@ -3945,7 +4025,7 @@
       .sheet-assistant-fields { grid-template-columns: 1fr 1fr; }
       .sheet-groups-filters { flex-direction: column; }
       .sheet-groups-stats { grid-template-columns: 1fr 1fr; }
-      .sheet-groups-banner { align-items: start; flex-direction: column; }
+      .sheet-groups-banner-top { align-items: start; flex-direction: column; }
       .sheet-groups-banner-meta { text-align: left; }
       .sheet-group-summary { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
       .sheet-group-block.responsible .sheet-group-field-list { grid-template-columns: 1fr 1fr; }
@@ -5461,10 +5541,12 @@
       sheetGroupsDraftSlots: {},
       sheetGroupsExpanded: {},
       sheetGroupAssistantExpanded: {},
+      sheetGroupsSectionExpanded: {},
       sheetGroupsFilters: {
         payment: "all",
         fire: "all",
-        contest: "all"
+        contest: "all",
+        search: ""
       },
       ticketReader: {
         folderId: "",
@@ -5648,6 +5730,7 @@
       sheetGroupsPaymentFilter: document.getElementById("sheetGroupsPaymentFilter"),
       sheetGroupsFireFilter: document.getElementById("sheetGroupsFireFilter"),
       sheetGroupsContestFilter: document.getElementById("sheetGroupsContestFilter"),
+      sheetGroupsSearchInput: null,
       formEditor: document.getElementById("formEditor"),
       formViewSwitch: document.getElementById("formViewSwitch"),
       formViewMainBtn: document.getElementById("formViewMainBtn"),
@@ -7622,6 +7705,7 @@
       if (!els.sheetGroupsView) return focusState;
       const active = document.activeElement;
       if (!active || !els.sheetGroupsView.contains(active)) return focusState;
+      focusState.elementId = active.id ? String(active.id) : "";
       focusState.tagName = String(active.tagName || "");
       focusState.groupId = active.dataset ? String(active.dataset.groupId || "") : "";
       focusState.row = active.dataset ? String(active.dataset.row || "") : "";
@@ -7640,6 +7724,10 @@
       if (!els.sheetGroupsView) return;
       let selector = "";
       let target = null;
+      if (focusState.elementId) {
+        target = document.getElementById(focusState.elementId);
+        if (target && !els.sheetGroupsView.contains(target)) target = null;
+      }
       if (focusState.row !== undefined && focusState.row !== "" && focusState.col !== undefined && focusState.col !== "") {
         selector = "[data-row='" + String(focusState.row).replace(/'/g, "\\'") + "'][data-col='" + String(focusState.col).replace(/'/g, "\\'") + "']";
         target = els.sheetGroupsView.querySelector(selector);
@@ -7736,6 +7824,85 @@
       });
       return values;
     }
+    function setSheetGroupIndexBadge(indexBadge, group, index) {
+      if (!indexBadge) return;
+      const normalizedStatus = normalizePaymentStatus(group && group.payment && group.payment.status);
+      const isRequest = normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST;
+      indexBadge.textContent = isRequest ? "\u26A0" : ("G" + String(index + 1));
+      indexBadge.classList.toggle("is-request", isRequest);
+      indexBadge.title = isRequest ? GROUP_PAYMENT_STATUS_REQUEST : ("Grupo " + String(index + 1));
+    }
+    function buildSheetGroupSearchIndex(group, rawValues) {
+      const values = Array.isArray(rawValues) ? rawValues : [];
+      const parts = [];
+      if (group && group.title) parts.push(group.title);
+      if (group && group.submittedAt) parts.push(group.submittedAt);
+      if (group && group.responseId) parts.push(group.responseId);
+      if (group && group.responsible) {
+        parts.push(group.responsible.name, group.responsible.email, group.responsible.dni, group.responsible.phone);
+      }
+      if (group && group.firePoint) parts.push(group.firePoint.value);
+      if (group && group.sharedLead) parts.push(group.sharedLead.value);
+      if (group && group.contest) parts.push(group.contest.value);
+      if (group && group.payment) {
+        parts.push(group.payment.status, group.payment.payer, group.payment.amount);
+      }
+      (group && group.assistants || []).forEach(function (assistant) {
+        parts.push(assistant && assistant.name, assistant && assistant.dni, assistant && assistant.email);
+      });
+      values.forEach(function (value) { parts.push(value); });
+      return normalizeCompareText(parts.filter(Boolean).join(" "));
+    }
+    function matchesSheetGroupSearch(group, query) {
+      const normalizedQuery = normalizeCompareText(String(query || "").trim());
+      if (!normalizedQuery) return true;
+      const haystack = String(group && group.searchIndex || "");
+      if (!haystack) return false;
+      return normalizedQuery.split(/\s+/).filter(Boolean).every(function (term) {
+        return haystack.indexOf(term) !== -1;
+      });
+    }
+    function sheetGroupsEmptyStateText(groups, filteredGroups) {
+      const allGroups = Array.isArray(groups) ? groups : [];
+      const visibleGroups = Array.isArray(filteredGroups) ? filteredGroups : allGroups;
+      if (!allGroups.length) return "No hay grupos para mostrar en esta hoja.";
+      if (String(state.sheetGroupsFilters && state.sheetGroupsFilters.search || "").trim()) {
+        return "No hay grupos que coincidan con la búsqueda actual.";
+      }
+      if (visibleGroups.length !== allGroups.length) return "No hay grupos que cumplan los filtros actuales.";
+      return "No hay grupos para mostrar en esta hoja.";
+    }
+    function handleSheetGroupsSearchInput(event) {
+      const input = event && event.target;
+      if (!input) return;
+      state.sheetGroupsFilters.search = String(input.value || "");
+      markSheetGroupsInteraction(420);
+      rerenderSheetGroupsFromModel();
+    }
+    function syncSheetGroupsBanner(groups) {
+      const allGroups = Array.isArray(groups) ? groups : [];
+      const banner = els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner") : null;
+      if (!banner) {
+        els.sheetGroupsSearchInput = null;
+        return null;
+      }
+      const meta = banner.querySelector(".sheet-groups-banner-meta");
+      if (meta) {
+        const totalAttendees = allGroups.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
+        meta.textContent = String(allGroups.length) + " grupos | " + String(totalAttendees) + " asistentes";
+      }
+      const searchInput = banner.querySelector("#sheetGroupsBannerSearchInput");
+      if (searchInput) {
+        const nextValue = String(state.sheetGroupsFilters && state.sheetGroupsFilters.search || "");
+        if (document.activeElement !== searchInput && searchInput.value !== nextValue) {
+          searchInput.value = nextValue;
+        }
+        els.sheetGroupsSearchInput = searchInput;
+      } else {
+        els.sheetGroupsSearchInput = null;
+      }
+      return banner;
+    }
     function syncSheetGroupsSummaryInfo(infoRow, group) {
       if (!infoRow) return;
       infoRow.innerHTML = "";
@@ -7805,7 +7972,7 @@
       card.style.setProperty('--i', String(Math.min(index + 1, 12)));
       syncSheetGroupCardTone(card, group);
       const indexBadge = card.querySelector(".sheet-group-index-badge");
-      if (indexBadge) indexBadge.textContent = "G" + (index + 1);
+      setSheetGroupIndexBadge(indexBadge, group, index);
       const summaryMeta = card.querySelector(".sheet-group-summary-meta");
       if (summaryMeta) {
         const attendeeCount = group.attendeeCount || 0;
@@ -7874,16 +8041,10 @@
         const filteredGroups = filterSheetGroups(groups);
         renderSheetGroupsToolbar(safeModel, filteredGroups);
         if (els.sheetGroupsEmpty) {
-          els.sheetGroupsEmpty.textContent = groups.length && !filteredGroups.length
-            ? "No hay grupos que cumplan los filtros actuales."
-            : "No hay grupos para mostrar en esta hoja.";
+          els.sheetGroupsEmpty.textContent = sheetGroupsEmptyStateText(groups, filteredGroups);
           els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
         }
-        const bannerMeta = els.sheetGroupsList ? els.sheetGroupsList.querySelector(".sheet-groups-banner-meta") : null;
-        if (bannerMeta) {
-          const totalAttendees = groups.reduce(function (sum, group) { return sum + (Number(group.attendeeCount) || 0); }, 0);
-          bannerMeta.textContent = String(groups.length) + " grupos | " + String(totalAttendees) + " asistentes";
-        }
+        syncSheetGroupsBanner(groups);
         filteredGroups.forEach(function (group, index) {
           const card = els.sheetGroupsList.querySelector(".sheet-group-card[data-group-id='" + String(group.id).replace(/'/g, "\\'") + "']");
           if (card) syncRenderedSheetGroupCard(card, group, index);
@@ -9194,30 +9355,31 @@
       els.sheetGroupsPaymentFilter.value = state.sheetGroupsFilters.payment || "all";
       els.sheetGroupsFireFilter.value = state.sheetGroupsFilters.fire || "all";
       els.sheetGroupsContestFilter.value = state.sheetGroupsFilters.contest || "all";
+      var paidCount = visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === GROUP_PAYMENT_STATUS_PAID; }).length;
+      var pendingCount = visible.filter(function (group) { return isGroupPendingLikeStatus(group.payment && group.payment.status); }).length;
+      var formatShort = function (v) { return (Number(v) || 0).toLocaleString("es-ES", { maximumFractionDigits: 2 }) + "\u20ac"; };
       const stats = [
-        { label: "Dinero recaudado", value: formatEuroAmount(filteredRevenue), meta: "Total global: " + formatEuroAmount(totalRevenue) },
-        { label: "Grupos visibles", value: String(visible.length), meta: "Total: " + String(groups.length) },
-        { label: "Asistentes visibles", value: String(filteredAttendees), meta: "Total: " + String(totalAttendees) },
-        {
-          label: "Pagados",
-          value: String(visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === GROUP_PAYMENT_STATUS_PAID; }).length),
-          meta: "Pendientes visibles: " + String(visible.filter(function (group) { return isGroupPendingLikeStatus(group.payment && group.payment.status); }).length)
-        }
+        { label: "Recaudado", value: formatShort(filteredRevenue) + "/" + formatShort(totalRevenue), meta: "" },
+        { label: "Grupos", value: String(visible.length) + (visible.length !== groups.length ? "/" + String(groups.length) : ""), meta: "" },
+        { label: "Asistentes", value: String(filteredAttendees) + (filteredAttendees !== totalAttendees ? "/" + String(totalAttendees) : ""), meta: "" },
+        { label: "Pagados", value: String(paidCount) + "/" + String(visible.length), meta: String(pendingCount) + " pendientes" }
       ];
       els.sheetGroupsStats.innerHTML = stats.map(function (stat) {
         return "<div class='sheet-groups-stat'>" +
           "<div class='sheet-groups-stat-label'>" + escapeHtml(stat.label) + "</div>" +
           "<div class='sheet-groups-stat-value'>" + escapeHtml(stat.value) + "</div>" +
-          "<div class='sheet-groups-stat-meta'>" + escapeHtml(stat.meta) + "</div>" +
+          (stat.meta ? "<div class='sheet-groups-stat-meta'>" + escapeHtml(stat.meta) + "</div>" : "") +
         "</div>";
       }).join("");
     }
     function filterSheetGroups(groups) {
       const filters = state.sheetGroupsFilters || {};
       return (groups || []).filter(function (group) {
+        const searchValue = String(filters.search || "");
         const paymentStatus = normalizePaymentStatus(group.payment && group.payment.status);
         const fireKey = firePointFilterKey(group.firePoint && group.firePoint.value);
         const contestValue = normalizeYesNoValue(group.contest && group.contest.value);
+        if (!matchesSheetGroupSearch(group, searchValue)) return false;
         if (filters.payment === "paid" && paymentStatus !== GROUP_PAYMENT_STATUS_PAID) return false;
         if (filters.payment === "partial" && paymentStatus !== GROUP_PAYMENT_STATUS_PARTIAL) return false;
         if (filters.payment === "pending" && !isGroupPendingLikeStatus(paymentStatus)) return false;
@@ -9235,6 +9397,7 @@
       state.sheetGroupsFilters.payment = els.sheetGroupsPaymentFilter ? (els.sheetGroupsPaymentFilter.value || "all") : "all";
       state.sheetGroupsFilters.fire = els.sheetGroupsFireFilter ? (els.sheetGroupsFireFilter.value || "all") : "all";
       state.sheetGroupsFilters.contest = els.sheetGroupsContestFilter ? (els.sheetGroupsContestFilter.value || "all") : "all";
+      markSheetGroupsInteraction(320);
       rerenderSheetGroupsFromModel();
     }
     function sheetGroupsStatusText(model) {
@@ -9440,6 +9603,7 @@
       state.sheetGroupsDraftSlots = {};
       state.sheetGroupsExpanded = {};
       state.sheetGroupAssistantExpanded = {};
+      state.sheetGroupsSectionExpanded = {};
     }
     function reloadCurrentSheetGroupsAfterStructureChange(options) {
       const config = options || {};
@@ -9724,6 +9888,12 @@
       }
       return false;
     }
+    function isSheetGroupSectionExpanded(key) {
+      if (Object.prototype.hasOwnProperty.call(state.sheetGroupsSectionExpanded, key)) {
+        return !!state.sheetGroupsSectionExpanded[key];
+      }
+      return true;
+    }
     function isSheetAssistantExpanded(groupId, assistantNumber, forceOpen) {
       const key = String(groupId || "") + "::" + String(assistantNumber || "");
       if (forceOpen) return true;
@@ -9868,12 +10038,15 @@
         const assistants = assistantSlots.filter(function (assistant) {
           return assistant.filled;
         });
+        const paymentStatus = normalizePaymentStatus(valueAt(values, paymentStatusCol));
         const submittedRaw = valueAt(values, Number.isInteger(headerIndex["submittedat"]) ? headerIndex["submittedat"] : headerIndex["timestamp"]);
         const submittedAt = parseSheetTimestamp(submittedRaw);
-        return {
+        const firePointValue = normalizeFirePointValue(valueAt(values, headerIndex["paella - punto de fuego"]));
+        const contestValue = normalizeYesNoValue(valueAt(values, headerIndex["paella - participa en concurso"]));
+        const group = {
           id: "group-" + rowIndex,
           sheetRow: rowIndex + 1,
-          title: responsible.name || responsible.email || ("Grupo " + (rowIndex + 1)),
+          title: responsible.name || responsible.email || (paymentStatus === GROUP_PAYMENT_STATUS_REQUEST ? GROUP_PAYMENT_STATUS_REQUEST : ("Grupo " + (rowIndex + 1))),
           submittedAt: submittedAt,
           responseId: valueAt(values, headerIndex["responseid"]),
           responsible: responsible,
@@ -9881,7 +10054,7 @@
           assistantSlots: assistantSlots,
           attendeeCount: 1 + assistants.length,
           firePoint: {
-            value: normalizeFirePointValue(valueAt(values, headerIndex["paella - punto de fuego"])),
+            value: firePointValue,
             col: headerIndex["paella - punto de fuego"]
           },
           sharedLead: {
@@ -9889,11 +10062,11 @@
             col: headerIndex["paella - responsable del otro grupo"]
           },
           contest: {
-            value: normalizeYesNoValue(valueAt(values, headerIndex["paella - participa en concurso"])),
+            value: contestValue,
             col: headerIndex["paella - participa en concurso"]
           },
           payment: {
-            status: normalizePaymentStatus(valueAt(values, paymentStatusCol)),
+            status: paymentStatus,
             payer: valueAt(values, paymentPayerCol),
             amount: valueAt(values, paymentAmountCol),
             statusCol: paymentStatusCol,
@@ -9901,6 +10074,8 @@
             amountCol: paymentAmountCol
           }
         };
+        group.searchIndex = buildSheetGroupSearchIndex(group, values);
+        return group;
       }).filter(Boolean);
       return baseModel;
     }
@@ -10005,10 +10180,43 @@
       else els.sheetGroupsList.classList.remove("skip-anim");
       const filteredGroups = filterSheetGroups(groups || []);
       renderSheetGroupsToolbar(currentSheetGroupsModel() || { groups: groups || [] }, filteredGroups);
+      const allGroups = groups || [];
+      if (allGroups.length) {
+        const totalAttendees = allGroups.reduce(function (s, g) { return s + (g.attendeeCount || 0); }, 0);
+        const banner = document.createElement("div");
+        const bannerTop = document.createElement("div");
+        const bannerTitle = document.createElement("div");
+        const bannerMeta = document.createElement("div");
+        const searchWrap = document.createElement("div");
+        const searchInput = document.createElement("input");
+        banner.className = "sheet-groups-banner";
+        bannerTop.className = "sheet-groups-banner-top";
+        bannerTitle.className = "sheet-groups-banner-title";
+        bannerTitle.textContent = "Vista de grupos";
+        bannerMeta.className = "sheet-groups-banner-meta";
+        bannerMeta.textContent = String(allGroups.length) + " grupos | " + String(totalAttendees) + " asistentes";
+        bannerTop.appendChild(bannerTitle);
+        bannerTop.appendChild(bannerMeta);
+        searchWrap.className = "sheet-groups-banner-search-wrap";
+        searchInput.id = "sheetGroupsBannerSearchInput";
+        searchInput.className = "search sheet-groups-banner-search";
+        searchInput.type = "search";
+        searchInput.placeholder = "Buscar por nombre, integrante, teléfono, DNI o cualquier dato";
+        searchInput.autocomplete = "off";
+        searchInput.spellcheck = false;
+        searchInput.value = String(state.sheetGroupsFilters && state.sheetGroupsFilters.search || "");
+        searchInput.addEventListener("input", handleSheetGroupsSearchInput);
+        searchWrap.appendChild(searchInput);
+        banner.appendChild(bannerTop);
+        banner.appendChild(searchWrap);
+        banner.style.setProperty('--i', '0');
+        els.sheetGroupsList.appendChild(banner);
+        els.sheetGroupsSearchInput = searchInput;
+      } else {
+        els.sheetGroupsSearchInput = null;
+      }
       if (els.sheetGroupsEmpty) {
-        els.sheetGroupsEmpty.textContent = (groups || []).length && !filteredGroups.length
-          ? "No hay grupos que cumplan los filtros actuales."
-          : "No hay grupos para mostrar en esta hoja.";
+        els.sheetGroupsEmpty.textContent = sheetGroupsEmptyStateText(allGroups, filteredGroups);
         els.sheetGroupsEmpty.classList.toggle("hidden", filteredGroups.length !== 0);
       }
       if (!filteredGroups.length) {
@@ -10017,16 +10225,64 @@
         if (scrollParent && savedScrollTop) scrollParent.scrollTop = savedScrollTop;
         return;
       }
-      const allGroups = groups || [];
-      const totalAttendees = allGroups.reduce(function (s, g) { return s + (g.attendeeCount || 0); }, 0);
-      const banner = document.createElement("div");
-      banner.className = "sheet-groups-banner";
-      banner.innerHTML =
-        "<div class='sheet-groups-banner-title'>Vista de grupos</div>" +
-        "<div class='sheet-groups-banner-meta'>" + escapeHtml(String(allGroups.length)) + " grupos | " + escapeHtml(String(totalAttendees)) + " asistentes</div>";
-      banner.style.setProperty('--i', '0');
-      els.sheetGroupsList.appendChild(banner);
-      (filteredGroups || []).forEach(function (group, index) {
+      var globalGroupIndex = 0;
+      var sectionDefs = [
+        {
+          key: "request",
+          label: "Peticiones de grupo",
+          className: "request-section",
+          groups: (filteredGroups || []).filter(function (g) {
+            return normalizePaymentStatus(g.payment && g.payment.status) === GROUP_PAYMENT_STATUS_REQUEST;
+          })
+        },
+        {
+          key: "pending",
+          label: "Pendiente de pago",
+          className: "pending-section",
+          groups: (filteredGroups || []).filter(function (g) {
+            var s = normalizePaymentStatus(g.payment && g.payment.status);
+            return s === GROUP_PAYMENT_STATUS_PENDING || s === GROUP_PAYMENT_STATUS_PARTIAL;
+          })
+        },
+        {
+          key: "paid",
+          label: "Pagados",
+          className: "paid-section",
+          groups: (filteredGroups || []).filter(function (g) {
+            return normalizePaymentStatus(g.payment && g.payment.status) === GROUP_PAYMENT_STATUS_PAID;
+          })
+        }
+      ];
+      sectionDefs.forEach(function (sectionDef) {
+        if (!sectionDef.groups.length) return;
+        var sectionAttendees = sectionDef.groups.reduce(function (s, g) { return s + (g.attendeeCount || 0); }, 0);
+        var sectionCountText = String(sectionDef.groups.length) + " " + (sectionDef.groups.length === 1 ? "grupo" : "grupos") + " · " + String(sectionAttendees) + " asistentes";
+        var sectionEl = document.createElement("details");
+        sectionEl.className = "sheet-groups-section " + sectionDef.className;
+        sectionEl.dataset.sectionKey = sectionDef.key;
+        sectionEl.open = isSheetGroupSectionExpanded(sectionDef.key);
+        sectionEl.addEventListener("toggle", (function (key) {
+          return function () { state.sheetGroupsSectionExpanded[key] = sectionEl.open; };
+        })(sectionDef.key));
+        var sectionSummary = document.createElement("summary");
+        sectionSummary.className = "sheet-groups-section-summary";
+        var sectionLabel = document.createElement("span");
+        sectionLabel.className = "sheet-groups-section-label";
+        sectionLabel.textContent = sectionDef.label;
+        var sectionCount = document.createElement("span");
+        sectionCount.className = "sheet-groups-section-count";
+        sectionCount.textContent = sectionCountText;
+        var sectionChevron = document.createElement("div");
+        sectionChevron.className = "sheet-group-chevron";
+        sectionChevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+        sectionSummary.appendChild(sectionLabel);
+        sectionSummary.appendChild(sectionCount);
+        sectionSummary.appendChild(sectionChevron);
+        sectionEl.appendChild(sectionSummary);
+        var sectionBody = document.createElement("div");
+        sectionBody.className = "sheet-groups-section-body";
+        sectionDef.groups.forEach(function (group) {
+        var index = globalGroupIndex++;
         const ticketPeople = buildTicketPeopleFromGroup(group);
         const card = document.createElement("details");
         const wasOpen = isSheetGroupExpanded(group.id, index);
@@ -10041,7 +10297,7 @@
         summary.className = "sheet-group-summary";
         const indexBadge = document.createElement("div");
         indexBadge.className = "sheet-group-index-badge";
-        indexBadge.textContent = String(index + 1);
+        setSheetGroupIndexBadge(indexBadge, group, index);
         summary.appendChild(indexBadge);
         
         const summaryMain = document.createElement("div");
@@ -10222,8 +10478,11 @@
         }
         card.appendChild(body);
         syncSheetGroupTicketActionState(card, group);
-        els.sheetGroupsList.appendChild(card);
-      });
+        sectionBody.appendChild(card);
+        }); // end sectionDef.groups.forEach
+        sectionEl.appendChild(sectionBody);
+        els.sheetGroupsList.appendChild(sectionEl);
+      }); // end sectionDefs.forEach
       appendCreateGroupAction();
       syncSheetGroupsInteractivity();
       if (scrollParent && savedScrollTop) scrollParent.scrollTop = savedScrollTop;
@@ -14021,6 +14280,7 @@
         state.sheetGroupsDraftSlots = {};
         state.sheetGroupsExpanded = {};
         state.sheetGroupAssistantExpanded = {};
+        state.sheetGroupsSectionExpanded = {};
       }
       const requestId = ++state.sheetLoadToken;
       if (!config.quiet) {
@@ -14118,6 +14378,7 @@
       state.sheetGroupsDraftSlots = {};
       state.sheetGroupsExpanded = {};
       state.sheetGroupAssistantExpanded = {};
+      state.sheetGroupsSectionExpanded = {};
       clearTimeout(state.saveTimer);
       state.saveQueued = false;
       state.saveInFlight = false;
@@ -14196,6 +14457,7 @@
       state.sheetGroupsDraftSlots = {};
       state.sheetGroupsExpanded = {};
       state.sheetGroupAssistantExpanded = {};
+      state.sheetGroupsSectionExpanded = {};
       state.titleDirty = false;
       state.editorMode = "read";
       state.canEdit = true;
@@ -15022,6 +15284,7 @@
         state.sheetGroupsDraftSlots = {};
         state.sheetGroupsExpanded = {};
         state.sheetGroupAssistantExpanded = {};
+        state.sheetGroupsSectionExpanded = {};
           state.spreadsheetViewMode = "table";
           state.sheetGroupLoadToken = 0;
           state.formId = "";
