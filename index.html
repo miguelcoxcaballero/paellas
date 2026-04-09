@@ -2667,9 +2667,15 @@
     .change-history-entry {
       margin: 0;
       border-top: 1px solid rgba(93,58,16,0.1);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
     .change-history-entry:first-child {
       border-top: none;
+    }
+    .change-history-entry[open] {
+      background: linear-gradient(180deg, rgba(255,252,245,0.96), rgba(255,248,235,0.92));
+      border-top-color: rgba(212,81,0,0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
     }
     .change-history-entry-summary {
       list-style: none;
@@ -2679,9 +2685,16 @@
       gap: 10px;
       padding: 10px 0;
       cursor: pointer;
+      transition: background 0.18s ease, padding 0.18s ease;
     }
     .change-history-entry-summary::-webkit-details-marker {
       display: none;
+    }
+    .change-history-entry-summary:hover {
+      background: rgba(255,255,255,0.44);
+    }
+    .change-history-entry[open] > .change-history-entry-summary {
+      padding-bottom: 12px;
     }
     .change-history-entry-main {
       min-width: 0;
@@ -2741,18 +2754,43 @@
       min-width: 0;
     }
     .change-history-entry-detail {
-      padding: 0 0 12px;
+      margin: 0 0 14px 44px;
+      padding: 12px 14px;
       display: grid;
       gap: 10px;
+      border: 1px solid rgba(212,81,0,0.14);
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,248,234,0.96));
+      box-shadow:
+        0 12px 24px rgba(120,78,18,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+    .change-history-entry-detail-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(93,58,16,0.1);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(93,58,16,0.7);
     }
     .change-history-entry-facts {
       display: grid;
-      gap: 7px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
     }
     .change-history-entry-fact {
       display: grid;
-      gap: 3px;
+      gap: 5px;
       min-width: 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(93,58,16,0.08);
+      background: rgba(255,252,246,0.9);
     }
     .change-history-entry-values {
       display: grid;
@@ -2761,8 +2799,12 @@
     }
     .change-history-entry-value {
       display: grid;
-      gap: 4px;
+      gap: 5px;
       min-width: 0;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(93,58,16,0.08);
+      background: rgba(255,255,255,0.92);
     }
     .change-history-entry-label {
       font-size: 0.58rem;
@@ -2783,9 +2825,11 @@
       font-style: italic;
     }
     .change-history-entry .sheet-group-chevron {
-      width: 20px;
-      height: 20px;
-      flex: 0 0 20px;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      border-radius: 999px;
+      background: rgba(93,58,16,0.08);
     }
     .change-history-entry[open] .sheet-group-chevron svg {
       transform: rotate(180deg);
@@ -5492,7 +5536,10 @@
       .change-history-entry-icon { min-width: 1.45rem; height: 1.45rem; font-size: 0.74rem; }
       .change-history-entry-summary { gap: 6px; padding: 8px 0; }
       .change-history-entry-head { gap: 6px; }
-      .change-history-entry-detail { padding-bottom: 10px; gap: 8px; }
+      .change-history-entry-detail { margin: 0 0 10px 0; padding: 10px; gap: 8px; border-radius: 14px; }
+      .change-history-entry-facts { grid-template-columns: 1fr; gap: 8px; }
+      .change-history-entry-fact,
+      .change-history-entry-value { padding: 9px 10px; border-radius: 11px; }
       .change-history-entry-values { gap: 8px; }
       .edit-session-actions { gap: 6px; }
       .sheet-groups-list { padding: 0 4px calc(4px + var(--viewport-bottom-offset)); }
@@ -12418,6 +12465,28 @@
     function hasChangeHistoryValue(value) {
       return String(value == null ? "" : value).trim() !== "";
     }
+    function detectHistoryPaymentStatusValue(value) {
+      const raw = String(value == null ? "" : value).trim();
+      if (!raw) return "";
+      const normalized = normalizePaymentStatus(raw);
+      return GROUP_PAYMENT_STATUS_OPTIONS.indexOf(normalized) !== -1 ? normalized : "";
+    }
+    function detectHistoryEntryStatusValue(value) {
+      const raw = String(value == null ? "" : value).trim();
+      if (!raw) return "";
+      const normalized = normalizeEntryStatus(raw);
+      return ["Pendiente", "Emitida", "HA ENTRADO"].indexOf(normalized) !== -1 ? normalized : "";
+    }
+    function detectHistoryFirePointValue(value) {
+      const raw = String(value == null ? "" : value).trim();
+      if (!raw) return "";
+      const normalized = normalizeFirePointValue(raw);
+      return normalized && normalized !== raw ? normalized : (
+        (normalizeCompareText(raw).indexOf("paella") !== -1 || normalizeCompareText(raw).indexOf("torra") !== -1 || normalizeCompareText(raw).indexOf("comparto") !== -1)
+          ? raw
+          : ""
+      );
+    }
     function changeHistoryEntryVisual(entry) {
       const normalizedType = String(entry && entry.type || "").trim().toUpperCase();
       const baseLabel = changeHistoryTypeLabel(normalizedType);
@@ -12565,6 +12634,98 @@
         return { icon: "✏", label: "Nombre del spreadsheet cambiado" };
       }
       if (normalizedType !== "CELDA") return { icon: "✏", label: baseLabel };
+      if (
+        hint.indexOf("pago") !== -1 ||
+        hint.indexOf("pagado") !== -1 ||
+        hint.indexOf("importe") !== -1 ||
+        hint.indexOf("pagador") !== -1 ||
+        hint.indexOf("payer") !== -1
+      ) {
+        return { icon: "€", label: "Pago actualizado" };
+      }
+      if (
+        hint.indexOf("entrada") !== -1 ||
+        hint.indexOf("ticket") !== -1 ||
+        hint.indexOf("qr") !== -1 ||
+        hint.indexOf("ha entrado") !== -1 ||
+        hint.indexOf("emitida") !== -1 ||
+        hint.indexOf("escaneada") !== -1 ||
+        hint.indexOf("validada") !== -1 ||
+        hint.indexOf("codigo") !== -1 ||
+        hint.indexOf("estado") !== -1
+      ) {
+        return { icon: "🎟", label: "Entrada actualizada" };
+      }
+      if (
+        hint.indexOf("acepta") !== -1 ||
+        hint.indexOf("acepto") !== -1 ||
+        hint.indexOf("aceptado") !== -1 ||
+        hint.indexOf("confirmado") !== -1
+      ) {
+        return { icon: "✓", label: "Aceptacion actualizada" };
+      }
+      if (hint.indexOf("concurso") !== -1) {
+        return { icon: "✓", label: "Concurso actualizado" };
+      }
+      if (
+        hint.indexOf("punto de fuego") !== -1 ||
+        hint.indexOf("torra") !== -1 ||
+        hint.indexOf("paella") !== -1
+      ) {
+        return { icon: "🔥", label: "Punto de fuego actualizado" };
+      }
+      if (
+        hint.indexOf("otro grupo") !== -1 ||
+        hint.indexOf("comparto") !== -1 ||
+        hint.indexOf("grupo compartido") !== -1
+      ) {
+        return { icon: "🤝", label: "Grupo vinculado" };
+      }
+      if (hint.indexOf("asistente") !== -1 || hint.indexOf("integrante") !== -1) {
+        if (!hadBefore && hasAfter) return { icon: "+👤", label: "Integrante anadido" };
+        if (hadBefore && !hasAfter) return { icon: "-👤", label: "Integrante eliminado" };
+        return { icon: "👤", label: "Integrante actualizado" };
+      }
+      if (hint.indexOf("responsable") !== -1) {
+        return { icon: "👑", label: "Responsable actualizado" };
+      }
+      return { icon: "✏", label: baseLabel };
+    }
+    function changeHistoryEntryVisual(entry) {
+      const normalizedType = String(entry && entry.type || "").trim().toUpperCase();
+      const baseLabel = changeHistoryTypeLabel(normalizedType);
+      const hint = normalizeChangeHistoryHintText(entry);
+      const hadBefore = hasChangeHistoryValue(entry && entry.before);
+      const hasAfter = hasChangeHistoryValue(entry && entry.after);
+      const paymentBefore = detectHistoryPaymentStatusValue(entry && entry.before);
+      const paymentAfter = detectHistoryPaymentStatusValue(entry && entry.after);
+      const entryStatusBefore = detectHistoryEntryStatusValue(entry && entry.before);
+      const entryStatusAfter = detectHistoryEntryStatusValue(entry && entry.after);
+      const fireBefore = detectHistoryFirePointValue(entry && entry.before);
+      const fireAfter = detectHistoryFirePointValue(entry && entry.after);
+      if (normalizedType === "INICIO_EDICION") return { icon: "🟠", label: "Inicio de edicion" };
+      if (normalizedType === "REANUDAR_EDICION") return { icon: "↺", label: "Edicion reanudada" };
+      if (normalizedType === "GRUPO_CREADO") return { icon: "+👥", label: "Grupo anadido" };
+      if (normalizedType === "GRUPO_ELIMINADO") return { icon: "-👥", label: "Grupo eliminado" };
+      if (normalizedType === "HOJA_CREADA") return { icon: "+📄", label: "Hoja anadida" };
+      if (normalizedType === "HOJA_ELIMINADA") return { icon: "-📄", label: "Hoja eliminada" };
+      if (normalizedType === "RENOMBRE_HOJA") return { icon: "✏", label: "Nombre de hoja cambiado" };
+      if (normalizedType === "RENOMBRE_SPREADSHEET" || normalizedType === "TITULO_SPREADSHEET") {
+        return { icon: "✏", label: "Nombre del spreadsheet cambiado" };
+      }
+      if (normalizedType !== "CELDA") return { icon: "✏", label: baseLabel };
+      if (paymentBefore || paymentAfter) {
+        if (hint.indexOf("importe") !== -1 || hint.indexOf("pagador") !== -1 || hint.indexOf("payer") !== -1) {
+          return { icon: "€", label: "Pago actualizado" };
+        }
+        return { icon: "€", label: "Estado de pago actualizado" };
+      }
+      if (entryStatusBefore || entryStatusAfter) {
+        return { icon: "🎟", label: "Estado de entrada actualizado" };
+      }
+      if (fireBefore || fireAfter) {
+        return { icon: "🔥", label: "Punto de fuego actualizado" };
+      }
       if (
         hint.indexOf("pago") !== -1 ||
         hint.indexOf("pagado") !== -1 ||
@@ -12776,6 +12937,12 @@
             const afterText = String(entry.after || "");
             const targetText = [entry.sheetTitle, entry.target].filter(Boolean).join(" | ");
             const summaryText = String(entry.summary || targetText || "Sin detalle");
+            const compactChangeText = (beforeText || afterText)
+              ? ((beforeText || "Vacio") + " -> " + (afterText || "Vacio"))
+              : summaryText;
+            const displaySummaryText = (/^celda\s/i.test(String(summaryText || "").trim()) || normalizeCompareText(summaryText) === normalizeCompareText(targetText))
+              ? compactChangeText
+              : summaryText;
             const entryVisual = changeHistoryEntryVisual(entry);
             const entryEl = document.createElement("details");
             entryEl.className = "change-history-entry";
@@ -12802,10 +12969,6 @@
             entryHead.appendChild(entryTitle);
             entryHead.appendChild(entryTime);
             entryMain.appendChild(entryHead);
-            const entryMeta = document.createElement("div");
-            entryMeta.className = "change-history-entry-meta";
-            entryMeta.textContent = summaryText;
-            entryMain.appendChild(entryMeta);
             entrySummary.appendChild(entryMain);
             const entryRight = document.createElement("div");
             entryRight.className = "change-history-entry-right";
@@ -12817,6 +12980,10 @@
             entryEl.appendChild(entrySummary);
             const entryDetail = document.createElement("div");
             entryDetail.className = "change-history-entry-detail";
+            const entryDetailHead = document.createElement("div");
+            entryDetailHead.className = "change-history-entry-detail-head";
+            entryDetailHead.textContent = "Detalle del cambio";
+            entryDetail.appendChild(entryDetailHead);
             const facts = document.createElement("div");
             facts.className = "change-history-entry-facts";
             function appendFact(label, value, allowEmpty) {
@@ -12835,7 +13002,7 @@
               facts.appendChild(fact);
             }
             appendFact("Ubicacion", targetText, false);
-            appendFact("Resumen", summaryText, !targetText);
+            appendFact("Resumen", displaySummaryText, !targetText);
             if (facts.children.length) entryDetail.appendChild(facts);
             if (beforeText || afterText) {
               const values = document.createElement("div");
