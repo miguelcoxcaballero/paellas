@@ -12770,7 +12770,7 @@
           const entryList = document.createElement("div");
           entryList.className = "change-history-entry-list";
           session.entries.sort(function (a, b) {
-            return changeHistoryEntrySortValue(b) - changeHistoryEntrySortValue(a);
+            return changeHistoryEntrySortValue(a) - changeHistoryEntrySortValue(b);
           }).forEach(function (entry, entryIndex) {
             const beforeText = String(entry.before || "");
             const afterText = String(entry.after || "");
