@@ -1074,6 +1074,11 @@
       transition: box-shadow .15s ease, transform .15s ease;
     }
     .picker-item:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .picker-item.is-active {
+      border-color: rgba(185, 90, 0, 0.22);
+      background: rgba(255, 249, 240, 0.96);
+      box-shadow: 0 6px 16px rgba(185, 90, 0, 0.08);
+    }
     .picker-main { min-width: 0; display: grid; gap: 3px; }
     .picker-title { font-size: 0.9rem; font-weight: 500; line-height: 1.2; word-break: break-word; }
     .picker-subtitle { font-size: 0.76rem; color: var(--muted); }
@@ -3981,6 +3986,10 @@
       border-color: rgba(182, 72, 72, 0.22);
       background: rgba(255, 248, 248, 0.98);
     }
+    .ticket-reader-review-card.is-loading {
+      border-color: rgba(185, 90, 0, 0.16);
+      background: rgba(255, 251, 244, 0.99);
+    }
     .ticket-reader-review-head {
       display: none;
     }
@@ -4007,6 +4016,10 @@
       background: rgba(255, 228, 228, 0.96);
       color: #9d3f3f;
     }
+    .ticket-reader-review-state.is-loading {
+      background: rgba(255, 242, 222, 0.96);
+      color: #8a5717;
+    }
     .ticket-reader-review-state-icon {
       width: 56px;
       height: 56px;
@@ -4021,6 +4034,17 @@
     }
     .ticket-reader-review-state.is-warning .ticket-reader-review-state-icon {
       background: rgba(157, 63, 63, 0.12);
+    }
+    .ticket-reader-review-state.is-loading .ticket-reader-review-state-icon {
+      background: rgba(185, 90, 0, 0.1);
+    }
+    .ticket-reader-review-spinner {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 3px solid rgba(185, 90, 0, 0.18);
+      border-top-color: #b95a00;
+      animation: ticketReaderReviewSpin 0.8s linear infinite;
     }
     .ticket-reader-review-state-copy {
       display: grid;
@@ -4058,6 +4082,9 @@
       border-top: none;
       padding-top: 4px;
     }
+    .ticket-reader-review-row.is-loading {
+      align-items: center;
+    }
     .ticket-reader-review-row-label {
       font-size: 0.6rem;
       color: var(--muted);
@@ -4071,6 +4098,26 @@
       word-break: break-word;
       font-weight: 600;
     }
+    .ticket-reader-review-loading-line {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(185, 90, 0, 0.1);
+    }
+    .ticket-reader-review-loading-line::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+      animation: ticketReaderReviewShimmer 1.1s ease-in-out infinite;
+    }
+    .ticket-reader-review-loading-line.short { width: 38%; }
+    .ticket-reader-review-loading-line.medium { width: 58%; }
+    .ticket-reader-review-loading-line.long { width: 82%; }
     .ticket-reader-review-actions {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
@@ -4078,6 +4125,12 @@
     }
     .ticket-reader-review-actions .btn.primary {
       width: 100%;
+    }
+    @keyframes ticketReaderReviewSpin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes ticketReaderReviewShimmer {
+      100% { transform: translateX(100%); }
     }
     .ticket-reader-result {
       border: 1px solid rgba(185, 90, 0, 0.1);
@@ -4152,7 +4205,9 @@
     .ticket-reader-hero {
       display: flex;
       align-items: center;
+      gap: 8px;
       padding: 4px 8px;
+      min-width: 0;
     }
     .ticket-reader-live-badge {
       flex: 0 0 auto;
@@ -4182,6 +4237,39 @@
     }
     .ticket-reader-live-badge.is-live::before {
       animation: badgePulse 1.6s ease-in-out infinite;
+    }
+    .ticket-reader-sheet-badge {
+      border: none;
+      min-width: 0;
+      max-width: 100%;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(185, 90, 0, 0.08);
+      color: #8a5717;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .ticket-reader-sheet-badge::before {
+      content: "\1F5C2";
+      flex: 0 0 auto;
+      font-size: 0.82rem;
+    }
+    .ticket-reader-picker-card {
+      width: min(560px, 100%);
+      display: grid;
+      gap: 12px;
+    }
+    .ticket-reader-picker-copy {
+      display: grid;
+      gap: 4px;
     }
     @keyframes badgePulse {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -6425,6 +6513,24 @@
     </div>
   </div>
 
+  <div id="ticketReaderPickerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ticketReaderPickerTitle">
+    <section id="ticketReaderPickerCard" class="card modal-card ticket-reader-picker-card">
+      <div class="row between center">
+        <div class="ticket-reader-picker-copy">
+          <div id="ticketReaderPickerTitle" class="title">Seleccionar hoja</div>
+          <div class="meta">Elige la spreadsheet de respuestas que quieres abrir en el lector.</div>
+        </div>
+        <button id="ticketReaderPickerCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div id="ticketReaderPickerStatus" class="status"></div>
+      <div id="ticketReaderPickerList" class="picker-list"></div>
+      <p id="ticketReaderPickerEmpty" class="meta hidden">No hay spreadsheets de respuestas dentro de esta paella.</p>
+      <div class="row modal-actions">
+        <button id="ticketReaderPickerCancelBtn" class="btn small" type="button">Cancelar</button>
+      </div>
+    </section>
+  </div>
+
   <div id="ticketReaderModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ticketReaderTitle">
     <section id="ticketReaderCard" class="card modal-card ticket-reader-card">
       <button id="ticketReaderCloseBtn" class="btn small ticket-reader-floating-close" type="button" aria-label="Cerrar">✕</button>
@@ -6433,6 +6539,7 @@
         <section class="ticket-reader-stage" aria-label="Zona de escaneo">
           <div class="ticket-reader-hero">
             <div id="ticketReaderLiveBadge" class="ticket-reader-live-badge">Inactiva</div>
+            <button id="ticketReaderSheetBadge" class="ticket-reader-sheet-badge hidden" type="button" aria-label="Cambiar hoja de respuestas"></button>
           </div>
           <div class="ticket-reader-camera-shell">
             <div id="ticketReaderCameraPlaceholder" class="ticket-reader-camera-placeholder">
@@ -6477,10 +6584,6 @@
         <section class="ticket-reader-panel" aria-label="Controles y resultados">
           <div class="ticket-reader-panel-block">
             <div class="ticket-reader-controls">
-              <label class="ticket-reader-field">
-                <span>Hoja</span>
-                <select id="ticketReaderSheetSelect" class="search"></select>
-              </label>
               <label class="ticket-reader-field ticket-reader-search">
                 <span>Buscar</span>
                 <input id="ticketReaderSearchInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre, DNI, teléfono o código">
@@ -6705,11 +6808,14 @@
         scanInFlight: false,
         reviewIdentity: null,
         reviewSubmitting: false,
+        reviewLoadToken: 0,
         loadTimer: 0,
         resumeCameraAfterReview: false,
+        resumeCameraAfterPicker: false,
         syncTimer: 0,
         syncInFlight: false,
-        lastMetaRefreshAt: 0
+        lastMetaRefreshAt: 0,
+        entryOverrides: {}
       },
       formId: "",
       formTitle: "",
@@ -7047,11 +7153,17 @@
       shareModalCloseBtn: document.getElementById("shareModalCloseBtn"),
       shareConfirmBtn: document.getElementById("shareConfirmBtn"),
       sharePeopleList: document.getElementById("sharePeopleList"),
+      ticketReaderPickerModal: document.getElementById("ticketReaderPickerModal"),
+      ticketReaderPickerCard: document.getElementById("ticketReaderPickerCard"),
+      ticketReaderPickerStatus: document.getElementById("ticketReaderPickerStatus"),
+      ticketReaderPickerList: document.getElementById("ticketReaderPickerList"),
+      ticketReaderPickerEmpty: document.getElementById("ticketReaderPickerEmpty"),
+      ticketReaderPickerCloseBtn: document.getElementById("ticketReaderPickerCloseBtn"),
+      ticketReaderPickerCancelBtn: document.getElementById("ticketReaderPickerCancelBtn"),
       ticketReaderModal: document.getElementById("ticketReaderModal"),
       ticketReaderCard: document.getElementById("ticketReaderCard"),
       ticketReaderCloseBtn: document.getElementById("ticketReaderCloseBtn"),
       ticketReaderFooterCloseBtn: document.getElementById("ticketReaderFooterCloseBtn"),
-      ticketReaderSheetSelect: document.getElementById("ticketReaderSheetSelect"),
       ticketReaderSearchInput: document.getElementById("ticketReaderSearchInput"),
       ticketReaderSearchBtn: document.getElementById("ticketReaderSearchBtn"),
       ticketReaderCameraBtn: document.getElementById("ticketReaderCameraBtn"),
@@ -7059,6 +7171,7 @@
       ticketReaderCameraWrap: document.getElementById("ticketReaderCameraWrap"),
       ticketReaderVideo: document.getElementById("ticketReaderVideo"),
       ticketReaderLiveBadge: document.getElementById("ticketReaderLiveBadge"),
+      ticketReaderSheetBadge: document.getElementById("ticketReaderSheetBadge"),
       ticketReaderCameraPlaceholder: document.getElementById("ticketReaderCameraPlaceholder"),
       ticketReaderStatusCard: document.getElementById("ticketReaderStatusCard"),
       ticketReaderStatus: document.getElementById("ticketReaderStatus"),
@@ -7494,6 +7607,7 @@
     function setShareStatus(text, tone) {
       setStatusOnElement(els.shareStatus, text, tone);
     }
+    function setTicketReaderPickerStatus(text, tone) { setStatusOnElement(els.ticketReaderPickerStatus, text, tone); }
     function setPaellaInviteStatus(text, tone) { setStatusOnElement(els.paellaInviteStatus, text, tone); }
     function setPaellaAccessStatus(text, tone) { setStatusOnElement(els.paellaAccessStatus, text, tone); }
     function setFormSyncStatus(text, tone) { setStatusOnElement(els.formSyncStatus, text, tone); }
@@ -10137,6 +10251,7 @@
     }
     var TICKET_READER_SYNC_INTERVAL = 2400;
     var TICKET_READER_META_REFRESH_INTERVAL = 12000;
+    var TICKET_READER_OVERRIDE_TTL_MS = 30000;
     function getTicketReaderSheetInfo(sheetTitle) {
       const targetTitle = String(sheetTitle || state.ticketReader.sheetTitle || "");
       return (state.ticketReader.sheets || []).find(function (entry) {
@@ -10715,6 +10830,124 @@
         reader.loadTimer = 0;
       }
     }
+    function nextTicketReaderReviewLoadToken() {
+      state.ticketReader.reviewLoadToken = (state.ticketReader.reviewLoadToken || 0) + 1;
+      return state.ticketReader.reviewLoadToken;
+    }
+    function buildTicketReaderIdentityKey(spreadsheetId, sheetTitle, identity) {
+      if (!identity) return "";
+      const row = Number(identity.row);
+      const role = String(identity.role || "").trim().toLowerCase();
+      const number = String(identity.number || "").trim();
+      const code = String(identity.code || "").trim().toUpperCase();
+      const rowKey = Number.isFinite(row) ? String(row) : "";
+      if (!rowKey && !code) return "";
+      return [
+        String(spreadsheetId || "").trim(),
+        String(sheetTitle || "").trim(),
+        rowKey,
+        role,
+        number,
+        code
+      ].join("::");
+    }
+    function rememberTicketReaderEntryOverride(person, values) {
+      if (!person || !state.ticketReader) return null;
+      const spreadsheetId = state.ticketReader.spreadsheetId;
+      const sheetTitle = state.ticketReader.sheetTitle;
+      const key = buildTicketReaderIdentityKey(spreadsheetId, sheetTitle, {
+        row: person.sheetRow,
+        role: person.role,
+        number: person.number,
+        code: person.code
+      });
+      if (!key) return null;
+      const overrides = state.ticketReader.entryOverrides || (state.ticketReader.entryOverrides = {});
+      const override = {
+        spreadsheetId: spreadsheetId,
+        sheetTitle: sheetTitle,
+        sheetRow: Number(person.sheetRow),
+        role: String(person.role || ""),
+        number: String(person.number || ""),
+        code: String(values && values.code != null ? values.code : person.code || "").trim().toUpperCase(),
+        codeCol: Number.isFinite(person.codeCol) ? person.codeCol : -1,
+        status: normalizeEntryStatus(values && values.status != null ? values.status : person.status),
+        statusCol: Number.isFinite(person.statusCol) ? person.statusCol : -1,
+        scannedAt: String(values && values.scannedAt != null ? values.scannedAt : person.scannedAt || "").trim(),
+        scannedAtCol: Number.isFinite(person.scannedAtCol) ? person.scannedAtCol : -1,
+        updatedAt: Date.now()
+      };
+      overrides[key] = override;
+      return override;
+    }
+    function overlayTicketReaderEntryOverridesOnRows(spreadsheetId, sheetTitle, rows) {
+      const merged = cloneSheetRows(rows);
+      const overrides = state.ticketReader.entryOverrides || {};
+      const now = Date.now();
+      Object.keys(overrides).forEach(function (key) {
+        const override = overrides[key];
+        if (!override) {
+          delete overrides[key];
+          return;
+        }
+        if ((now - Number(override.updatedAt || 0)) > TICKET_READER_OVERRIDE_TTL_MS) {
+          delete overrides[key];
+          return;
+        }
+        if (
+          String(override.spreadsheetId || "") !== String(spreadsheetId || "") ||
+          String(override.sheetTitle || "") !== String(sheetTitle || "")
+        ) {
+          return;
+        }
+        const rowIndex = Number(override.sheetRow);
+        if (!Number.isFinite(rowIndex) || rowIndex < 0) {
+          delete overrides[key];
+          return;
+        }
+        while (merged.length <= rowIndex) merged.push([]);
+        if (!Array.isArray(merged[rowIndex])) merged[rowIndex] = [];
+        const row = merged[rowIndex];
+        const remoteStatus = Number.isFinite(override.statusCol) && override.statusCol >= 0
+          ? normalizeEntryStatus(row[override.statusCol])
+          : "";
+        const remoteCode = Number.isFinite(override.codeCol) && override.codeCol >= 0
+          ? String(row[override.codeCol] || "").trim().toUpperCase()
+          : "";
+        const remoteScannedAt = Number.isFinite(override.scannedAtCol) && override.scannedAtCol >= 0
+          ? parseSheetTimestamp(row[override.scannedAtCol])
+          : "";
+        const statusSynced = !override.status || remoteStatus === normalizeEntryStatus(override.status);
+        const codeSynced = !override.code || !Number.isFinite(override.codeCol) || override.codeCol < 0 || remoteCode === override.code;
+        const scannedAtSynced = !override.scannedAt || !Number.isFinite(override.scannedAtCol) || override.scannedAtCol < 0 || normalizeCompareText(remoteScannedAt) === normalizeCompareText(override.scannedAt);
+        if (statusSynced && codeSynced && (scannedAtSynced || statusSynced)) {
+          delete overrides[key];
+          return;
+        }
+        if (Number.isFinite(override.codeCol) && override.codeCol >= 0) {
+          while (row.length <= override.codeCol) row.push("");
+          row[override.codeCol] = override.code || "";
+        }
+        if (Number.isFinite(override.statusCol) && override.statusCol >= 0) {
+          while (row.length <= override.statusCol) row.push("");
+          row[override.statusCol] = override.status || "";
+        }
+        if (Number.isFinite(override.scannedAtCol) && override.scannedAtCol >= 0) {
+          while (row.length <= override.scannedAtCol) row.push("");
+          row[override.scannedAtCol] = override.scannedAt || "";
+        }
+      });
+      return merged;
+    }
+    function applyTicketReaderRows(rows, spreadsheetId, sheetTitle) {
+      const mergedRows = overlayTicketReaderEntryOverridesOnRows(spreadsheetId, sheetTitle, rows);
+      const model = buildPaellaGroupsFromSheetRows(mergedRows, sheetTitle);
+      state.ticketReader.spreadsheetId = spreadsheetId;
+      state.ticketReader.sheetTitle = sheetTitle;
+      state.ticketReader.model = model;
+      state.ticketReader.rows = mergedRows;
+      return model;
+    }
     function scheduleTicketReaderCameraResume() {
       if (!state.ticketReader.resumeCameraAfterReview || state.ticketReader.stream || state.ticketReader.scanTimer) return;
       state.ticketReader.resumeCameraAfterReview = false;
@@ -10727,13 +10960,16 @@
       }, 120);
     }
     function closeTicketReaderReview() {
+      nextTicketReaderReviewLoadToken();
       state.ticketReader.reviewIdentity = null;
       state.ticketReader.reviewSubmitting = false;
       if (els.ticketReaderReviewOverlay) els.ticketReaderReviewOverlay.classList.add("hidden");
       if (els.ticketReaderReviewCard) els.ticketReaderReviewCard.classList.remove("is-warning");
+      if (els.ticketReaderReviewCard) els.ticketReaderReviewCard.classList.remove("is-loading");
       if (els.ticketReaderReviewTitle) els.ticketReaderReviewTitle.textContent = "Validar entrada";
       if (els.ticketReaderReviewSubtitle) els.ticketReaderReviewSubtitle.textContent = "";
       if (els.ticketReaderReviewGrid) els.ticketReaderReviewGrid.innerHTML = "";
+      if (els.ticketReaderReviewCloseBtn) els.ticketReaderReviewCloseBtn.textContent = "Cerrar";
       if (els.ticketReaderReviewConfirmBtn) {
         els.ticketReaderReviewConfirmBtn.disabled = false;
         els.ticketReaderReviewConfirmBtn.classList.remove("hidden");
@@ -10743,9 +10979,11 @@
     }
     function closeTicketReaderModal() {
       clearTicketReaderLoadTimer();
+      closeTicketReaderPickerModal({ skipCameraResume: true });
       stopTicketReaderAutoRefresh();
       stopTicketReaderCamera();
       state.ticketReader.resumeCameraAfterReview = false;
+      state.ticketReader.resumeCameraAfterPicker = false;
       closeTicketReaderReview();
       if (els.ticketReaderModal) els.ticketReaderModal.classList.remove("visible");
       if (els.ticketReaderResults) els.ticketReaderResults.innerHTML = "";
@@ -10872,7 +11110,7 @@
         if (!sheetInfo) throw new Error("La spreadsheet no tiene hojas visibles.");
         return fetchSpreadsheetRowsByTitle(targetId, sheetInfo.title, sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount, sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount)
           .then(function (rows) {
-            let model = buildPaellaGroupsFromSheetRows(rows, sheetInfo.title);
+            let model = buildPaellaGroupsFromSheetRows(overlayTicketReaderEntryOverridesOnRows(targetId, sheetInfo.title, rows), sheetInfo.title);
             if (!model.groups.length) {
               const compatibleSheet = sheets.find(function (entry) {
                 return entry.title !== sheetInfo.title;
@@ -10880,21 +11118,17 @@
               if (compatibleSheet) {
                 sheetInfo = compatibleSheet;
                 return fetchSpreadsheetRowsByTitle(targetId, sheetInfo.title, sheetInfo.gridProperties && sheetInfo.gridProperties.rowCount, sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount).then(function (otherRows) {
-                  model = buildPaellaGroupsFromSheetRows(otherRows, sheetInfo.title);
-                  return { meta: meta, sheetInfo: sheetInfo, model: model };
+                  model = buildPaellaGroupsFromSheetRows(overlayTicketReaderEntryOverridesOnRows(targetId, sheetInfo.title, otherRows), sheetInfo.title);
+                  return { meta: meta, sheetInfo: sheetInfo, rows: otherRows, model: model };
                 });
               }
             }
-            return { meta: meta, sheetInfo: sheetInfo, model: model };
+            return { meta: meta, sheetInfo: sheetInfo, rows: rows, model: model };
           });
       }).then(function (result) {
-        const rows = result.model && Array.isArray(result.model.rows) ? result.model.rows : [];
-        const model = buildPaellaGroupsFromSheetRows(rows, result.sheetInfo.title);
-        state.ticketReader.spreadsheetId = targetId;
-        state.ticketReader.sheetTitle = result.sheetInfo.title;
-        state.ticketReader.model = model;
-        state.ticketReader.rows = rows;
+        const model = applyTicketReaderRows(result.rows || [], targetId, result.sheetInfo.title);
         setTicketReaderSheetsFromMeta(result.meta);
+        syncTicketReaderSelectedSheetUi();
         setTicketReaderStatus(
           model.groups.length ? "Hoja lista." : "Sin grupos en esta hoja.",
           model.groups.length ? "good" : "error"
@@ -10906,18 +11140,90 @@
         setBusy(els.ticketReaderCard, false);
       });
     }
+    function getTicketReaderCandidateById(spreadsheetId) {
+      const targetId = String(spreadsheetId || "").trim();
+      return (state.ticketReader.candidates || []).find(function (item) {
+        return item && String(item.id || "") === targetId;
+      }) || null;
+    }
+    function syncTicketReaderSelectedSheetUi() {
+      if (!els.ticketReaderSheetBadge) return;
+      const selected = getTicketReaderCandidateById(state.ticketReader.spreadsheetId);
+      if (!selected) {
+        els.ticketReaderSheetBadge.textContent = "";
+        els.ticketReaderSheetBadge.classList.add("hidden");
+        return;
+      }
+      els.ticketReaderSheetBadge.textContent = selected.name || "Spreadsheet";
+      els.ticketReaderSheetBadge.title = selected.name || "Spreadsheet";
+      els.ticketReaderSheetBadge.setAttribute("aria-label", "Hoja activa: " + (selected.name || "Spreadsheet") + ". Pulsa para cambiar");
+      els.ticketReaderSheetBadge.classList.remove("hidden");
+    }
     function renderTicketReaderSheetOptions() {
       const candidates = getTicketReaderSheetCandidates();
       state.ticketReader.candidates = candidates;
-      els.ticketReaderSheetSelect.innerHTML = "";
-      candidates.forEach(function (item) {
-        const option = document.createElement("option");
-        option.value = item.id;
-        option.textContent = item.name || "Spreadsheet";
-        els.ticketReaderSheetSelect.appendChild(option);
-      });
-      els.ticketReaderSheetSelect.disabled = !candidates.length;
+      syncTicketReaderSelectedSheetUi();
       return candidates;
+    }
+    function renderTicketReaderPickerOptions() {
+      const candidates = renderTicketReaderSheetOptions();
+      if (!els.ticketReaderPickerList || !els.ticketReaderPickerEmpty) return candidates;
+      els.ticketReaderPickerList.innerHTML = "";
+      els.ticketReaderPickerEmpty.classList.toggle("hidden", candidates.length !== 0);
+      candidates.forEach(function (item) {
+        const btn = document.createElement("button");
+        const isActive = String(item.id || "") === String(state.ticketReader.spreadsheetId || "");
+        btn.type = "button";
+        btn.className = "picker-item" + (isActive ? " is-active" : "");
+        btn.innerHTML =
+          "<div class='picker-main'>" +
+            "<div class='picker-title'>" + escapeHtml(item.name || "Spreadsheet") + "</div>" +
+            "<div class='picker-subtitle'>" + escapeHtml(isActive ? "Seleccionada actualmente" : "Pulsa para abrir el lector con esta hoja") + "</div>" +
+          "</div>" +
+          "<span class='picker-arrow' aria-hidden='true'>" + (isActive ? "&#10003;" : "&#8250;") + "</span>";
+        btn.addEventListener("click", function () {
+          closeTicketReaderPickerModal({ skipCameraResume: true });
+          openTicketReaderModal(item.id);
+        });
+        els.ticketReaderPickerList.appendChild(btn);
+      });
+      return candidates;
+    }
+    function closeTicketReaderPickerModal(options) {
+      const config = options || {};
+      if (!els.ticketReaderPickerModal) return;
+      const shouldResumeCamera = !config.skipCameraResume && !!state.ticketReader.resumeCameraAfterPicker;
+      state.ticketReader.resumeCameraAfterPicker = false;
+      els.ticketReaderPickerModal.classList.remove("visible");
+      setBusy(els.ticketReaderPickerCard, false);
+      setTicketReaderPickerStatus("", "");
+      if (shouldResumeCamera) {
+        setTimeout(function () {
+          if (!els.ticketReaderModal || !els.ticketReaderModal.classList.contains("visible")) return;
+          if (els.ticketReaderReviewOverlay && !els.ticketReaderReviewOverlay.classList.contains("hidden")) return;
+          startTicketReaderCamera().catch(function () {});
+        }, 120);
+      }
+    }
+    function openTicketReaderPickerModal() {
+      const candidates = renderTicketReaderPickerOptions();
+      if (!els.ticketReaderPickerModal) return;
+      state.ticketReader.resumeCameraAfterPicker = !!(
+        els.ticketReaderModal &&
+        els.ticketReaderModal.classList.contains("visible") &&
+        (state.ticketReader.stream || state.ticketReader.scanTimer)
+      );
+      if (state.ticketReader.resumeCameraAfterPicker) stopTicketReaderCamera();
+      setTicketReaderPickerStatus("", "");
+      els.ticketReaderPickerModal.classList.add("visible");
+      if (!candidates.length) {
+        setTicketReaderPickerStatus("No hay ninguna hoja disponible para escanear.", "error");
+      }
+      requestAnimationFrame(function () {
+        const firstButton = els.ticketReaderPickerList && els.ticketReaderPickerList.querySelector(".picker-item");
+        if (firstButton) firstButton.focus();
+        else if (els.ticketReaderPickerCloseBtn) els.ticketReaderPickerCloseBtn.focus();
+      });
     }
     function renderTicketReaderResults(results, emptyText) {
       if (!els.ticketReaderResults) return;
@@ -11024,11 +11330,7 @@
         const columnCount = (sheetInfo && sheetInfo.gridProperties && sheetInfo.gridProperties.columnCount) || 50;
         return fetchSpreadsheetRowsByTitle(spreadsheetId, sheetTitle, rowCount, columnCount)
           .then(function (rows) {
-            const model = buildPaellaGroupsFromSheetRows(rows, sheetTitle);
-            state.ticketReader.sheetTitle = sheetTitle;
-            state.ticketReader.model = model;
-            state.ticketReader.rows = rows;
-            return model;
+            return applyTicketReaderRows(rows, spreadsheetId, sheetTitle);
           });
       }
       const syncMeta = (config.refreshMeta || !state.ticketReader.sheets.length)
@@ -11110,7 +11412,136 @@
         number: person.number
       }) || person;
     }
-    function openTicketReaderReview(person) {
+    function buildTicketReaderReviewDetails(person, includeEmptyValues) {
+      const latest = person || {};
+      const details = [
+        ["Nombre", latest.name || "Asistente"],
+        ["Grupo", latest.groupTitle || "Grupo"],
+        ["Estado", normalizeEntryStatus(latest.status) || "Pendiente"],
+        ["Codigo", latest.code || ""],
+        ["Rol", latest.role === "responsable" ? "Responsable" : ("Integrante " + (latest.number || ""))],
+        ["DNI", latest.dni || ""],
+        ["Telefono", latest.phone || ""],
+        ["Email", latest.email || ""],
+        ["Entrada", latest.info || ""],
+        ["Ultimo acceso", latest.scannedAt || ""]
+      ];
+      if (includeEmptyValues) return details;
+      return details.filter(function (entry) {
+        const val = String(entry[1]).trim();
+        return val !== "" && val !== "-";
+      });
+    }
+    function buildTicketReaderLoadingLine(index) {
+      const widthClass = ["long", "medium", "short", "medium", "long"][index % 5];
+      return "<span class='ticket-reader-review-loading-line " + widthClass + "' aria-hidden='true'></span>";
+    }
+    function buildTicketReaderReviewDetailsHtml(details, loading) {
+      return (details || []).map(function (entry, index) {
+        return "<div class='ticket-reader-review-row" + (loading ? " is-loading" : "") + "'>" +
+          "<div class='ticket-reader-review-row-label'>" + escapeHtml(entry[0]) + "</div>" +
+          "<div class='ticket-reader-review-row-value'>" + (loading ? buildTicketReaderLoadingLine(index) : escapeHtml(entry[1])) + "</div>" +
+        "</div>";
+      }).join("");
+    }
+    function renderTicketReaderReviewState(options) {
+      const config = options || {};
+      const loading = !!config.loading;
+      const alreadyEntered = !!config.alreadyEntered;
+      const normalizedStatus = normalizeEntryStatus(config.status) || "Pendiente";
+      const stateClass = loading ? "is-loading" : (alreadyEntered ? "is-warning" : "is-fresh");
+      const stateIcon = loading
+        ? "<div class='ticket-reader-review-spinner'></div>"
+        : (alreadyEntered ? "&#9888;&#65039;" : "&#9989;");
+      const statusClass = normalizedStatus === "HA ENTRADO" ? "is-entered" : (normalizedStatus === "Emitida" ? "is-emitted" : "is-not-emitted");
+      const stateTitle = loading
+        ? "Comprobando entrada"
+        : (alreadyEntered ? "Esta entrada ya fue validada" : "Entrada lista para validar");
+      const stateText = loading
+        ? "Actualizando el estado de acceso y los datos de la entrada..."
+        : (alreadyEntered
+          ? ("Acceso anterior: " + (config.scannedAt || "Hora desconocida"))
+          : "Revisa los datos y confirma antes de marcar HA ENTRADO.");
+      return (
+        "<div class='ticket-reader-review-state " + stateClass + "'>" +
+          "<div class='ticket-reader-review-state-icon' aria-hidden='true'>" + stateIcon + "</div>" +
+          "<div class='ticket-reader-review-state-copy'>" +
+            "<div class='ticket-reader-review-state-title'>" + escapeHtml(stateTitle) + "</div>" +
+            "<div class='ticket-reader-review-state-text'>" +
+              (loading ? "" : ("<span class='entry-status-chip " + statusClass + "'>" + escapeHtml(normalizedStatus) + "</span> ")) +
+              escapeHtml(stateText) +
+            "</div>" +
+          "</div>" +
+        "</div>"
+      );
+    }
+    function renderTicketReaderReviewPopup(options) {
+      const config = options || {};
+      const loading = !!config.loading;
+      const person = config.person || null;
+      const subtitle = config.subtitle || (person && person.groupTitle) || "Grupo";
+      if (els.ticketReaderReviewCard) {
+        els.ticketReaderReviewCard.classList.toggle("is-warning", !loading && !!config.alreadyEntered);
+        els.ticketReaderReviewCard.classList.toggle("is-loading", loading);
+      }
+      if (els.ticketReaderReviewTitle) {
+        els.ticketReaderReviewTitle.textContent = loading ? "Comprobando entrada" : (config.alreadyEntered ? "Entrada ya validada" : "Revisar entrada");
+      }
+      if (els.ticketReaderReviewSubtitle) {
+        els.ticketReaderReviewSubtitle.textContent = subtitle;
+      }
+      if (els.ticketReaderReviewGrid) {
+        els.ticketReaderReviewGrid.innerHTML =
+          renderTicketReaderReviewState({
+            loading: loading,
+            alreadyEntered: !!config.alreadyEntered,
+            status: config.status,
+            scannedAt: config.scannedAt
+          }) +
+          "<div class='ticket-reader-review-details'>" +
+            buildTicketReaderReviewDetailsHtml(config.details || [], loading) +
+          "</div>";
+      }
+      if (els.ticketReaderReviewCloseBtn) {
+        els.ticketReaderReviewCloseBtn.disabled = false;
+        els.ticketReaderReviewCloseBtn.textContent = loading ? "Cancelar" : "Cerrar";
+      }
+      if (els.ticketReaderReviewConfirmBtn) {
+        els.ticketReaderReviewConfirmBtn.disabled = loading || !!config.alreadyEntered;
+        els.ticketReaderReviewConfirmBtn.classList.toggle("hidden", loading || !!config.alreadyEntered);
+        els.ticketReaderReviewConfirmBtn.textContent = "Validar";
+      }
+      if (els.ticketReaderReviewOverlay) els.ticketReaderReviewOverlay.classList.remove("hidden");
+      requestAnimationFrame(function () {
+        if (loading && els.ticketReaderReviewCloseBtn) {
+          els.ticketReaderReviewCloseBtn.focus();
+        } else if (config.alreadyEntered && els.ticketReaderReviewCloseBtn) {
+          els.ticketReaderReviewCloseBtn.focus();
+        } else if (els.ticketReaderReviewConfirmBtn && !els.ticketReaderReviewConfirmBtn.classList.contains("hidden")) {
+          els.ticketReaderReviewConfirmBtn.focus();
+        }
+      });
+    }
+    function openTicketReaderReviewLoading(person, loadToken) {
+      if (typeof loadToken === "number" && loadToken !== state.ticketReader.reviewLoadToken) return false;
+      const preview = resolveTicketReaderPerson(person) || person;
+      if (!preview) return false;
+      state.ticketReader.reviewIdentity = {
+        code: preview.code,
+        row: preview.sheetRow,
+        role: preview.role,
+        number: preview.number
+      };
+      state.ticketReader.reviewSubmitting = false;
+      renderTicketReaderReviewPopup({
+        loading: true,
+        person: preview,
+        status: preview.status,
+        details: buildTicketReaderReviewDetails(preview, true)
+      });
+      return true;
+    }
+    function openTicketReaderReviewLegacy(person) {
       const latest = resolveTicketReaderPerson(person);
       if (!latest) return false;
       const alreadyEntered = normalizeEntryStatus(latest.status) === "HA ENTRADO";
@@ -11182,6 +11613,29 @@
       });
       return true;
     }
+    function openTicketReaderReview(person) {
+      const latest = resolveTicketReaderPerson(person);
+      if (!latest) return false;
+      const alreadyEntered = normalizeEntryStatus(latest.status) === "HA ENTRADO";
+      playScanBeep(alreadyEntered ? "error" : "valid");
+      state.ticketReader.reviewIdentity = {
+        code: latest.code,
+        row: latest.sheetRow,
+        role: latest.role,
+        number: latest.number
+      };
+      state.ticketReader.reviewSubmitting = false;
+      setTicketReaderStatus(alreadyEntered ? "Entrada ya validada." : "Entrada lista para validar.", alreadyEntered ? "error" : "good");
+      renderTicketReaderReviewPopup({
+        loading: false,
+        alreadyEntered: alreadyEntered,
+        person: latest,
+        status: latest.status,
+        scannedAt: latest.scannedAt,
+        details: buildTicketReaderReviewDetails(latest, false)
+      });
+      return true;
+    }
     function commitTicketReaderPersonEntry(person) {
       if (!person || !state.ticketReader.spreadsheetId || !state.ticketReader.sheetTitle) return Promise.resolve(false);
       const ensureColumnsIfNeeded = function (resolvedPerson) {
@@ -11224,9 +11678,18 @@
           payloads.push(buildSheetSingleCellPayload(state.ticketReader.sheetTitle, latest.sheetRow, latest.scannedAtCol, nowText));
         }
         return writeSpreadsheetCellPayloads(state.ticketReader.spreadsheetId, payloads).then(function () {
+          rememberTicketReaderEntryOverride(latest, {
+            code: latest.code,
+            status: "HA ENTRADO",
+            scannedAt: nowText
+          });
+          applyTicketReaderRows(state.ticketReader.rows || [], state.ticketReader.spreadsheetId, state.ticketReader.sheetTitle);
           setTicketReaderStatus("Entrada validada.", "good");
           closeTicketReaderReview();
-          return refreshTicketReaderModel().then(function () {
+          return refreshTicketReaderModel({ refreshMeta: false }).then(function () {
+            renderTicketReaderResults([], "");
+            return true;
+          }).catch(function () {
             renderTicketReaderResults([], "");
             return true;
           });
@@ -11253,17 +11716,35 @@
     }
     function markTicketPersonEntered(person) {
       if (!person) return Promise.resolve(false);
-      return silentRefreshTicketReaderRows({ refreshMeta: true }).then(function () {
-        openTicketReaderReview(resolveTicketReaderPerson(person) || person);
+      const preview = resolveTicketReaderPerson(person) || person;
+      const loadToken = nextTicketReaderReviewLoadToken();
+      setTicketReaderStatus("Comprobando entrada...", "");
+      openTicketReaderReviewLoading(preview, loadToken);
+      const shouldRefreshMeta = !state.ticketReader.lastMetaRefreshAt ||
+        !state.ticketReader.sheets.length ||
+        (Date.now() - state.ticketReader.lastMetaRefreshAt) >= TICKET_READER_META_REFRESH_INTERVAL;
+      return silentRefreshTicketReaderRows({ refreshMeta: shouldRefreshMeta }).then(function () {
+        if (loadToken !== state.ticketReader.reviewLoadToken) return false;
+        openTicketReaderReview(resolveTicketReaderPerson(person) || preview);
         return true;
       }).catch(function () {
-        openTicketReaderReview(person);
+        if (loadToken !== state.ticketReader.reviewLoadToken) return false;
+        openTicketReaderReview(resolveTicketReaderPerson(person) || preview);
         return true;
       });
     }
-    function openTicketReaderModal() {
+    function openTicketReaderModal(selectedSpreadsheetId) {
       clearTicketReaderLoadTimer();
       const candidates = renderTicketReaderSheetOptions();
+      const requestedId = String(selectedSpreadsheetId || "").trim();
+      const preferred = requestedId && candidates.some(function (item) { return item.id === requestedId; })
+        ? requestedId
+        : (state.ticketReader.spreadsheetId && candidates.some(function (item) { return item.id === state.ticketReader.spreadsheetId; })
+          ? state.ticketReader.spreadsheetId
+          : (candidates[0] ? candidates[0].id : ""));
+      if (preferred) state.ticketReader.spreadsheetId = preferred;
+      syncTicketReaderSelectedSheetUi();
+      closeTicketReaderPickerModal();
       els.ticketReaderModal.classList.add("visible");
       els.ticketReaderResults.innerHTML = "";
       els.ticketReaderSearchInput.value = "";
@@ -11274,10 +11755,6 @@
         renderTicketReaderResults([], "No hay spreadsheets de respuestas dentro de esta paella.");
         return;
       }
-      const preferred = state.ticketReader.spreadsheetId && candidates.some(function (item) { return item.id === state.ticketReader.spreadsheetId; })
-        ? state.ticketReader.spreadsheetId
-        : candidates[0].id;
-      els.ticketReaderSheetSelect.value = preferred;
       state.ticketReader.loadTimer = setTimeout(function () {
         state.ticketReader.loadTimer = 0;
         loadTicketReaderSheet(preferred).catch(function (err) {
@@ -19921,7 +20398,7 @@
     });
     if (els.paellaEntryReaderBtn) {
       els.paellaEntryReaderBtn.addEventListener("click", function () {
-        openTicketReaderModal();
+        openTicketReaderPickerModal();
       });
     }
     els.createDireccionBtn.addEventListener("click", function () {
@@ -20172,6 +20649,18 @@
         if (event.target === els.editSessionStartModal) closeEditSessionStartModal();
       });
     }
+    if (els.ticketReaderPickerCloseBtn) els.ticketReaderPickerCloseBtn.addEventListener("click", closeTicketReaderPickerModal);
+    if (els.ticketReaderPickerCancelBtn) els.ticketReaderPickerCancelBtn.addEventListener("click", closeTicketReaderPickerModal);
+    if (els.ticketReaderPickerModal) {
+      els.ticketReaderPickerModal.addEventListener("click", function (event) {
+        if (event.target === els.ticketReaderPickerModal) closeTicketReaderPickerModal();
+      });
+    }
+    if (els.ticketReaderSheetBadge) {
+      els.ticketReaderSheetBadge.addEventListener("click", function () {
+        openTicketReaderPickerModal();
+      });
+    }
     if (els.ticketReaderCloseBtn) els.ticketReaderCloseBtn.addEventListener("click", closeTicketReaderModal);
     if (els.ticketReaderFooterCloseBtn) els.ticketReaderFooterCloseBtn.addEventListener("click", closeTicketReaderModal);
     if (els.ticketReaderReviewCloseBtn) els.ticketReaderReviewCloseBtn.addEventListener("click", closeTicketReaderReview);
@@ -20188,15 +20677,6 @@
     if (els.ticketReaderReviewOverlay) {
       els.ticketReaderReviewOverlay.addEventListener("click", function (event) {
         if (event.target === els.ticketReaderReviewOverlay) closeTicketReaderReview();
-      });
-    }
-    if (els.ticketReaderSheetSelect) {
-      els.ticketReaderSheetSelect.addEventListener("change", function () {
-        stopTicketReaderCamera();
-        loadTicketReaderSheet(els.ticketReaderSheetSelect.value).catch(function (err) {
-          console.error(err);
-          renderTicketReaderResults([], messageFromError(err, "No se pudo cargar la hoja."));
-        });
       });
     }
     if (els.ticketReaderSearchBtn) {
