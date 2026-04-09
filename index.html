@@ -2630,9 +2630,12 @@
     }
     .change-history-session-info {
       display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
       align-items: center;
       justify-content: flex-end;
       gap: 10px;
+      min-width: 0;
     }
     .change-history-session-date-block {
       display: grid;
@@ -5554,7 +5557,7 @@
       .change-history-entry-meta,
       .change-history-entry-time,
       .change-history-entry-text { font-size: 0.62rem; }
-      .change-history-session-info { gap: 6px; align-items: flex-end; }
+      .change-history-session-info { gap: 6px; flex-direction: row; flex-wrap: nowrap; align-items: center; }
       .change-history-session-date-block { gap: 1px; }
       .change-history-session-weekday { font-size: 0.72rem; }
       .change-history-session-date-value { font-size: 0.58rem; }
@@ -6603,6 +6606,8 @@
       sheetChangeHistoryEntries: [],
       sheetChangeHistoryLoadedAt: 0,
       sheetChangeHistoryLoadToken: 0,
+      sheetChangeHistorySearch: "",
+      sheetChangeHistoryContextByTitle: {},
       registeredEditSession: null,
       editSessionStartDraft: null,
       editSessionStartSubmitting: false,
@@ -6805,6 +6810,7 @@
       sheetChangeHistoryStatus: document.getElementById("sheetChangeHistoryStatus"),
       sheetChangeHistoryList: document.getElementById("sheetChangeHistoryList"),
       sheetChangeHistoryEmpty: document.getElementById("sheetChangeHistoryEmpty"),
+      sheetChangeHistorySearchInput: null,
       formEditor: document.getElementById("formEditor"),
       formViewSwitch: document.getElementById("formViewSwitch"),
       formViewMainBtn: document.getElementById("formViewMainBtn"),
@@ -10292,7 +10298,9 @@
           }
           state.sheetChangeHistoryLoadedAt = Date.now();
           if (options && options.refreshView && state.spreadsheetViewMode === "history") {
-            renderChangeHistoryList(state.sheetChangeHistoryEntries || []);
+            loadChangeHistoryContextModels(state.sheetChangeHistoryEntries || []).finally(function () {
+              renderChangeHistoryList(state.sheetChangeHistoryEntries || []);
+            });
           }
           return true;
         });
@@ -12634,7 +12642,7 @@
       if (parsed >= (now - oneWeekMs)) {
         return {
           key: "recent",
-          label: "Ultima semana",
+          label: "Ultimos 7 dias",
           sortValue: Number.MAX_SAFE_INTEGER
         };
       }
@@ -12834,45 +12842,565 @@
       }
       return { icon: "✏", label: baseLabel };
     }
+    function handleSheetChangeHistorySearchInput(event) {
+      const input = event && event.target;
+      if (!input) return;
+      state.sheetChangeHistorySearch = String(input.value || "");
+      renderChangeHistoryList(state.sheetChangeHistoryEntries || []);
+    }
+    function fetchSheetRowsByTitle(sheetTitle) {
+      const info = findSpreadsheetSheetByTitle(sheetTitle);
+      if (!info || !state.spreadsheetId || !sheetTitle) return Promise.resolve([]);
+      const rowCount = Math.max(1, Number(info.rowCount || (info.gridProperties && info.gridProperties.rowCount)) || 1);
+      const columnCount = Math.max(1, Number(info.columnCount || (info.gridProperties && info.gridProperties.columnCount)) || 1);
+      return fetchJson(
+        "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(state.spreadsheetId) +
+        "/values/" + encodeURIComponent(quoteSheetTitle(info.title) + "!A1:" + columnLabel(columnCount - 1) + rowCount),
+        { method: "GET" }
+      ).then(function (data) {
+        return Array.isArray(data && data.values) ? data.values : [];
+      });
+    }
+    function getChangeHistoryContextModel(sheetTitle) {
+      const normalizedTitle = normalizeCompareText(sheetTitle);
+      if (!normalizedTitle) return null;
+      if (normalizedTitle === normalizeCompareText(state.currentSheetTitle || "")) {
+        const liveModel = currentSheetGroupsModel();
+        if (liveModel) return liveModel;
+      }
+      return state.sheetChangeHistoryContextByTitle[normalizedTitle] || null;
+    }
+    function loadChangeHistoryContextModels(entries, requestId) {
+      const titles = Array.from(new Set((entries || []).map(function (entry) {
+        return String(entry && entry.sheetTitle || "").trim();
+      }).filter(function (title) {
+        return !!title && !isChangeHistorySheetTitle(title);
+      })));
+      return Promise.all(titles.map(function (title) {
+        const normalizedTitle = normalizeCompareText(title);
+        if (!normalizedTitle) return Promise.resolve(null);
+        if (normalizedTitle === normalizeCompareText(state.currentSheetTitle || "")) {
+          const liveModel = currentSheetGroupsModel();
+          if (liveModel) {
+            state.sheetChangeHistoryContextByTitle[normalizedTitle] = liveModel;
+            return Promise.resolve(liveModel);
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(state.sheetChangeHistoryContextByTitle, normalizedTitle)) {
+          return Promise.resolve(state.sheetChangeHistoryContextByTitle[normalizedTitle] || null);
+        }
+        if (!findSpreadsheetSheetByTitle(title)) {
+          state.sheetChangeHistoryContextByTitle[normalizedTitle] = null;
+          return Promise.resolve(null);
+        }
+        return fetchSheetRowsByTitle(title).then(function (rows) {
+          if (requestId && requestId !== state.sheetChangeHistoryLoadToken) return null;
+          const model = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(title, rows), title);
+          state.sheetChangeHistoryContextByTitle[normalizedTitle] = model;
+          return model;
+        }).catch(function () {
+          state.sheetChangeHistoryContextByTitle[normalizedTitle] = null;
+          return null;
+        });
+      })).then(function () {
+        return state.sheetChangeHistoryContextByTitle;
+      });
+    }
+    function columnIndexFromLabel(label) {
+      const raw = String(label || "").trim().toUpperCase();
+      if (!/^[A-Z]+$/.test(raw)) return -1;
+      let value = 0;
+      for (let i = 0; i < raw.length; i += 1) {
+        value = (value * 26) + (raw.charCodeAt(i) - 64);
+      }
+      return value - 1;
+    }
+    function parseChangeHistoryTarget(entry) {
+      const fallbackSheetTitle = String(entry && entry.sheetTitle || "").trim();
+      const rawTarget = String(entry && entry.target || "").trim();
+      let sheetTitle = fallbackSheetTitle;
+      let ref = rawTarget;
+      const bangIndex = rawTarget.lastIndexOf("!");
+      if (bangIndex !== -1) {
+        sheetTitle = String(rawTarget.slice(0, bangIndex) || fallbackSheetTitle).replace(/^'+|'+$/g, "").trim() || fallbackSheetTitle;
+        ref = String(rawTarget.slice(bangIndex + 1) || "").trim();
+      }
+      const cleanRef = ref.replace(/\$/g, "");
+      const match = /^([A-Z]+)?(\d+)$/i.exec(cleanRef);
+      const rowNumber = match ? Number(match[2]) : NaN;
+      return {
+        sheetTitle: sheetTitle || fallbackSheetTitle,
+        ref: cleanRef,
+        rowNumber: Number.isFinite(rowNumber) ? rowNumber : NaN,
+        rowIndex: Number.isFinite(rowNumber) ? (rowNumber - 1) : NaN,
+        colLabel: match && match[1] ? match[1].toUpperCase() : "",
+        colIndex: match && match[1] ? columnIndexFromLabel(match[1]) : -1
+      };
+    }
+    function getChangeHistoryGroupRef(model, group) {
+      if (!model || !group || !Array.isArray(model.groups)) return "";
+      const groupIndex = model.groups.findIndex(function (candidate) {
+        return !!candidate && candidate.sheetRow === group.sheetRow;
+      });
+      return groupIndex >= 0 ? ("G" + String(groupIndex + 1)) : "";
+    }
+    function resolveChangeHistoryFieldContext(group, colIndex) {
+      if (!group || !Number.isFinite(colIndex) || colIndex < 0) return null;
+      function matches(value) {
+        return Number.isFinite(value) && value === colIndex;
+      }
+      if (matches(group.payment && group.payment.statusCol)) return { kind: "payment", fieldKey: "status" };
+      if (matches(group.payment && group.payment.payerCol)) return { kind: "payment", fieldKey: "payer" };
+      if (matches(group.payment && group.payment.amountCol)) return { kind: "payment", fieldKey: "amount" };
+      if (matches(group.firePoint && group.firePoint.col)) return { kind: "fire", fieldKey: "value" };
+      if (matches(group.sharedLead && group.sharedLead.col)) return { kind: "shared", fieldKey: "value" };
+      if (matches(group.contest && group.contest.col)) return { kind: "contest", fieldKey: "value" };
+      if (group.responsible) {
+        if (matches(group.responsible.nameCol)) return { kind: "responsible", fieldKey: "name", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.emailCol)) return { kind: "responsible", fieldKey: "email", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.dniCol)) return { kind: "responsible", fieldKey: "dni", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.phoneCol)) return { kind: "responsible", fieldKey: "phone", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.entry && group.responsible.entry.statusCol)) return { kind: "responsibleEntry", fieldKey: "status", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.entry && group.responsible.entry.infoCol)) return { kind: "responsibleEntry", fieldKey: "info", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.entry && group.responsible.entry.codeCol)) return { kind: "responsibleEntry", fieldKey: "code", role: "responsable", number: 0, person: group.responsible };
+        if (matches(group.responsible.entry && group.responsible.entry.scannedAtCol)) return { kind: "responsibleEntry", fieldKey: "scannedAt", role: "responsable", number: 0, person: group.responsible };
+      }
+      const slots = Array.isArray(group.assistantSlots) ? group.assistantSlots : [];
+      for (let i = 0; i < slots.length; i += 1) {
+        const slot = slots[i];
+        if (!slot) continue;
+        if (matches(slot.nameCol)) return { kind: "assistant", fieldKey: "name", role: "asistente", number: slot.number, person: slot };
+        if (matches(slot.emailCol)) return { kind: "assistant", fieldKey: "email", role: "asistente", number: slot.number, person: slot };
+        if (matches(slot.dniCol)) return { kind: "assistant", fieldKey: "dni", role: "asistente", number: slot.number, person: slot };
+        if (matches(slot.entry && slot.entry.statusCol)) return { kind: "assistantEntry", fieldKey: "status", role: "asistente", number: slot.number, person: slot };
+        if (matches(slot.entry && slot.entry.infoCol)) return { kind: "assistantEntry", fieldKey: "info", role: "asistente", number: slot.number, person: slot };
+        if (matches(slot.entry && slot.entry.codeCol)) return { kind: "assistantEntry", fieldKey: "code", role: "asistente", number: slot.number, person: slot };
+        if (matches(slot.entry && slot.entry.scannedAtCol)) return { kind: "assistantEntry", fieldKey: "scannedAt", role: "asistente", number: slot.number, person: slot };
+      }
+      return null;
+    }
+    function resolveChangeHistoryEntryContext(entry) {
+      const targetInfo = parseChangeHistoryTarget(entry);
+      const sheetTitle = targetInfo.sheetTitle || String(entry && entry.sheetTitle || "").trim();
+      const model = getChangeHistoryContextModel(sheetTitle);
+      const groups = Array.isArray(model && model.groups) ? model.groups : [];
+      const group = Number.isFinite(targetInfo.rowIndex)
+        ? (groups.find(function (candidate) { return !!candidate && candidate.sheetRow === targetInfo.rowIndex; }) || null)
+        : null;
+      return {
+        sheetTitle: sheetTitle,
+        targetInfo: targetInfo,
+        model: model,
+        group: group,
+        groupRef: getChangeHistoryGroupRef(model, group),
+        responsibleName: group && group.responsible ? (group.responsible.name || group.title || "") : "",
+        responsibleEmail: group && group.responsible ? (group.responsible.email || "") : "",
+        responsibleDni: group && group.responsible ? (group.responsible.dni || "") : "",
+        fieldContext: resolveChangeHistoryFieldContext(group, targetInfo.colIndex)
+      };
+    }
+    function buildChangeHistoryPersonSnapshot(fieldContext, entry, preferBefore) {
+      if (!fieldContext || !fieldContext.role) return null;
+      const source = fieldContext.person || {};
+      const value = String(preferBefore ? (entry && entry.before) : (entry && entry.after) || "").trim();
+      const person = {
+        key: String(fieldContext.role || "persona") + ":" + String(fieldContext.number || 0),
+        role: String(fieldContext.role || "persona"),
+        number: fieldContext.number || 0,
+        name: String(source.name || "").trim(),
+        email: String(source.email || "").trim(),
+        dni: String(source.dni || "").trim()
+      };
+      if (fieldContext.fieldKey === "name" && value) person.name = value;
+      if (fieldContext.fieldKey === "email" && value) person.email = value;
+      if (fieldContext.fieldKey === "dni" && value) person.dni = value;
+      return person;
+    }
+    function mergeChangeHistoryPerson(personMap, person) {
+      if (!personMap || !person || !person.key) return;
+      if (!personMap[person.key]) {
+        personMap[person.key] = {
+          key: person.key,
+          role: person.role,
+          number: person.number || 0,
+          name: "",
+          email: "",
+          dni: ""
+        };
+      }
+      if (person.name) personMap[person.key].name = person.name;
+      if (person.email) personMap[person.key].email = person.email;
+      if (person.dni) personMap[person.key].dni = person.dni;
+    }
+    function changeHistoryPersonLabel(person) {
+      if (!person) return "Integrante";
+      return person.name || person.email || person.dni || ((person.role === "responsable" ? "Responsable" : "Integrante") + (person.number ? (" " + String(person.number)) : ""));
+    }
+    function formatChangeHistoryPeopleList(people) {
+      const labels = (people || []).map(changeHistoryPersonLabel).filter(Boolean);
+      if (!labels.length) return "";
+      if (labels.length === 1) return labels[0];
+      if (labels.length === 2) return labels[0] + " y " + labels[1];
+      return labels.slice(0, -1).join(", ") + " y " + labels[labels.length - 1];
+    }
+    function compactHistoryLabel(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      return String(raw.split("·")[0] || raw).trim();
+    }
+    function buildChangeHistoryActionChangeLines(entries, valueKey) {
+      const lines = [];
+      (entries || []).forEach(function (entry) {
+        const label = compactHistoryLabel(entry && entry.summary) || parseChangeHistoryTarget(entry).ref || String(entry && entry.target || "").trim();
+        const value = String(entry && entry[valueKey] || "").trim() || "Vacio";
+        const line = label ? (label + ": " + value) : value;
+        if (lines.indexOf(line) === -1) lines.push(line);
+      });
+      return lines.join("\n");
+    }
+    function buildChangeHistoryActionLocationText(entries) {
+      const targets = [];
+      (entries || []).forEach(function (entry) {
+        const target = String(entry && entry.target || "").trim();
+        const sheetTitle = String(entry && entry.sheetTitle || "").trim();
+        const text = [sheetTitle, target].filter(Boolean).join(" | ");
+        if (text && targets.indexOf(text) === -1) targets.push(text);
+      });
+      return targets.join("\n");
+    }
+    function buildChangeHistoryActionSummaryText(entries) {
+      const items = [];
+      (entries || []).forEach(function (entry) {
+        const summary = compactHistoryLabel(entry && entry.summary);
+        if (!summary || /^celda\s/i.test(summary)) return;
+        if (items.indexOf(summary) === -1) items.push(summary);
+      });
+      return items.join("\n");
+    }
+    function formatChangeHistoryAmount(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      return /€/.test(raw) ? raw : (raw + " €");
+    }
+    function buildChangeHistoryActionGroupPrefix(action) {
+      if (action.groupRef && action.responsibleName) return action.groupRef + " con responsable " + action.responsibleName;
+      if (action.groupRef) return action.groupRef;
+      if (action.responsibleName) return "El grupo de " + action.responsibleName;
+      if (action.groupTitle) return action.groupTitle;
+      return "El grupo";
+    }
+    function createChangeHistoryActionVisual(action) {
+      if (!action) return { icon: "✏", label: "Cambio" };
+      if (action.kind === "start") return { icon: "🟠", label: "Inicio de edicion" };
+      if (action.kind === "resume") return { icon: "↺", label: "Edicion reanudada" };
+      if (action.kind === "group-create") return { icon: "+👥", label: "Grupo anadido" };
+      if (action.kind === "group-delete") return { icon: "-👥", label: "Grupo eliminado" };
+      if (action.kind === "sheet-create") return { icon: "+📄", label: "Hoja anadida" };
+      if (action.kind === "sheet-delete") return { icon: "-📄", label: "Hoja eliminada" };
+      if (action.kind === "sheet-rename") return { icon: "✏", label: "Nombre de hoja cambiado" };
+      if (action.kind === "document-rename") return { icon: "✏", label: "Nombre del spreadsheet cambiado" };
+      if (action.kind === "payment") return { icon: "€", label: "Pago actualizado" };
+      if (action.kind === "fire") return { icon: "🔥", label: "Punto de fuego actualizado" };
+      if (action.kind === "shared") return { icon: "🤝", label: "Grupo vinculado" };
+      if (action.kind === "contest") return { icon: "✓", label: "Concurso actualizado" };
+      if (action.kind === "assistant-add") return { icon: "+👤", label: action.people.length > 1 ? "Integrantes anadidos" : "Integrante anadido" };
+      if (action.kind === "assistant-remove") return { icon: "-👤", label: action.people.length > 1 ? "Integrantes eliminados" : "Integrante eliminado" };
+      if (action.kind === "assistant-update") return { icon: "👤", label: action.people.length > 1 ? "Integrantes actualizados" : "Integrante actualizado" };
+      if (action.kind === "responsible") return { icon: "👑", label: "Responsable actualizado" };
+      if (action.kind === "ticket") return { icon: "🎟", label: "Entrada actualizada" };
+      return changeHistoryEntryVisual(action.entries && action.entries[0]);
+    }
+    function buildChangeHistoryActionTitle(action) {
+      const prefix = buildChangeHistoryActionGroupPrefix(action);
+      const peopleText = formatChangeHistoryPeopleList(action.people);
+      const paymentStatus = normalizePaymentStatus(action.paymentStatusAfter || action.paymentStatusBefore || "");
+      const paymentAmount = formatChangeHistoryAmount(action.paymentAmountAfter || action.paymentAmountBefore || (action.group && action.group.payment && action.group.payment.amount) || "");
+      const paymentPayer = String(action.paymentPayerAfter || action.paymentPayerBefore || "").trim();
+      const nextValue = String(action.afterValue || action.beforeValue || "").trim();
+      if (action.kind === "start") return "Inicio de edicion registrada";
+      if (action.kind === "resume") return "Edicion reanudada dentro del mismo cambio";
+      if (action.kind === "group-create") return "Se ha creado " + prefix;
+      if (action.kind === "group-delete") return "Se ha eliminado " + prefix;
+      if (action.kind === "sheet-create") return "Se ha creado la hoja " + (action.afterValue || action.sheetTitle || "nueva hoja");
+      if (action.kind === "sheet-delete") return "Se ha eliminado la hoja " + (action.beforeValue || action.sheetTitle || "sin nombre");
+      if (action.kind === "sheet-rename") return "La hoja se ha renombrado a " + (action.afterValue || action.sheetTitle || "sin nombre");
+      if (action.kind === "document-rename") return "El spreadsheet se ha renombrado a " + (action.afterValue || "sin nombre");
+      if (action.kind === "payment") {
+        if (paymentStatus === GROUP_PAYMENT_STATUS_PAID) return prefix + " ha pagado" + (paymentAmount ? (" " + paymentAmount) : "");
+        if (action.paymentAmountAfter) return prefix + " ha actualizado el importe a " + formatChangeHistoryAmount(action.paymentAmountAfter);
+        if (paymentPayer) return prefix + " ha actualizado quien paga a " + paymentPayer;
+        if (paymentStatus) return prefix + " ha actualizado el estado de pago a " + paymentStatus;
+        return prefix + " ha actualizado el pago";
+      }
+      if (action.kind === "fire") return prefix + " ha cambiado el punto de fuego a " + (nextValue || "sin definir");
+      if (action.kind === "shared") return prefix + " ha actualizado el grupo compartido a " + (nextValue || "sin definir");
+      if (action.kind === "contest") return prefix + " ha actualizado el concurso a " + (nextValue || "sin definir");
+      if (action.kind === "assistant-add") return prefix + " ha anadido a " + (peopleText || "nuevos integrantes");
+      if (action.kind === "assistant-remove") return prefix + " ha eliminado a " + (peopleText || "integrantes");
+      if (action.kind === "assistant-update") return prefix + " ha actualizado a " + (peopleText || "integrantes");
+      if (action.kind === "responsible") return prefix + " ha actualizado los datos del responsable";
+      if (action.kind === "ticket") {
+        if (action.entryStatusAfter) return prefix + " ha marcado la entrada de " + (peopleText || "una persona") + " como " + action.entryStatusAfter;
+        return prefix + " ha actualizado la entrada de " + (peopleText || "una persona");
+      }
+      const summary = action.summaryText || compactHistoryLabel(action.entries && action.entries[0] && action.entries[0].summary) || createChangeHistoryActionVisual(action).label || "Cambio";
+      if (action.groupRef || action.responsibleName || action.groupTitle) return prefix + " ha actualizado " + summary;
+      return summary;
+    }
+    function buildChangeHistoryActionSearchIndex(action) {
+      const parts = [
+        action.title,
+        action.sheetTitle,
+        action.groupDisplay,
+        action.responsibleDisplay,
+        action.peopleDisplay,
+        action.summaryText,
+        action.locationText,
+        action.beforeText,
+        action.afterText
+      ];
+      (action.entries || []).forEach(function (entry) {
+        parts.push(
+          entry && entry.sessionName,
+          entry && entry.summary,
+          entry && entry.target,
+          entry && entry.before,
+          entry && entry.after,
+          entry && entry.sheetTitle
+        );
+      });
+      (action.people || []).forEach(function (person) {
+        parts.push(person && person.name, person && person.email, person && person.dni);
+      });
+      return normalizeCompareText(parts.filter(Boolean).join(" "));
+    }
+    function matchesChangeHistoryActionSearch(action, query) {
+      const normalizedQuery = normalizeCompareText(String(query || "").trim());
+      if (!normalizedQuery) return true;
+      const haystack = String(action && action.searchIndex || "");
+      if (!haystack) return false;
+      return normalizedQuery.split(/\s+/).filter(Boolean).every(function (term) {
+        return haystack.indexOf(term) !== -1;
+      });
+    }
+    function buildChangeHistoryDisplayActions(entries) {
+      const actionMap = new Map();
+      (Array.isArray(entries) ? entries.slice() : []).sort(function (a, b) {
+        return changeHistoryEntrySortValue(a) - changeHistoryEntrySortValue(b);
+      }).forEach(function (entry) {
+        const context = resolveChangeHistoryEntryContext(entry);
+        const normalizedType = String(entry && entry.type || "").trim().toUpperCase();
+        const beforeText = String(entry && entry.before || "").trim();
+        const afterText = String(entry && entry.after || "").trim();
+        const hadBefore = !!beforeText;
+        const hasAfter = !!afterText;
+        const fieldContext = context.fieldContext;
+        let kind = "generic";
+        let actionKey = normalizedType + "::" + String(entry && entry.timestamp || "") + "::" + String(entry && entry.target || "") + "::" + String(entry && entry.summary || "");
+        let preferBeforePerson = false;
+        if (normalizedType === "INICIO_EDICION") {
+          kind = "start";
+          actionKey = "start::" + String(entry && entry.timestamp || "");
+        } else if (normalizedType === "REANUDAR_EDICION") {
+          kind = "resume";
+          actionKey = "resume::" + String(entry && entry.timestamp || "");
+        } else if (normalizedType === "GRUPO_CREADO") {
+          kind = "group-create";
+          actionKey = "group-create::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+        } else if (normalizedType === "GRUPO_ELIMINADO") {
+          kind = "group-delete";
+          actionKey = "group-delete::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+        } else if (normalizedType === "HOJA_CREADA") {
+          kind = "sheet-create";
+        } else if (normalizedType === "HOJA_ELIMINADA") {
+          kind = "sheet-delete";
+        } else if (normalizedType === "RENOMBRE_HOJA") {
+          kind = "sheet-rename";
+        } else if (normalizedType === "RENOMBRE_SPREADSHEET" || normalizedType === "TITULO_SPREADSHEET") {
+          kind = "document-rename";
+        } else if (normalizedType === "CELDA") {
+          if (fieldContext && fieldContext.kind === "payment") {
+            kind = "payment";
+            actionKey = "payment::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+          } else if (fieldContext && fieldContext.kind === "fire") {
+            kind = "fire";
+            actionKey = "fire::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+          } else if (fieldContext && fieldContext.kind === "shared") {
+            kind = "shared";
+            actionKey = "shared::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+          } else if (fieldContext && fieldContext.kind === "contest") {
+            kind = "contest";
+            actionKey = "contest::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+          } else if (fieldContext && fieldContext.kind === "responsible") {
+            kind = "responsible";
+            actionKey = "responsible::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+            preferBeforePerson = !hasAfter && hadBefore;
+          } else if (fieldContext && fieldContext.kind === "assistant") {
+            const mode = !hadBefore && hasAfter ? "add" : (hadBefore && !hasAfter ? "remove" : "update");
+            kind = "assistant-" + mode;
+            actionKey = "assistant::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex) + "::" + mode;
+            preferBeforePerson = mode === "remove";
+          } else if (fieldContext && (fieldContext.kind === "assistantEntry" || fieldContext.kind === "responsibleEntry")) {
+            kind = "ticket";
+            actionKey = "ticket::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex) + "::" + String(fieldContext.role || "") + "::" + String(fieldContext.number || 0);
+            preferBeforePerson = !hasAfter && hadBefore;
+          } else if ((detectHistoryPaymentStatusValue(beforeText) || detectHistoryPaymentStatusValue(afterText)) && Number.isFinite(context.targetInfo.rowIndex)) {
+            kind = "payment";
+            actionKey = "payment::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+          } else if ((detectHistoryFirePointValue(beforeText) || detectHistoryFirePointValue(afterText)) && Number.isFinite(context.targetInfo.rowIndex)) {
+            kind = "fire";
+            actionKey = "fire::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex);
+          }
+        }
+        if (!actionMap.has(actionKey)) {
+          actionMap.set(actionKey, {
+            key: actionKey,
+            kind: kind,
+            timestamp: String(entry && entry.timestamp || ""),
+            entries: [],
+            sheetTitle: context.sheetTitle || String(entry && entry.sheetTitle || ""),
+            group: null,
+            groupRef: "",
+            groupTitle: "",
+            responsibleName: "",
+            responsibleEmail: "",
+            responsibleDni: "",
+            peopleMap: {},
+            people: [],
+            paymentStatusBefore: "",
+            paymentStatusAfter: "",
+            paymentAmountBefore: "",
+            paymentAmountAfter: "",
+            paymentPayerBefore: "",
+            paymentPayerAfter: "",
+            entryStatusAfter: "",
+            beforeValue: "",
+            afterValue: ""
+          });
+        }
+        const action = actionMap.get(actionKey);
+        action.kind = kind;
+        action.entries.push(entry);
+        if (!action.timestamp || changeHistoryEntrySortValue(entry) < changeHistoryEntrySortValue({ timestamp: action.timestamp })) {
+          action.timestamp = String(entry && entry.timestamp || action.timestamp || "");
+        }
+        if (!action.sheetTitle) action.sheetTitle = context.sheetTitle || String(entry && entry.sheetTitle || "");
+        if (context.group && !action.group) action.group = context.group;
+        if (!action.groupRef && context.groupRef) action.groupRef = context.groupRef;
+        if (!action.groupTitle && context.group && context.group.title) action.groupTitle = context.group.title;
+        if (!action.responsibleName && context.responsibleName) action.responsibleName = context.responsibleName;
+        if (!action.responsibleEmail && context.responsibleEmail) action.responsibleEmail = context.responsibleEmail;
+        if (!action.responsibleDni && context.responsibleDni) action.responsibleDni = context.responsibleDni;
+        if ((kind === "group-create" || kind === "group-delete") && !action.responsibleName) {
+          action.responsibleName = afterText || beforeText || action.responsibleName;
+        }
+        if (!action.beforeValue && beforeText) action.beforeValue = beforeText;
+        if (!action.afterValue && afterText) action.afterValue = afterText;
+        if (fieldContext && fieldContext.kind === "payment") {
+          if (fieldContext.fieldKey === "status") {
+            action.paymentStatusBefore = beforeText || action.paymentStatusBefore;
+            action.paymentStatusAfter = afterText || action.paymentStatusAfter;
+          }
+          if (fieldContext.fieldKey === "amount") {
+            action.paymentAmountBefore = beforeText || action.paymentAmountBefore;
+            action.paymentAmountAfter = afterText || action.paymentAmountAfter;
+          }
+          if (fieldContext.fieldKey === "payer") {
+            action.paymentPayerBefore = beforeText || action.paymentPayerBefore;
+            action.paymentPayerAfter = afterText || action.paymentPayerAfter;
+          }
+        }
+        if (!action.paymentStatusBefore) action.paymentStatusBefore = detectHistoryPaymentStatusValue(beforeText) || action.paymentStatusBefore;
+        if (!action.paymentStatusAfter) action.paymentStatusAfter = detectHistoryPaymentStatusValue(afterText) || action.paymentStatusAfter;
+        if (!action.entryStatusAfter) action.entryStatusAfter = detectHistoryEntryStatusValue(afterText) || action.entryStatusAfter;
+        if ((kind === "assistant-add" || kind === "assistant-remove" || kind === "assistant-update" || kind === "ticket" || kind === "responsible")) {
+          const personSnapshot = buildChangeHistoryPersonSnapshot(fieldContext, entry, preferBeforePerson);
+          if (personSnapshot) mergeChangeHistoryPerson(action.peopleMap, personSnapshot);
+        }
+      });
+      return Array.from(actionMap.values()).map(function (action) {
+        action.people = Object.keys(action.peopleMap).map(function (key) {
+          return action.peopleMap[key];
+        }).sort(function (a, b) {
+          return Number(a.number || 0) - Number(b.number || 0);
+        });
+        action.groupDisplay = [action.groupRef, action.groupTitle].filter(Boolean).join(" · ");
+        action.responsibleDisplay = [action.responsibleName, action.responsibleDni, action.responsibleEmail].filter(Boolean).join(" · ");
+        action.peopleDisplay = formatChangeHistoryPeopleList(action.people);
+        action.locationText = buildChangeHistoryActionLocationText(action.entries);
+        action.summaryText = buildChangeHistoryActionSummaryText(action.entries);
+        action.beforeText = buildChangeHistoryActionChangeLines(action.entries, "before");
+        action.afterText = buildChangeHistoryActionChangeLines(action.entries, "after");
+        action.visual = createChangeHistoryActionVisual(action);
+        action.title = buildChangeHistoryActionTitle(action);
+        action.searchIndex = buildChangeHistoryActionSearchIndex(action);
+        return action;
+      }).sort(function (a, b) {
+        return changeHistoryEntrySortValue(a) - changeHistoryEntrySortValue(b);
+      });
+    }
     function renderChangeHistoryList(entries) {
       if (!els.sheetChangeHistoryList) return;
       const sourceEntries = Array.isArray(entries) ? entries.slice() : [];
-      els.sheetChangeHistoryList.innerHTML = "";
-      const banner = document.createElement("div");
-      banner.className = "sheet-groups-banner";
-      banner.innerHTML =
-        "<div class='sheet-groups-banner-top'>" +
-          "<div class='sheet-groups-banner-title'>Historial de cambios</div>" +
-          "<div class='sheet-groups-banner-meta'></div>" +
-        "</div>";
-      const sessionsMap = new Map();
-      sourceEntries.sort(function (a, b) {
-        return changeHistoryEntrySortValue(b) - changeHistoryEntrySortValue(a);
-      }).forEach(function (entry) {
-        const key = entry.sessionId || ("legacy:" + entry.timestamp + ":" + entry.summary);
-        if (!sessionsMap.has(key)) {
-          sessionsMap.set(key, {
-            sessionId: entry.sessionId || "",
-            sessionName: entry.sessionName || "Cambio sin nombre",
-            userName: entry.userName || "Usuario",
-            userEmail: entry.userEmail || "",
-            userPhoto: entry.userPhoto || "",
-            startedAt: entry.timestamp || "",
-            latestAt: entry.timestamp || "",
-            entries: []
-          });
-        }
-        const session = sessionsMap.get(key);
-        session.entries.push(entry);
-        if (!session.startedAt || changeHistoryEntrySortValue(entry) < changeHistoryEntrySortValue({ timestamp: session.startedAt })) {
-          session.startedAt = entry.timestamp || session.startedAt;
-        }
-        if (changeHistoryEntrySortValue(entry) > changeHistoryEntrySortValue({ timestamp: session.latestAt })) {
-          session.latestAt = entry.timestamp || session.latestAt;
-        }
+      const existingBanner = els.sheetChangeHistoryList.querySelector(".sheet-groups-banner");
+      Array.prototype.slice.call(els.sheetChangeHistoryList.children || []).forEach(function (child) {
+        if (child !== existingBanner) els.sheetChangeHistoryList.removeChild(child);
       });
-      const sessions = Array.from(sessionsMap.values()).sort(function (a, b) {
-        return changeHistoryEntrySortValue({ timestamp: b.latestAt }) - changeHistoryEntrySortValue({ timestamp: a.latestAt });
+      const banner = existingBanner || document.createElement("div");
+      let bannerTop = banner.querySelector(".sheet-groups-banner-top");
+      let bannerTitle = banner.querySelector(".sheet-groups-banner-title");
+      let bannerMeta = banner.querySelector(".sheet-groups-banner-meta");
+      let searchWrap = banner.querySelector(".sheet-groups-banner-search-wrap");
+      let searchInput = banner.querySelector("#sheetChangeHistorySearchInput");
+      banner.className = "sheet-groups-banner";
+      if (!bannerTop) {
+        bannerTop = document.createElement("div");
+        bannerTop.className = "sheet-groups-banner-top";
+        banner.appendChild(bannerTop);
+      }
+      if (!bannerTitle) {
+        bannerTitle = document.createElement("div");
+        bannerTitle.className = "sheet-groups-banner-title";
+        bannerTop.appendChild(bannerTitle);
+      }
+      if (!bannerMeta) {
+        bannerMeta = document.createElement("div");
+        bannerMeta.className = "sheet-groups-banner-meta";
+        bannerTop.appendChild(bannerMeta);
+      }
+      if (!searchWrap) {
+        searchWrap = document.createElement("div");
+        searchWrap.className = "sheet-groups-banner-search-wrap";
+        banner.appendChild(searchWrap);
+      }
+      if (!searchInput) {
+        searchInput = document.createElement("input");
+        searchInput.id = "sheetChangeHistorySearchInput";
+        searchInput.className = "search sheet-groups-banner-search";
+        searchInput.type = "search";
+        searchInput.autocomplete = "off";
+        searchInput.spellcheck = false;
+        searchInput.addEventListener("input", handleSheetChangeHistorySearchInput);
+        searchWrap.appendChild(searchInput);
+      }
+      bannerTitle.textContent = "Historial de cambios";
+      bannerMeta.textContent = "";
+      searchInput.placeholder = "Buscar por grupo, responsable, integrante, DNI, email o accion";
+      if (document.activeElement !== searchInput) {
+        searchInput.value = String(state.sheetChangeHistorySearch || "");
+      }
+      els.sheetChangeHistorySearchInput = searchInput;
+      if (banner.parentNode !== els.sheetChangeHistoryList) {
+        els.sheetChangeHistoryList.insertBefore(banner, els.sheetChangeHistoryList.firstChild || null);
+      }
+      const normalizedSearch = normalizeCompareText(state.sheetChangeHistorySearch || "");
+      const sessions = buildChangeHistorySessions(sourceEntries).map(function (session) {
+        const actions = buildChangeHistoryDisplayActions(session.entries || []).filter(function (action) {
+          return matchesChangeHistoryActionSearch(action, normalizedSearch);
+        });
+        return Object.assign({}, session, { actions: actions });
+      }).filter(function (session) {
+        return Array.isArray(session.actions) && session.actions.length;
       });
       const bucketsMap = new Map();
       sessions.forEach(function (session) {
@@ -12888,22 +13416,25 @@
         }
         const bucket = bucketsMap.get(descriptor.key);
         bucket.sessions.push(session);
-        bucket.changeCount += Array.isArray(session.entries) ? session.entries.length : 0;
+        bucket.changeCount += Array.isArray(session.actions) ? session.actions.length : 0;
       });
       const buckets = Array.from(bucketsMap.values()).sort(function (a, b) {
         return Number(b.sortValue || 0) - Number(a.sortValue || 0);
       });
-      const meta = banner.querySelector(".sheet-groups-banner-meta");
-      if (meta) {
-        meta.textContent = String(sessions.length) + " sesiones | " + String(sourceEntries.length) + " acciones";
+      if (bannerMeta) {
+        const actionCount = sessions.reduce(function (sum, session) {
+          return sum + ((session.actions || []).length || 0);
+        }, 0);
+        bannerMeta.textContent = normalizedSearch
+          ? (String(actionCount) + " resultados | " + String(sessions.length) + " sesiones")
+          : (String(sessions.length) + " sesiones | " + String(actionCount) + " acciones");
       }
-      els.sheetChangeHistoryList.appendChild(banner);
       if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
       if (!buckets.length) return;
       buckets.forEach(function (bucket, bucketIndex) {
         const sectionEl = document.createElement("details");
         sectionEl.className = "sheet-groups-section change-history-bucket";
-        sectionEl.open = bucketIndex === 0;
+        sectionEl.open = !!normalizedSearch || bucketIndex === 0;
         const sectionSummary = document.createElement("summary");
         sectionSummary.className = "sheet-groups-section-summary";
         const sectionLabel = document.createElement("span");
@@ -12924,7 +13455,7 @@
         bucket.sessions.forEach(function (session, sessionIndex) {
           const card = document.createElement("details");
           card.className = "sheet-group-card change-history-session-card";
-          card.open = (bucketIndex === 0 && sessionIndex === 0) || !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId);
+          card.open = !!normalizedSearch || (bucketIndex === 0 && sessionIndex === 0) || !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId);
           const summary = document.createElement("summary");
           summary.className = "sheet-group-summary";
           const avatar = document.createElement("div");
@@ -12974,7 +13505,7 @@
           chipStack.className = "change-history-session-chip-stack";
           const countChip = document.createElement("span");
           countChip.className = "sheet-group-chip";
-          countChip.textContent = String(session.entries.length) + " acciones";
+          countChip.textContent = String((session.actions || []).length) + " acciones";
           chipStack.appendChild(countChip);
           if (state.registeredEditSession && state.registeredEditSession.id === session.sessionId) {
             const liveChip = document.createElement("span");
@@ -12994,23 +13525,15 @@
           body.className = "sheet-group-body";
           const entryList = document.createElement("div");
           entryList.className = "change-history-entry-list";
-          session.entries.sort(function (a, b) {
-            return changeHistoryEntrySortValue(a) - changeHistoryEntrySortValue(b);
-          }).forEach(function (entry, entryIndex) {
-            const beforeText = String(entry.before || "");
-            const afterText = String(entry.after || "");
-            const targetText = [entry.sheetTitle, entry.target].filter(Boolean).join(" | ");
-            const summaryText = String(entry.summary || targetText || "Sin detalle");
-            const compactChangeText = (beforeText || afterText)
-              ? ((beforeText || "Vacio") + " -> " + (afterText || "Vacio"))
-              : summaryText;
-            const displaySummaryText = (/^celda\s/i.test(String(summaryText || "").trim()) || normalizeCompareText(summaryText) === normalizeCompareText(targetText))
-              ? compactChangeText
-              : summaryText;
-            const entryVisual = changeHistoryEntryVisual(entry);
+          (session.actions || []).forEach(function (action, entryIndex) {
+            const beforeText = String(action.beforeText || "");
+            const afterText = String(action.afterText || "");
+            const targetText = String(action.locationText || "");
+            const summaryText = String(action.summaryText || action.title || "Sin detalle");
+            const entryVisual = action.visual || createChangeHistoryActionVisual(action);
             const entryEl = document.createElement("details");
             entryEl.className = "change-history-entry";
-            entryEl.open = !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId && entryIndex === 0);
+            entryEl.open = !normalizedSearch && !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId && entryIndex === 0);
             const entrySummary = document.createElement("summary");
             entrySummary.className = "change-history-entry-summary";
             const entryMain = document.createElement("div");
@@ -13024,12 +13547,12 @@
             entryIcon.textContent = entryVisual.icon || "✏";
             const entryTitleText = document.createElement("span");
             entryTitleText.className = "change-history-entry-title-text";
-            entryTitleText.textContent = entryVisual.label || changeHistoryTypeLabel(entry.type);
+            entryTitleText.textContent = action.title || entryVisual.label || "Cambio";
             entryTitle.appendChild(entryIcon);
             entryTitle.appendChild(entryTitleText);
             const entryTime = document.createElement("div");
             entryTime.className = "change-history-entry-time";
-            entryTime.textContent = changeHistoryEntryTimeValue(entry);
+            entryTime.textContent = changeHistoryEntryTimeValue(action);
             entryHead.appendChild(entryTitle);
             entryHead.appendChild(entryTime);
             entryMain.appendChild(entryHead);
@@ -13065,8 +13588,11 @@
               fact.appendChild(factText);
               facts.appendChild(fact);
             }
+            appendFact("Grupo", action.groupDisplay, false);
+            appendFact("Responsable", action.responsibleDisplay, false);
+            appendFact("Personas afectadas", action.peopleDisplay, false);
             appendFact("Ubicacion", targetText, false);
-            appendFact("Resumen", displaySummaryText, !targetText);
+            appendFact("Resumen", summaryText, !targetText);
             if (facts.children.length) entryDetail.appendChild(facts);
             if (beforeText || afterText) {
               const values = document.createElement("div");
@@ -13114,14 +13640,18 @@
       if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
       return loadChangeHistoryEntries({ force: !!config.force, requestId: requestId }).then(function (entries) {
         if (requestId !== state.sheetChangeHistoryLoadToken) return false;
-        renderChangeHistoryList(entries);
-        setChangeHistoryStatus("", "");
-        return true;
+        return loadChangeHistoryContextModels(entries, requestId).then(function () {
+          if (requestId !== state.sheetChangeHistoryLoadToken) return false;
+          renderChangeHistoryList(entries);
+          setChangeHistoryStatus("", "");
+          return true;
+        });
       }).catch(function (err) {
         console.error(err);
         if (requestId !== state.sheetChangeHistoryLoadToken) return false;
         if (els.sheetChangeHistoryList) els.sheetChangeHistoryList.innerHTML = "";
         if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
+        els.sheetChangeHistorySearchInput = null;
         setChangeHistoryStatus("", "");
         return false;
       });
@@ -17873,6 +18403,8 @@
       state.sheetChangeHistoryEntries = [];
       state.sheetChangeHistoryLoadedAt = 0;
       state.sheetChangeHistoryLoadToken = 0;
+      state.sheetChangeHistorySearch = "";
+      state.sheetChangeHistoryContextByTitle = {};
       state.spreadsheetLastDataViewMode = "table";
       resetRegisteredEditState();
       clearTimeout(state.saveTimer);
@@ -17957,6 +18489,8 @@
       state.sheetChangeHistoryEntries = [];
       state.sheetChangeHistoryLoadedAt = 0;
       state.sheetChangeHistoryLoadToken = 0;
+      state.sheetChangeHistorySearch = "";
+      state.sheetChangeHistoryContextByTitle = {};
       state.spreadsheetLastDataViewMode = "groups";
       resetRegisteredEditState();
       state.titleDirty = false;
@@ -18835,6 +19369,8 @@
           state.sheetChangeHistoryEntries = [];
           state.sheetChangeHistoryLoadedAt = 0;
           state.sheetChangeHistoryLoadToken = 0;
+          state.sheetChangeHistorySearch = "";
+          state.sheetChangeHistoryContextByTitle = {};
           state.spreadsheetLastDataViewMode = "table";
           resetRegisteredEditState();
           state.spreadsheetViewMode = "table";
