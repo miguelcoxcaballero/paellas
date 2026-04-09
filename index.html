@@ -7668,7 +7668,9 @@
     function hasPendingRegisteredHistoryLogs() {
       return !!(
         (state.changeLogPendingRows && state.changeLogPendingRows.length) ||
-        (state.changeLogCellDrafts && Object.keys(state.changeLogCellDrafts).length)
+        Object.keys(state.changeLogCellDrafts || {}).some(function (key) {
+          return !!(state.changeLogCellDrafts[key] && state.changeLogCellDrafts[key].committed);
+        })
       );
     }
     function currentRegisteredHistoryEntryBase() {
@@ -7704,8 +7706,13 @@
       });
       return appendChangeHistoryRows([buildChangeHistoryRow(entry)], { refreshView: true });
     }
-    function flushRegisteredCellChangeDrafts() {
-      const drafts = Object.keys(state.changeLogCellDrafts || {}).map(function (key) {
+    function flushRegisteredCellChangeDrafts(options) {
+      const config = options || {};
+      const draftKeys = Object.keys(state.changeLogCellDrafts || {}).filter(function (key) {
+        const draft = state.changeLogCellDrafts[key];
+        return !!(draft && (config.forceAll || draft.committed));
+      });
+      const drafts = draftKeys.map(function (key) {
         return state.changeLogCellDrafts[key];
       }).filter(Boolean);
       if (!drafts.length) return false;
@@ -7726,11 +7733,13 @@
           summary: headerLabel ? (headerLabel + " · " + ref) : ("Celda " + ref)
         });
       });
-      state.changeLogCellDrafts = {};
+      draftKeys.forEach(function (key) {
+        delete state.changeLogCellDrafts[key];
+      });
       return true;
     }
-    function flushRegisteredHistoryLog() {
-      flushRegisteredCellChangeDrafts();
+    function flushRegisteredHistoryLog(options) {
+      flushRegisteredCellChangeDrafts(options);
       const rows = Array.isArray(state.changeLogPendingRows) ? state.changeLogPendingRows.slice() : [];
       if (!rows.length) return Promise.resolve(false);
       state.changeLogPendingRows = [];
@@ -7746,6 +7755,7 @@
       const existing = state.changeLogCellDrafts[key];
       if (existing) {
         existing.after = nextAfter;
+        existing.committed = false;
         if (existing.before === nextAfter) delete state.changeLogCellDrafts[key];
         return true;
       }
@@ -7756,8 +7766,32 @@
         row: Number(row) || 0,
         col: Number(col) || 0,
         before: nextBefore,
-        after: nextAfter
+        after: nextAfter,
+        committed: false
       };
+      return true;
+    }
+    function commitRegisteredCellChangeDraft(sheetTitle, row, col) {
+      if (!sheetTitle || isChangeHistorySheetTitle(sheetTitle)) return false;
+      const key = [sheetTitle, row, col].join("::");
+      const existing = state.changeLogCellDrafts[key];
+      if (!existing) return false;
+      if (existing.before === existing.after) {
+        delete state.changeLogCellDrafts[key];
+        return false;
+      }
+      existing.committed = true;
+      return true;
+    }
+    function scheduleRegisteredHistoryCommitFlush() {
+      if (!isRegisteredEditingActive()) return false;
+      if (state.saveInFlight || state.saveQueued || state.titleDirty || hasPendingSheetChanges()) {
+        queueAutosave(220);
+        return true;
+      }
+      flushRegisteredHistoryLog().catch(function (err) {
+        console.error(err);
+      });
       return true;
     }
     function normalizeHeaderMatchKey(value) {
@@ -13067,6 +13101,39 @@
       if (labels.length === 2) return labels[0] + " y " + labels[1];
       return labels.slice(0, -1).join(", ") + " y " + labels[labels.length - 1];
     }
+    function formatChangeHistoryLabelList(labels) {
+      const items = (labels || []).map(function (label) {
+        return String(label || "").trim();
+      }).filter(Boolean);
+      if (!items.length) return "";
+      if (items.length === 1) return items[0];
+      if (items.length === 2) return items[0] + " y " + items[1];
+      return items.slice(0, -1).join(", ") + " y " + items[items.length - 1];
+    }
+    function getChangeHistoryEditedFieldLabel(fieldContext, entry) {
+      if (!fieldContext) return compactHistoryLabel(entry && entry.summary) || parseChangeHistoryTarget(entry).ref || "Campo";
+      if (fieldContext.kind === "assistant" || fieldContext.kind === "responsible") {
+        if (fieldContext.fieldKey === "name") return "Nombre";
+        if (fieldContext.fieldKey === "email") return "Email";
+        if (fieldContext.fieldKey === "dni") return "DNI";
+        if (fieldContext.fieldKey === "phone") return "Telefono";
+      }
+      if (fieldContext.kind === "assistantEntry" || fieldContext.kind === "responsibleEntry") {
+        if (fieldContext.fieldKey === "status") return "Estado de entrada";
+        if (fieldContext.fieldKey === "info") return "Info de entrada";
+        if (fieldContext.fieldKey === "code") return "Codigo de entrada";
+        if (fieldContext.fieldKey === "scannedAt") return "Escaneado";
+      }
+      if (fieldContext.kind === "payment") {
+        if (fieldContext.fieldKey === "status") return "Estado de pago";
+        if (fieldContext.fieldKey === "amount") return "Importe";
+        if (fieldContext.fieldKey === "payer") return "Quien paga";
+      }
+      if (fieldContext.kind === "fire") return "Punto de fuego";
+      if (fieldContext.kind === "shared") return "Grupo compartido";
+      if (fieldContext.kind === "contest") return "Concurso";
+      return compactHistoryLabel(entry && entry.summary) || parseChangeHistoryTarget(entry).ref || "Campo";
+    }
     function compactHistoryLabel(value) {
       const raw = String(value || "").trim();
       if (!raw) return "";
@@ -13149,6 +13216,11 @@
     function buildChangeHistoryActionTitle(action) {
       const prefix = buildChangeHistoryActionGroupPrefix(action);
       const peopleText = formatChangeHistoryPeopleList(action.people);
+      const editedFieldsText = formatChangeHistoryLabelList(action.editedFieldLabels);
+      const primaryPerson = action.people && action.people.length ? action.people[0] : null;
+      const primaryPersonLabel = primaryPerson
+        ? changeHistoryPersonLabel(primaryPerson)
+        : ((action.subjectRole === "asistente" ? "Integrante " : "Persona ") + (action.subjectNumber == null ? "" : String(action.subjectNumber)));
       const paymentTransition = resolveChangeHistoryPaymentStatusTransition(action);
       const paymentStatusBefore = paymentTransition.before;
       const paymentStatusAfter = paymentTransition.after;
@@ -13179,7 +13251,7 @@
       if (action.kind === "contest") return prefix + " ha actualizado el concurso a " + (nextValue || "sin definir");
       if (action.kind === "assistant-add") return prefix + " ha anadido a " + (peopleText || "nuevos integrantes");
       if (action.kind === "assistant-remove") return prefix + " ha eliminado a " + (peopleText || "integrantes");
-      if (action.kind === "assistant-update") return prefix + " ha actualizado a " + (peopleText || "integrantes");
+      if (action.kind === "assistant-update") return "Edicion de " + (editedFieldsText || "datos") + " del integrante " + primaryPersonLabel;
       if (action.kind === "responsible") return prefix + " ha actualizado los datos del responsable";
       if (action.kind === "ticket") {
         if (action.entryStatusAfter) return prefix + " ha marcado la entrada de " + (peopleText || "una persona") + " como " + action.entryStatusAfter;
@@ -13196,6 +13268,7 @@
         action.groupDisplay,
         action.responsibleDisplay,
         action.peopleDisplay,
+        action.editedFieldsDisplay,
         action.summaryText,
         action.locationText,
         action.beforeText,
@@ -13300,7 +13373,7 @@
           } else if (fieldContext && fieldContext.kind === "assistant") {
             const mode = !hadBefore && hasAfter ? "add" : (hadBefore && !hasAfter ? "remove" : "update");
             kind = "assistant-" + mode;
-            actionKey = "assistant::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex) + "::" + mode;
+            actionKey = "assistant::" + context.sheetTitle + "::" + String(context.targetInfo.rowIndex) + "::" + String(fieldContext.number || "") + "::" + mode;
             preferBeforePerson = mode === "remove";
           } else if (fieldContext && (fieldContext.kind === "assistantEntry" || fieldContext.kind === "responsibleEntry")) {
             kind = "ticket";
@@ -13329,6 +13402,10 @@
             responsibleDni: "",
             peopleMap: {},
             people: [],
+            editedFieldLabels: [],
+            editedFieldsDisplay: "",
+            subjectRole: "",
+            subjectNumber: null,
             paymentStatusBefore: "",
             paymentStatusAfter: "",
             paymentAmountBefore: "",
@@ -13375,6 +13452,14 @@
         if (!action.paymentStatusBefore) action.paymentStatusBefore = detectHistoryPaymentStatusValue(beforeText) || action.paymentStatusBefore;
         if (!action.paymentStatusAfter) action.paymentStatusAfter = detectHistoryPaymentStatusValue(afterText) || action.paymentStatusAfter;
         if (!action.entryStatusAfter) action.entryStatusAfter = detectHistoryEntryStatusValue(afterText) || action.entryStatusAfter;
+        if (fieldContext) {
+          const editedFieldLabel = getChangeHistoryEditedFieldLabel(fieldContext, entry);
+          if (editedFieldLabel && action.editedFieldLabels.indexOf(editedFieldLabel) === -1) {
+            action.editedFieldLabels.push(editedFieldLabel);
+          }
+          if (!action.subjectRole && fieldContext.role) action.subjectRole = String(fieldContext.role || "");
+          if (action.subjectNumber == null && fieldContext.number != null) action.subjectNumber = fieldContext.number;
+        }
         if ((kind === "assistant-add" || kind === "assistant-remove" || kind === "assistant-update" || kind === "ticket" || kind === "responsible")) {
           const personSnapshot = buildChangeHistoryPersonSnapshot(fieldContext, entry, preferBeforePerson);
           if (personSnapshot) mergeChangeHistoryPerson(action.peopleMap, personSnapshot);
@@ -13389,6 +13474,7 @@
         action.groupDisplay = [action.groupRef, action.groupTitle].filter(Boolean).join(" · ");
         action.responsibleDisplay = [action.responsibleName, action.responsibleDni, action.responsibleEmail].filter(Boolean).join(" · ");
         action.peopleDisplay = formatChangeHistoryPeopleList(action.people);
+        action.editedFieldsDisplay = formatChangeHistoryLabelList(action.editedFieldLabels);
         action.locationText = buildChangeHistoryActionLocationText(action.entries);
         action.summaryText = buildChangeHistoryActionSummaryText(action.entries);
         action.beforeText = buildChangeHistoryActionChangeLines(action.entries, "before");
@@ -13670,6 +13756,7 @@
             appendFact("Grupo", action.groupDisplay, false);
             appendFact("Responsable", action.responsibleDisplay, false);
             appendFact("Personas afectadas", action.peopleDisplay, false);
+            appendFact("Campos editados", action.editedFieldsDisplay, false);
             appendFact("Ubicacion", targetText, false);
             appendFact("Resumen", summaryText, !targetText);
             if (facts.children.length) entryDetail.appendChild(facts);
@@ -19119,7 +19206,7 @@
             return persistSpreadsheetTitle().then(function () {
               return saveSheetDrafts();
             }).then(function () {
-              return flushRegisteredHistoryLog();
+              return flushRegisteredHistoryLog({ forceAll: !!config.force });
             });
           });
         })
@@ -19169,6 +19256,9 @@
       setCellValue(info.title, row, col, target.value);
       state.sheetDirtyCells[info.title].add(cellKey(row, col));
       target.classList.add("is-dirty");
+      if (event.type === "change" && commitRegisteredCellChangeDraft(info.title, row, col)) {
+        scheduleRegisteredHistoryCommitFlush();
+      }
       queueAutosave();
     }
     function findSheetGroupById(groupId) {
@@ -19194,6 +19284,9 @@
       if (!Number.isFinite(row) || !Number.isFinite(col) || col < 0) return;
       applySheetGroupCellDraft(state.currentSheetTitle, row, col, target.value, { delay: 450 });
       target.classList.add("is-dirty");
+      if (event.type === "change" && commitRegisteredCellChangeDraft(state.currentSheetTitle, row, col)) {
+        scheduleRegisteredHistoryCommitFlush();
+      }
       const shouldRefreshModel = target.classList.contains("sheet-group-select") || event.type === "change";
       if (shouldRefreshModel) {
         scheduleSheetGroupsModelUiRefresh(target.classList.contains("sheet-group-select") ? 0 : 80);
@@ -19878,6 +19971,7 @@
       }
     });
     els.sheetGrid.addEventListener("input", handleGridInput);
+    els.sheetGrid.addEventListener("change", handleGridInput);
     var scrollRafPending = false;
     var scrollFetchTimer = 0;
     els.sheetWrap.addEventListener("scroll", function () {
