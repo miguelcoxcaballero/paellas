@@ -2696,6 +2696,23 @@
       border-top: 1px solid rgba(93,58,16,0.1);
       transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
+    .change-history-entry.is-search-match {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,247,230,0.96), rgba(255,239,205,0.92));
+      border-top-color: rgba(224,116,24,0.26);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.62);
+    }
+    .change-history-entry.is-search-match::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffb347, #e06a00);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.35);
+    }
     .change-history-entry:first-child {
       border-top: none;
     }
@@ -2722,6 +2739,9 @@
     }
     .change-history-entry[open] > .change-history-entry-summary {
       padding-bottom: 12px;
+    }
+    .change-history-entry.is-search-match > .change-history-entry-summary {
+      padding-left: 12px;
     }
     .change-history-entry-main {
       min-width: 0;
@@ -2757,6 +2777,10 @@
       font-size: 0.86rem;
       line-height: 1;
       flex: 0 0 auto;
+    }
+    .change-history-entry.is-search-match .change-history-entry-icon {
+      background: linear-gradient(180deg, rgba(255,196,92,0.26), rgba(224,106,0,0.18));
+      color: #8c3900;
     }
     .change-history-entry-title-text {
       min-width: 0;
@@ -11729,7 +11753,7 @@
       setAt(["Responsable - telefono"], draft.phone);
       setAt(["Responsable - DNI"], draft.dni);
       setAt(["submittedAt", "timestamp"], new Date().toLocaleString("es-ES"));
-      setAt(["Pago - estado"], draft.paymentStatus || GROUP_PAYMENT_STATUS_PENDING);
+      setAt(["Pago - estado"], draft.paymentStatus || GROUP_PAYMENT_STATUS_REQUEST);
       setAt(["Pago - importe", "Pago - cantidad", "Pago - euros"], draft.amount);
       if ((draft.paymentStatus === GROUP_PAYMENT_STATUS_PAID || draft.paymentStatus === GROUP_PAYMENT_STATUS_PARTIAL) && draft.responsibleName) {
         setAt(["Pago - quien paga", "Pago - paga"], draft.responsibleName);
@@ -13089,6 +13113,18 @@
       if (action.groupTitle) return action.groupTitle;
       return "El grupo";
     }
+    function resolveChangeHistoryPaymentStatusTransition(action) {
+      const transition = { before: "", after: "" };
+      (action && action.entries || []).forEach(function (entry) {
+        const before = detectHistoryPaymentStatusValue(entry && entry.before);
+        const after = detectHistoryPaymentStatusValue(entry && entry.after);
+        if (before && !transition.before) transition.before = before;
+        if (after) transition.after = after;
+      });
+      if (!transition.before) transition.before = normalizePaymentStatus(action && action.paymentStatusBefore || "");
+      if (!transition.after) transition.after = normalizePaymentStatus(action && (action.paymentStatusAfter || action.paymentStatusBefore) || "");
+      return transition;
+    }
     function createChangeHistoryActionVisual(action) {
       if (!action) return { icon: "✏", label: "Cambio" };
       if (action.kind === "start") return { icon: "🟠", label: "Inicio de edicion" };
@@ -13113,7 +13149,10 @@
     function buildChangeHistoryActionTitle(action) {
       const prefix = buildChangeHistoryActionGroupPrefix(action);
       const peopleText = formatChangeHistoryPeopleList(action.people);
-      const paymentStatus = normalizePaymentStatus(action.paymentStatusAfter || action.paymentStatusBefore || "");
+      const paymentTransition = resolveChangeHistoryPaymentStatusTransition(action);
+      const paymentStatusBefore = paymentTransition.before;
+      const paymentStatusAfter = paymentTransition.after;
+      const paymentStatus = paymentStatusAfter || paymentStatusBefore;
       const paymentAmount = formatChangeHistoryAmount(action.paymentAmountAfter || action.paymentAmountBefore || (action.group && action.group.payment && action.group.payment.amount) || "");
       const paymentPayer = String(action.paymentPayerAfter || action.paymentPayerBefore || "").trim();
       const nextValue = String(action.afterValue || action.beforeValue || "").trim();
@@ -13126,10 +13165,13 @@
       if (action.kind === "sheet-rename") return "La hoja se ha renombrado a " + (action.afterValue || action.sheetTitle || "sin nombre");
       if (action.kind === "document-rename") return "El spreadsheet se ha renombrado a " + (action.afterValue || "sin nombre");
       if (action.kind === "payment") {
+        if (paymentStatusBefore && paymentStatusAfter && paymentStatusBefore !== paymentStatusAfter) {
+          return prefix + " ha actualizado el estado de pago de \"" + paymentStatusBefore + "\" a \"" + paymentStatusAfter + "\"";
+        }
         if (paymentStatus === GROUP_PAYMENT_STATUS_PAID) return prefix + " ha pagado" + (paymentAmount ? (" " + paymentAmount) : "");
         if (action.paymentAmountAfter) return prefix + " ha actualizado el importe a " + formatChangeHistoryAmount(action.paymentAmountAfter);
         if (paymentPayer) return prefix + " ha actualizado quien paga a " + paymentPayer;
-        if (paymentStatus) return prefix + " ha actualizado el estado de pago a " + paymentStatus;
+        if (paymentStatus) return prefix + " ha actualizado el estado de pago a \"" + paymentStatus + "\"";
         return prefix + " ha actualizado el pago";
       }
       if (action.kind === "fire") return prefix + " ha cambiado el punto de fuego a " + (nextValue || "sin definir");
@@ -13174,14 +13216,34 @@
       });
       return normalizeCompareText(parts.filter(Boolean).join(" "));
     }
-    function matchesChangeHistoryActionSearch(action, query) {
+    function matchesChangeHistorySearchIndex(haystack, query) {
       const normalizedQuery = normalizeCompareText(String(query || "").trim());
       if (!normalizedQuery) return true;
-      const haystack = String(action && action.searchIndex || "");
-      if (!haystack) return false;
+      const normalizedHaystack = normalizeCompareText(String(haystack || ""));
+      if (!normalizedHaystack) return false;
       return normalizedQuery.split(/\s+/).filter(Boolean).every(function (term) {
-        return haystack.indexOf(term) !== -1;
+        return normalizedHaystack.indexOf(term) !== -1;
       });
+    }
+    function matchesChangeHistoryActionSearch(action, query) {
+      return matchesChangeHistorySearchIndex(action && action.searchIndex || "", query);
+    }
+    function buildChangeHistorySessionSearchIndex(session, actions) {
+      const parts = [
+        session && session.sessionName,
+        session && session.userName,
+        session && session.userEmail
+      ];
+      (actions || []).forEach(function (action) {
+        parts.push(
+          action && action.searchIndex,
+          action && action.title,
+          action && action.groupDisplay,
+          action && action.responsibleDisplay,
+          action && action.peopleDisplay
+        );
+      });
+      return normalizeCompareText(parts.filter(Boolean).join(" "));
     }
     function buildChangeHistoryDisplayActions(entries) {
       const actionMap = new Map();
@@ -13395,12 +13457,22 @@
       }
       const normalizedSearch = normalizeCompareText(state.sheetChangeHistorySearch || "");
       const sessions = buildChangeHistorySessions(sourceEntries).map(function (session) {
-        const actions = buildChangeHistoryDisplayActions(session.entries || []).filter(function (action) {
-          return matchesChangeHistoryActionSearch(action, normalizedSearch);
+        const actions = buildChangeHistoryDisplayActions(session.entries || []);
+        let matchedActionCount = 0;
+        actions.forEach(function (action) {
+          action.matchesSearch = matchesChangeHistoryActionSearch(action, normalizedSearch);
+          if (action.matchesSearch) matchedActionCount += 1;
         });
-        return Object.assign({}, session, { actions: actions });
+        const sessionSearchIndex = buildChangeHistorySessionSearchIndex(session, actions);
+        const sessionMatches = !normalizedSearch || matchedActionCount > 0 || matchesChangeHistorySearchIndex(sessionSearchIndex, normalizedSearch);
+        return Object.assign({}, session, {
+          actions: actions,
+          searchIndex: sessionSearchIndex,
+          matchedActionCount: matchedActionCount,
+          matchesSearch: sessionMatches
+        });
       }).filter(function (session) {
-        return Array.isArray(session.actions) && session.actions.length;
+        return Array.isArray(session.actions) && session.actions.length && session.matchesSearch;
       });
       const bucketsMap = new Map();
       sessions.forEach(function (session) {
@@ -13411,12 +13483,14 @@
             label: descriptor.label,
             sortValue: descriptor.sortValue,
             sessions: [],
-            changeCount: 0
+            actionCount: 0,
+            matchedActionCount: 0
           });
         }
         const bucket = bucketsMap.get(descriptor.key);
         bucket.sessions.push(session);
-        bucket.changeCount += Array.isArray(session.actions) ? session.actions.length : 0;
+        bucket.actionCount += Array.isArray(session.actions) ? session.actions.length : 0;
+        bucket.matchedActionCount += Number(session.matchedActionCount || 0);
       });
       const buckets = Array.from(bucketsMap.values()).sort(function (a, b) {
         return Number(b.sortValue || 0) - Number(a.sortValue || 0);
@@ -13425,8 +13499,11 @@
         const actionCount = sessions.reduce(function (sum, session) {
           return sum + ((session.actions || []).length || 0);
         }, 0);
+        const matchedActionCount = sessions.reduce(function (sum, session) {
+          return sum + Number(session.matchedActionCount || 0);
+        }, 0);
         bannerMeta.textContent = normalizedSearch
-          ? (String(actionCount) + " resultados | " + String(sessions.length) + " sesiones")
+          ? (String(sessions.length) + " cambios | " + String(matchedActionCount) + " acciones coinciden")
           : (String(sessions.length) + " sesiones | " + String(actionCount) + " acciones");
       }
       if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
@@ -13442,7 +13519,9 @@
         sectionLabel.textContent = bucket.label || "Sin fecha";
         const sectionCount = document.createElement("span");
         sectionCount.className = "sheet-groups-section-count";
-        sectionCount.textContent = String(bucket.sessions.length) + " sesiones | " + String(bucket.changeCount) + " acciones";
+        sectionCount.textContent = normalizedSearch
+          ? (String(bucket.sessions.length) + " cambios | " + String(bucket.matchedActionCount) + " acciones coinciden")
+          : (String(bucket.sessions.length) + " sesiones | " + String(bucket.actionCount) + " acciones");
         const sectionChevron = document.createElement("div");
         sectionChevron.className = "sheet-group-chevron";
         sectionChevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
@@ -13532,8 +13611,8 @@
             const summaryText = String(action.summaryText || action.title || "Sin detalle");
             const entryVisual = action.visual || createChangeHistoryActionVisual(action);
             const entryEl = document.createElement("details");
-            entryEl.className = "change-history-entry";
-            entryEl.open = !normalizedSearch && !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId && entryIndex === 0);
+            entryEl.className = "change-history-entry" + (normalizedSearch && action.matchesSearch ? " is-search-match" : "");
+            entryEl.open = (normalizedSearch && action.matchesSearch) || (!normalizedSearch && !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId && entryIndex === 0));
             const entrySummary = document.createElement("summary");
             entrySummary.className = "change-history-entry-summary";
             const entryMain = document.createElement("div");
@@ -13960,18 +14039,6 @@
             actionsBtn.dataset.assistantNumber = String(assistant ? assistant.number : (person && person.number ? person.number : ""));
             actionsBtn.setAttribute("aria-haspopup", "menu");
             actionsBtn.setAttribute("aria-expanded", "false");
-            actionsBtn.addEventListener("click", function (e) {
-              e.preventDefault();
-              e.stopPropagation();
-              var assistantNumber = assistant ? assistant.number : (person && person.number ? person.number : "");
-              var menuId = buildSheetMemberActionMenuId(group.id, assistantNumber);
-              if (state.activeItemMenu && state.activeItemMenu.itemId === menuId) {
-                closeItemActionMenu();
-                return;
-              }
-              closeItemActionMenu();
-              openSheetMemberActionMenu(group.id, assistantNumber, actionsBtn);
-            });
             actionsBtn.addEventListener("pointerdown", function (e) {
               e.stopPropagation();
             });
@@ -19127,7 +19194,10 @@
       if (!Number.isFinite(row) || !Number.isFinite(col) || col < 0) return;
       applySheetGroupCellDraft(state.currentSheetTitle, row, col, target.value, { delay: 450 });
       target.classList.add("is-dirty");
-      scheduleSheetGroupsModelUiRefresh(target.classList.contains("sheet-group-select") ? 0 : 120);
+      const shouldRefreshModel = target.classList.contains("sheet-group-select") || event.type === "change";
+      if (shouldRefreshModel) {
+        scheduleSheetGroupsModelUiRefresh(target.classList.contains("sheet-group-select") ? 0 : 80);
+      }
     }
     function handleSheetGroupsActionClick(event) {
       const button = event.target.closest("[data-group-action]");
@@ -19135,7 +19205,7 @@
       const action = button.dataset.groupAction;
       if (button.disabled || !state.currentSheetTitle) return;
       markSheetGroupsInteraction(520);
-      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "make-responsible" || action === "group-add" || action === "group-delete" || action === "bulk-apply-price";
+      const requiresEdit = action === "payment-status" || action === "assistant-add" || action === "assistant-remove" || action === "make-responsible" || action === "member-menu" || action === "group-add" || action === "group-delete" || action === "bulk-apply-price";
       if (requiresEdit && (state.editorMode !== "edit" || !state.canEdit)) return;
       if (action === "group-add") {
         openNewGroupWizard();
@@ -19148,6 +19218,19 @@
       const groupId = button.dataset.groupId;
       const group = findSheetGroupById(groupId);
       if (!group) return;
+      if (action === "member-menu") {
+        event.preventDefault();
+        event.stopPropagation();
+        const assistantNumber = String(button.dataset.assistantNumber || "");
+        const menuId = buildSheetMemberActionMenuId(groupId, assistantNumber);
+        if (state.activeItemMenu && state.activeItemMenu.itemId === menuId) {
+          closeItemActionMenu();
+          return;
+        }
+        closeItemActionMenu();
+        openSheetMemberActionMenu(groupId, assistantNumber, button);
+        return;
+      }
       if (action === "group-delete") {
         openFormDeleteModal({
           modalTitle: "Eliminar grupo",
