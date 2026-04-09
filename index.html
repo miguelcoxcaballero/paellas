@@ -28,6 +28,9 @@
       --radius-lg: 16px;
       --app-height: 100vh;
       --viewport-bottom-offset: 0px;
+      --theme-shift-ease: cubic-bezier(.22, 1, .36, 1);
+      --theme-shift-fast: .34s;
+      --theme-shift-slow: .58s;
     }
     * {
       box-sizing: border-box;
@@ -47,25 +50,53 @@
     body {
       margin: 0;
       min-height: var(--app-height);
+      position: relative;
+      isolation: isolate;
       font-family: Georgia, "Times New Roman", serif;
       color: var(--ink);
       background:
         radial-gradient(circle at 15% 20%, rgba(255,255,255,.35), transparent 18%),
         radial-gradient(circle at 88% 14%, rgba(255,183,0,.24), transparent 22%),
         linear-gradient(180deg, var(--bg2) 0%, var(--bg) 48%, #f7c900 100%);
-      transition: background .25s ease, color .25s ease;
+      transition: background var(--theme-shift-slow) var(--theme-shift-ease), color var(--theme-shift-fast) var(--theme-shift-ease);
     }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -14%;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 221, 138, 0.42), transparent 22%),
+        radial-gradient(circle at 82% 14%, rgba(255, 103, 0, 0.28), transparent 28%),
+        radial-gradient(circle at 50% 110%, rgba(255, 71, 0, 0.24), transparent 32%),
+        linear-gradient(180deg, rgba(255, 190, 60, 0.18) 0%, rgba(255, 110, 0, 0.1) 100%);
+      opacity: 0;
+      transform: scale(1.07) translateY(18px);
+      filter: saturate(0.92) blur(2px);
+      transition:
+        opacity var(--theme-shift-fast) var(--theme-shift-ease),
+        transform var(--theme-shift-slow) var(--theme-shift-ease),
+        filter var(--theme-shift-slow) var(--theme-shift-ease);
+    }
+    body.registered-editing-preview,
     body.registered-editing {
-      --bg: #ffbe68;
-      --bg2: #ffe2ba;
-      --paper: rgba(255, 245, 228, 0.93);
-      --line: rgba(116, 53, 8, 0.16);
-      --ink: #4c2404;
-      --muted: #8b5118;
-      --accent: #d56b17;
-      --accent2: #a94907;
-      --shadow: 0 18px 52px rgba(142, 73, 13, 0.14);
-      --shadow-md: 0 10px 36px rgba(142, 73, 13, 0.18);
+      --bg: #ff8f1f;
+      --bg2: #ffc152;
+      --paper: rgba(255, 246, 236, 0.94);
+      --line: rgba(150, 54, 0, 0.18);
+      --ink: #4d1f00;
+      --muted: #9c4209;
+      --accent: #ff6a00;
+      --accent2: #dd4200;
+      --shadow: 0 22px 60px rgba(171, 61, 0, 0.18);
+      --shadow-md: 0 14px 42px rgba(171, 61, 0, 0.22);
+    }
+    body.registered-editing-preview::before,
+    body.registered-editing::before {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      filter: saturate(1.18) blur(0);
     }
     button, input, select { font: inherit; }
     button { border: 0; background: none; color: inherit; cursor: pointer; }
@@ -75,6 +106,8 @@
       height: var(--app-height);
       min-height: var(--app-height);
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
       padding: 0;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
@@ -94,6 +127,14 @@
       background: var(--bg2);
       border-bottom: 1px solid var(--line);
       z-index: 100;
+      transition:
+        background var(--theme-shift-fast) var(--theme-shift-ease),
+        border-color var(--theme-shift-fast) var(--theme-shift-ease),
+        box-shadow var(--theme-shift-fast) var(--theme-shift-ease);
+    }
+    body.registered-editing-preview .topbar,
+    body.registered-editing .topbar {
+      box-shadow: 0 10px 28px rgba(177, 73, 0, 0.14);
     }
     .topbar > *, .row > *, .head > * { min-width: 0; }
     .topbar-actions { display: flex; align-items: center; gap: 10px; }
@@ -789,13 +830,26 @@
       place-items: center;
       padding: 18px 12px;
       background: rgba(64, 36, 5, 0.32);
+      backdrop-filter: blur(0px) saturate(1);
+      -webkit-backdrop-filter: blur(0px) saturate(1);
       opacity: 0;
       visibility: hidden;
-      transition: all .25s ease;
+      transition:
+        opacity var(--theme-shift-fast) var(--theme-shift-ease),
+        visibility var(--theme-shift-fast) var(--theme-shift-ease),
+        background var(--theme-shift-fast) var(--theme-shift-ease),
+        backdrop-filter var(--theme-shift-fast) var(--theme-shift-ease),
+        -webkit-backdrop-filter var(--theme-shift-fast) var(--theme-shift-ease);
     }
     .modal-overlay.visible {
       opacity: 1;
       visibility: visible;
+    }
+    body.registered-editing-preview .modal-overlay.visible,
+    body.registered-editing .modal-overlay.visible {
+      background: rgba(95, 28, 0, 0.24);
+      backdrop-filter: blur(10px) saturate(1.08);
+      -webkit-backdrop-filter: blur(10px) saturate(1.08);
     }
     .btn-icon-sq {
       width: 36px;
@@ -868,10 +922,14 @@
       border-radius: var(--radius-lg);
       padding: 22px;
       box-shadow: var(--shadow-md);
-      transform: scale(0.95);
-      transition: transform .25s ease;
+      transform: translateY(14px) scale(0.96);
+      transition:
+        transform var(--theme-shift-fast) var(--theme-shift-ease),
+        background var(--theme-shift-fast) var(--theme-shift-ease),
+        border-color var(--theme-shift-fast) var(--theme-shift-ease),
+        box-shadow var(--theme-shift-fast) var(--theme-shift-ease);
     }
-    .modal-overlay.visible .modal-card { transform: scale(1); }
+    .modal-overlay.visible .modal-card { transform: translateY(0) scale(1); }
     .modal-copy { display: grid; gap: 6px; }
     .group-create-modal {
       width: min(680px, 100%);
@@ -2556,28 +2614,73 @@
     .sheet-groups-banner-price-summary.is-error {
       color: #a14b3b;
     }
+    .change-history-bucket .sheet-groups-section-summary {
+      color: var(--muted);
+    }
+    .change-history-session-card .sheet-group-summary {
+      align-items: center;
+    }
+    .change-history-avatar {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(93,58,16,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,226,194,0.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+      display: grid;
+      place-items: center;
+    }
+    .change-history-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .change-history-avatar-fallback {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
     .change-history-entry-list {
       display: grid;
-      gap: 8px;
-      padding-top: 4px;
+      gap: 0;
+      padding-top: 2px;
     }
     .change-history-entry {
-      border: 1px solid rgba(93,58,16,0.12);
-      border-radius: 12px;
-      background: rgba(255,251,240,0.88);
-      padding: 10px 12px;
+      margin: 0;
+      border-top: 1px solid rgba(93,58,16,0.1);
+    }
+    .change-history-entry:first-child {
+      border-top: none;
+    }
+    .change-history-entry-summary {
+      list-style: none;
       display: grid;
-      gap: 7px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 10px;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+    .change-history-entry-summary::-webkit-details-marker {
+      display: none;
+    }
+    .change-history-entry-main {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
     }
     .change-history-entry-head {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
       min-width: 0;
     }
     .change-history-entry-title {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #2b1b08;
       min-width: 0;
@@ -2587,17 +2690,38 @@
       font-weight: 600;
       color: rgba(93,58,16,0.52);
       white-space: nowrap;
+      flex: 0 0 auto;
     }
     .change-history-entry-meta {
-      font-size: 0.73rem;
+      font-size: 0.72rem;
       color: rgba(93,58,16,0.72);
       line-height: 1.35;
       word-break: break-word;
     }
+    .change-history-entry-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .change-history-entry-detail {
+      padding: 0 0 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .change-history-entry-facts {
+      display: grid;
+      gap: 7px;
+    }
+    .change-history-entry-fact {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
     .change-history-entry-values {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
+      gap: 12px;
     }
     .change-history-entry-value {
       display: grid;
@@ -2612,11 +2736,6 @@
       color: rgba(93,58,16,0.5);
     }
     .change-history-entry-text {
-      min-height: 34px;
-      border-radius: 10px;
-      border: 1px solid rgba(93,58,16,0.1);
-      background: rgba(255,255,255,0.7);
-      padding: 7px 9px;
       font-size: 0.72rem;
       line-height: 1.35;
       color: #2f1d09;
@@ -2627,10 +2746,38 @@
       color: rgba(93,58,16,0.42);
       font-style: italic;
     }
+    .change-history-entry .sheet-group-chevron {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+    }
+    .change-history-entry[open] .sheet-group-chevron svg {
+      transform: rotate(180deg);
+    }
     .edit-session-modal {
       width: min(560px, calc(100vw - 24px));
       display: grid;
       gap: 14px;
+    }
+    body.registered-editing-preview .edit-session-modal,
+    body.registered-editing .edit-session-modal {
+      background:
+        linear-gradient(180deg, rgba(255, 251, 246, 0.98) 0%, rgba(255, 239, 224, 0.96) 100%);
+      border-color: rgba(212, 81, 0, 0.24);
+      box-shadow:
+        0 24px 60px rgba(170, 58, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+    body.registered-editing-preview .edit-session-modal .head,
+    body.registered-editing .edit-session-modal .head {
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(212, 81, 0, 0.16);
+    }
+    body.registered-editing-preview .edit-session-modal .search,
+    body.registered-editing .edit-session-modal .search {
+      background: rgba(255, 252, 248, 0.92);
+      border-color: rgba(212, 81, 0, 0.18);
+      box-shadow: 0 10px 22px rgba(196, 83, 17, 0.08);
     }
     .edit-session-body {
       display: grid;
@@ -5245,6 +5392,12 @@
       .change-history-entry-meta,
       .change-history-entry-time,
       .change-history-entry-text { font-size: 0.62rem; }
+      .change-history-avatar { width: 30px; height: 30px; flex-basis: 30px; border-radius: 9px; }
+      .change-history-avatar-fallback { font-size: 0.68rem; }
+      .change-history-entry-summary { gap: 6px; padding: 8px 0; }
+      .change-history-entry-head { gap: 6px; }
+      .change-history-entry-detail { padding-bottom: 10px; gap: 8px; }
+      .change-history-entry-values { gap: 8px; }
       .edit-session-actions { gap: 6px; }
       .sheet-groups-list { padding: 0 4px calc(4px + var(--viewport-bottom-offset)); }
       .sheet-groups-section-summary { padding: 2px 0 3px; margin-bottom: 2px; }
@@ -5533,9 +5686,9 @@
           <div id="sheetGroupsEmpty" class="form-empty hidden">No hay grupos para mostrar en esta hoja.</div>
         </div>
         <div id="sheetChangeHistoryView" class="sheet-groups-view hidden-panel">
-          <div id="sheetChangeHistoryStatus" class="status"></div>
+          <div id="sheetChangeHistoryStatus" class="status hidden-panel"></div>
           <div id="sheetChangeHistoryList" class="sheet-groups-list"></div>
-          <div id="sheetChangeHistoryEmpty" class="form-empty hidden">Todavía no hay cambios registrados en este spreadsheet.</div>
+          <div id="sheetChangeHistoryEmpty" class="form-empty hidden hidden-panel"></div>
         </div>
         <div id="formEditor" class="form-shell hidden-panel">
           <div id="formViewSwitch" class="form-view-switch">
@@ -7160,6 +7313,14 @@
     function getChangeHistorySheetInfo() {
       return findSpreadsheetSheetByTitle(CHANGE_HISTORY_SHEET_TITLE);
     }
+    function getVisibleSpreadsheetSheets() {
+      return (state.spreadsheetSheets || []).filter(function (sheet) {
+        return sheet && !isChangeHistorySheetTitle(sheet.title);
+      });
+    }
+    function getFirstVisibleSpreadsheetSheet() {
+      return getVisibleSpreadsheetSheets()[0] || null;
+    }
     function buildRegisteredEditSessionId() {
       return "chg_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
     }
@@ -7232,6 +7393,7 @@
       if (els.editSessionStartCard) setBusy(els.editSessionStartCard, false);
       if (els.editSessionStartConfirmBtn) els.editSessionStartConfirmBtn.disabled = false;
       document.body.classList.remove("registered-editing");
+      document.body.classList.remove("registered-editing-preview");
       if (!config.keepModalOpen && els.editSessionStartModal) {
         els.editSessionStartModal.classList.remove("visible");
       }
@@ -8473,10 +8635,16 @@
           columnCount: props.gridProperties ? props.gridProperties.columnCount : 26
         };
       });
-      if (!state.spreadsheetSheets.length) {
+      const visibleSheets = getVisibleSpreadsheetSheets();
+      const firstVisibleSheet = visibleSheets[0] || null;
+      if (!visibleSheets.length) {
         state.currentSheetTitle = "";
-      } else if (!state.currentSheetTitle || !state.spreadsheetSheets.some(function (sheetInfo) { return sheetInfo.title === state.currentSheetTitle; })) {
-        state.currentSheetTitle = state.spreadsheetSheets[0].title;
+      } else if (
+        !state.currentSheetTitle ||
+        isChangeHistorySheetTitle(state.currentSheetTitle) ||
+        !visibleSheets.some(function (sheetInfo) { return sheetInfo.title === state.currentSheetTitle; })
+      ) {
+        state.currentSheetTitle = firstVisibleSheet ? firstVisibleSheet.title : "";
       }
       syncEditorTitle();
       renderTabs();
@@ -11344,6 +11512,7 @@
     function applyNewGroupLocally(model, rowValues, insertRow) {
       const nextRows = cloneSheetRows(model && model.rows ? model.rows : []);
       nextRows.push(rowValues.slice());
+      clearPendingSheetGroupsLiveUpdate();
       ensureSheetState(state.currentSheetTitle);
       rowValues.forEach(function (value, col) {
         setCellValue(state.currentSheetTitle, insertRow, col, value);
@@ -11398,6 +11567,37 @@
         return true;
       });
     }
+    function reconcileCurrentSheetGroupsAfterAppend(insertRow, options) {
+      const config = options || {};
+      const attempt = Number(config.attempt) || 0;
+      const titleAtStart = state.currentSheetTitle;
+      if (!state.spreadsheetId || !titleAtStart || state.spreadsheetViewMode !== "groups") return Promise.resolve(false);
+      return fetchCurrentSheetRows().then(function (rows) {
+        if (titleAtStart !== state.currentSheetTitle || state.spreadsheetViewMode !== "groups") return false;
+        const hasExpectedRow = Array.isArray(rows) && rows.length > insertRow && (rows[insertRow] || []).some(function (value) {
+          return !!String(value || "").trim();
+        });
+        if (!hasExpectedRow && attempt < 4) {
+          return new Promise(function (resolve) {
+            setTimeout(resolve, 180 + (attempt * 180));
+          }).then(function () {
+            return reconcileCurrentSheetGroupsAfterAppend(insertRow, Object.assign({}, config, {
+              attempt: attempt + 1
+            }));
+          });
+        }
+        if (!hasExpectedRow) return false;
+        clearPendingSheetGroupsLiveUpdate();
+        state.sheetGroupsModel = buildPaellaGroupsFromSheetRows(overlayDirtyCellsOnRows(titleAtStart, rows), titleAtStart);
+        sheetGroupsLastRowSig = JSON.stringify(rows);
+        applySheetGroupsModelToView(state.sheetGroupsModel, { skipAnim: true, preserveFocus: true });
+        setSheetGroupsStatus(sheetGroupsStatusText(state.sheetGroupsModel), state.sheetGroupsModel.groups.length ? "" : "error");
+        return true;
+      }).catch(function (err) {
+        console.error(err);
+        return false;
+      });
+    }
     function insertManualSheetGroup(draft) {
       const model = currentSheetGroupsModel();
       if (!model || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
@@ -11444,17 +11644,19 @@
             card.scrollIntoView({ block: "nearest" });
           }
         });
-        return appendImmediateRegisteredHistoryEntry("GRUPO_CREADO", {
+        return reconcileCurrentSheetGroupsAfterAppend(insertRow).then(function () {
+          return appendImmediateRegisteredHistoryEntry("GRUPO_CREADO", {
           sheetTitle: state.currentSheetTitle || "",
           target: state.currentSheetTitle + "!" + String(insertRow + 1),
           before: "",
-          after: normalizedDraft.name || "Nuevo grupo",
+          after: normalizedDraft.responsibleName || "Nuevo grupo",
           summary: "Grupo creado"
-        }).catch(function (err) {
-          console.error(err);
-          return false;
-        }).then(function () {
-          return true;
+          }).catch(function (err) {
+            console.error(err);
+            return false;
+          }).then(function () {
+            return true;
+          });
         });
       }).catch(function (err) {
         console.error(err);
@@ -12035,10 +12237,44 @@
       const parsed = Date.parse(entry && entry.timestamp || "");
       return Number.isFinite(parsed) ? parsed : 0;
     }
+    function capitalizeHistoryLabel(value) {
+      const text = String(value || "").trim();
+      if (!text) return "";
+      return text.charAt(0).toLocaleUpperCase("es-ES") + text.slice(1);
+    }
+    function describeChangeHistoryBucket(timestamp) {
+      const parsed = Date.parse(timestamp || "");
+      if (!Number.isFinite(parsed)) {
+        return {
+          key: "unknown",
+          label: "Sin fecha",
+          sortValue: -1
+        };
+      }
+      const now = Date.now();
+      const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+      if (parsed >= (now - oneWeekMs)) {
+        return {
+          key: "recent",
+          label: "Ultima semana",
+          sortValue: Number.MAX_SAFE_INTEGER
+        };
+      }
+      const date = new Date(parsed);
+      return {
+        key: "month:" + date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0"),
+        label: capitalizeHistoryLabel(date.toLocaleDateString("es-ES", {
+          month: "long",
+          year: "numeric"
+        })),
+        sortValue: Date.UTC(date.getFullYear(), date.getMonth(), 1)
+      };
+    }
     function setChangeHistoryStatus(text, tone) {
       if (!els.sheetChangeHistoryStatus) return;
       els.sheetChangeHistoryStatus.textContent = text || "";
       els.sheetChangeHistoryStatus.dataset.tone = tone || "";
+      els.sheetChangeHistoryStatus.classList.add("hidden-panel");
     }
     function renderChangeHistoryList(entries) {
       if (!els.sheetChangeHistoryList) return;
@@ -12080,115 +12316,221 @@
       const sessions = Array.from(sessionsMap.values()).sort(function (a, b) {
         return changeHistoryEntrySortValue({ timestamp: b.latestAt }) - changeHistoryEntrySortValue({ timestamp: a.latestAt });
       });
+      const bucketsMap = new Map();
+      sessions.forEach(function (session) {
+        const descriptor = describeChangeHistoryBucket(session.latestAt || session.startedAt);
+        if (!bucketsMap.has(descriptor.key)) {
+          bucketsMap.set(descriptor.key, {
+            key: descriptor.key,
+            label: descriptor.label,
+            sortValue: descriptor.sortValue,
+            sessions: [],
+            changeCount: 0
+          });
+        }
+        const bucket = bucketsMap.get(descriptor.key);
+        bucket.sessions.push(session);
+        bucket.changeCount += Array.isArray(session.entries) ? session.entries.length : 0;
+      });
+      const buckets = Array.from(bucketsMap.values()).sort(function (a, b) {
+        return Number(b.sortValue || 0) - Number(a.sortValue || 0);
+      });
       const meta = banner.querySelector(".sheet-groups-banner-meta");
       if (meta) {
-        meta.textContent = String(sessions.length) + " sesiones | " + String(sourceEntries.length) + " cambios";
+        meta.textContent = String(sessions.length) + " sesiones | " + String(sourceEntries.length) + " acciones";
       }
       els.sheetChangeHistoryList.appendChild(banner);
-      if (els.sheetChangeHistoryEmpty) {
-        els.sheetChangeHistoryEmpty.classList.toggle("hidden", sourceEntries.length !== 0);
-      }
-      if (!sessions.length) return;
-      sessions.forEach(function (session, index) {
-        const card = document.createElement("details");
-        card.className = "sheet-group-card";
-        card.open = index === 0 || !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId);
-        const summary = document.createElement("summary");
-        summary.className = "sheet-group-summary";
-        const badge = document.createElement("div");
-        badge.className = "sheet-group-index-badge";
-        badge.textContent = "R" + String(index + 1);
-        summary.appendChild(badge);
-        const main = document.createElement("div");
-        main.className = "sheet-group-summary-main";
-        const title = document.createElement("div");
-        title.className = "sheet-group-title-large";
-        title.textContent = session.sessionName || "Cambio sin nombre";
-        main.appendChild(title);
-        const summaryMeta = document.createElement("div");
-        summaryMeta.className = "sheet-group-summary-meta";
-        summaryMeta.textContent = (session.userEmail || session.userName || "Usuario") + " | " + (formatRegisteredEditTimestamp(session.startedAt) || "Sin fecha");
-        main.appendChild(summaryMeta);
-        summary.appendChild(main);
-        const right = document.createElement("div");
-        right.className = "sheet-group-summary-right";
-        const info = document.createElement("div");
-        info.className = "sheet-group-summary-info";
-        const countChip = document.createElement("span");
-        countChip.className = "sheet-group-chip";
-        countChip.textContent = String(session.entries.length) + " cambios";
-        info.appendChild(countChip);
-        if (state.registeredEditSession && state.registeredEditSession.id === session.sessionId) {
-          const liveChip = document.createElement("span");
-          liveChip.className = "sheet-group-chip is-progress";
-          liveChip.textContent = "En edición";
-          info.appendChild(liveChip);
-        }
-        right.appendChild(info);
-        const chevron = document.createElement("div");
-        chevron.className = "sheet-group-chevron";
-        chevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
-        right.appendChild(chevron);
-        summary.appendChild(right);
-        card.appendChild(summary);
-        const body = document.createElement("div");
-        body.className = "sheet-group-body";
-        const entryList = document.createElement("div");
-        entryList.className = "change-history-entry-list";
-        session.entries.sort(function (a, b) {
-          return changeHistoryEntrySortValue(b) - changeHistoryEntrySortValue(a);
-        }).forEach(function (entry) {
-          const entryEl = document.createElement("article");
-          entryEl.className = "change-history-entry";
-          const beforeText = String(entry.before || "");
-          const afterText = String(entry.after || "");
-          entryEl.innerHTML =
-            "<div class='change-history-entry-head'>" +
-              "<div class='change-history-entry-title'>" + escapeHtml(changeHistoryTypeLabel(entry.type)) + "</div>" +
-              "<div class='change-history-entry-time'>" + escapeHtml(changeHistoryEntryTimeValue(entry)) + "</div>" +
-            "</div>" +
-            "<div class='change-history-entry-meta'>" + escapeHtml(entry.summary || [entry.sheetTitle, entry.target].filter(Boolean).join(" · ") || "Sin detalle") + "</div>" +
-            (
-              beforeText || afterText
-                ? (
-                    "<div class='change-history-entry-values'>" +
-                      "<div class='change-history-entry-value'>" +
-                        "<div class='change-history-entry-label'>Antes</div>" +
-                        "<div class='change-history-entry-text" + (beforeText ? "" : " is-empty") + "'>" + escapeHtml(beforeText || "Vacío") + "</div>" +
-                      "</div>" +
-                      "<div class='change-history-entry-value'>" +
-                        "<div class='change-history-entry-label'>Después</div>" +
-                        "<div class='change-history-entry-text" + (afterText ? "" : " is-empty") + "'>" + escapeHtml(afterText || "Vacío") + "</div>" +
-                      "</div>" +
-                    "</div>"
-                  )
-                : ""
-            );
-          entryList.appendChild(entryEl);
+      if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
+      if (!buckets.length) return;
+      buckets.forEach(function (bucket, bucketIndex) {
+        const sectionEl = document.createElement("details");
+        sectionEl.className = "sheet-groups-section change-history-bucket";
+        sectionEl.open = bucketIndex === 0;
+        const sectionSummary = document.createElement("summary");
+        sectionSummary.className = "sheet-groups-section-summary";
+        const sectionLabel = document.createElement("span");
+        sectionLabel.className = "sheet-groups-section-label";
+        sectionLabel.textContent = bucket.label || "Sin fecha";
+        const sectionCount = document.createElement("span");
+        sectionCount.className = "sheet-groups-section-count";
+        sectionCount.textContent = String(bucket.sessions.length) + " sesiones | " + String(bucket.changeCount) + " acciones";
+        const sectionChevron = document.createElement("div");
+        sectionChevron.className = "sheet-group-chevron";
+        sectionChevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+        sectionSummary.appendChild(sectionLabel);
+        sectionSummary.appendChild(sectionCount);
+        sectionSummary.appendChild(sectionChevron);
+        sectionEl.appendChild(sectionSummary);
+        const sectionBody = document.createElement("div");
+        sectionBody.className = "sheet-groups-section-body";
+        bucket.sessions.forEach(function (session, sessionIndex) {
+          const card = document.createElement("details");
+          card.className = "sheet-group-card change-history-session-card";
+          card.open = (bucketIndex === 0 && sessionIndex === 0) || !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId);
+          const summary = document.createElement("summary");
+          summary.className = "sheet-group-summary";
+          const avatar = document.createElement("div");
+          avatar.className = "change-history-avatar";
+          const avatarImg = document.createElement("img");
+          avatarImg.className = "hidden";
+          const avatarFallback = document.createElement("span");
+          avatarFallback.className = "change-history-avatar-fallback";
+          avatarFallback.textContent = ((session.userName || session.userEmail || "U").trim().charAt(0) || "U").toUpperCase();
+          avatar.appendChild(avatarImg);
+          avatar.appendChild(avatarFallback);
+          setUserAvatar(avatarImg, avatarFallback, session.userPhoto || "", session.userName || session.userEmail || "Usuario");
+          summary.appendChild(avatar);
+          const main = document.createElement("div");
+          main.className = "sheet-group-summary-main";
+          const title = document.createElement("div");
+          title.className = "sheet-group-title-large";
+          title.textContent = session.sessionName || "Cambio sin nombre";
+          main.appendChild(title);
+          const summaryMeta = document.createElement("div");
+          summaryMeta.className = "sheet-group-summary-meta";
+          summaryMeta.textContent = (session.userEmail || session.userName || "Usuario") + " | " + (formatRegisteredEditTimestamp(session.startedAt) || "Sin fecha");
+          main.appendChild(summaryMeta);
+          summary.appendChild(main);
+          const right = document.createElement("div");
+          right.className = "sheet-group-summary-right";
+          const info = document.createElement("div");
+          info.className = "sheet-group-summary-info";
+          const countChip = document.createElement("span");
+          countChip.className = "sheet-group-chip";
+          countChip.textContent = String(session.entries.length) + " acciones";
+          info.appendChild(countChip);
+          if (state.registeredEditSession && state.registeredEditSession.id === session.sessionId) {
+            const liveChip = document.createElement("span");
+            liveChip.className = "sheet-group-chip is-progress";
+            liveChip.textContent = "En edicion";
+            info.appendChild(liveChip);
+          }
+          right.appendChild(info);
+          const chevron = document.createElement("div");
+          chevron.className = "sheet-group-chevron";
+          chevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+          right.appendChild(chevron);
+          summary.appendChild(right);
+          card.appendChild(summary);
+          const body = document.createElement("div");
+          body.className = "sheet-group-body";
+          const entryList = document.createElement("div");
+          entryList.className = "change-history-entry-list";
+          session.entries.sort(function (a, b) {
+            return changeHistoryEntrySortValue(b) - changeHistoryEntrySortValue(a);
+          }).forEach(function (entry, entryIndex) {
+            const beforeText = String(entry.before || "");
+            const afterText = String(entry.after || "");
+            const targetText = [entry.sheetTitle, entry.target].filter(Boolean).join(" | ");
+            const summaryText = String(entry.summary || targetText || "Sin detalle");
+            const entryEl = document.createElement("details");
+            entryEl.className = "change-history-entry";
+            entryEl.open = !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId && entryIndex === 0);
+            const entrySummary = document.createElement("summary");
+            entrySummary.className = "change-history-entry-summary";
+            const entryMain = document.createElement("div");
+            entryMain.className = "change-history-entry-main";
+            const entryHead = document.createElement("div");
+            entryHead.className = "change-history-entry-head";
+            const entryTitle = document.createElement("div");
+            entryTitle.className = "change-history-entry-title";
+            entryTitle.textContent = changeHistoryTypeLabel(entry.type);
+            const entryTime = document.createElement("div");
+            entryTime.className = "change-history-entry-time";
+            entryTime.textContent = changeHistoryEntryTimeValue(entry);
+            entryHead.appendChild(entryTitle);
+            entryHead.appendChild(entryTime);
+            entryMain.appendChild(entryHead);
+            const entryMeta = document.createElement("div");
+            entryMeta.className = "change-history-entry-meta";
+            entryMeta.textContent = summaryText;
+            entryMain.appendChild(entryMeta);
+            entrySummary.appendChild(entryMain);
+            const entryRight = document.createElement("div");
+            entryRight.className = "change-history-entry-right";
+            const entryChevron = document.createElement("div");
+            entryChevron.className = "sheet-group-chevron";
+            entryChevron.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>';
+            entryRight.appendChild(entryChevron);
+            entrySummary.appendChild(entryRight);
+            entryEl.appendChild(entrySummary);
+            const entryDetail = document.createElement("div");
+            entryDetail.className = "change-history-entry-detail";
+            const facts = document.createElement("div");
+            facts.className = "change-history-entry-facts";
+            function appendFact(label, value, allowEmpty) {
+              const normalizedValue = value == null ? "" : String(value);
+              if (!allowEmpty && !normalizedValue) return;
+              const fact = document.createElement("div");
+              fact.className = "change-history-entry-fact";
+              const factLabel = document.createElement("div");
+              factLabel.className = "change-history-entry-label";
+              factLabel.textContent = label;
+              const factText = document.createElement("div");
+              factText.className = "change-history-entry-text" + (normalizedValue ? "" : " is-empty");
+              factText.textContent = normalizedValue || "Vacio";
+              fact.appendChild(factLabel);
+              fact.appendChild(factText);
+              facts.appendChild(fact);
+            }
+            appendFact("Ubicacion", targetText, false);
+            appendFact("Resumen", summaryText, !targetText);
+            if (facts.children.length) entryDetail.appendChild(facts);
+            if (beforeText || afterText) {
+              const values = document.createElement("div");
+              values.className = "change-history-entry-values";
+              const beforeWrap = document.createElement("div");
+              beforeWrap.className = "change-history-entry-value";
+              const beforeLabel = document.createElement("div");
+              beforeLabel.className = "change-history-entry-label";
+              beforeLabel.textContent = "Antes";
+              const beforeValue = document.createElement("div");
+              beforeValue.className = "change-history-entry-text" + (beforeText ? "" : " is-empty");
+              beforeValue.textContent = beforeText || "Vacio";
+              beforeWrap.appendChild(beforeLabel);
+              beforeWrap.appendChild(beforeValue);
+              const afterWrap = document.createElement("div");
+              afterWrap.className = "change-history-entry-value";
+              const afterLabel = document.createElement("div");
+              afterLabel.className = "change-history-entry-label";
+              afterLabel.textContent = "Despues";
+              const afterValue = document.createElement("div");
+              afterValue.className = "change-history-entry-text" + (afterText ? "" : " is-empty");
+              afterValue.textContent = afterText || "Vacio";
+              afterWrap.appendChild(afterLabel);
+              afterWrap.appendChild(afterValue);
+              values.appendChild(beforeWrap);
+              values.appendChild(afterWrap);
+              entryDetail.appendChild(values);
+            }
+            entryEl.appendChild(entryDetail);
+            entryList.appendChild(entryEl);
+          });
+          body.appendChild(entryList);
+          card.appendChild(body);
+          sectionBody.appendChild(card);
         });
-        body.appendChild(entryList);
-        card.appendChild(body);
-        els.sheetChangeHistoryList.appendChild(card);
+        sectionEl.appendChild(sectionBody);
+        els.sheetChangeHistoryList.appendChild(sectionEl);
       });
     }
     function renderChangeHistoryView(options) {
       const config = options || {};
       if (!isSpreadsheetDocumentActive() || state.spreadsheetViewMode !== "history") return Promise.resolve(false);
       const requestId = ++state.sheetChangeHistoryLoadToken;
-      setChangeHistoryStatus("Cargando historial...", "");
       if (els.sheetChangeHistoryList) els.sheetChangeHistoryList.innerHTML = "";
       if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
       return loadChangeHistoryEntries({ force: !!config.force, requestId: requestId }).then(function (entries) {
         if (requestId !== state.sheetChangeHistoryLoadToken) return false;
         renderChangeHistoryList(entries);
-        setChangeHistoryStatus(entries.length ? "" : "Todavía no hay cambios registrados en este spreadsheet.", entries.length ? "" : "");
+        setChangeHistoryStatus("", "");
         return true;
       }).catch(function (err) {
         console.error(err);
         if (requestId !== state.sheetChangeHistoryLoadToken) return false;
         if (els.sheetChangeHistoryList) els.sheetChangeHistoryList.innerHTML = "";
-        if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.remove("hidden");
-        setChangeHistoryStatus(messageFromError(err, "No se ha podido cargar el historial de cambios"), "error");
+        if (els.sheetChangeHistoryEmpty) els.sheetChangeHistoryEmpty.classList.add("hidden");
+        setChangeHistoryStatus("", "");
         return false;
       });
     }
@@ -12739,8 +13081,9 @@
     function openEditSessionStartModal() {
       if (!isSpreadsheetDocumentActive() || !state.canEdit || state.editSessionStartSubmitting) return false;
       resetEditSessionStartModal();
-      els.editSessionStartModal.classList.add("visible");
+      document.body.classList.add("registered-editing-preview");
       requestAnimationFrame(function () {
+        els.editSessionStartModal.classList.add("visible");
         if (els.editSessionStartNameInput && typeof els.editSessionStartNameInput.focus === "function") {
           els.editSessionStartNameInput.focus();
         }
@@ -12750,6 +13093,12 @@
     function closeEditSessionStartModal(force) {
       if (state.editSessionStartSubmitting && !force) return false;
       els.editSessionStartModal.classList.remove("visible");
+      if (state.registeredEditSession && state.editorMode === "edit") {
+        document.body.classList.remove("registered-editing-preview");
+        document.body.classList.add("registered-editing");
+      } else {
+        document.body.classList.remove("registered-editing-preview");
+      }
       state.editSessionStartDraft = null;
       state.editSessionStartSubmitting = false;
       if (els.editSessionStartNameInput) {
@@ -16170,8 +16519,7 @@
       els.sheetTabs.innerHTML = "";
       closeTabMenu();
       if (!isSpreadsheetDocumentActive()) return;
-      state.spreadsheetSheets.forEach(function (sheet) {
-        const isHistorySheet = isChangeHistorySheetTitle(sheet.title);
+      getVisibleSpreadsheetSheets().forEach(function (sheet) {
         const shell = document.createElement("div");
         shell.className = "tab-shell";
         const btn = document.createElement("button");
@@ -16184,14 +16532,14 @@
         if (sheet.title !== state.currentSheetTitle) {
           btn.addEventListener("click", function () {
             if (state.spreadsheetViewMode === "history") {
-              state.spreadsheetViewMode = isHistorySheet ? "table" : (state.spreadsheetLastDataViewMode || "table");
+              state.spreadsheetViewMode = state.spreadsheetLastDataViewMode || "table";
               syncSheetViewToggle();
               syncEditorSurface();
             }
             loadSheet(sheet.title);
           });
         }
-        if (state.canEdit && state.editorMode === "edit" && !isHistorySheet) {
+        if (state.canEdit && state.editorMode === "edit") {
           btn.addEventListener("dblclick", function (event) {
             event.preventDefault();
             startInlineTabRename(label, sheet, btn);
@@ -16241,7 +16589,7 @@
       menuEl.style.top = Math.round(top) + "px";
     }
     function openTabMenu(anchorEl, tabShell, sheet) {
-      if (!anchorEl || !tabShell || state.editorMode !== "edit" || state.spreadsheetSheets.length <= 1 || isChangeHistorySheetTitle(sheet && sheet.title)) return;
+      if (!anchorEl || !tabShell || state.editorMode !== "edit" || getVisibleSpreadsheetSheets().length <= 1 || isChangeHistorySheetTitle(sheet && sheet.title)) return;
       if (activeTabMenu && activeTabMenu.sheetId === sheet.sheetId && activeTabMenu.container === tabShell) {
         closeTabMenu();
         return;
@@ -16308,8 +16656,9 @@
         delete state.sheetData[sheet.title];
         delete state.sheetDirtyCells[sheet.title];
         delete state.sheetWindow[sheet.title];
-        if (state.currentSheetTitle === sheet.title && state.spreadsheetSheets.length > 0) {
-          loadSheet(state.spreadsheetSheets[0].title);
+        const nextVisibleSheet = getFirstVisibleSpreadsheetSheet();
+        if (state.currentSheetTitle === sheet.title && nextVisibleSheet) {
+          loadSheet(nextVisibleSheet.title);
         } else {
           renderTabs();
         }
@@ -16883,7 +17232,8 @@
       saveStoredUiSession();
       return loadSpreadsheetMeta(item.id)
         .then(function (meta) {
-          if (!state.spreadsheetSheets.length) {
+          const firstVisibleSheet = getFirstVisibleSpreadsheetSheet();
+          if (!firstVisibleSheet) {
             setEditorStatus("El archivo no tiene sheets visibles", "error");
             return;
           }
@@ -16891,7 +17241,7 @@
           applyEditorMode();
           refreshDirtyState();
           saveStoredUiSession();
-          return loadSheet(state.currentSheetTitle || state.spreadsheetSheets[0].title).then(function () {
+          return loadSheet(state.currentSheetTitle || firstVisibleSheet.title).then(function () {
             startCollabPolling();
             if (state.spreadsheetViewMode === "groups") startGroupsViewPoll();
           });
@@ -17272,10 +17622,11 @@
             skipApplyMode: true
           })
           .then(function () {
-            if (!state.spreadsheetSheets.length) return false;
+            const firstVisibleSheet = getFirstVisibleSpreadsheetSheet();
+            if (!firstVisibleSheet) return false;
             if (!state.canEdit) state.editorMode = "read";
             applyEditorMode();
-            return loadSheet(state.currentSheetTitle || state.spreadsheetSheets[0].title, {
+            return loadSheet(state.currentSheetTitle || firstVisibleSheet.title, {
               quiet: true,
               preserveDirty: true,
               skipDirtyState: true
