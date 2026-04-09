@@ -2621,20 +2621,44 @@
       align-items: center;
     }
     .change-history-session-card .sheet-group-summary-meta {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 3px 8px;
       white-space: normal;
       overflow: visible;
       text-overflow: clip;
     }
-    .change-history-session-date {
-      font-weight: 700;
-      color: #1f1507;
-    }
     .change-history-session-email {
       color: rgba(93,58,16,0.66);
+    }
+    .change-history-session-info {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .change-history-session-date-block {
+      display: grid;
+      justify-items: end;
+      gap: 2px;
+      text-align: right;
+      min-width: 0;
+    }
+    .change-history-session-weekday {
+      font-size: 0.86rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #1f1507;
+    }
+    .change-history-session-date-value {
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.15;
+      color: #1f1507;
+      white-space: nowrap;
+    }
+    .change-history-session-chip-stack {
+      display: grid;
+      justify-items: end;
+      gap: 3px;
+      flex: 0 0 auto;
     }
     .change-history-avatar {
       width: 40px;
@@ -5530,7 +5554,11 @@
       .change-history-entry-meta,
       .change-history-entry-time,
       .change-history-entry-text { font-size: 0.62rem; }
-      .change-history-session-date { width: 100%; }
+      .change-history-session-info { gap: 6px; align-items: flex-end; }
+      .change-history-session-date-block { gap: 1px; }
+      .change-history-session-weekday { font-size: 0.72rem; }
+      .change-history-session-date-value { font-size: 0.58rem; }
+      .change-history-session-chip-stack { gap: 2px; }
       .change-history-avatar { width: 30px; height: 30px; flex-basis: 30px; border-radius: 50%; }
       .change-history-avatar-fallback { font-size: 0.68rem; }
       .change-history-entry-icon { min-width: 1.45rem; height: 1.45rem; font-size: 0.74rem; }
@@ -12455,6 +12483,29 @@
       });
       return capitalizeHistoryLabel(String(dateText || "").trim()) + " | " + timeText;
     }
+    function getChangeHistorySessionDateParts(value) {
+      const date = value ? new Date(value) : null;
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+        return {
+          weekday: "",
+          dateValue: "Sin fecha"
+        };
+      }
+      const includeWeekday = isRecentChangeHistoryTimestamp(value);
+      return {
+        weekday: includeWeekday
+          ? capitalizeHistoryLabel(date.toLocaleDateString("es-ES", { weekday: "long" }))
+          : "",
+        dateValue: date.toLocaleDateString("es-ES", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        }) + " | " + date.toLocaleTimeString("es-ES", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+      };
+    }
     function normalizeChangeHistoryHintText(entry) {
       return normalizeCompareText([
         entry && entry.summary,
@@ -12895,10 +12946,6 @@
           main.appendChild(title);
           const summaryMeta = document.createElement("div");
           summaryMeta.className = "sheet-group-summary-meta";
-          const summaryDate = document.createElement("span");
-          summaryDate.className = "change-history-session-date";
-          summaryDate.textContent = formatChangeHistorySessionTimestamp(session.startedAt) || "Sin fecha";
-          summaryMeta.appendChild(summaryDate);
           const summaryEmail = document.createElement("span");
           summaryEmail.className = "change-history-session-email";
           summaryEmail.textContent = session.userEmail || session.userName || "Usuario";
@@ -12908,17 +12955,34 @@
           const right = document.createElement("div");
           right.className = "sheet-group-summary-right";
           const info = document.createElement("div");
-          info.className = "sheet-group-summary-info";
+          info.className = "sheet-group-summary-info change-history-session-info";
+          const dateParts = getChangeHistorySessionDateParts(session.startedAt);
+          const dateBlock = document.createElement("div");
+          dateBlock.className = "change-history-session-date-block";
+          if (dateParts.weekday) {
+            const weekdayEl = document.createElement("div");
+            weekdayEl.className = "change-history-session-weekday";
+            weekdayEl.textContent = dateParts.weekday;
+            dateBlock.appendChild(weekdayEl);
+          }
+          const dateValueEl = document.createElement("div");
+          dateValueEl.className = "change-history-session-date-value";
+          dateValueEl.textContent = dateParts.dateValue;
+          dateBlock.appendChild(dateValueEl);
+          info.appendChild(dateBlock);
+          const chipStack = document.createElement("div");
+          chipStack.className = "change-history-session-chip-stack";
           const countChip = document.createElement("span");
           countChip.className = "sheet-group-chip";
           countChip.textContent = String(session.entries.length) + " acciones";
-          info.appendChild(countChip);
+          chipStack.appendChild(countChip);
           if (state.registeredEditSession && state.registeredEditSession.id === session.sessionId) {
             const liveChip = document.createElement("span");
             liveChip.className = "sheet-group-chip is-progress";
             liveChip.textContent = "En edicion";
-            info.appendChild(liveChip);
+            chipStack.appendChild(liveChip);
           }
+          info.appendChild(chipStack);
           right.appendChild(info);
           const chevron = document.createElement("div");
           chevron.className = "sheet-group-chevron";
