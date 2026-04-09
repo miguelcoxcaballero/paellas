@@ -6309,6 +6309,55 @@
     </section>
   </div>
 
+  <div id="addAssistantWizardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="addAssistantWizardTitle">
+    <section id="addAssistantWizardCard" class="card modal-card group-create-modal">
+      <div class="head">
+        <div class="modal-copy">
+          <div id="addAssistantWizardTitle" class="title">Anadir integrante</div>
+          <div class="meta">Completa los datos antes de incorporarlo al grupo.</div>
+        </div>
+        <button id="addAssistantWizardCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="group-create-shell">
+        <div class="group-create-progress single-step">
+          <div class="group-create-progress-item active">
+            <div class="group-create-progress-kicker">Paso unico</div>
+            <div class="group-create-progress-title">Nuevo integrante</div>
+          </div>
+        </div>
+        <div id="addAssistantWizardStatus" class="status"></div>
+        <div class="group-create-step-wrap">
+          <div class="group-create-step">
+            <div class="group-create-step-head">
+              <div class="group-create-step-title">Datos del integrante</div>
+              <div id="addAssistantWizardSummary" class="group-create-step-meta">Completa los campos marcados en rojo para crear el integrante.</div>
+            </div>
+            <div class="group-create-grid">
+              <label id="addAssistantWizardNameField" class="group-create-field full">
+                <span>Nombre</span>
+                <input id="addAssistantWizardName" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Nombre completo">
+              </label>
+              <label id="addAssistantWizardDniField" class="group-create-field">
+                <span>DNI</span>
+                <input id="addAssistantWizardDni" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="12345678A">
+              </label>
+              <label id="addAssistantWizardEmailField" class="group-create-field">
+                <span>Email</span>
+                <input id="addAssistantWizardEmail" class="search" type="email" autocomplete="off" spellcheck="false" placeholder="correo@upv.es">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group-create-actions">
+        <button id="addAssistantWizardCancelBtn" class="btn small" type="button">Cancelar</button>
+        <div class="group-create-actions-right">
+          <button id="addAssistantWizardConfirmBtn" class="btn primary" type="button">Anadir integrante</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div id="editSessionStartModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editSessionStartTitle">
     <section id="editSessionStartCard" class="card modal-card edit-session-modal">
       <div class="head">
@@ -6962,6 +7011,20 @@
       promoteResponsibleWizardPhone: document.getElementById("promoteResponsibleWizardPhone"),
       promoteResponsibleWizardDniField: document.getElementById("promoteResponsibleWizardDniField"),
       promoteResponsibleWizardDni: document.getElementById("promoteResponsibleWizardDni"),
+      addAssistantWizardModal: document.getElementById("addAssistantWizardModal"),
+      addAssistantWizardCard: document.getElementById("addAssistantWizardCard"),
+      addAssistantWizardTitle: document.getElementById("addAssistantWizardTitle"),
+      addAssistantWizardSummary: document.getElementById("addAssistantWizardSummary"),
+      addAssistantWizardStatus: document.getElementById("addAssistantWizardStatus"),
+      addAssistantWizardCloseBtn: document.getElementById("addAssistantWizardCloseBtn"),
+      addAssistantWizardCancelBtn: document.getElementById("addAssistantWizardCancelBtn"),
+      addAssistantWizardConfirmBtn: document.getElementById("addAssistantWizardConfirmBtn"),
+      addAssistantWizardNameField: document.getElementById("addAssistantWizardNameField"),
+      addAssistantWizardName: document.getElementById("addAssistantWizardName"),
+      addAssistantWizardDniField: document.getElementById("addAssistantWizardDniField"),
+      addAssistantWizardDni: document.getElementById("addAssistantWizardDni"),
+      addAssistantWizardEmailField: document.getElementById("addAssistantWizardEmailField"),
+      addAssistantWizardEmail: document.getElementById("addAssistantWizardEmail"),
       editSessionStartModal: document.getElementById("editSessionStartModal"),
       editSessionStartCard: document.getElementById("editSessionStartCard"),
       editSessionStartCloseBtn: document.getElementById("editSessionStartCloseBtn"),
@@ -9598,6 +9661,7 @@
       setValue(group.responsible && group.responsible.dniCol, group.responsible && group.responsible.dni);
       setValue(group.responsible && group.responsible.phoneCol, group.responsible && group.responsible.phone);
       setValue(group.firePoint && group.firePoint.col, group.firePoint && group.firePoint.value);
+      setValue(group.firePointGranted && group.firePointGranted.col, group.firePointGranted && group.firePointGranted.value);
       setValue(group.contest && group.contest.col, group.contest && group.contest.value);
       setValue(group.payment && group.payment.amountCol, group.payment && group.payment.amount);
       (group.assistantSlots || []).forEach(function (assistant) {
@@ -9614,7 +9678,10 @@
       return values;
     }
     function getSheetGroupFirePointIcon(group) {
-      const fireKey = firePointFilterKey(group && group.firePoint && group.firePoint.value);
+      const grantedValue = group && group.firePointGranted ? group.firePointGranted.value : "";
+      const normalizedGranted = normalizeCompareText(grantedValue);
+      if (!normalizedGranted || normalizedGranted === "por confirmar" || normalizedGranted.indexOf("confirm") !== -1) return "\u23F3";
+      const fireKey = firePointFilterKey(grantedValue);
       return fireKey === "paella"
         ? "\ud83e\udd58"
         : (fireKey === "torra"
@@ -9622,6 +9689,19 @@
           : (fireKey === "shared"
             ? "\ud83e\udd1d"
             : "\u274c"));
+    }
+    function getSheetGroupFirePointLabel(group) {
+      const grantedValue = group && group.firePointGranted ? group.firePointGranted.value : "";
+      const normalizedGranted = normalizeCompareText(grantedValue);
+      if (!normalizedGranted || normalizedGranted === "por confirmar" || normalizedGranted.indexOf("confirm") !== -1) {
+        return "Punto de fuego por confirmar";
+      }
+      const fireKey = firePointFilterKey(grantedValue);
+      return fireKey === "paella"
+        ? "Paella"
+        : (fireKey === "torra"
+          ? "Torrà"
+          : (fireKey === "shared" ? "Comparte punto de fuego" : "Sin punto de fuego"));
     }
     function getSheetGroupDisplayTitle(group, index) {
       const baseTitle = group && group.title ? group.title : ("Grupo " + (index + 1));
@@ -9635,6 +9715,8 @@
       const groupNumber = String(index + 1);
       indexBadge.textContent = "G" + groupNumber;
       indexBadge.classList.toggle("is-request", isRequest);
+      indexBadge.title = "Grupo " + groupNumber + " · " + getSheetGroupFirePointLabel(group) + (isRequest ? (" · " + GROUP_PAYMENT_STATUS_REQUEST) : "");
+      return;
       indexBadge.title = "Grupo " + groupNumber + " · " + (
         fireKey === "paella"
           ? "Paella"
@@ -9653,6 +9735,7 @@
         parts.push(group.responsible.name, group.responsible.email, group.responsible.dni, group.responsible.phone);
       }
       if (group && group.firePoint) parts.push(group.firePoint.value);
+      if (group && group.firePointGranted) parts.push(group.firePointGranted.value);
       if (group && group.sharedLead) parts.push(group.sharedLead.value);
       if (group && group.contest) parts.push(group.contest.value);
       if (group && group.payment) {
@@ -9985,6 +10068,7 @@
       const raw = String(value || "").trim();
       const normalized = normalizeCompareText(raw);
       if (!normalized) return "";
+      if (normalized === "por confirmar" || normalized === "pendiente" || normalized === "pendiente de confirmar") return "Por confirmar";
       if (normalized === "no" || normalized === "x" || normalized === "no tiene") return "❌ No";
       if (normalized.indexOf("torra") !== -1 || normalized.indexOf("barbacoa") !== -1) return "🔥 Sí, para torrá";
       if (normalized.indexOf("comparto") !== -1 || normalized.indexOf("otro grupo") !== -1) return "🤝 Comparto punto de fuego con otro grupo";
@@ -11546,15 +11630,131 @@
     var newGroupWizardSubmitting = false;
     var promoteResponsibleWizardSubmitting = false;
     var promoteResponsibleWizardAction = null;
+    var addAssistantWizardSubmitting = false;
+    var addAssistantWizardAction = null;
     function setNewGroupWizardStatus(text, tone) {
       setStatusOnElement(els.newGroupWizardStatus, text, tone);
     }
     function setPromoteResponsibleWizardStatus(text, tone) {
       setStatusOnElement(els.promoteResponsibleWizardStatus, text, tone);
     }
+    function setAddAssistantWizardStatus(text, tone) {
+      setStatusOnElement(els.addAssistantWizardStatus, text, tone);
+    }
     function setGroupCreateFieldInvalid(fieldEl, inputEl, invalid) {
       if (fieldEl) fieldEl.classList.toggle("is-invalid", !!invalid);
       if (inputEl) inputEl.setAttribute("aria-invalid", invalid ? "true" : "false");
+    }
+    function addAssistantWizardFieldDefs() {
+      return [
+        { key: "name", field: els.addAssistantWizardNameField, input: els.addAssistantWizardName },
+        { key: "dni", field: els.addAssistantWizardDniField, input: els.addAssistantWizardDni },
+        { key: "email", field: els.addAssistantWizardEmailField, input: els.addAssistantWizardEmail }
+      ];
+    }
+    function readAddAssistantWizardDraft() {
+      return normalizeParsedPersonFields({
+        name: String(els.addAssistantWizardName && els.addAssistantWizardName.value || "").trim(),
+        dni: String(els.addAssistantWizardDni && els.addAssistantWizardDni.value || "").trim(),
+        email: String(els.addAssistantWizardEmail && els.addAssistantWizardEmail.value || "").trim()
+      });
+    }
+    function syncAddAssistantWizardInvalidState() {
+      const draft = readAddAssistantWizardDraft();
+      addAssistantWizardFieldDefs().forEach(function (entry) {
+        setGroupCreateFieldInvalid(entry.field, entry.input, !String(draft[entry.key] || "").trim());
+      });
+      return draft;
+    }
+    function resetAddAssistantWizard() {
+      addAssistantWizardSubmitting = false;
+      addAssistantWizardAction = null;
+      if (els.addAssistantWizardName) els.addAssistantWizardName.value = "";
+      if (els.addAssistantWizardDni) els.addAssistantWizardDni.value = "";
+      if (els.addAssistantWizardEmail) els.addAssistantWizardEmail.value = "";
+      if (els.addAssistantWizardTitle) els.addAssistantWizardTitle.textContent = "Anadir integrante";
+      if (els.addAssistantWizardSummary) {
+        els.addAssistantWizardSummary.textContent = "Completa los campos marcados en rojo para crear el integrante.";
+      }
+      if (els.addAssistantWizardCard) setBusy(els.addAssistantWizardCard, false);
+      setAddAssistantWizardStatus("", "");
+      addAssistantWizardFieldDefs().forEach(function (entry) {
+        setGroupCreateFieldInvalid(entry.field, entry.input, false);
+      });
+    }
+    function validateAddAssistantWizard() {
+      const draft = syncAddAssistantWizardInvalidState();
+      const missing = addAssistantWizardFieldDefs().filter(function (entry) {
+        return !String(draft[entry.key] || "").trim();
+      });
+      if (missing.length) {
+        setAddAssistantWizardStatus("Completa los campos marcados en rojo antes de anadir el integrante.", "error");
+        const firstInput = missing[0] && missing[0].input;
+        if (firstInput && typeof firstInput.focus === "function") firstInput.focus();
+        return false;
+      }
+      setAddAssistantWizardStatus("", "");
+      return true;
+    }
+    function openAddAssistantWizard(groupId) {
+      const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+      if (!model || !state.spreadsheetId || !state.currentSheetTitle) {
+        setSheetGroupsStatus("No hay una hoja de grupos activa.", "error");
+        return false;
+      }
+      const group = findGroupByIdInModel(model, groupId);
+      if (!group) {
+        setSheetGroupsStatus("No se ha encontrado el grupo.", "error");
+        return false;
+      }
+      closeItemActionMenu();
+      resetAddAssistantWizard();
+      addAssistantWizardAction = {
+        groupId: group.id,
+        groupTitle: group.title || "",
+        responsibleName: group.responsible && group.responsible.name ? group.responsible.name : ""
+      };
+      if (els.addAssistantWizardSummary) {
+        els.addAssistantWizardSummary.textContent =
+          "Se anadira un nuevo integrante a " +
+          (group.title || "este grupo") +
+          (addAssistantWizardAction.responsibleName ? (" con responsable \"" + addAssistantWizardAction.responsibleName + "\".") : ".");
+      }
+      syncAddAssistantWizardInvalidState();
+      if (els.addAssistantWizardModal) els.addAssistantWizardModal.classList.add("visible");
+      requestAnimationFrame(function () {
+        if (els.addAssistantWizardName && typeof els.addAssistantWizardName.focus === "function") {
+          els.addAssistantWizardName.focus();
+        }
+      });
+      return true;
+    }
+    function closeAddAssistantWizard(force) {
+      if (addAssistantWizardSubmitting && !force) return false;
+      if (els.addAssistantWizardModal) els.addAssistantWizardModal.classList.remove("visible");
+      resetAddAssistantWizard();
+      return true;
+    }
+    function submitAddAssistantWizard() {
+      if (addAssistantWizardSubmitting) return Promise.resolve(false);
+      if (!addAssistantWizardAction) return Promise.reject(new Error("No hay ningun alta de integrante pendiente."));
+      if (!validateAddAssistantWizard()) return Promise.resolve(false);
+      const draft = readAddAssistantWizardDraft();
+      addAssistantWizardSubmitting = true;
+      if (els.addAssistantWizardCard) setBusy(els.addAssistantWizardCard, true);
+      setAddAssistantWizardStatus("Anadiendo integrante...", "");
+      return addAssistantToSheetGroup(addAssistantWizardAction.groupId, draft)
+        .then(function (result) {
+          if (result) closeAddAssistantWizard(true);
+          return result;
+        })
+        .catch(function (err) {
+          console.error(err);
+          if (els.addAssistantWizardCard) setBusy(els.addAssistantWizardCard, false);
+          addAssistantWizardSubmitting = false;
+          setAddAssistantWizardStatus(messageFromError(err, "No se ha podido anadir el integrante"), "error");
+          throw err;
+        });
     }
     function promoteResponsibleWizardFieldDefs() {
       return [
@@ -11793,6 +11993,7 @@
         setAt(["Pago - quien paga", "Pago - paga"], draft.responsibleName);
       }
       setAt(["Paella - punto de fuego"], draft.firePoint);
+      setAt(["Paella - punto de fuego concedido"], "Por confirmar");
       setAt(["Paella - responsable del otro grupo"], draft.sharedLead);
       setAt(["Paella - participa en concurso"], draft.contest);
       const columns = Object.keys(valuesByCol).map(function (key) { return Number(key); }).filter(Number.isFinite);
@@ -12048,6 +12249,7 @@
       if (!Number.isInteger(model.headerIndex["pago - importe"]) && !Number.isInteger(model.headerIndex["pago - cantidad"]) && !Number.isInteger(model.headerIndex["pago - euros"])) {
         requiredLabels.push("Pago - importe");
       }
+      if (!Number.isInteger(model.headerIndex["paella - punto de fuego concedido"])) requiredLabels.push("Paella - punto de fuego concedido");
       if (!requiredLabels.length) return Promise.resolve(false);
       return ensureCurrentSheetHeaders(requiredLabels).then(function () {
         return true;
@@ -12096,6 +12298,38 @@
           },
           filled: false
         };
+      });
+    }
+    function addAssistantToSheetGroup(groupId, draft) {
+      if (!state.currentSheetTitle) return Promise.reject(new Error("No hay una hoja de grupos activa."));
+      setSheetGroupsStatus("Anadiendo integrante...", "");
+      return ensureAllCurrentEntryHeaders().then(function () {
+        const model = rebuildCurrentSheetGroupsModel() || currentSheetGroupsModel();
+        const group = findGroupByIdInModel(model, groupId);
+        if (!group) throw new Error("No se ha encontrado el grupo.");
+        return ensureAssistantSlotColumns(group).then(function (slot) {
+          if (!slot || !Number.isFinite(slot.nameCol) || !Number.isFinite(slot.dniCol) || !Number.isFinite(slot.emailCol)) {
+            throw new Error("No se ha podido preparar el nuevo integrante.");
+          }
+          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, slot.nameCol, draft.name || "", { delay: 160 });
+          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, slot.dniCol, draft.dni || "", { delay: 160 });
+          applySheetGroupCellDraft(state.currentSheetTitle, group.sheetRow, slot.emailCol, draft.email || "", { delay: 160 });
+          commitRegisteredCellChangeDraft(state.currentSheetTitle, group.sheetRow, slot.nameCol);
+          commitRegisteredCellChangeDraft(state.currentSheetTitle, group.sheetRow, slot.dniCol);
+          commitRegisteredCellChangeDraft(state.currentSheetTitle, group.sheetRow, slot.emailCol);
+          scheduleRegisteredHistoryCommitFlush();
+          state.sheetGroupsExpanded[groupId] = true;
+          state.sheetGroupAssistantExpanded[groupId + "::" + String(slot.number || "")] = true;
+          rebuildCurrentSheetGroupsModel();
+          applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
+          setSheetGroupsStatus("Se ha anadido al integrante " + (draft.name || ("Integrante " + String(slot.number || ""))) + ".", "good");
+          requestAnimationFrame(function () {
+            const selector = ".sheet-group-card[data-group-id='" + String(groupId).replace(/'/g, "\\'") + "'] .sheet-group-input[data-col='" + String(slot.nameCol) + "']";
+            const input = document.querySelector(selector);
+            if (input && typeof input.focus === "function") input.focus();
+          });
+          return true;
+        });
       });
     }
     function buildGroupResponsiblePromotionAssignments(group, assistantSlot, draft) {
@@ -12396,6 +12630,7 @@
         const submittedRaw = valueAt(values, Number.isInteger(headerIndex["submittedat"]) ? headerIndex["submittedat"] : headerIndex["timestamp"]);
         const submittedAt = parseSheetTimestamp(submittedRaw);
         const firePointValue = normalizeFirePointValue(valueAt(values, headerIndex["paella - punto de fuego"]));
+        const firePointGrantedValue = normalizeFirePointValue(valueAt(values, headerIndex["paella - punto de fuego concedido"])) || "Por confirmar";
         const contestValue = normalizeYesNoValue(valueAt(values, headerIndex["paella - participa en concurso"]));
         const group = {
           id: "group-" + (baseModel.rowOffset + rowIndex),
@@ -12410,6 +12645,10 @@
           firePoint: {
             value: firePointValue,
             col: headerIndex["paella - punto de fuego"]
+          },
+          firePointGranted: {
+            value: firePointGrantedValue,
+            col: headerIndex["paella - punto de fuego concedido"]
           },
           sharedLead: {
             value: valueAt(values, headerIndex["paella - responsable del otro grupo"]),
@@ -13010,7 +13249,8 @@
       if (matches(group.payment && group.payment.statusCol)) return { kind: "payment", fieldKey: "status" };
       if (matches(group.payment && group.payment.payerCol)) return { kind: "payment", fieldKey: "payer" };
       if (matches(group.payment && group.payment.amountCol)) return { kind: "payment", fieldKey: "amount" };
-      if (matches(group.firePoint && group.firePoint.col)) return { kind: "fire", fieldKey: "value" };
+      if (matches(group.firePoint && group.firePoint.col)) return { kind: "fire", fieldKey: "requested" };
+      if (matches(group.firePointGranted && group.firePointGranted.col)) return { kind: "fire", fieldKey: "granted" };
       if (matches(group.sharedLead && group.sharedLead.col)) return { kind: "shared", fieldKey: "value" };
       if (matches(group.contest && group.contest.col)) return { kind: "contest", fieldKey: "value" };
       if (group.responsible) {
@@ -13055,6 +13295,66 @@
         responsibleEmail: group && group.responsible ? (group.responsible.email || "") : "",
         responsibleDni: group && group.responsible ? (group.responsible.dni || "") : "",
         fieldContext: resolveChangeHistoryFieldContext(group, targetInfo.colIndex)
+      };
+    }
+    function findChangeHistoryPersonInGroup(group, role, number) {
+      if (!group) return null;
+      if (role === "responsable") return group.responsible || null;
+      const slots = Array.isArray(group.assistantSlots) ? group.assistantSlots : [];
+      return slots.find(function (slot) {
+        return String(slot && slot.number || "") === String(number == null ? "" : number);
+      }) || null;
+    }
+    function buildFallbackHistoryFieldContextFromSummary(entry, context) {
+      const label = compactHistoryLabel(entry && entry.summary);
+      const normalized = normalizeHeaderMatchKey(label);
+      if (!normalized) return null;
+      let role = "";
+      let number = null;
+      const assistantMatch = normalized.match(/\b(?:asistente|integrante)\s+(\d+)\b/);
+      if (assistantMatch) {
+        role = "asistente";
+        number = Number(assistantMatch[1]);
+      } else if (normalized.indexOf("responsable") !== -1) {
+        role = "responsable";
+        number = 0;
+      } else {
+        return null;
+      }
+      let kind = "";
+      let fieldKey = "";
+      if (normalized.indexOf("nombre") !== -1) {
+        kind = role === "responsable" ? "responsible" : "assistant";
+        fieldKey = "name";
+      } else if (normalized.indexOf("correo") !== -1 || normalized.indexOf("email") !== -1) {
+        kind = role === "responsable" ? "responsible" : "assistant";
+        fieldKey = "email";
+      } else if (normalized.indexOf("dni") !== -1) {
+        kind = role === "responsable" ? "responsible" : "assistant";
+        fieldKey = "dni";
+      } else if (normalized.indexOf("telefono") !== -1) {
+        kind = role === "responsable" ? "responsible" : "assistant";
+        fieldKey = "phone";
+      } else if (normalized.indexOf("entrada") !== -1 && normalized.indexOf("estado") !== -1) {
+        kind = role === "responsable" ? "responsibleEntry" : "assistantEntry";
+        fieldKey = "status";
+      } else if (normalized.indexOf("entrada") !== -1 && normalized.indexOf("info") !== -1) {
+        kind = role === "responsable" ? "responsibleEntry" : "assistantEntry";
+        fieldKey = "info";
+      } else if (normalized.indexOf("entrada") !== -1 && normalized.indexOf("codigo") !== -1) {
+        kind = role === "responsable" ? "responsibleEntry" : "assistantEntry";
+        fieldKey = "code";
+      } else if (normalized.indexOf("entrada") !== -1 && normalized.indexOf("escaneado") !== -1) {
+        kind = role === "responsable" ? "responsibleEntry" : "assistantEntry";
+        fieldKey = "scannedAt";
+      }
+      if (!kind || !fieldKey) return null;
+      return {
+        kind: kind,
+        fieldKey: fieldKey,
+        role: role,
+        number: number,
+        person: findChangeHistoryPersonInGroup(context && context.group, role, number)
       };
     }
     function buildChangeHistoryPersonSnapshot(fieldContext, entry, preferBefore) {
@@ -13114,7 +13414,7 @@
       if (!fieldContext) return compactHistoryLabel(entry && entry.summary) || parseChangeHistoryTarget(entry).ref || "Campo";
       if (fieldContext.kind === "assistant" || fieldContext.kind === "responsible") {
         if (fieldContext.fieldKey === "name") return "Nombre";
-        if (fieldContext.fieldKey === "email") return "Email";
+        if (fieldContext.fieldKey === "email") return "Correo UPV";
         if (fieldContext.fieldKey === "dni") return "DNI";
         if (fieldContext.fieldKey === "phone") return "Telefono";
       }
@@ -13129,7 +13429,10 @@
         if (fieldContext.fieldKey === "amount") return "Importe";
         if (fieldContext.fieldKey === "payer") return "Quien paga";
       }
-      if (fieldContext.kind === "fire") return "Punto de fuego";
+      if (fieldContext.kind === "fire") {
+        if (fieldContext.fieldKey === "granted") return "Punto de fuego concedido";
+        return "Punto de fuego solicitado";
+      }
       if (fieldContext.kind === "shared") return "Grupo compartido";
       if (fieldContext.kind === "contest") return "Concurso";
       return compactHistoryLabel(entry && entry.summary) || parseChangeHistoryTarget(entry).ref || "Campo";
@@ -13246,10 +13549,18 @@
         if (paymentStatus) return prefix + " ha actualizado el estado de pago a \"" + paymentStatus + "\"";
         return prefix + " ha actualizado el pago";
       }
-      if (action.kind === "fire") return prefix + " ha cambiado el punto de fuego a " + (nextValue || "sin definir");
+      if (action.kind === "fire") {
+        if ((action.editedFieldLabels || []).indexOf("Punto de fuego concedido") !== -1) {
+          return prefix + " ha actualizado el punto de fuego concedido a " + (nextValue || "sin definir");
+        }
+        return prefix + " ha cambiado el punto de fuego solicitado a " + (nextValue || "sin definir");
+      }
       if (action.kind === "shared") return prefix + " ha actualizado el grupo compartido a " + (nextValue || "sin definir");
       if (action.kind === "contest") return prefix + " ha actualizado el concurso a " + (nextValue || "sin definir");
-      if (action.kind === "assistant-add") return prefix + " ha anadido a " + (peopleText || "nuevos integrantes");
+      if (action.kind === "assistant-add") {
+        if (action.people && action.people.length === 1 && peopleText) return prefix + " ha anadido al integrante " + peopleText;
+        return prefix + " ha anadido a " + (peopleText || "nuevos integrantes");
+      }
       if (action.kind === "assistant-remove") return prefix + " ha eliminado a " + (peopleText || "integrantes");
       if (action.kind === "assistant-update") return "Edicion de " + (editedFieldsText || "datos") + " del integrante " + primaryPersonLabel;
       if (action.kind === "responsible") return prefix + " ha actualizado los datos del responsable";
@@ -13329,7 +13640,7 @@
         const afterText = String(entry && entry.after || "").trim();
         const hadBefore = !!beforeText;
         const hasAfter = !!afterText;
-        const fieldContext = context.fieldContext;
+        const fieldContext = context.fieldContext || buildFallbackHistoryFieldContextFromSummary(entry, context);
         let kind = "generic";
         let actionKey = normalizedType + "::" + String(entry && entry.timestamp || "") + "::" + String(entry && entry.target || "") + "::" + String(entry && entry.summary || "");
         let preferBeforePerson = false;
@@ -14211,7 +14522,8 @@
         settingsBlock.appendChild(paymentRow);
         var settingsGrid = document.createElement("div");
         settingsGrid.className = "sheet-group-inline-grid triple";
-        settingsGrid.appendChild(createSheetGroupField("Punto de fuego", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Sin valor" })));
+        settingsGrid.appendChild(createSheetGroupField("Punto de fuego solicitado", createSheetGroupSelect(group.id, group.sheetRow, group.firePoint.col, group.firePoint.value, ["", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Sin valor" })));
+        settingsGrid.appendChild(createSheetGroupField("Punto de fuego concedido", createSheetGroupSelect(group.id, group.sheetRow, group.firePointGranted && group.firePointGranted.col, (group.firePointGranted && group.firePointGranted.value) || "Por confirmar", ["Por confirmar", "🥘 Sí, para paella", "🔥 Sí, para torrá", "🤝 Comparto punto de fuego con otro grupo", "❌ No"], { emptyLabel: "Por confirmar" })));
         settingsGrid.appendChild(createSheetGroupField("Concurso", createSheetGroupSelect(group.id, group.sheetRow, group.contest.col, group.contest.value, ["", "Sí", "No"], { emptyLabel: "Sin valor" })));
         settingsGrid.appendChild(createSheetGroupField("Importe", createSheetGroupTextInput(group.id, group.sheetRow, group.payment.amountCol, group.payment.amount, { placeholder: "0,00", inputMode: "decimal" })));
         settingsBlock.appendChild(settingsGrid);
@@ -19374,25 +19686,8 @@
         return;
       }
       if (action === "assistant-add") {
-        setSheetGroupsStatus("Preparando nuevo integrante...", "");
-        ensureAssistantSlotColumns(group).then(function (slot) {
-          const openSlots = state.sheetGroupsDraftSlots[groupId] ? state.sheetGroupsDraftSlots[groupId].slice() : [];
-          if (openSlots.indexOf(slot.number) === -1) openSlots.push(slot.number);
-          state.sheetGroupsDraftSlots[groupId] = openSlots;
-          state.sheetGroupsExpanded[groupId] = true;
-          state.sheetGroupAssistantExpanded[groupId + "::" + slot.number] = true;
-          rebuildCurrentSheetGroupsModel();
-          applySheetGroupsModelToView(currentSheetGroupsModel(), { skipAnim: true, preserveFocus: true });
-          setSheetGroupsStatus("Integrante listo para editar.", "good");
-          requestAnimationFrame(function () {
-            const selector = ".sheet-group-card[data-group-id='" + String(groupId).replace(/'/g, "\\'") + "'] .sheet-group-input[data-col='" + String(slot.nameCol) + "']";
-            const input = document.querySelector(selector);
-            if (input && typeof input.focus === "function") input.focus();
-          });
-        }).catch(function (err) {
-          console.error(err);
-          setSheetGroupsStatus(messageFromError(err, "No se ha podido preparar un nuevo integrante"), "error");
-        });
+        openAddAssistantWizard(groupId);
+        return;
       }
       if (action === "assistant-remove") {
         const assistantNumber = String(button.dataset.assistantNumber || "");
@@ -19794,6 +20089,41 @@
     if (els.promoteResponsibleWizardModal) {
       els.promoteResponsibleWizardModal.addEventListener("click", function (event) {
         if (event.target === els.promoteResponsibleWizardModal) closePromoteResponsibleWizard();
+      });
+    }
+    if (els.addAssistantWizardCloseBtn) els.addAssistantWizardCloseBtn.addEventListener("click", closeAddAssistantWizard);
+    if (els.addAssistantWizardCancelBtn) els.addAssistantWizardCancelBtn.addEventListener("click", closeAddAssistantWizard);
+    if (els.addAssistantWizardConfirmBtn) {
+      els.addAssistantWizardConfirmBtn.addEventListener("click", function () {
+        submitAddAssistantWizard().catch(function () {});
+      });
+    }
+    addAssistantWizardFieldDefs().forEach(function (entry) {
+      if (!entry.input) return;
+      entry.input.addEventListener("input", function () {
+        const draft = syncAddAssistantWizardInvalidState();
+        const hasMissing = addAssistantWizardFieldDefs().some(function (fieldDef) {
+          return !String(draft[fieldDef.key] || "").trim();
+        });
+        if (!hasMissing) setAddAssistantWizardStatus("", "");
+        else if (els.addAssistantWizardStatus && els.addAssistantWizardStatus.dataset.tone === "error") {
+          setAddAssistantWizardStatus("Completa los campos marcados en rojo antes de anadir el integrante.", "error");
+        }
+      });
+      entry.input.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeAddAssistantWizard();
+          return;
+        }
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        submitAddAssistantWizard().catch(function () {});
+      });
+    });
+    if (els.addAssistantWizardModal) {
+      els.addAssistantWizardModal.addEventListener("click", function (event) {
+        if (event.target === els.addAssistantWizardModal) closeAddAssistantWizard();
       });
     }
     if (els.editSessionStartCloseBtn) {
