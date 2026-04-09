@@ -2620,11 +2620,27 @@
     .change-history-session-card .sheet-group-summary {
       align-items: center;
     }
+    .change-history-session-card .sheet-group-summary-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3px 8px;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .change-history-session-date {
+      font-weight: 700;
+      color: #1f1507;
+    }
+    .change-history-session-email {
+      color: rgba(93,58,16,0.66);
+    }
     .change-history-avatar {
       width: 40px;
       height: 40px;
       flex: 0 0 40px;
-      border-radius: 12px;
+      border-radius: 50%;
       overflow: hidden;
       border: 1px solid rgba(93,58,16,0.12);
       background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,226,194,0.92));
@@ -2684,11 +2700,31 @@
       font-weight: 700;
       color: #2b1b08;
       min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .change-history-entry-icon {
+      min-width: 1.7rem;
+      height: 1.7rem;
+      padding: 0 0.28rem;
+      border-radius: 999px;
+      background: rgba(93,58,16,0.08);
+      color: #1f1507;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.86rem;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+    .change-history-entry-title-text {
+      min-width: 0;
     }
     .change-history-entry-time {
       font-size: 0.68rem;
-      font-weight: 600;
-      color: rgba(93,58,16,0.52);
+      font-weight: 700;
+      color: #1f1507;
       white-space: nowrap;
       flex: 0 0 auto;
     }
@@ -2799,6 +2835,59 @@
       border-color: rgba(164, 43, 24, 0.55);
       box-shadow: 0 0 0 3px rgba(164, 43, 24, 0.12);
       background: rgba(255, 241, 239, 0.96);
+    }
+    .edit-session-recent {
+      display: grid;
+      gap: 8px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(93,58,16,0.12);
+      background: rgba(255, 250, 239, 0.82);
+    }
+    .edit-session-recent.hidden {
+      display: none;
+    }
+    .edit-session-recent-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #2f1c08;
+    }
+    .edit-session-recent-list {
+      display: grid;
+      gap: 8px;
+    }
+    .edit-session-recent-item {
+      width: 100%;
+      border: 1px solid rgba(93,58,16,0.12);
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 3px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .edit-session-recent-item:hover {
+      border-color: rgba(212, 81, 0, 0.3);
+      background: rgba(255, 247, 236, 0.96);
+      transform: translateY(-1px);
+    }
+    .edit-session-recent-item.is-selected {
+      border-color: rgba(212, 81, 0, 0.44);
+      background: rgba(255, 238, 221, 0.98);
+      box-shadow: 0 10px 24px rgba(196, 83, 17, 0.12);
+    }
+    .edit-session-recent-name {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #2a1a08;
+      line-height: 1.25;
+    }
+    .edit-session-recent-meta {
+      font-size: 0.68rem;
+      color: rgba(93,58,16,0.66);
+      line-height: 1.3;
     }
     .edit-session-profile {
       display: flex;
@@ -5379,6 +5468,11 @@
       .history-view-btn { width: 28px; height: 28px; min-width: 28px; }
       .history-view-btn svg { width: 14px; height: 14px; }
       .edit-session-modal { width: min(100vw - 12px, 520px); gap: 10px; }
+      .edit-session-recent { padding: 10px; gap: 6px; }
+      .edit-session-recent-item { padding: 8px 10px; border-radius: 10px; }
+      .edit-session-recent-title { font-size: 0.72rem; }
+      .edit-session-recent-name { font-size: 0.7rem; }
+      .edit-session-recent-meta { font-size: 0.6rem; }
       .edit-session-profile { gap: 8px; padding: 8px 10px; align-items: start; }
       .edit-session-user { gap: 8px; }
       .edit-session-avatar { width: 34px; height: 34px; flex-basis: 34px; }
@@ -5392,8 +5486,10 @@
       .change-history-entry-meta,
       .change-history-entry-time,
       .change-history-entry-text { font-size: 0.62rem; }
-      .change-history-avatar { width: 30px; height: 30px; flex-basis: 30px; border-radius: 9px; }
+      .change-history-session-date { width: 100%; }
+      .change-history-avatar { width: 30px; height: 30px; flex-basis: 30px; border-radius: 50%; }
       .change-history-avatar-fallback { font-size: 0.68rem; }
+      .change-history-entry-icon { min-width: 1.45rem; height: 1.45rem; font-size: 0.74rem; }
       .change-history-entry-summary { gap: 6px; padding: 8px 0; }
       .change-history-entry-head { gap: 6px; }
       .change-history-entry-detail { padding-bottom: 10px; gap: 8px; }
@@ -6122,6 +6218,10 @@
       </div>
       <div class="edit-session-body">
         <div id="editSessionStartStatus" class="status"></div>
+        <section id="editSessionStartRecentSection" class="edit-session-recent hidden">
+          <div class="edit-session-recent-title">¿Continuar con alguno de estos cambios?</div>
+          <div id="editSessionStartRecentList" class="edit-session-recent-list"></div>
+        </section>
         <label class="edit-session-field">
           <span>Nombre del cambio para el registro</span>
           <input id="editSessionStartNameInput" class="search" type="text" autocomplete="off" spellcheck="false" placeholder="Ej. Corrección grupos pago jueves">
@@ -6761,6 +6861,8 @@
       editSessionStartCard: document.getElementById("editSessionStartCard"),
       editSessionStartCloseBtn: document.getElementById("editSessionStartCloseBtn"),
       editSessionStartStatus: document.getElementById("editSessionStartStatus"),
+      editSessionStartRecentSection: document.getElementById("editSessionStartRecentSection"),
+      editSessionStartRecentList: document.getElementById("editSessionStartRecentList"),
       editSessionStartNameInput: document.getElementById("editSessionStartNameInput"),
       editSessionStartAvatar: document.getElementById("editSessionStartAvatar"),
       editSessionStartAvatarFallback: document.getElementById("editSessionStartAvatarFallback"),
@@ -7342,6 +7444,58 @@
         email: String(user.emailAddress || ""),
         photo: String(user.photoLink || "")
       };
+    }
+    function changeHistoryEntryUserMatches(entry, user) {
+      const currentUser = user || currentHistoryUserSnapshot();
+      const currentEmail = normalizeCompareText(currentUser.email || "");
+      const entryEmail = normalizeCompareText(entry && entry.userEmail || "");
+      if (currentEmail && entryEmail) return currentEmail === entryEmail;
+      return normalizeCompareText(entry && entry.userName || "") === normalizeCompareText(currentUser.name || "");
+    }
+    function buildChangeHistorySessions(entries) {
+      const sessionsMap = new Map();
+      (Array.isArray(entries) ? entries.slice() : []).sort(function (a, b) {
+        return changeHistoryEntrySortValue(b) - changeHistoryEntrySortValue(a);
+      }).forEach(function (entry) {
+        const key = entry.sessionId || ("legacy:" + entry.timestamp + ":" + entry.summary);
+        if (!sessionsMap.has(key)) {
+          sessionsMap.set(key, {
+            sessionId: entry.sessionId || "",
+            sessionName: entry.sessionName || "Cambio sin nombre",
+            userName: entry.userName || "Usuario",
+            userEmail: entry.userEmail || "",
+            userPhoto: entry.userPhoto || "",
+            startedAt: entry.timestamp || "",
+            latestAt: entry.timestamp || "",
+            entries: []
+          });
+        }
+        const session = sessionsMap.get(key);
+        session.entries.push(entry);
+        if (!session.sessionName && entry.sessionName) session.sessionName = entry.sessionName;
+        if (!session.userName && entry.userName) session.userName = entry.userName;
+        if (!session.userEmail && entry.userEmail) session.userEmail = entry.userEmail;
+        if (!session.userPhoto && entry.userPhoto) session.userPhoto = entry.userPhoto;
+        if (!session.startedAt || changeHistoryEntrySortValue(entry) < changeHistoryEntrySortValue({ timestamp: session.startedAt })) {
+          session.startedAt = entry.timestamp || session.startedAt;
+        }
+        if (changeHistoryEntrySortValue(entry) > changeHistoryEntrySortValue({ timestamp: session.latestAt })) {
+          session.latestAt = entry.timestamp || session.latestAt;
+        }
+      });
+      return Array.from(sessionsMap.values()).sort(function (a, b) {
+        return changeHistoryEntrySortValue({ timestamp: b.latestAt }) - changeHistoryEntrySortValue({ timestamp: a.latestAt });
+      });
+    }
+    function getRecentEditableChangeHistorySessions(entries) {
+      const user = currentHistoryUserSnapshot();
+      const cutoff = Date.now() - (24 * 60 * 60 * 1000);
+      return buildChangeHistorySessions(entries).filter(function (session) {
+        const latestAt = changeHistoryEntrySortValue({ timestamp: session.latestAt || session.startedAt });
+        if (!latestAt || latestAt < cutoff) return false;
+        const firstEntry = Array.isArray(session.entries) && session.entries.length ? session.entries[0] : session;
+        return changeHistoryEntryUserMatches(firstEntry, user);
+      }).slice(0, 5);
     }
     function buildChangeHistoryRow(entry) {
       const safe = entry || {};
@@ -12233,6 +12387,110 @@
     function changeHistoryEntryTimeValue(entry) {
       return formatRegisteredEditTimestamp(entry && entry.timestamp);
     }
+    function isRecentChangeHistoryTimestamp(value) {
+      const parsed = Date.parse(value || "");
+      if (!Number.isFinite(parsed)) return false;
+      return parsed >= (Date.now() - (7 * 24 * 60 * 60 * 1000));
+    }
+    function formatChangeHistorySessionTimestamp(value) {
+      const date = value ? new Date(value) : null;
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+      const includeWeekday = isRecentChangeHistoryTimestamp(value);
+      const dateText = date.toLocaleDateString("es-ES", {
+        weekday: includeWeekday ? "long" : undefined,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      const timeText = date.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      return capitalizeHistoryLabel(String(dateText || "").trim()) + " | " + timeText;
+    }
+    function normalizeChangeHistoryHintText(entry) {
+      return normalizeCompareText([
+        entry && entry.summary,
+        entry && entry.target,
+        entry && entry.sheetTitle
+      ].filter(Boolean).join(" "));
+    }
+    function hasChangeHistoryValue(value) {
+      return String(value == null ? "" : value).trim() !== "";
+    }
+    function changeHistoryEntryVisual(entry) {
+      const normalizedType = String(entry && entry.type || "").trim().toUpperCase();
+      const baseLabel = changeHistoryTypeLabel(normalizedType);
+      const hint = normalizeChangeHistoryHintText(entry);
+      const hadBefore = hasChangeHistoryValue(entry && entry.before);
+      const hasAfter = hasChangeHistoryValue(entry && entry.after);
+      if (normalizedType === "INICIO_EDICION") return { icon: "🟠", label: "Inicio de edicion" };
+      if (normalizedType === "GRUPO_CREADO") return { icon: "+👥", label: "Grupo anadido" };
+      if (normalizedType === "GRUPO_ELIMINADO") return { icon: "-👥", label: "Grupo eliminado" };
+      if (normalizedType === "HOJA_CREADA") return { icon: "+📄", label: "Hoja anadida" };
+      if (normalizedType === "HOJA_ELIMINADA") return { icon: "-📄", label: "Hoja eliminada" };
+      if (normalizedType === "RENOMBRE_HOJA") return { icon: "✏", label: "Nombre de hoja cambiado" };
+      if (normalizedType === "RENOMBRE_SPREADSHEET" || normalizedType === "TITULO_SPREADSHEET") {
+        return { icon: "✏", label: "Nombre del spreadsheet cambiado" };
+      }
+      if (normalizedType !== "CELDA") return { icon: "✏", label: baseLabel };
+      if (
+        hint.indexOf("pago") !== -1 ||
+        hint.indexOf("pagado") !== -1 ||
+        hint.indexOf("importe") !== -1 ||
+        hint.indexOf("pagador") !== -1 ||
+        hint.indexOf("payer") !== -1
+      ) {
+        return { icon: "€", label: "Pago actualizado" };
+      }
+      if (
+        hint.indexOf("entrada") !== -1 ||
+        hint.indexOf("ticket") !== -1 ||
+        hint.indexOf("qr") !== -1 ||
+        hint.indexOf("ha entrado") !== -1 ||
+        hint.indexOf("emitida") !== -1 ||
+        hint.indexOf("escaneada") !== -1 ||
+        hint.indexOf("validada") !== -1 ||
+        hint.indexOf("codigo") !== -1 ||
+        hint.indexOf("estado") !== -1
+      ) {
+        return { icon: "🎟", label: "Entrada actualizada" };
+      }
+      if (
+        hint.indexOf("acepta") !== -1 ||
+        hint.indexOf("acepto") !== -1 ||
+        hint.indexOf("aceptado") !== -1 ||
+        hint.indexOf("confirmado") !== -1
+      ) {
+        return { icon: "✓", label: "Aceptacion actualizada" };
+      }
+      if (hint.indexOf("concurso") !== -1) {
+        return { icon: "✓", label: "Concurso actualizado" };
+      }
+      if (
+        hint.indexOf("punto de fuego") !== -1 ||
+        hint.indexOf("torra") !== -1 ||
+        hint.indexOf("paella") !== -1
+      ) {
+        return { icon: "🔥", label: "Punto de fuego actualizado" };
+      }
+      if (
+        hint.indexOf("otro grupo") !== -1 ||
+        hint.indexOf("comparto") !== -1 ||
+        hint.indexOf("grupo compartido") !== -1
+      ) {
+        return { icon: "🤝", label: "Grupo vinculado" };
+      }
+      if (hint.indexOf("asistente") !== -1 || hint.indexOf("integrante") !== -1) {
+        if (!hadBefore && hasAfter) return { icon: "+👤", label: "Integrante anadido" };
+        if (hadBefore && !hasAfter) return { icon: "-👤", label: "Integrante eliminado" };
+        return { icon: "👤", label: "Integrante actualizado" };
+      }
+      if (hint.indexOf("responsable") !== -1) {
+        return { icon: "👑", label: "Responsable actualizado" };
+      }
+      return { icon: "✏", label: baseLabel };
+    }
     function changeHistoryEntrySortValue(entry) {
       const parsed = Date.parse(entry && entry.timestamp || "");
       return Number.isFinite(parsed) ? parsed : 0;
@@ -12275,6 +12533,94 @@
       els.sheetChangeHistoryStatus.textContent = text || "";
       els.sheetChangeHistoryStatus.dataset.tone = tone || "";
       els.sheetChangeHistoryStatus.classList.add("hidden-panel");
+    }
+    function changeHistoryTypeLabel(type) {
+      const normalized = String(type || "").trim().toUpperCase();
+      if (normalized === "INICIO_EDICION") return "Inicio de edicion";
+      if (normalized === "REANUDAR_EDICION") return "Edicion reanudada";
+      if (normalized === "CELDA") return "Cambio de celda";
+      if (normalized === "RENOMBRE_SPREADSHEET") return "Renombre del spreadsheet";
+      if (normalized === "TITULO_SPREADSHEET") return "Nombre del spreadsheet";
+      if (normalized === "RENOMBRE_HOJA") return "Renombre de hoja";
+      if (normalized === "GRUPO_CREADO") return "Grupo creado";
+      if (normalized === "GRUPO_ELIMINADO") return "Grupo eliminado";
+      if (normalized === "HOJA_CREADA") return "Hoja creada";
+      if (normalized === "HOJA_ELIMINADA") return "Hoja eliminada";
+      return normalized || "Cambio";
+    }
+    function changeHistoryEntryVisual(entry) {
+      const normalizedType = String(entry && entry.type || "").trim().toUpperCase();
+      const baseLabel = changeHistoryTypeLabel(normalizedType);
+      const hint = normalizeChangeHistoryHintText(entry);
+      const hadBefore = hasChangeHistoryValue(entry && entry.before);
+      const hasAfter = hasChangeHistoryValue(entry && entry.after);
+      if (normalizedType === "INICIO_EDICION") return { icon: "🟠", label: "Inicio de edicion" };
+      if (normalizedType === "REANUDAR_EDICION") return { icon: "↺", label: "Edicion reanudada" };
+      if (normalizedType === "GRUPO_CREADO") return { icon: "+👥", label: "Grupo anadido" };
+      if (normalizedType === "GRUPO_ELIMINADO") return { icon: "-👥", label: "Grupo eliminado" };
+      if (normalizedType === "HOJA_CREADA") return { icon: "+📄", label: "Hoja anadida" };
+      if (normalizedType === "HOJA_ELIMINADA") return { icon: "-📄", label: "Hoja eliminada" };
+      if (normalizedType === "RENOMBRE_HOJA") return { icon: "✏", label: "Nombre de hoja cambiado" };
+      if (normalizedType === "RENOMBRE_SPREADSHEET" || normalizedType === "TITULO_SPREADSHEET") {
+        return { icon: "✏", label: "Nombre del spreadsheet cambiado" };
+      }
+      if (normalizedType !== "CELDA") return { icon: "✏", label: baseLabel };
+      if (
+        hint.indexOf("pago") !== -1 ||
+        hint.indexOf("pagado") !== -1 ||
+        hint.indexOf("importe") !== -1 ||
+        hint.indexOf("pagador") !== -1 ||
+        hint.indexOf("payer") !== -1
+      ) {
+        return { icon: "€", label: "Pago actualizado" };
+      }
+      if (
+        hint.indexOf("entrada") !== -1 ||
+        hint.indexOf("ticket") !== -1 ||
+        hint.indexOf("qr") !== -1 ||
+        hint.indexOf("ha entrado") !== -1 ||
+        hint.indexOf("emitida") !== -1 ||
+        hint.indexOf("escaneada") !== -1 ||
+        hint.indexOf("validada") !== -1 ||
+        hint.indexOf("codigo") !== -1 ||
+        hint.indexOf("estado") !== -1
+      ) {
+        return { icon: "🎟", label: "Entrada actualizada" };
+      }
+      if (
+        hint.indexOf("acepta") !== -1 ||
+        hint.indexOf("acepto") !== -1 ||
+        hint.indexOf("aceptado") !== -1 ||
+        hint.indexOf("confirmado") !== -1
+      ) {
+        return { icon: "✓", label: "Aceptacion actualizada" };
+      }
+      if (hint.indexOf("concurso") !== -1) {
+        return { icon: "✓", label: "Concurso actualizado" };
+      }
+      if (
+        hint.indexOf("punto de fuego") !== -1 ||
+        hint.indexOf("torra") !== -1 ||
+        hint.indexOf("paella") !== -1
+      ) {
+        return { icon: "🔥", label: "Punto de fuego actualizado" };
+      }
+      if (
+        hint.indexOf("otro grupo") !== -1 ||
+        hint.indexOf("comparto") !== -1 ||
+        hint.indexOf("grupo compartido") !== -1
+      ) {
+        return { icon: "🤝", label: "Grupo vinculado" };
+      }
+      if (hint.indexOf("asistente") !== -1 || hint.indexOf("integrante") !== -1) {
+        if (!hadBefore && hasAfter) return { icon: "+👤", label: "Integrante anadido" };
+        if (hadBefore && !hasAfter) return { icon: "-👤", label: "Integrante eliminado" };
+        return { icon: "👤", label: "Integrante actualizado" };
+      }
+      if (hint.indexOf("responsable") !== -1) {
+        return { icon: "👑", label: "Responsable actualizado" };
+      }
+      return { icon: "✏", label: baseLabel };
     }
     function renderChangeHistoryList(entries) {
       if (!els.sheetChangeHistoryList) return;
@@ -12388,7 +12734,14 @@
           main.appendChild(title);
           const summaryMeta = document.createElement("div");
           summaryMeta.className = "sheet-group-summary-meta";
-          summaryMeta.textContent = (session.userEmail || session.userName || "Usuario") + " | " + (formatRegisteredEditTimestamp(session.startedAt) || "Sin fecha");
+          const summaryDate = document.createElement("span");
+          summaryDate.className = "change-history-session-date";
+          summaryDate.textContent = formatChangeHistorySessionTimestamp(session.startedAt) || "Sin fecha";
+          summaryMeta.appendChild(summaryDate);
+          const summaryEmail = document.createElement("span");
+          summaryEmail.className = "change-history-session-email";
+          summaryEmail.textContent = session.userEmail || session.userName || "Usuario";
+          summaryMeta.appendChild(summaryEmail);
           main.appendChild(summaryMeta);
           summary.appendChild(main);
           const right = document.createElement("div");
@@ -12423,6 +12776,7 @@
             const afterText = String(entry.after || "");
             const targetText = [entry.sheetTitle, entry.target].filter(Boolean).join(" | ");
             const summaryText = String(entry.summary || targetText || "Sin detalle");
+            const entryVisual = changeHistoryEntryVisual(entry);
             const entryEl = document.createElement("details");
             entryEl.className = "change-history-entry";
             entryEl.open = !!(state.registeredEditSession && state.registeredEditSession.id === session.sessionId && entryIndex === 0);
@@ -12434,7 +12788,14 @@
             entryHead.className = "change-history-entry-head";
             const entryTitle = document.createElement("div");
             entryTitle.className = "change-history-entry-title";
-            entryTitle.textContent = changeHistoryTypeLabel(entry.type);
+            const entryIcon = document.createElement("span");
+            entryIcon.className = "change-history-entry-icon";
+            entryIcon.textContent = entryVisual.icon || "✏";
+            const entryTitleText = document.createElement("span");
+            entryTitleText.className = "change-history-entry-title-text";
+            entryTitleText.textContent = entryVisual.label || changeHistoryTypeLabel(entry.type);
+            entryTitle.appendChild(entryIcon);
+            entryTitle.appendChild(entryTitleText);
             const entryTime = document.createElement("div");
             entryTime.className = "change-history-entry-time";
             entryTime.textContent = changeHistoryEntryTimeValue(entry);
@@ -13054,6 +13415,84 @@
       els.editSessionStartStatus.textContent = text || "";
       els.editSessionStartStatus.dataset.tone = tone || "";
     }
+    function getSelectedEditSessionStartRecentSession() {
+      const draft = state.editSessionStartDraft || {};
+      const selectedId = String(draft.selectedSessionId || "");
+      const sessions = Array.isArray(draft.recentSessions) ? draft.recentSessions : [];
+      return sessions.find(function (session) {
+        return String(session.sessionId || "") === selectedId;
+      }) || null;
+    }
+    function syncEditSessionStartConfirmBtn() {
+      if (!els.editSessionStartConfirmBtn) return;
+      els.editSessionStartConfirmBtn.textContent = getSelectedEditSessionStartRecentSession()
+        ? "Continuar edicion registrada"
+        : "Comenzar edicion registrada";
+    }
+    function renderEditSessionStartRecentOptions() {
+      if (!els.editSessionStartRecentSection || !els.editSessionStartRecentList) return;
+      const draft = state.editSessionStartDraft || {};
+      const recentSessions = Array.isArray(draft.recentSessions) ? draft.recentSessions : [];
+      els.editSessionStartRecentList.innerHTML = "";
+      els.editSessionStartRecentSection.classList.toggle("hidden", recentSessions.length === 0);
+      recentSessions.forEach(function (session) {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "edit-session-recent-item" + (String(draft.selectedSessionId || "") === String(session.sessionId || "") ? " is-selected" : "");
+        const name = document.createElement("div");
+        name.className = "edit-session-recent-name";
+        name.textContent = session.sessionName || "Cambio sin nombre";
+        const meta = document.createElement("div");
+        meta.className = "edit-session-recent-meta";
+        meta.textContent = (formatChangeHistorySessionTimestamp(session.latestAt || session.startedAt) || "Sin fecha") + " | " + String((session.entries || []).length) + " acciones";
+        item.appendChild(name);
+        item.appendChild(meta);
+        item.addEventListener("click", function () {
+          if (!state.editSessionStartDraft) return;
+          const alreadySelected = String(state.editSessionStartDraft.selectedSessionId || "") === String(session.sessionId || "");
+          state.editSessionStartDraft.selectedSessionId = alreadySelected ? "" : String(session.sessionId || "");
+          if (!alreadySelected && els.editSessionStartNameInput) {
+            els.editSessionStartNameInput.value = String(session.sessionName || "");
+            els.editSessionStartNameInput.classList.remove("is-invalid");
+            state.editSessionStartDraft.name = String(session.sessionName || "");
+          }
+          renderEditSessionStartRecentOptions();
+          syncEditSessionStartConfirmBtn();
+        });
+        els.editSessionStartRecentList.appendChild(item);
+      });
+      syncEditSessionStartConfirmBtn();
+    }
+    function loadEditSessionStartRecentOptions() {
+      if (!state.editSessionStartDraft) return Promise.resolve([]);
+      const draft = state.editSessionStartDraft;
+      draft.recentLoadToken = Number(draft.recentLoadToken || 0) + 1;
+      const requestToken = draft.recentLoadToken;
+      const hasHistorySheet = !!getChangeHistorySheetInfo();
+      const hasCachedEntries = Array.isArray(state.sheetChangeHistoryEntries) && state.sheetChangeHistoryEntries.length;
+      if (!hasHistorySheet && !hasCachedEntries) {
+        draft.recentSessions = [];
+        draft.selectedSessionId = "";
+        renderEditSessionStartRecentOptions();
+        return Promise.resolve([]);
+      }
+      return loadChangeHistoryEntries({ force: !hasCachedEntries, allowMissing: true }).then(function (entries) {
+        if (!state.editSessionStartDraft || state.editSessionStartDraft !== draft || Number(draft.recentLoadToken || 0) !== requestToken) return [];
+        draft.recentSessions = getRecentEditableChangeHistorySessions(entries);
+        if (!draft.recentSessions.some(function (session) { return String(session.sessionId || "") === String(draft.selectedSessionId || ""); })) {
+          draft.selectedSessionId = "";
+        }
+        renderEditSessionStartRecentOptions();
+        return draft.recentSessions.slice();
+      }).catch(function (err) {
+        console.error(err);
+        if (!state.editSessionStartDraft || state.editSessionStartDraft !== draft) return [];
+        draft.recentSessions = [];
+        draft.selectedSessionId = "";
+        renderEditSessionStartRecentOptions();
+        return [];
+      });
+    }
     function syncEditSessionStartDraftProfile() {
       const draft = state.editSessionStartDraft || {};
       const user = currentHistoryUserSnapshot();
@@ -13068,7 +13507,10 @@
     function resetEditSessionStartModal() {
       state.editSessionStartDraft = {
         name: "",
-        startedAt: new Date().toISOString()
+        startedAt: new Date().toISOString(),
+        selectedSessionId: "",
+        recentSessions: [],
+        recentLoadToken: 0
       };
       setEditSessionStartStatus("", "");
       if (els.editSessionStartNameInput) {
@@ -13077,6 +13519,7 @@
       }
       if (els.editSessionStartConfirmBtn) els.editSessionStartConfirmBtn.disabled = false;
       syncEditSessionStartDraftProfile();
+      renderEditSessionStartRecentOptions();
     }
     function openEditSessionStartModal() {
       if (!isSpreadsheetDocumentActive() || !state.canEdit || state.editSessionStartSubmitting) return false;
@@ -13088,6 +13531,7 @@
           els.editSessionStartNameInput.focus();
         }
       });
+      loadEditSessionStartRecentOptions().catch(function () {});
       return true;
     }
     function closeEditSessionStartModal(force) {
@@ -13164,6 +13608,82 @@
       }).catch(function (err) {
         console.error(err);
         setEditSessionStartStatus(messageFromError(err, "No se ha podido iniciar la edición registrada"), "error");
+        return false;
+      }).finally(function () {
+        state.editSessionStartSubmitting = false;
+        if (els.editSessionStartConfirmBtn) els.editSessionStartConfirmBtn.disabled = false;
+        if (els.editSessionStartCard) setBusy(els.editSessionStartCard, false);
+      });
+    }
+    function submitEditSessionStartModal() {
+      if (!isSpreadsheetDocumentActive() || !state.canEdit || state.editSessionStartSubmitting) return Promise.resolve(false);
+      const changeName = String(els.editSessionStartNameInput && els.editSessionStartNameInput.value || "").trim();
+      if (!changeName) {
+        if (els.editSessionStartNameInput) {
+          els.editSessionStartNameInput.classList.add("is-invalid");
+          els.editSessionStartNameInput.focus();
+        }
+        setEditSessionStartStatus("Pon un nombre para registrar esta edicion.", "error");
+        return Promise.resolve(false);
+      }
+      const user = currentHistoryUserSnapshot();
+      const selectedRecentSession = getSelectedEditSessionStartRecentSession();
+      const startedAt = selectedRecentSession && selectedRecentSession.startedAt
+        ? selectedRecentSession.startedAt
+        : (state.editSessionStartDraft && state.editSessionStartDraft.startedAt
+          ? state.editSessionStartDraft.startedAt
+          : new Date().toISOString());
+      const session = selectedRecentSession
+        ? {
+            id: String(selectedRecentSession.sessionId || buildRegisteredEditSessionId()),
+            name: String(selectedRecentSession.sessionName || changeName),
+            startedAt: String(selectedRecentSession.startedAt || startedAt),
+            userName: String(selectedRecentSession.userName || user.name),
+            userEmail: String(selectedRecentSession.userEmail || user.email),
+            userPhoto: String(selectedRecentSession.userPhoto || user.photo)
+          }
+        : {
+            id: buildRegisteredEditSessionId(),
+            name: changeName,
+            startedAt: startedAt,
+            userName: user.name,
+            userEmail: user.email,
+            userPhoto: user.photo
+          };
+      state.editSessionStartSubmitting = true;
+      if (els.editSessionStartConfirmBtn) els.editSessionStartConfirmBtn.disabled = true;
+      if (els.editSessionStartCard) setBusy(els.editSessionStartCard, true);
+      setEditSessionStartStatus(selectedRecentSession ? "Reanudando registro de edicion..." : "Creando registro de edicion...", "");
+      return ensureChangeHistorySheet().then(function () {
+        return appendChangeHistoryRows([buildChangeHistoryRow({
+          sessionId: session.id,
+          sessionName: session.name,
+          type: selectedRecentSession ? "REANUDAR_EDICION" : "INICIO_EDICION",
+          timestamp: selectedRecentSession ? new Date().toISOString() : session.startedAt,
+          userName: session.userName,
+          userEmail: session.userEmail,
+          userPhoto: session.userPhoto,
+          documentTitle: state.spreadsheetTitle || currentTitle(),
+          sheetTitle: state.currentSheetTitle || "",
+          target: "Sesion",
+          before: "",
+          after: "",
+          summary: selectedRecentSession ? "Reanudacion de edicion registrada" : "Inicio de edicion registrada"
+        })], { refreshView: true });
+      }).then(function () {
+        state.registeredEditSession = session;
+        state.changeLogPendingRows = [];
+        state.changeLogCellDrafts = {};
+        state.editorMode = "edit";
+        closeEditSessionStartModal(true);
+        applyEditorMode();
+        saveStoredUiSession();
+        return ensureSheetGroupsManagementColumnsForEditing().then(function () {
+          return true;
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setEditSessionStartStatus(messageFromError(err, "No se ha podido iniciar la edicion registrada"), "error");
         return false;
       }).finally(function () {
         state.editSessionStartSubmitting = false;
@@ -18351,10 +18871,16 @@
     if (els.editSessionStartNameInput) {
       els.editSessionStartNameInput.addEventListener("input", function () {
         if (state.editSessionStartDraft) state.editSessionStartDraft.name = String(els.editSessionStartNameInput.value || "");
+        var selectedRecentSession = getSelectedEditSessionStartRecentSession();
+        if (state.editSessionStartDraft && selectedRecentSession && String(els.editSessionStartNameInput.value || "").trim() !== String(selectedRecentSession.sessionName || "").trim()) {
+          state.editSessionStartDraft.selectedSessionId = "";
+          renderEditSessionStartRecentOptions();
+        }
         els.editSessionStartNameInput.classList.remove("is-invalid");
         if (els.editSessionStartStatus && els.editSessionStartStatus.dataset.tone === "error") {
           setEditSessionStartStatus("", "");
         }
+        syncEditSessionStartConfirmBtn();
       });
       els.editSessionStartNameInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
