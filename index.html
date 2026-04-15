@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>paellas.net</title>
 
   <script src="https://accounts.google.com/gsi/client" async defer data-auto_prompt="false"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js" integrity="sha512-pUhApVQtLbnpLtJn6DuzDD5o2xtmLJnJ7oBoMsBnzOkVkpqofGLGPaBJ6ayD2zQe3lCgCibhJBi4cj5wAxwVKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     :root {
       --bg: #ffd84a;
@@ -4741,6 +4742,87 @@
     #editorView { grid-template-rows: auto minmax(0, 1fr); }
     #editorShell { overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 14px 20px; }
     #editorView > .card:last-child { display: grid; min-height: 0; overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-bottom: none; padding: 0 20px 20px; }
+
+    /* ── Desktop layout (≥ 1100 px) ───────────────────────────────── */
+    @media (min-width: 1100px) {
+      /* Ampliar contenedor en pantallas grandes */
+      .app { width: min(1600px, 100vw); }
+
+      /* Topbar con más aire */
+      .topbar { padding: 12px 28px; }
+
+      /* Barra de búsqueda */
+      .drive-header { padding: 14px 28px; }
+      .drive-search-group { max-width: 520px; }
+
+      /* ── Layout de dos columnas en la vista Drive ── */
+      .drive-scroll {
+        grid-template-columns: 320px minmax(0, 1fr);
+        padding: 22px 28px calc(22px + var(--viewport-bottom-offset));
+        gap: 20px;
+        align-items: start;
+        align-content: start;
+      }
+
+      /* Columna izquierda: paellas + dirección */
+      #paellaPanel    { grid-column: 1; grid-row: 1; }
+      #direccionPanel { grid-column: 1; grid-row: 2; }
+
+      /* Columna derecha: unidad + compartidos */
+      #folderSection { grid-column: 2; grid-row: 1; }
+      #sharedSection { grid-column: 2; grid-row: 2; }
+
+      /* Paneles izquierdos más altos en desktop */
+      .paella-panel-content { max-height: min(60vh, 700px); }
+      .paella-panel.is-folder-open .paella-panel-content { max-height: min(72vh, 840px); }
+
+      /* Paneles derechos más altos en desktop */
+      .drive-section-body         { max-height: min(62vh, 720px); }
+      .drive-section-body.compact { max-height: min(40vh, 480px); }
+
+      /* Grid con más columnas para aprovechar el ancho */
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      }
+
+      /* Paella cards en grid más ancho */
+      .paella-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+
+      /* Paella-focus: colapsa a una sola columna (la paella ocupa todo) */
+      .drive-scroll.paella-focus {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr);
+      }
+      .drive-scroll.paella-focus #paellaPanel    { grid-column: 1; grid-row: 1; }
+      .drive-scroll.paella-focus #direccionPanel { grid-column: 1; grid-row: 2; }
+      .drive-scroll.paella-focus #folderSection  { grid-column: 1; grid-row: 3; }
+      .drive-scroll.paella-focus #sharedSection  { grid-column: 1; grid-row: 4; }
+
+      /* Editor: más respiración horizontal */
+      #editorShell { padding: 16px 28px; gap: 12px; }
+      #editorView > .card:last-child { padding: 0 28px 28px; }
+
+      /* Separador visual suave entre columnas (línea vertical) */
+      .drive-scroll::after {
+        display: none; /* decorativo desactivado; la separación la da el gap */
+      }
+    }
+
+    /* ── Extra-wide (≥ 1400 px): columna izquierda algo más ancha ── */
+    @media (min-width: 1400px) {
+      .drive-scroll {
+        grid-template-columns: 360px minmax(0, 1fr);
+        padding: 24px 36px calc(24px + var(--viewport-bottom-offset));
+        gap: 24px;
+      }
+      .topbar { padding: 14px 36px; }
+      .drive-header { padding: 14px 36px; }
+      #editorShell { padding: 18px 36px; }
+      #editorView > .card:last-child { padding: 0 36px 36px; }
+    }
+
     @media (max-width: 860px) {
       .app { width: 100vw; padding: 0; }
       .topbar { padding: 10px 14px; min-height: 48px; gap: 8px; }
@@ -7264,37 +7346,16 @@
       return { displayName, emailAddress, photoLink };
     }
     function loadTokenFromStorage() {
+      // Tokens are kept in memory only — clean up any data persisted by older versions
       try {
-        const raw = localStorage.getItem(AUTH_TOKEN_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.token && parsed.expiry && Date.now() < parsed.expiry - 60000) {
-            state.accessToken = parsed.token;
-            state.accessTokenExpiresAt = parsed.expiry;
-            scheduleTokenRefresh();
-            return true;
-          }
-          localStorage.removeItem(AUTH_TOKEN_KEY);
-        }
-        // Migrate from legacy session key
-        const legacyRaw = localStorage.getItem(AUTH_SESSION_KEY) || localStorage.getItem(LEGACY_AUTH_SESSION_KEY);
-        if (legacyRaw) {
-          const data = JSON.parse(legacyRaw);
-          if (data && data.accessToken && data.expiresAt && Date.now() < data.expiresAt - 60000) {
-            state.accessToken = data.accessToken;
-            state.accessTokenExpiresAt = data.expiresAt;
-            if (data.user && data.user.emailAddress) localStorage.setItem(AUTH_HINT_EMAIL_KEY, data.user.emailAddress);
-            saveTokenToStorage(state.accessToken, state.accessTokenExpiresAt);
-            localStorage.setItem(AUTH_REMEMBER_KEY, "1");
-            scheduleTokenRefresh();
-            return true;
-          }
-        }
-        return false;
-      } catch (e) { return false; }
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_SESSION_KEY);
+        localStorage.removeItem(LEGACY_AUTH_SESSION_KEY);
+      } catch (e) {}
+      return false;
     }
-    function saveTokenToStorage(token, expiry) {
-      try { localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify({ token: token, expiry: expiry })); } catch (e) {}
+    function saveTokenToStorage() {
+      // Tokens are kept in memory only — not persisted to localStorage
     }
     function clearTokenStorage() {
       try {
@@ -7416,7 +7477,6 @@
           }
           state.accessToken = resp.access_token;
           state.accessTokenExpiresAt = Date.now() + (Math.max(60, Number(resp.expires_in) || 3600)) * 1000;
-          saveTokenToStorage(state.accessToken, state.accessTokenExpiresAt);
           localStorage.setItem(AUTH_REMEMBER_KEY, "1");
           const email = (state.currentUser && state.currentUser.emailAddress)
             || localStorage.getItem(AUTH_HINT_EMAIL_KEY);
@@ -7542,8 +7602,8 @@
     function restoreStoredSession() {
       if (state.sessionRestoreInFlight) return state.sessionRestoreInFlight;
       setLoginStatus("Recuperando sesion...");
-      const hasToken = loadTokenFromStorage();
-      if (hasToken || localStorage.getItem(AUTH_REMEMBER_KEY) === "1") {
+      loadTokenFromStorage();
+      if (localStorage.getItem(AUTH_REMEMBER_KEY) === "1") {
         state.sessionRestoreInFlight = openAuthenticatedDrive()
           .then(function () { return true; })
           .catch(function (err) {
@@ -7661,6 +7721,10 @@
     function normalizeFolderColor(value) {
       const color = String(value || "").trim().toLowerCase();
       return /^#[0-9a-f]{6}$/.test(color) ? color : "";
+    }
+    function isValidDriveId(id) {
+      // Drive IDs are alphanumeric + dashes/underscores, or the special alias "root"
+      return typeof id === "string" && /^(root|[-\w]{10,})$/.test(id);
     }
     function hexToRgba(color, alpha) {
       const hex = normalizeFolderColor(color);
@@ -16271,6 +16335,7 @@
       });
     }
     function loadMoveFolders(folderId) {
+      if (!isValidDriveId(folderId)) return Promise.reject(new Error("ID de carpeta no válido"));
       renderMoveBreadcrumbs();
       setBusy(els.moveModalCard, true);
       setMoveStatus("");
@@ -17972,6 +18037,7 @@
       return cloneFolderStack(state.folderStack).map(function (entry) { return entry.name; }).join(" / ");
     }
     function fetchLinkedSheetOptions(folderId) {
+      if (!isValidDriveId(folderId)) return Promise.reject(new Error("ID de carpeta no válido"));
       const query = encodeURIComponent(
         "'" + folderId + "' in parents and trashed=false and mimeType='" + DRIVE_SPREADSHEET_MIME + "'"
       );
@@ -18669,6 +18735,7 @@
     }
     function loadDireccionFolder(folderId, nextStack) {
       if (!folderId) return Promise.resolve([]);
+      if (!isValidDriveId(folderId)) return Promise.reject(new Error("ID de carpeta no válido"));
       if (Array.isArray(nextStack) && nextStack.length) {
         state.activeDireccionStack = cloneFolderStack(nextStack);
       }
@@ -19026,6 +19093,7 @@
       });
     }
     function loadFolder(folderId) {
+      if (!isValidDriveId(folderId)) return Promise.reject(new Error("ID de carpeta no válido"));
       setBusy(els.driveShell, true);
       setDriveStatus("");
       const query = encodeURIComponent(
@@ -19059,6 +19127,7 @@
     }
     function loadPaellaFolder(folderId, nextStack) {
       if (!folderId) return Promise.resolve([]);
+      if (!isValidDriveId(folderId)) return Promise.reject(new Error("ID de carpeta no válido"));
       if (Array.isArray(nextStack) && nextStack.length) {
         state.activePaellaStack = normalizePaellaFolderStack(nextStack);
       }
@@ -19138,6 +19207,7 @@
       });
     }
     function loadPickerFolders(folderId) {
+      if (!isValidDriveId(folderId)) return Promise.reject(new Error("ID de carpeta no válido"));
       renderPickerBreadcrumbs();
       setBusy(els.newSheetModalCard, true);
       setPickerStatus("");
