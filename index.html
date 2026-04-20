@@ -2423,33 +2423,97 @@
       font-size: 12px;
       text-transform: uppercase;
     }
-    .sheet-entries-logo-row {
+    .sheet-entries-logos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .sheet-entries-logo-slot {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sheet-entries-logo-drop {
+      position: relative;
+      height: 80px;
+      border: 1.5px dashed rgba(0,0,0,0.18);
+      border-radius: 10px;
+      background: #fafafa;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color .15s, background .15s;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
     }
-    .sheet-entries-logo-preview {
-      width: 56px;
-      height: 56px;
-      flex: 0 0 auto;
-      border: 1px dashed rgba(0,0,0,0.2);
-      border-radius: 8px;
-      background: #fafafa center/contain no-repeat;
-      position: relative;
+    .sheet-entries-logo-drop:hover,
+    .sheet-entries-logo-drop.drag-over {
+      border-color: var(--accent, #b95a00);
+      background: rgba(185,90,0,0.04);
     }
-    .sheet-entries-logo-preview:empty::after {
-      content: "Sin logo";
+    .sheet-entries-logo-thumb {
       position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      font-size: 10px;
-      color: rgba(0,0,0,0.4);
+      inset: 6px;
+      background: center/contain no-repeat;
     }
-    .sheet-entries-logo-actions {
+    .sheet-entries-logo-thumb:not(:empty) ~ .sheet-entries-logo-drop-hint { display: none; }
+    .sheet-entries-logo-drop-hint {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10px;
+      color: rgba(0,0,0,0.45);
+      text-align: center;
+      line-height: 1.4;
+      padding: 4px;
+      pointer-events: none;
+    }
+    .sheet-entries-logo-drop-hint svg {
+      opacity: 0.45;
+    }
+    .sheet-entries-logo-pick-btn {
+      pointer-events: all;
+      border: none;
+      background: none;
+      padding: 0;
+      color: var(--accent, #b95a00);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .sheet-entries-logo-pick-btn:hover { opacity: 0.8; }
+    .sheet-entries-logo-slot-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      color: rgba(0,0,0,0.5);
+      padding: 0 2px;
+    }
+    .sheet-entries-logo-clear {
+      border: none;
+      background: none;
+      padding: 0 2px;
+      cursor: pointer;
+      font-size: 14px;
+      color: rgba(0,0,0,0.4);
+      line-height: 1;
+    }
+    .sheet-entries-logo-clear:hover { color: #c00; }
+    .ticket-preview-logos {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+    .ticket-preview-logo-img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 2px;
     }
     .sheet-entries-actions {
       display: flex;
@@ -2524,13 +2588,10 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .ticket-preview-logo {
-      width: 34px;
-      height: 34px;
-      background: center/contain no-repeat;
-      flex: 0 0 auto;
+    .ticket-preview-qr-img {
+      display: block;
+      border-radius: 2px;
     }
-    .ticket-preview-logo:empty { display: none; }
     .ticket-preview-body {
       padding: 10px 12px;
       display: grid;
@@ -6427,7 +6488,7 @@
           <div class="sheet-entries-layout">
             <div class="sheet-entries-form">
               <div class="sheet-entries-title">Diseño de entradas</div>
-              <div class="sheet-entries-help">Personaliza la apariencia de los PDFs generados para esta hoja.</div>
+              <div class="sheet-entries-help">Personaliza la apariencia de los PDFs generados. Los cambios se guardan automáticamente en la carpeta "Archivos Entradas" del evento.</div>
               <label class="sheet-entries-field">
                 <span>Nombre del evento</span>
                 <input id="entriesDesignEventName" class="search" type="text" placeholder="Usa el título del documento" maxlength="60">
@@ -6457,19 +6518,56 @@
                 <input id="entriesDesignFooterText" class="search" type="text" value="CÓDIGO INTRANSFERIBLE Y DE UN SOLO USO" maxlength="80">
               </label>
               <div class="sheet-entries-field">
-                <span>Logo</span>
-                <div class="sheet-entries-logo-row">
-                  <div id="entriesDesignLogoPreview" class="sheet-entries-logo-preview" aria-hidden="true"></div>
-                  <div class="sheet-entries-logo-actions">
-                    <button id="entriesDesignLogoBtn" class="btn small" type="button">Subir imagen</button>
-                    <button id="entriesDesignLogoClearBtn" class="btn small" type="button">Quitar</button>
-                    <input id="entriesDesignLogoInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" hidden>
+                <span>Logos (hasta 3)</span>
+                <div class="sheet-entries-logos-grid">
+                  <div class="sheet-entries-logo-slot" id="entriesLogoSlot0" data-slot="0">
+                    <div class="sheet-entries-logo-drop" id="entriesLogoDrop0" data-slot="0">
+                      <div class="sheet-entries-logo-thumb" id="entriesLogoThumb0"></div>
+                      <div class="sheet-entries-logo-drop-hint" id="entriesLogoHint0">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Arrastra o<br><button type="button" class="sheet-entries-logo-pick-btn" data-slot="0">selecciona</button></span>
+                      </div>
+                    </div>
+                    <div class="sheet-entries-logo-slot-foot">
+                      <span>Logo 1</span>
+                      <button type="button" class="sheet-entries-logo-clear hidden" id="entriesLogoClear0" data-slot="0" title="Quitar logo">×</button>
+                    </div>
+                    <input type="file" hidden accept="image/png,image/jpeg,image/jpg,image/webp" id="entriesLogoInput0" data-slot="0">
+                  </div>
+                  <div class="sheet-entries-logo-slot" id="entriesLogoSlot1" data-slot="1">
+                    <div class="sheet-entries-logo-drop" id="entriesLogoDrop1" data-slot="1">
+                      <div class="sheet-entries-logo-thumb" id="entriesLogoThumb1"></div>
+                      <div class="sheet-entries-logo-drop-hint" id="entriesLogoHint1">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Arrastra o<br><button type="button" class="sheet-entries-logo-pick-btn" data-slot="1">selecciona</button></span>
+                      </div>
+                    </div>
+                    <div class="sheet-entries-logo-slot-foot">
+                      <span>Logo 2</span>
+                      <button type="button" class="sheet-entries-logo-clear hidden" id="entriesLogoClear1" data-slot="1" title="Quitar logo">×</button>
+                    </div>
+                    <input type="file" hidden accept="image/png,image/jpeg,image/jpg,image/webp" id="entriesLogoInput1" data-slot="1">
+                  </div>
+                  <div class="sheet-entries-logo-slot" id="entriesLogoSlot2" data-slot="2">
+                    <div class="sheet-entries-logo-drop" id="entriesLogoDrop2" data-slot="2">
+                      <div class="sheet-entries-logo-thumb" id="entriesLogoThumb2"></div>
+                      <div class="sheet-entries-logo-drop-hint" id="entriesLogoHint2">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Arrastra o<br><button type="button" class="sheet-entries-logo-pick-btn" data-slot="2">selecciona</button></span>
+                      </div>
+                    </div>
+                    <div class="sheet-entries-logo-slot-foot">
+                      <span>Logo 3</span>
+                      <button type="button" class="sheet-entries-logo-clear hidden" id="entriesLogoClear2" data-slot="2" title="Quitar logo">×</button>
+                    </div>
+                    <input type="file" hidden accept="image/png,image/jpeg,image/jpg,image/webp" id="entriesLogoInput2" data-slot="2">
                   </div>
                 </div>
-                <div class="sheet-entries-help sheet-entries-help-small">PNG o JPG con fondo transparente preferentemente. Se mostrará en la esquina derecha de la cabecera.</div>
+                <div class="sheet-entries-help sheet-entries-help-small">PNG con fondo transparente preferentemente. Se muestran en la esquina derecha de la cabecera.</div>
               </div>
               <div class="sheet-entries-actions">
                 <button id="entriesDesignResetBtn" class="btn small" type="button">Restablecer</button>
+                <button id="entriesDesignTestBtn" class="btn small" type="button">Entrada de prueba</button>
                 <span id="entriesDesignSaveStatus" class="sheet-entries-save-status" aria-live="polite"></span>
               </div>
             </div>
@@ -6482,16 +6580,16 @@
                       <div id="entriesPreviewEventName" class="ticket-preview-event">ENTRADA OFICIAL</div>
                       <div id="entriesPreviewSubtitle" class="ticket-preview-sub">Grupo: Ejemplo - Responsable</div>
                     </div>
-                    <div id="entriesPreviewLogo" class="ticket-preview-logo"></div>
+                    <div id="entriesPreviewLogos" class="ticket-preview-logos"></div>
                   </div>
                   <div class="ticket-preview-body">
                     <div class="ticket-preview-name">Nombre Apellidos</div>
                     <div class="ticket-preview-qr" aria-hidden="true">
-                      <svg viewBox="0 0 40 40" width="90" height="90"><rect width="40" height="40" fill="#fff"/><g fill="#111"><rect x="2" y="2" width="10" height="10"/><rect x="28" y="2" width="10" height="10"/><rect x="2" y="28" width="10" height="10"/><rect x="16" y="16" width="3" height="3"/><rect x="22" y="18" width="3" height="3"/><rect x="14" y="24" width="3" height="3"/><rect x="24" y="28" width="3" height="3"/><rect x="30" y="22" width="3" height="3"/></g></svg>
+                      <img id="entriesPreviewQrImg" class="ticket-preview-qr-img" alt="QR" width="90" height="90">
                     </div>
                     <dl class="ticket-preview-fields">
                       <div><dt>DNI</dt><dd>00000000A</dd></div>
-                      <div><dt>EMAIL</dt><dd>ejemplo@paellas.net</dd></div>
+                      <div><dt>EMAIL</dt><dd>ejemplo@correo.com</dd></div>
                       <div><dt>TELÉFONO</dt><dd>600 000 000</dd></div>
                     </dl>
                   </div>
@@ -7501,16 +7599,13 @@
       entriesDesignHeaderTextColor: document.getElementById("entriesDesignHeaderTextColor"),
       entriesDesignHeaderTextColorText: document.getElementById("entriesDesignHeaderTextColorText"),
       entriesDesignFooterText: document.getElementById("entriesDesignFooterText"),
-      entriesDesignLogoPreview: document.getElementById("entriesDesignLogoPreview"),
-      entriesDesignLogoBtn: document.getElementById("entriesDesignLogoBtn"),
-      entriesDesignLogoClearBtn: document.getElementById("entriesDesignLogoClearBtn"),
-      entriesDesignLogoInput: document.getElementById("entriesDesignLogoInput"),
       entriesDesignResetBtn: document.getElementById("entriesDesignResetBtn"),
       entriesDesignSaveStatus: document.getElementById("entriesDesignSaveStatus"),
       entriesPreviewHeader: document.getElementById("entriesPreviewHeader"),
       entriesPreviewEventName: document.getElementById("entriesPreviewEventName"),
       entriesPreviewSubtitle: document.getElementById("entriesPreviewSubtitle"),
-      entriesPreviewLogo: document.getElementById("entriesPreviewLogo"),
+      entriesPreviewLogos: document.getElementById("entriesPreviewLogos"),
+      entriesPreviewQrImg: document.getElementById("entriesPreviewQrImg"),
       entriesPreviewFooter: document.getElementById("entriesPreviewFooter"),
       formToolbar: document.getElementById("formToolbar"),
       formToolbarMeta: document.getElementById("formToolbarMeta"),
@@ -11214,14 +11309,16 @@
       const clean = String(name || "").replace(/[\\/:*?"<>|]+/g, "_").trim();
       return clean || (fallback || "archivo");
     }
-    const TICKET_DESIGN_STORAGE_PREFIX = "paellas_ticket_design_v1_";
+    const TICKET_DESIGN_STORAGE_PREFIX = "paellas_ticket_design_v2_";
+    const ENTRADAS_FOLDER_NAME = "Archivos Entradas";
+    const ENTRADAS_CONFIG_FILENAME = "ticket-design.json";
     const DEFAULT_TICKET_DESIGN = {
       eventName: "",
       subtitle: "",
       headerColor: "#b95a00",
       headerTextColor: "#ffffff",
       footerText: "CÓDIGO INTRANSFERIBLE Y DE UN SOLO USO",
-      logoDataUrl: ""
+      logos: ["", "", ""]
     };
     function ticketDesignStorageKey() {
       if (!state.spreadsheetId) return "";
@@ -11245,36 +11342,39 @@
         b: parseInt(clean.slice(5, 7), 16)
       };
     }
-    function loadTicketDesign() {
+    function normalizeTicketDesignFromObj(parsed) {
+      const d = Object.assign({}, DEFAULT_TICKET_DESIGN);
+      if (!parsed || typeof parsed !== "object") return d;
+      d.eventName = typeof parsed.eventName === "string" ? parsed.eventName : "";
+      d.subtitle = typeof parsed.subtitle === "string" ? parsed.subtitle : "";
+      d.headerColor = normalizeHexColor(parsed.headerColor, DEFAULT_TICKET_DESIGN.headerColor);
+      d.headerTextColor = normalizeHexColor(parsed.headerTextColor, DEFAULT_TICKET_DESIGN.headerTextColor);
+      d.footerText = typeof parsed.footerText === "string" ? parsed.footerText : DEFAULT_TICKET_DESIGN.footerText;
+      const rawLogos = Array.isArray(parsed.logos) ? parsed.logos : (parsed.logoDataUrl ? [parsed.logoDataUrl] : []);
+      d.logos = [0, 1, 2].map(function (i) {
+        const v = rawLogos[i];
+        return (typeof v === "string" && v.indexOf("data:image/") === 0) ? v : "";
+      });
+      return d;
+    }
+    function loadTicketDesignFromStorage() {
       const key = ticketDesignStorageKey();
-      const base = Object.assign({}, DEFAULT_TICKET_DESIGN);
-      if (!key) return base;
+      if (!key) return Object.assign({}, DEFAULT_TICKET_DESIGN);
       try {
         const raw = localStorage.getItem(key);
-        if (!raw) return base;
-        const parsed = JSON.parse(raw) || {};
-        base.eventName = typeof parsed.eventName === "string" ? parsed.eventName : "";
-        base.subtitle = typeof parsed.subtitle === "string" ? parsed.subtitle : "";
-        base.headerColor = normalizeHexColor(parsed.headerColor, DEFAULT_TICKET_DESIGN.headerColor);
-        base.headerTextColor = normalizeHexColor(parsed.headerTextColor, DEFAULT_TICKET_DESIGN.headerTextColor);
-        base.footerText = typeof parsed.footerText === "string" ? parsed.footerText : DEFAULT_TICKET_DESIGN.footerText;
-        base.logoDataUrl = typeof parsed.logoDataUrl === "string" && parsed.logoDataUrl.indexOf("data:image/") === 0 ? parsed.logoDataUrl : "";
+        if (!raw) return Object.assign({}, DEFAULT_TICKET_DESIGN);
+        return normalizeTicketDesignFromObj(JSON.parse(raw));
       } catch (err) {
-        console.warn("No se pudo cargar el diseño de entradas:", err);
+        return Object.assign({}, DEFAULT_TICKET_DESIGN);
       }
-      return base;
     }
-    function saveTicketDesign(design) {
+    function saveTicketDesignToStorage(design) {
       const key = ticketDesignStorageKey();
       if (!key) return;
-      try {
-        localStorage.setItem(key, JSON.stringify(design));
-      } catch (err) {
-        console.warn("No se pudo guardar el diseño de entradas:", err);
-      }
+      try { localStorage.setItem(key, JSON.stringify(design)); } catch (err) { }
     }
     function currentTicketDesign() {
-      if (!state.ticketDesign) state.ticketDesign = loadTicketDesign();
+      if (!state.ticketDesign) state.ticketDesign = loadTicketDesignFromStorage();
       return state.ticketDesign;
     }
     function effectiveTicketEventName(design) {
@@ -11282,6 +11382,110 @@
       const override = (d.eventName || "").trim();
       if (override) return override;
       return state.fileMeta && state.fileMeta.title ? state.fileMeta.title : "ENTRADA";
+    }
+    function findOrCreateDriveSubfolder(parentFolderId, folderName) {
+      const query = encodeURIComponent(
+        "'" + parentFolderId + "' in parents and trashed=false and mimeType='application/vnd.google-apps.folder' and name='" + folderName.replace(/'/g, "\\'") + "'"
+      );
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query + "&fields=files(id,name)&supportsAllDrives=true&includeItemsFromAllDrives=true"
+      ).then(function (data) {
+        const files = (data && data.files) || [];
+        if (files.length) return files[0];
+        return fetchJson(
+          "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: folderName, mimeType: "application/vnd.google-apps.folder", parents: [parentFolderId] })
+          }
+        );
+      });
+    }
+    function findDriveFileInFolder(folderId, fileName) {
+      const query = encodeURIComponent(
+        "'" + folderId + "' in parents and trashed=false and name='" + fileName.replace(/'/g, "\\'") + "'"
+      );
+      return fetchJson(
+        "https://www.googleapis.com/drive/v3/files?q=" + query + "&fields=files(id,name)&supportsAllDrives=true&includeItemsFromAllDrives=true"
+      ).then(function (data) {
+        const files = (data && data.files) || [];
+        return files.length ? files[0] : null;
+      });
+    }
+    function uploadDriveJsonFileMultipart(parentFolderId, fileName, jsonContent) {
+      const boundary = "paellas_mp_" + Date.now().toString(36);
+      const meta = JSON.stringify({ name: fileName, parents: [parentFolderId], mimeType: "application/json" });
+      const body = "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+        meta + "\r\n--" + boundary + "\r\nContent-Type: application/json\r\n\r\n" +
+        jsonContent + "\r\n--" + boundary + "--";
+      return authFetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name&supportsAllDrives=true",
+        { method: "POST", headers: { "Content-Type": "multipart/related; boundary=" + boundary }, body: body }
+      ).then(function (res) { return res.json(); });
+    }
+    function updateDriveFileContent(fileId, jsonContent) {
+      return authFetch(
+        "https://www.googleapis.com/upload/drive/v3/files/" + encodeURIComponent(fileId) + "?uploadType=media&fields=id",
+        { method: "PATCH", headers: { "Content-Type": "application/json" }, body: jsonContent }
+      ).then(function (res) { return res.json(); });
+    }
+    function downloadDriveFileText(fileId) {
+      return authFetch(
+        "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId) + "?alt=media"
+      ).then(function (res) { return res.text(); });
+    }
+    function saveTicketDesignToDrive(design) {
+      const parentFolderId = currentFormFolderId && currentFormFolderId();
+      if (!parentFolderId || parentFolderId === "root") return Promise.resolve();
+      const jsonStr = JSON.stringify(Object.assign({ _version: 2 }, design));
+      return findOrCreateDriveSubfolder(parentFolderId, ENTRADAS_FOLDER_NAME).then(function (folder) {
+        state.entradasFolderId = folder.id;
+        if (state.entradasConfigFileId) {
+          return updateDriveFileContent(state.entradasConfigFileId, jsonStr);
+        }
+        return findDriveFileInFolder(folder.id, ENTRADAS_CONFIG_FILENAME).then(function (existing) {
+          if (existing) {
+            state.entradasConfigFileId = existing.id;
+            return updateDriveFileContent(existing.id, jsonStr);
+          }
+          return uploadDriveJsonFileMultipart(folder.id, ENTRADAS_CONFIG_FILENAME, jsonStr).then(function (created) {
+            state.entradasConfigFileId = created.id;
+            return created;
+          });
+        });
+      });
+    }
+    function loadTicketDesignFromDrive() {
+      const parentFolderId = currentFormFolderId && currentFormFolderId();
+      if (!parentFolderId || parentFolderId === "root") return Promise.resolve(null);
+      return findOrCreateDriveSubfolder(parentFolderId, ENTRADAS_FOLDER_NAME).then(function (folder) {
+        state.entradasFolderId = folder.id;
+        return findDriveFileInFolder(folder.id, ENTRADAS_CONFIG_FILENAME);
+      }).then(function (file) {
+        if (!file) return null;
+        state.entradasConfigFileId = file.id;
+        return downloadDriveFileText(file.id).then(function (text) {
+          return normalizeTicketDesignFromObj(JSON.parse(text));
+        });
+      }).catch(function (err) {
+        console.warn("No se pudo cargar el diseño desde Drive:", err);
+        return null;
+      });
+    }
+    function saveTicketDesign(design) {
+      saveTicketDesignToStorage(design);
+      saveTicketDesignToDrive(design).catch(function (err) {
+        console.warn("Drive save failed:", err);
+      });
+    }
+    function generatePreviewQr() {
+      const qrious = window.QRious;
+      if (!qrious || !els.entriesPreviewQrImg) return;
+      try {
+        const qr = new qrious({ value: "PREVIEW-ENTRADA-PRUEBA", size: 180, backgroundAlpha: 1, foreground: "#111", background: "#ffffff" });
+        els.entriesPreviewQrImg.src = qr.toDataURL("image/png");
+      } catch (err) { /* silently ignore */ }
     }
     function updateEntriesDesignPreview() {
       const d = currentTicketDesign();
@@ -11293,18 +11497,35 @@
       }
       if (els.entriesPreviewSubtitle) {
         els.entriesPreviewSubtitle.textContent = d.subtitle ? d.subtitle : "Grupo: Ejemplo - Responsable";
-        els.entriesPreviewSubtitle.style.color = d.headerTextColor;
         els.entriesPreviewSubtitle.style.opacity = "0.88";
       }
-      if (els.entriesPreviewLogo) {
-        els.entriesPreviewLogo.style.backgroundImage = d.logoDataUrl ? "url('" + d.logoDataUrl + "')" : "";
+      if (els.entriesPreviewLogos) {
+        els.entriesPreviewLogos.innerHTML = "";
+        (d.logos || []).forEach(function (url) {
+          if (!url) return;
+          const img = document.createElement("img");
+          img.className = "ticket-preview-logo-img";
+          img.src = url;
+          img.alt = "logo";
+          els.entriesPreviewLogos.appendChild(img);
+        });
       }
-      if (els.entriesDesignLogoPreview) {
-        els.entriesDesignLogoPreview.style.backgroundImage = d.logoDataUrl ? "url('" + d.logoDataUrl + "')" : "";
+      const view = els.sheetEntriesView;
+      if (view) {
+        [0, 1, 2].forEach(function (i) {
+          const thumb = view.querySelector("#entriesLogoThumb" + i);
+          const hint = view.querySelector("#entriesLogoHint" + i);
+          const clearBtn = view.querySelector("#entriesLogoClear" + i);
+          const url = d.logos && d.logos[i];
+          if (thumb) thumb.style.backgroundImage = url ? "url('" + url + "')" : "";
+          if (hint) hint.style.display = url ? "none" : "";
+          if (clearBtn) clearBtn.classList.toggle("hidden", !url);
+        });
       }
       if (els.entriesPreviewFooter) {
         els.entriesPreviewFooter.textContent = d.footerText || DEFAULT_TICKET_DESIGN.footerText;
       }
+      generatePreviewQr();
     }
     function fillEntriesDesignInputs() {
       const d = currentTicketDesign();
@@ -11316,22 +11537,19 @@
       if (els.entriesDesignHeaderTextColorText) els.entriesDesignHeaderTextColorText.value = d.headerTextColor;
       if (els.entriesDesignFooterText) els.entriesDesignFooterText.value = d.footerText || "";
     }
-    let entriesDesignSaveStatusTimer = 0;
+    var entriesDesignSaveStatusTimer = 0;
     function showEntriesDesignSaveStatus(text, variant) {
       if (!els.entriesDesignSaveStatus) return;
       els.entriesDesignSaveStatus.textContent = text || "";
       els.entriesDesignSaveStatus.classList.toggle("is-good", variant === "good");
-      if (entriesDesignSaveStatusTimer) {
-        clearTimeout(entriesDesignSaveStatusTimer);
-        entriesDesignSaveStatusTimer = 0;
-      }
+      if (entriesDesignSaveStatusTimer) { clearTimeout(entriesDesignSaveStatusTimer); entriesDesignSaveStatusTimer = 0; }
       if (text) {
         entriesDesignSaveStatusTimer = setTimeout(function () {
           if (els.entriesDesignSaveStatus) {
             els.entriesDesignSaveStatus.textContent = "";
             els.entriesDesignSaveStatus.classList.remove("is-good");
           }
-        }, 1800);
+        }, 2200);
       }
     }
     function commitTicketDesignField(patch) {
@@ -11339,7 +11557,7 @@
       Object.assign(d, patch);
       saveTicketDesign(d);
       updateEntriesDesignPreview();
-      showEntriesDesignSaveStatus("Guardado", "good");
+      showEntriesDesignSaveStatus("Guardado en Drive", "good");
     }
     function resizeLogoImage(dataUrl, maxSize) {
       return new Promise(function (resolve, reject) {
@@ -11352,54 +11570,61 @@
             const canvas = document.createElement("canvas");
             canvas.width = w;
             canvas.height = h;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, w, h);
+            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
             resolve(canvas.toDataURL("image/png"));
-          } catch (err) {
-            reject(err);
-          }
+          } catch (err) { reject(err); }
         };
         img.onerror = function () { reject(new Error("Imagen inválida")); };
         img.src = dataUrl;
       });
     }
-    function handleEntriesLogoFile(file) {
+    function handleEntriesLogoFile(file, slotIndex) {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function () {
         const raw = reader.result;
         if (typeof raw !== "string") return;
-        resizeLogoImage(raw, 320).then(function (resized) {
-          commitTicketDesignField({ logoDataUrl: resized });
+        resizeLogoImage(raw, 400).then(function (resized) {
+          const d = currentTicketDesign();
+          const logos = (d.logos || ["", "", ""]).slice();
+          logos[slotIndex] = resized;
+          commitTicketDesignField({ logos: logos });
         }).catch(function (err) {
           console.warn(err);
           showEntriesDesignSaveStatus("No se pudo cargar la imagen");
         });
       };
-      reader.onerror = function () {
-        showEntriesDesignSaveStatus("No se pudo leer el archivo");
-      };
+      reader.onerror = function () { showEntriesDesignSaveStatus("No se pudo leer el archivo"); };
       reader.readAsDataURL(file);
     }
     function renderEntriesDesignerView() {
-      state.ticketDesign = loadTicketDesign();
+      state.ticketDesign = loadTicketDesignFromStorage();
       fillEntriesDesignInputs();
       updateEntriesDesignPreview();
+      state.entradasConfigFileId = state.entradasConfigFileId || null;
+      showEntriesDesignSaveStatus("Cargando desde Drive…");
+      loadTicketDesignFromDrive().then(function (driveDesign) {
+        if (!driveDesign) { showEntriesDesignSaveStatus(""); return; }
+        state.ticketDesign = driveDesign;
+        saveTicketDesignToStorage(driveDesign);
+        fillEntriesDesignInputs();
+        updateEntriesDesignPreview();
+        showEntriesDesignSaveStatus("Diseño cargado desde Drive", "good");
+      }).catch(function () { showEntriesDesignSaveStatus(""); });
     }
     function bindEntriesDesignerHandlers() {
       if (!els.sheetEntriesView) return;
-      const onTextCommit = function (field, source) {
+      function onTextCommit(field, source) {
         if (!source) return;
         source.addEventListener("input", function () {
-          const patch = {};
-          patch[field] = source.value;
+          const patch = {}; patch[field] = source.value;
           commitTicketDesignField(patch);
         });
-      };
+      }
       onTextCommit("eventName", els.entriesDesignEventName);
       onTextCommit("subtitle", els.entriesDesignSubtitle);
       onTextCommit("footerText", els.entriesDesignFooterText);
-      const bindColorPair = function (field, colorInput, textInput) {
+      function bindColorPair(field, colorInput, textInput) {
         if (!colorInput || !textInput) return;
         colorInput.addEventListener("input", function () {
           const val = normalizeHexColor(colorInput.value, DEFAULT_TICKET_DESIGN[field]);
@@ -11409,36 +11634,97 @@
         });
         textInput.addEventListener("change", function () {
           const val = normalizeHexColor(textInput.value, colorInput.value);
-          textInput.value = val;
-          colorInput.value = val;
+          textInput.value = val; colorInput.value = val;
           const patch = {}; patch[field] = val;
           commitTicketDesignField(patch);
         });
-      };
+      }
       bindColorPair("headerColor", els.entriesDesignHeaderColor, els.entriesDesignHeaderColorText);
       bindColorPair("headerTextColor", els.entriesDesignHeaderTextColor, els.entriesDesignHeaderTextColorText);
-      if (els.entriesDesignLogoBtn && els.entriesDesignLogoInput) {
-        els.entriesDesignLogoBtn.addEventListener("click", function () {
-          els.entriesDesignLogoInput.click();
-        });
-        els.entriesDesignLogoInput.addEventListener("change", function () {
-          const file = els.entriesDesignLogoInput.files && els.entriesDesignLogoInput.files[0];
-          handleEntriesLogoFile(file);
-          els.entriesDesignLogoInput.value = "";
-        });
-      }
-      if (els.entriesDesignLogoClearBtn) {
-        els.entriesDesignLogoClearBtn.addEventListener("click", function () {
-          commitTicketDesignField({ logoDataUrl: "" });
-        });
-      }
+      [0, 1, 2].forEach(function (i) {
+        const dropZone = els.sheetEntriesView.querySelector("#entriesLogoDrop" + i);
+        const fileInput = els.sheetEntriesView.querySelector("#entriesLogoInput" + i);
+        const clearBtn = els.sheetEntriesView.querySelector("#entriesLogoClear" + i);
+        const pickBtn = els.sheetEntriesView.querySelector(".sheet-entries-logo-pick-btn[data-slot='" + i + "']");
+        if (dropZone && fileInput) {
+          dropZone.addEventListener("click", function (e) {
+            if (e.target === pickBtn || (pickBtn && pickBtn.contains(e.target))) return;
+            fileInput.click();
+          });
+          pickBtn && pickBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            fileInput.click();
+          });
+          dropZone.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            dropZone.classList.add("drag-over");
+          });
+          dropZone.addEventListener("dragleave", function () {
+            dropZone.classList.remove("drag-over");
+          });
+          dropZone.addEventListener("drop", function (e) {
+            e.preventDefault();
+            dropZone.classList.remove("drag-over");
+            const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+            if (file && file.type.indexOf("image/") === 0) handleEntriesLogoFile(file, i);
+          });
+          fileInput.addEventListener("change", function () {
+            const file = fileInput.files && fileInput.files[0];
+            if (file) handleEntriesLogoFile(file, i);
+            fileInput.value = "";
+          });
+        }
+        if (clearBtn) {
+          clearBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const d = currentTicketDesign();
+            const logos = (d.logos || ["", "", ""]).slice();
+            logos[i] = "";
+            commitTicketDesignField({ logos: logos });
+          });
+        }
+      });
       if (els.entriesDesignResetBtn) {
         els.entriesDesignResetBtn.addEventListener("click", function () {
-          state.ticketDesign = Object.assign({}, DEFAULT_TICKET_DESIGN);
+          state.ticketDesign = Object.assign({}, DEFAULT_TICKET_DESIGN, { logos: ["", "", ""] });
+          state.entradasConfigFileId = null;
           saveTicketDesign(state.ticketDesign);
           fillEntriesDesignInputs();
           updateEntriesDesignPreview();
           showEntriesDesignSaveStatus("Restablecido", "good");
+        });
+      }
+      const testBtn = els.sheetEntriesView.querySelector("#entriesDesignTestBtn");
+      if (testBtn) {
+        testBtn.addEventListener("click", function () {
+          const design = currentTicketDesign();
+          const samplePeople = [{
+            name: "Nombre Apellidos",
+            role: "responsable",
+            number: "01",
+            groupTitle: "Grupo de prueba",
+            dni: "00000000A",
+            email: "ejemplo@correo.com",
+            phone: "600 000 000",
+            info: "Entrada normal",
+            sheetRow: 1,
+            code: "PREVIEW-SAMPLE"
+          }];
+          testBtn.disabled = true;
+          testBtn.textContent = "Generando…";
+          renderTicketPdfBlob(samplePeople, {
+            spreadsheetId: "preview",
+            sheetTitle: "Hoja1",
+            eventName: effectiveTicketEventName(design),
+            design: design
+          }).then(function (blob) {
+            downloadBlob(blob, "entrada-prueba.pdf");
+          }).catch(function (err) {
+            showEntriesDesignSaveStatus(messageFromError(err, "Error al generar la entrada"));
+          }).finally(function () {
+            testBtn.disabled = false;
+            testBtn.textContent = "Entrada de prueba";
+          });
         });
       }
     }
@@ -11474,8 +11760,8 @@
         let eventName = String(config.eventName || "ENTRADA OFICIAL").trim();
         if (eventName.length > 32) eventName = eventName.substring(0, 30) + "...";
 
-        const hasLogo = !!design.logoDataUrl;
-        const titleMaxWidth = hasLogo ? 68 : 85;
+        const activeLogos = (design.logos || []).filter(function (l) { return !!l; });
+        const titleMaxWidth = activeLogos.length ? 68 : 85;
         doc.setFontSize(14);
         doc.text(eventName, 10, 13, { maxWidth: titleMaxWidth });
 
@@ -11493,13 +11779,20 @@
         );
         doc.text(headerSubText, 10, 21, { maxWidth: titleMaxWidth });
 
-        if (hasLogo) {
-          try {
-            const logoFormat = design.logoDataUrl.indexOf("data:image/jpeg") === 0 ? "JPEG" : "PNG";
-            doc.addImage(design.logoDataUrl, logoFormat, 82, 4, 18, 18, undefined, "FAST");
-          } catch (logoErr) {
-            console.warn("No se pudo insertar el logo en el PDF:", logoErr);
-          }
+        if (activeLogos.length) {
+          const logoSize = activeLogos.length === 1 ? 18 : (activeLogos.length === 2 ? 14 : 11);
+          const logoGap = 2;
+          const totalW = activeLogos.length * logoSize + (activeLogos.length - 1) * logoGap;
+          var lx = 95 - totalW;
+          activeLogos.forEach(function (logoUrl) {
+            try {
+              const fmt = logoUrl.indexOf("data:image/jpeg") === 0 ? "JPEG" : "PNG";
+              doc.addImage(logoUrl, fmt, lx, 4, logoSize, logoSize, undefined, "FAST");
+            } catch (err) {
+              console.warn("No se pudo insertar el logo:", err);
+            }
+            lx += logoSize + logoGap;
+          });
         }
         
         // QR Code (Right aligned)
@@ -20167,6 +20460,8 @@
       state.canEdit = true;
       state.spreadsheetId = "";
       state.ticketDesign = null;
+      state.entradasFolderId = null;
+      state.entradasConfigFileId = null;
       state.spreadsheetSheets = [];
       state.currentSheetTitle = "";
       state.sheetData = {};
@@ -20252,6 +20547,8 @@
       state._loadedFormItemIds = [];
       state.spreadsheetId = item.id;
       state.ticketDesign = null;
+      state.entradasFolderId = null;
+      state.entradasConfigFileId = null;
       state.spreadsheetTitle = item.name || "Google Sheets";
       state.savedSpreadsheetTitle = state.spreadsheetTitle;
       state.spreadsheetSheets = [];
