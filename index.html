@@ -11739,61 +11739,94 @@
       const headerTextRgb = hexToRgb(design.headerTextColor || DEFAULT_TICKET_DESIGN.headerTextColor);
       const subtitleOverride = (design.subtitle || "").trim();
       const footerText = (design.footerText || DEFAULT_TICKET_DESIGN.footerText).trim() || DEFAULT_TICKET_DESIGN.footerText;
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [105, 148] });
+      const activeLogos = (design.logos || []).filter(function (l) { return !!l; });
 
-      people.forEach(function (person, index) {
-        if (index > 0) doc.addPage([105, 148], "portrait");
-        const qrText = buildTicketQrText(config.spreadsheetId, config.sheetTitle, person.sheetRow, person.role, person.number, person.code);
-        const qrDataUrl = createQrDataUrl(qrText);
+      function loadImgDims(dataUrl) {
+        return new Promise(function (resolve) {
+          const img = new Image();
+          img.onload = function () { resolve({ w: img.naturalWidth || 1, h: img.naturalHeight || 1 }); };
+          img.onerror = function () { resolve({ w: 1, h: 1 }); };
+          img.src = dataUrl;
+        });
+      }
 
-        // Full bleed white background
-        doc.setFillColor(255, 255, 255);
-        doc.rect(0, 0, 105, 148, "F");
+      return Promise.all(activeLogos.map(loadImgDims)).then(function (logoDims) {
+        // Logo slot layout: max height 18mm, slot width proportional to aspect ratio capped at 28mm each
+        const LOGO_MAX_H = 18;
+        const LOGO_MAX_W = 28;
+        const LOGO_GAP = 3;
+        const HEADER_RIGHT = 95;
+        const TEXT_LEFT = 10;
 
-        // Header (Primary Color)
-        doc.setFillColor(headerRgb.r, headerRgb.g, headerRgb.b);
-        doc.rect(0, 0, 105, 26, "F");
+        const slotWidths = logoDims.map(function (dim) {
+          const ratio = dim.w / dim.h;
+          return Math.min(LOGO_MAX_W, Math.round(LOGO_MAX_H * ratio * 10) / 10);
+        });
+        const totalLogoW = slotWidths.reduce(function (s, w) { return s + w; }, 0) + (activeLogos.length - 1) * LOGO_GAP;
+        const logoGroupX = activeLogos.length ? (HEADER_RIGHT - totalLogoW) : HEADER_RIGHT;
+        const titleMaxWidth = activeLogos.length ? Math.max(20, logoGroupX - TEXT_LEFT - 4) : 85;
 
-        doc.setTextColor(headerTextRgb.r, headerTextRgb.g, headerTextRgb.b);
-        doc.setFont("helvetica", "bold");
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [105, 148] });
 
-        let eventName = String(config.eventName || "ENTRADA OFICIAL").trim();
-        if (eventName.length > 32) eventName = eventName.substring(0, 30) + "...";
+        people.forEach(function (person, index) {
+          if (index > 0) doc.addPage([105, 148], "portrait");
+          const qrText = buildTicketQrText(config.spreadsheetId, config.sheetTitle, person.sheetRow, person.role, person.number, person.code);
+          const qrDataUrl = createQrDataUrl(qrText);
 
-        const activeLogos = (design.logos || []).filter(function (l) { return !!l; });
-        const titleMaxWidth = activeLogos.length ? 68 : 85;
-        doc.setFontSize(14);
-        doc.text(eventName, 10, 13, { maxWidth: titleMaxWidth });
+          doc.setFillColor(255, 255, 255);
+          doc.rect(0, 0, 105, 148, "F");
 
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
+          doc.setFillColor(headerRgb.r, headerRgb.g, headerRgb.b);
+          doc.rect(0, 0, 105, 26, "F");
 
-        const roleInGroup = person.role === "responsable" ? "Responsable" : ("Asistente #" + (person.number || ""));
-        const groupText = "Grupo: " + String(person.groupTitle || "Sin Grupo").substring(0, 50) + " - " + roleInGroup;
-        const headerSubText = subtitleOverride ? (subtitleOverride + " · " + groupText) : groupText;
+          doc.setTextColor(headerTextRgb.r, headerTextRgb.g, headerTextRgb.b);
+          doc.setFont("helvetica", "bold");
 
-        doc.setTextColor(
-          Math.round(headerTextRgb.r * 0.85 + 255 * 0.15),
-          Math.round(headerTextRgb.g * 0.85 + 230 * 0.15),
-          Math.round(headerTextRgb.b * 0.85 + 200 * 0.15)
-        );
-        doc.text(headerSubText, 10, 21, { maxWidth: titleMaxWidth });
+          let eventName = String(config.eventName || "ENTRADA OFICIAL").trim();
+          if (eventName.length > 32) eventName = eventName.substring(0, 30) + "...";
 
-        if (activeLogos.length) {
-          const logoSize = activeLogos.length === 1 ? 18 : (activeLogos.length === 2 ? 14 : 11);
-          const logoGap = 2;
-          const totalW = activeLogos.length * logoSize + (activeLogos.length - 1) * logoGap;
-          var lx = 95 - totalW;
-          activeLogos.forEach(function (logoUrl) {
-            try {
-              const fmt = logoUrl.indexOf("data:image/jpeg") === 0 ? "JPEG" : "PNG";
-              doc.addImage(logoUrl, fmt, lx, 4, logoSize, logoSize, undefined, "FAST");
-            } catch (err) {
-              console.warn("No se pudo insertar el logo:", err);
-            }
-            lx += logoSize + logoGap;
-          });
-        }
+          doc.setFontSize(14);
+          doc.text(eventName, 10, 13, { maxWidth: titleMaxWidth });
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+
+          const roleInGroup = person.role === "responsable" ? "Responsable" : ("Asistente #" + (person.number || ""));
+          const groupText = "Grupo: " + String(person.groupTitle || "Sin Grupo").substring(0, 50) + " - " + roleInGroup;
+          const headerSubText = subtitleOverride ? (subtitleOverride + " · " + groupText) : groupText;
+
+          doc.setTextColor(
+            Math.round(headerTextRgb.r * 0.85 + 255 * 0.15),
+            Math.round(headerTextRgb.g * 0.85 + 230 * 0.15),
+            Math.round(headerTextRgb.b * 0.85 + 200 * 0.15)
+          );
+          doc.text(headerSubText, 10, 21, { maxWidth: titleMaxWidth });
+
+          if (activeLogos.length) {
+            var lx = logoGroupX;
+            activeLogos.forEach(function (logoUrl, li) {
+              const dim = logoDims[li];
+              const slotW = slotWidths[li];
+              const ratio = dim.w / dim.h;
+              let drawW, drawH;
+              if (ratio >= 1) {
+                drawW = slotW;
+                drawH = slotW / ratio;
+              } else {
+                drawH = LOGO_MAX_H;
+                drawW = LOGO_MAX_H * ratio;
+              }
+              const drawX = lx + (slotW - drawW) / 2;
+              const drawY = 4 + (LOGO_MAX_H - drawH) / 2;
+              try {
+                const fmt = logoUrl.indexOf("data:image/jpeg") === 0 ? "JPEG" : "PNG";
+                doc.addImage(logoUrl, fmt, drawX, drawY, drawW, drawH, undefined, "FAST");
+              } catch (err) {
+                console.warn("No se pudo insertar el logo:", err);
+              }
+              lx += slotW + LOGO_GAP;
+            });
+          }
         
         // QR Code (Right aligned)
         doc.addImage(qrDataUrl, "PNG", 64, 34, 32, 32);
@@ -11849,9 +11882,10 @@
         doc.setTextColor(150, 150, 150);
         doc.setFont("helvetica", "normal");
         doc.text(footerText, 10, 140, { maxWidth: 85 });
-        
-      });
-      return Promise.resolve(doc.output("blob"));
+
+        }); // end people.forEach
+        return doc.output("blob");
+      }); // end Promise.all logoDims
     }
     function downloadBlob(blob, fileName) {
       const url = URL.createObjectURL(blob);
