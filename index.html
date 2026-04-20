@@ -2375,109 +2375,130 @@
       animation: none !important;
     }
     .sheet-groups-toolbar {
-      display: grid;
-      gap: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px 12px;
       align-content: start;
-      position: relative;
+      position: sticky;
+      top: 0;
       z-index: 12;
-      padding: 10px 12px 10px;
+      padding: 8px 12px;
       border: none;
       border-bottom: 1px solid rgba(0,0,0,0.07);
       border-radius: 0;
-      background: transparent;
+      background: rgba(255, 250, 240, 0.9);
+      backdrop-filter: saturate(1.3) blur(10px);
+      -webkit-backdrop-filter: saturate(1.3) blur(10px);
       box-shadow: none;
       isolation: isolate;
       overflow: visible;
     }
     .sheet-groups-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px;
-      padding: 4px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(185, 90, 0, 0.05);
-      border: 1px solid rgba(0,0,0,0.02);
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      border: 0;
+      min-width: 0;
     }
     .sheet-groups-stat {
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      padding: 8px 10px;
-      display: grid;
-      gap: 2px;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 999px;
+      background: #fff;
+      padding: 4px 11px;
+      display: inline-flex;
+      align-items: center;
       min-width: 0;
-      box-shadow: none;
-      transition: background .15s ease;
+      box-shadow: 0 1px 2px rgba(185, 90, 0, 0.04);
+      transition: background .15s ease, border-color .15s ease;
       animation: none;
     }
+    .sheet-groups-stat:nth-child(1) { border-color: rgba(44, 122, 65, 0.18); background: rgba(44, 122, 65, 0.06); }
     .sheet-groups-stat:nth-child(1) .sheet-groups-stat-value { color: #2c7a41; }
+    .sheet-groups-stat:nth-child(2) { border-color: rgba(76, 108, 166, 0.18); background: rgba(76, 108, 166, 0.06); }
     .sheet-groups-stat:nth-child(2) .sheet-groups-stat-value { color: #4c6ca6; }
+    .sheet-groups-stat:nth-child(3) { border-color: rgba(161, 98, 34, 0.18); background: rgba(161, 98, 34, 0.06); }
     .sheet-groups-stat:nth-child(3) .sheet-groups-stat-value { color: #a16222; }
     .sheet-groups-stat:nth-child(4) .sheet-groups-stat-value { color: #2c7a41; }
-    .sheet-groups-stat:hover {
-      background: #fdfbf7;
-    }
+    .sheet-groups-stat:hover { filter: brightness(1.02); }
     .sheet-groups-stat-label {
-      font-size: 0.58rem;
+      font-size: 0.6rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.06em;
       font-weight: 700;
+      margin-right: 6px;
     }
     .sheet-groups-stat-value {
-      font-size: 1.05rem;
-      font-weight: 800;
+      font-size: 0.78rem;
+      font-weight: 700;
       line-height: 1.15;
       min-width: 0;
       color: var(--ink);
+      white-space: nowrap;
     }
     .sheet-groups-stat-meta {
-      font-size: 0.6rem;
+      font-size: 0.68rem;
       color: var(--muted);
       line-height: 1.2;
+      margin-left: 6px;
     }
     .sheet-groups-filters {
-      display: flex;
-      gap: 8px;
-      align-items: end;
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
       transition: opacity 0.2s ease, transform 0.2s ease;
+      min-width: 0;
+      margin-left: auto;
     }
     .sheet-groups-filter-btn-mobile {
       display: none;
     }
     .sheet-groups-filter {
-      display: grid;
+      display: inline-flex;
+      align-items: center;
       gap: 6px;
       min-width: 0;
-      flex: 1 1 0;
     }
     .sheet-groups-filter span {
-      font-size: 0.64rem;
+      font-size: 0.66rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       font-weight: 700;
+      white-space: nowrap;
     }
     .sheet-groups-filter-select {
-      width: 100%;
       min-width: 0;
-      min-height: 42px;
-      border: none;
-      border-bottom: 2px solid rgba(185,90,0,0.12);
-      border-radius: 12px 12px 4px 4px;
-      background: rgba(185,90,0,0.02);
+      min-height: 30px;
+      border: 1px solid rgba(185,90,0,0.16);
+      border-radius: 999px;
+      background: #fff;
       color: var(--ink);
       font: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      padding: 10px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 24px 4px 10px;
       outline: none;
-      transition: border-color .2s ease, background .2s ease;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23a16222' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color .2s ease, background-color .2s ease;
     }
+    .sheet-groups-filter-select:hover { border-color: rgba(185,90,0,0.34); }
     .sheet-groups-filter-select:focus {
-      border-color: rgba(185,90,0,0.4);
-      background: rgba(185,90,0,0.05);
+      border-color: rgba(185,90,0,0.5);
+      box-shadow: 0 0 0 3px rgba(185,90,0,0.12);
     }
     .sheet-group-card {
       border: none;
@@ -2525,78 +2546,93 @@
       background: transparent;
       color: #5d3a10;
       border-radius: 0;
-      padding: 14px 12px 10px;
+      padding: 10px 12px 8px;
       margin-bottom: 0;
       border: none;
       box-shadow: none;
     }
     .sheet-groups-banner-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      min-width: 0;
+      display: none;
     }
     .sheet-groups-banner-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: rgba(93,58,16,0.55);
+      display: none;
     }
     .sheet-groups-banner-meta {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      color: rgba(93,58,16,0.45);
-      text-align: right;
+      color: rgba(93,58,16,0.55);
+      white-space: nowrap;
     }
     .sheet-groups-banner-search-wrap {
       width: 100%;
       min-width: 0;
+      position: relative;
     }
     .sheet-groups-banner-search {
       width: 100%;
       min-width: 0;
+      padding-left: 38px;
+    }
+    .sheet-groups-banner-search-wrap::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      margin-top: -8px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a16222' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat center / contain;
+      pointer-events: none;
+      opacity: 0.7;
     }
     .sheet-groups-banner-pricing {
-      display: grid;
+      display: flex;
       gap: 6px;
       min-width: 0;
+      flex-wrap: wrap;
+      align-items: center;
     }
     .sheet-groups-banner-price-row {
       display: flex;
-      align-items: end;
-      gap: 8px;
+      align-items: center;
+      gap: 6px;
       min-width: 0;
+      flex: 1 1 auto;
     }
     .sheet-groups-banner-price-field {
       flex: 1 1 auto;
       min-width: 0;
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 0 2px;
     }
     .sheet-groups-banner-price-label {
       font-size: 0.68rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: rgba(93,58,16,0.5);
+      color: rgba(93,58,16,0.55);
+      white-space: nowrap;
+      flex: 0 0 auto;
     }
     .sheet-groups-banner-price-input {
-      width: 100%;
+      flex: 1 1 auto;
       min-width: 0;
+      padding: 6px 10px;
+      font-size: 0.82rem;
     }
     .sheet-groups-banner-price-apply {
       appearance: none;
       border: 1px solid rgba(143,102,41,0.28);
       background: #f6edd4;
       color: #5d3a10;
-      border-radius: 12px;
-      height: 36px;
-      padding: 0 12px;
+      border-radius: 999px;
+      height: 30px;
+      padding: 0 14px;
       font: inherit;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       line-height: 1;
       white-space: nowrap;
@@ -4369,39 +4405,68 @@
       border-right-width: 3px;
       border-bottom-right-radius: 10px;
     }
+    button.ticket-reader-camera-placeholder {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      text-align: center;
+    }
     .ticket-reader-camera-placeholder {
       display: grid;
       place-items: center;
       padding: 26px;
+      transition: background 0.2s ease;
+    }
+    .ticket-reader-camera-placeholder:hover,
+    .ticket-reader-camera-placeholder:focus-visible {
+      background: rgba(255,255,255,0.04);
+      outline: none;
+    }
+    .ticket-reader-camera-placeholder:focus-visible .ticket-reader-camera-placeholder-icon {
+      box-shadow: 0 0 0 3px rgba(255, 221, 138, 0.35);
     }
     .ticket-reader-camera-placeholder-inner {
       width: min(100%, 420px);
       display: grid;
-      gap: 14px;
+      gap: 12px;
       justify-items: center;
       text-align: center;
       color: rgba(255,255,255,0.92);
     }
     .ticket-reader-camera-placeholder-icon {
-      width: 88px;
-      height: 88px;
-      border-radius: 24px;
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
       display: grid;
       place-items: center;
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+    .ticket-reader-camera-placeholder:hover .ticket-reader-camera-placeholder-icon {
+      transform: translateY(-1px);
+      background: rgba(255, 218, 138, 0.16);
     }
     .ticket-reader-camera-placeholder-icon svg {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       fill: #fff6da;
       opacity: 0.94;
     }
     .ticket-reader-camera-placeholder-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+    .ticket-reader-camera-placeholder-hint {
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: rgba(255, 248, 220, 0.7);
+      max-width: 32ch;
     }
     .ticket-reader-stage-camera {
       display: block;
@@ -4417,13 +4482,51 @@
     .ticket-reader-panel-block {
       display: grid;
       gap: 10px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(185, 90, 0, 0.08);
-      background: rgba(255, 253, 248, 0.65);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      padding: 0;
+      border-radius: 0;
+      border: none;
+      background: transparent;
     }
+    .ticket-reader-camera-toggle {
+      margin-left: auto;
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(185, 90, 0, 0.18);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 244, 218, 0.95) 100%);
+      color: var(--accent2);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+    .ticket-reader-camera-toggle:hover {
+      background: linear-gradient(180deg, #fff 0%, rgba(255, 237, 195, 0.98) 100%);
+      border-color: rgba(185, 90, 0, 0.32);
+    }
+    .ticket-reader-camera-toggle:active { transform: translateY(0.5px); }
+    .ticket-reader-camera-toggle-icon {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+    .ticket-reader-camera-toggle .ticket-reader-camera-toggle-stop { display: none; }
+    .ticket-reader-camera-toggle.is-active {
+      background: rgba(156, 30, 30, 0.08);
+      border-color: rgba(156, 30, 30, 0.25);
+      color: #a23030;
+    }
+    .ticket-reader-camera-toggle.is-active:hover {
+      background: rgba(156, 30, 30, 0.14);
+      border-color: rgba(156, 30, 30, 0.38);
+    }
+    .ticket-reader-camera-toggle.is-active .ticket-reader-camera-toggle-play { display: none; }
+    .ticket-reader-camera-toggle.is-active .ticket-reader-camera-toggle-stop { display: inline-block; }
     .ticket-reader-controls {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -5215,6 +5318,7 @@
         transform: translateY(0) scale(1);
       }
       .sheet-groups-filters .sheet-groups-filter {
+        display: grid;
         gap: 4px;
       }
       .sheet-groups-filters .sheet-groups-filter:nth-child(3) {
@@ -5226,9 +5330,10 @@
       }
       .sheet-groups-filters .sheet-groups-filter-select {
         min-height: 36px;
-        padding: 7px 10px;
+        padding: 7px 28px 7px 10px;
         font-size: 0.78rem;
-        border-radius: 10px 10px 4px 4px;
+        border-radius: 10px;
+        width: 100%;
       }
       
       .sheet-groups-banner {
@@ -6623,9 +6728,18 @@
           <div class="ticket-reader-hero">
             <div id="ticketReaderLiveBadge" class="ticket-reader-live-badge">Inactiva</div>
             <button id="ticketReaderSheetBadge" class="ticket-reader-sheet-badge hidden" type="button" aria-label="Cambiar hoja de respuestas"></button>
+            <button id="ticketReaderCameraToggleBtn" class="ticket-reader-camera-toggle" type="button" aria-label="Iniciar o detener la cámara">
+              <svg class="ticket-reader-camera-toggle-icon ticket-reader-camera-toggle-play" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 8.5a2.5 2.5 0 0 0-2.5-2.5H16l-1.2-1.6a2 2 0 0 0-1.6-.8h-2.4a2 2 0 0 0-1.6.8L8 6H5.5A2.5 2.5 0 0 0 3 8.5V18a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-9 9.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"></path>
+              </svg>
+              <svg class="ticket-reader-camera-toggle-icon ticket-reader-camera-toggle-stop" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="7" y="7" width="10" height="10" rx="1.5"></rect>
+              </svg>
+              <span class="ticket-reader-camera-toggle-label">Cámara</span>
+            </button>
           </div>
           <div class="ticket-reader-camera-shell">
-            <div id="ticketReaderCameraPlaceholder" class="ticket-reader-camera-placeholder">
+            <button id="ticketReaderCameraPlaceholder" class="ticket-reader-camera-placeholder" type="button" aria-label="Activar cámara">
               <div class="ticket-reader-camera-placeholder-inner">
                 <div class="ticket-reader-camera-placeholder-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24">
@@ -6640,9 +6754,10 @@
                     <rect x="11" y="15" width="2" height="2" rx="0.4"></rect>
                   </svg>
                 </div>
-                <div class="ticket-reader-camera-placeholder-title">Pulsa Cámara para escanear</div>
+                <div class="ticket-reader-camera-placeholder-title">Toca para activar la cámara</div>
+                <div class="ticket-reader-camera-placeholder-hint">Apunta al QR o busca por nombre / DNI abajo</div>
               </div>
-            </div>
+            </button>
         <div class="ticket-reader-controls ticket-reader-stage-camera" aria-hidden="true">
           <label class="ticket-reader-field">
             <span>Hoja de respuestas</span>
@@ -7256,6 +7371,7 @@
       ticketReaderLiveBadge: document.getElementById("ticketReaderLiveBadge"),
       ticketReaderSheetBadge: document.getElementById("ticketReaderSheetBadge"),
       ticketReaderCameraPlaceholder: document.getElementById("ticketReaderCameraPlaceholder"),
+      ticketReaderCameraToggleBtn: document.getElementById("ticketReaderCameraToggleBtn"),
       ticketReaderStatusCard: document.getElementById("ticketReaderStatusCard"),
       ticketReaderStatus: document.getElementById("ticketReaderStatus"),
       ticketReaderResults: document.getElementById("ticketReaderResults"),
@@ -10312,6 +10428,12 @@
       if (els.ticketReaderLiveBadge) {
         els.ticketReaderLiveBadge.textContent = active ? "Escaneando\u2026" : "Inactiva";
         els.ticketReaderLiveBadge.classList.toggle("is-live", active);
+      }
+      if (els.ticketReaderCameraToggleBtn) {
+        els.ticketReaderCameraToggleBtn.classList.toggle("is-active", active);
+        els.ticketReaderCameraToggleBtn.setAttribute("aria-pressed", active ? "true" : "false");
+        const label = els.ticketReaderCameraToggleBtn.querySelector(".ticket-reader-camera-toggle-label");
+        if (label) label.textContent = active ? "Detener" : "Cámara";
       }
     }
     var TICKET_READER_SYNC_INTERVAL = 2400;
@@ -20770,6 +20892,18 @@
     }
     if (els.ticketReaderCameraBtn) els.ticketReaderCameraBtn.addEventListener("click", startTicketReaderCamera);
     if (els.ticketReaderCameraStopBtn) els.ticketReaderCameraStopBtn.addEventListener("click", stopTicketReaderCamera);
+    if (els.ticketReaderCameraPlaceholder) {
+      els.ticketReaderCameraPlaceholder.addEventListener("click", function () {
+        startTicketReaderCamera().catch(function () {});
+      });
+    }
+    if (els.ticketReaderCameraToggleBtn) {
+      els.ticketReaderCameraToggleBtn.addEventListener("click", function () {
+        const active = !!(state.ticketReader && (state.ticketReader.stream || state.ticketReader.scanTimer));
+        if (active) stopTicketReaderCamera();
+        else startTicketReaderCamera().catch(function () {});
+      });
+    }
     if (els.ticketReaderResults) {
       els.ticketReaderResults.addEventListener("click", function (event) {
         const button = event.target.closest("[data-ticket-action='validate']");
