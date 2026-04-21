@@ -5195,14 +5195,17 @@
       min-height: 0;
       overflow: auto;
       padding: 16px 20px calc(16px + var(--viewport-bottom-offset));
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 20px;
-      align-content: start;
+      align-items: stretch;
     }
     .drive-scroll.paella-focus {
       overflow: hidden;
-      align-content: stretch;
-      grid-template-rows: minmax(0, 1fr);
+    }
+    .drive-scroll.paella-focus > .paella-panel {
+      flex: 1 1 0;
+      min-height: 0;
     }
     .drive-scroll.paella-focus .paella-panel {
       min-height: 0;
@@ -5273,28 +5276,26 @@
       .drive-header { padding: 14px 28px; }
       .drive-search-group { max-width: 520px; }
 
-      /* ── Layout de dos columnas en la vista Drive ── */
+      /* ── Layout de columna única estilo Google Drive ── */
       .drive-scroll {
-        grid-template-columns: 320px minmax(0, 1fr);
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: none;
         padding: 22px 28px calc(22px + var(--viewport-bottom-offset));
         gap: 20px;
-        align-items: start;
-        align-content: start;
+        align-items: stretch;
       }
 
-      /* Columna izquierda: paellas + dirección */
-      #paellaPanel    { grid-column: 1; grid-row: 1; }
-      #direccionPanel { grid-column: 1; grid-row: 2; }
-
-      /* Columna derecha: unidad + compartidos */
-      #folderSection { grid-column: 2; grid-row: 1; }
-      #sharedSection { grid-column: 2; grid-row: 2; }
+      /* Todas las secciones ocupan ancho completo y se apilan verticalmente */
+      #paellaPanel, #direccionPanel, #folderSection, #sharedSection {
+        grid-column: auto;
+        grid-row: auto;
+        width: 100%;
+      }
 
       /* Paneles izquierdos más altos en desktop */
       .paella-panel-content { max-height: min(60vh, 700px); }
       .paella-panel.is-folder-open .paella-panel-content { max-height: min(72vh, 840px); }
-
-      /* Paneles derechos: sin max-height, el drive-scroll hace el scroll */
 
       /* Grid con más columnas para aprovechar el ancho */
       .grid {
@@ -5309,15 +5310,11 @@
         grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       }
 
-      /* Paella-focus: colapsa a una sola columna (la paella ocupa todo) */
+      /* Paella-focus: la paella ocupa todo */
       .drive-scroll.paella-focus {
-        grid-template-columns: 1fr;
-        grid-template-rows: minmax(0, 1fr);
+        display: flex;
+        flex-direction: column;
       }
-      .drive-scroll.paella-focus #paellaPanel    { grid-column: 1; grid-row: 1; }
-      .drive-scroll.paella-focus #direccionPanel { grid-column: 1; grid-row: 2; }
-      .drive-scroll.paella-focus #folderSection  { grid-column: 1; grid-row: 3; }
-      .drive-scroll.paella-focus #sharedSection  { grid-column: 1; grid-row: 4; }
 
       /* Editor: más respiración horizontal */
       #editorShell { padding: 16px 28px; gap: 12px; }
@@ -5329,10 +5326,9 @@
       }
     }
 
-    /* ── Extra-wide (≥ 1400 px): columna izquierda algo más ancha ── */
+    /* ── Extra-wide (≥ 1400 px): padding más amplio ── */
     @media (min-width: 1400px) {
       .drive-scroll {
-        grid-template-columns: 360px minmax(0, 1fr);
         padding: 24px 36px calc(24px + var(--viewport-bottom-offset));
         gap: 24px;
       }
