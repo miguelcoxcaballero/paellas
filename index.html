@@ -5239,10 +5239,9 @@
     }
     .drive-section-card {
       display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
       gap: 12px;
       padding: 18px;
-      min-height: 0;
     }
     .drive-section-head {
       display: grid;
@@ -5251,18 +5250,13 @@
     }
     .drive-section-body {
       min-height: 0;
-      max-height: min(46vh, 560px);
-      overflow: auto;
       padding: 4px;
       display: grid;
       align-content: start;
       gap: 12px;
     }
-    .drive-section-body.compact {
-      max-height: min(28vh, 320px);
-    }
     #itemsGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-    #sharedGrid { align-content: start; }
+    #sharedGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     #editorView { grid-template-rows: auto minmax(0, 1fr); }
     #editorShell { overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 14px 20px; }
     #editorView > .card:last-child { display: grid; min-height: 0; overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-bottom: none; padding: 0 20px 20px; }
@@ -5300,9 +5294,7 @@
       .paella-panel-content { max-height: min(60vh, 700px); }
       .paella-panel.is-folder-open .paella-panel-content { max-height: min(72vh, 840px); }
 
-      /* Paneles derechos más altos en desktop */
-      .drive-section-body         { max-height: min(62vh, 720px); }
-      .drive-section-body.compact { max-height: min(40vh, 480px); }
+      /* Paneles derechos: sin max-height, el drive-scroll hace el scroll */
 
       /* Grid con más columnas para aprovechar el ancho */
       .grid {
@@ -5313,7 +5305,7 @@
       .paella-grid {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       }
-      #itemsGrid {
+      #itemsGrid, #sharedGrid {
         grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       }
 
@@ -18712,9 +18704,22 @@
       els.sharedGrid.innerHTML = "";
       els.sharedEmptyState.classList.toggle("hidden", filtered.length !== 0);
       filtered.forEach(function (item) {
+        const isForm = item.mimeType === DRIVE_FORM_MIME;
         const el = document.createElement("article");
-        el.className = "item" + driveItemTypeClass(item);
-        el.innerHTML = "<div class='item-row'>" + driveFileIconMarkup(item.mimeType) + itemTitleMarkup(item.name, true) + "</div>";
+        el.className = "item gd-item" + driveItemTypeClass(item);
+        var icon = driveFileIconMarkup(item.mimeType);
+        var tagLabel = isForm ? "Form" : "Hoja";
+        var dateLabel = formatDriveDate(item.modifiedTime) || "";
+        el.innerHTML =
+          "<div class='item-row'>" + icon + itemTitleMarkup(item.name, true) + "</div>" +
+          "<div class='gd-item-cover'>" + icon + "</div>" +
+          "<div class='gd-item-body'>" +
+            "<div class='gd-item-title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+            "<div class='gd-item-foot'>" +
+              "<span class='gd-item-tag'>" + escapeHtml(tagLabel) + "</span>" +
+              "<span>" + escapeHtml(dateLabel) + "</span>" +
+            "</div>" +
+          "</div>";
         el.appendChild(createItemActionButton(item, "shared"));
         el.addEventListener("click", function () {
           openDriveDocument(item);
