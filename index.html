@@ -567,50 +567,65 @@
       line-height: 1;
     }
     .paella-grid {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       align-content: start;
     }
     .paella-card {
       --paella-folder-color: var(--accent2);
       --paella-folder-bg: rgba(185, 90, 0, 0.1);
-      border: 1px solid rgba(185, 90, 0, 0.12);
-      background: rgba(255, 255, 255, 0.74);
-      border-radius: 16px;
-      padding: 14px;
-      display: grid;
-      gap: 12px;
-      box-shadow: none;
+      border: 1px solid rgba(185, 90, 0, 0.13);
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 14px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
       cursor: pointer;
-      transition: box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+      transition: box-shadow .18s ease, border-color .18s ease;
     }
     .paella-card:hover {
-      box-shadow: none;
-      border-color: rgba(185, 90, 0, 0.24);
+      box-shadow: 0 2px 10px rgba(185, 90, 0, 0.10);
+      border-color: rgba(185, 90, 0, 0.28);
     }
     .paella-card-head {
+      background: var(--paella-folder-bg);
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-width: 0;
+      justify-content: center;
+      height: 76px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .paella-card-head .item-actions {
+      position: absolute;
+      top: 6px;
+      right: 6px;
     }
     .paella-card-icon {
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-      border-radius: 12px;
+      width: 46px;
+      height: 46px;
+      min-width: 46px;
+      border-radius: 13px;
       display: grid;
       place-items: center;
       color: var(--paella-folder-color);
-      background: var(--paella-folder-bg);
-      border: 1px solid var(--paella-folder-color);
-      font-size: 1.45rem;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(185, 90, 0, 0.2);
+      font-size: 1.6rem;
       line-height: 1;
     }
+    .paella-card-body {
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
     .paella-card-title {
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       font-weight: 700;
       line-height: 1.2;
-      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -618,21 +633,102 @@
     .paella-card-meta {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 0.78rem;
+      gap: 6px;
+      font-size: 0.74rem;
       color: var(--muted);
+      flex-wrap: wrap;
     }
     .paella-card-tag {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
+      padding: 2px 7px;
       border-radius: 999px;
       background: var(--paella-folder-bg);
       color: var(--paella-folder-color);
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
+    /* ── Google Drive–style portrait items for Mi unidad ── */
+    .gd-item {
+      height: auto;
+      flex-direction: column;
+      padding: 0;
+      gap: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      align-items: stretch;
+      position: relative;
+    }
+    .gd-item > .item-row { display: none; }
+    .gd-item > .item-actions {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+    }
+    .gd-item-cover {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80px;
+      background: rgba(0, 0, 0, 0.04);
+      flex-shrink: 0;
+    }
+    .gd-item-cover .item-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      color: var(--muted);
+      opacity: 0.65;
+    }
+    .gd-item-cover .item-icon-emoji {
+      font-size: 2rem;
+      opacity: 0.7;
+    }
+    .gd-item-body {
+      padding: 10px 12px 12px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .gd-item-title {
+      font-size: 0.86rem;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .gd-item-foot {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .gd-item-tag {
+      display: inline-flex;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(0, 0, 0, 0.07);
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .gd-item.is-paella .gd-item-cover { background: rgba(185, 90, 0, 0.08); }
+    .gd-item.is-paella .gd-item-cover .item-icon-emoji { opacity: 0.85; }
+    .gd-item.is-paella .gd-item-tag { background: rgba(185, 90, 0, 0.12); color: #8a5211; }
+    .gd-item.is-sheet .gd-item-cover { background: rgba(52, 168, 83, 0.07); }
+    .gd-item.is-sheet .gd-item-cover .item-icon { color: #1e8a3c; opacity: 0.8; }
+    .gd-item.is-sheet .gd-item-tag { background: rgba(52, 168, 83, 0.12); color: #1e8a3c; }
+    .gd-item.is-form .gd-item-cover { background: rgba(103, 58, 183, 0.07); }
+    .gd-item.is-form .gd-item-cover .item-icon { color: #5e35b1; opacity: 0.8; }
+    .gd-item.is-form .gd-item-tag { background: rgba(103, 58, 183, 0.1); color: #5e35b1; }
     .linked-pair-card {
       grid-column: 1 / -1;
       border: none;
@@ -5129,6 +5225,17 @@
       letter-spacing: 0.06em;
       color: var(--muted);
       margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.1);
+      display: block;
+      min-width: 12px;
     }
     .drive-section-card {
       display: grid;
@@ -5154,7 +5261,7 @@
     .drive-section-body.compact {
       max-height: min(28vh, 320px);
     }
-    #itemsGrid { align-content: start; }
+    #itemsGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     #sharedGrid { align-content: start; }
     #editorView { grid-template-rows: auto minmax(0, 1fr); }
     #editorShell { overflow: hidden; border-radius: 0; border-left: none; border-right: none; border-top: none; padding: 14px 20px; }
@@ -5204,7 +5311,10 @@
 
       /* Paella cards en grid más ancho */
       .paella-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      #itemsGrid {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       }
 
       /* Paella-focus: colapsa a una sola columna (la paella ocupa todo) */
@@ -5952,11 +6062,12 @@
       .form-response-value { font-size: 0.8rem; }
       .crumbs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
       .crumb, .tab { padding: 5px 10px; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
-      .paella-card { padding: 10px; gap: 8px; border-radius: 12px; }
-      .paella-card-icon { width: 34px; height: 34px; min-width: 34px; border-radius: 10px; font-size: 1.2rem; }
-      .paella-card-title { font-size: 0.88rem; }
-      .paella-card-meta { font-size: 0.74rem; gap: 8px; }
-      .paella-card-tag { padding: 4px 8px; font-size: 0.68rem; }
+      .paella-card { border-radius: 12px; }
+      .paella-card-head { height: 64px; }
+      .paella-card-icon { width: 38px; height: 38px; min-width: 38px; border-radius: 10px; font-size: 1.3rem; }
+      .paella-card-body { padding: 8px 10px 10px; }
+      .paella-card-title { font-size: 0.84rem; }
+      .paella-card-meta { font-size: 0.7rem; }
       .paella-panel-meta { font-size: 0.78rem; }
       .paella-create-btn { min-height: 36px; padding: 6px 12px; font-size: 0.82rem; border-radius: 10px; }
       .paella-entry-reader-btn {
@@ -18282,12 +18393,26 @@
       filtered.forEach(function (item) {
         const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
         const isPaella = isPaellaFolder(item);
+        const isForm = item.mimeType === DRIVE_FORM_MIME;
+        const isSheet = !isFolder && !isForm;
         const el = document.createElement("article");
-        el.className = "item" + (isFolder ? "" : driveItemTypeClass(item));
+        const typeClass = isFolder ? "" : driveItemTypeClass(item);
+        el.className = "item gd-item" + typeClass + (isPaella ? " is-paella" : "");
         var icon = isFolder
           ? driveFolderIconMarkup(isPaella, item.folderColorRgb)
           : driveFileIconMarkup(item.mimeType);
-        el.innerHTML = "<div class='item-row'>" + icon + itemTitleMarkup(item.name, !!item.shared) + "</div>";
+        var tagLabel = isPaella ? "Paella" : isForm ? "Form" : isFolder ? "Carpeta" : "Hoja";
+        var dateLabel = formatDriveDate(item.modifiedTime) || "";
+        el.innerHTML =
+          "<div class='item-row'>" + icon + itemTitleMarkup(item.name, !!item.shared) + "</div>" +
+          "<div class='gd-item-cover'>" + icon + "</div>" +
+          "<div class='gd-item-body'>" +
+            "<div class='gd-item-title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+            "<div class='gd-item-foot'>" +
+              "<span class='gd-item-tag'>" + escapeHtml(tagLabel) + "</span>" +
+              "<span>" + escapeHtml(dateLabel) + "</span>" +
+            "</div>" +
+          "</div>";
         el.appendChild(createItemActionButton(item, "drive"));
         el.addEventListener("click", function () {
           if (isFolder) {
@@ -18492,11 +18617,13 @@
         el.innerHTML =
           "<div class='paella-card-head'>" +
             "<div class='paella-card-icon' aria-hidden='true'>" + paellaCardIconMarkup() + "</div>" +
-            "<div class='paella-card-title'>" + escapeHtml(item.name || "Paella sin nombre") + "</div>" +
           "</div>" +
-          "<div class='paella-card-meta'>" +
-            "<span class='paella-card-tag'>Carpeta Drive</span>" +
-            "<span>" + escapeHtml(updatedLabel || "Abrir") + "</span>" +
+          "<div class='paella-card-body'>" +
+            "<div class='paella-card-title'>" + escapeHtml(item.name || "Paella sin nombre") + "</div>" +
+            "<div class='paella-card-meta'>" +
+              "<span class='paella-card-tag'>Paella</span>" +
+              "<span>" + escapeHtml(updatedLabel || "") + "</span>" +
+            "</div>" +
           "</div>";
         const head = el.querySelector(".paella-card-head");
         if (head) head.appendChild(createItemActionButton(item, "paella-root"));
@@ -18560,11 +18687,13 @@
         el.innerHTML =
           "<div class='paella-card-head'>" +
             "<div class='paella-card-icon' aria-hidden='true'>&#128203;</div>" +
-            "<div class='paella-card-title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
           "</div>" +
-          "<div class='paella-card-meta'>" +
-            "<span class='paella-card-tag'>Carpeta Drive</span>" +
-            "<span>" + escapeHtml(updatedLabel || "Abrir") + "</span>" +
+          "<div class='paella-card-body'>" +
+            "<div class='paella-card-title'>" + escapeHtml(item.name || "Sin nombre") + "</div>" +
+            "<div class='paella-card-meta'>" +
+              "<span class='paella-card-tag'>Dirección</span>" +
+              "<span>" + escapeHtml(updatedLabel || "") + "</span>" +
+            "</div>" +
           "</div>";
         const head = el.querySelector(".paella-card-head");
         if (head) head.appendChild(createItemActionButton(item, "direccion-root"));
