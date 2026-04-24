@@ -5258,15 +5258,24 @@
       align-content: start;
       gap: 12px;
     }
+    /* Las secciones del home no deben encogerse dentro del flex column */
+    .drive-scroll > #paellaPanel,
+    .drive-scroll > #folderSection,
+    .drive-scroll > #sharedSection {
+      flex-shrink: 0;
+    }
     /* Mi unidad: crece con el contenido; el scroll vertical lo hace la página */
     #folderSectionBody {
+      max-height: none;
       overflow: visible;
     }
-    /* Compartidos y Paellas: fila única con scroll horizontal */
+    /* Compartidos y Paellas: fila única con scroll horizontal, altura natural */
     #sharedSectionBody,
     #paellaPanelContent {
+      max-height: none;
       overflow-x: auto;
       overflow-y: hidden;
+      padding-bottom: 6px;
     }
     #sharedGrid,
     #paellasGrid {
