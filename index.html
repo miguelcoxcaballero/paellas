@@ -5257,11 +5257,27 @@
       display: grid;
       align-content: start;
       gap: 12px;
-      max-height: min(60vh, 700px);
-      overflow: auto;
     }
-    .drive-section-body.compact {
-      max-height: min(50vh, 560px);
+    /* Mi unidad: scroll vertical interno */
+    #folderSectionBody {
+      max-height: min(60vh, 700px);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    /* Compartidos y Paellas: fila única con scroll horizontal */
+    #sharedSectionBody,
+    #paellaPanelContent {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    #sharedGrid,
+    #paellasGrid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 170px;
+      grid-template-columns: none !important;
+      gap: 12px;
+      padding: 4px;
     }
     #itemsGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     #sharedGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
@@ -5512,11 +5528,8 @@
         padding: 12px;
         gap: 10px;
       }
-      .drive-section-body,
-      .drive-section-body.compact {
-        max-height: min(38vh, 420px);
-        overflow: auto;
-        padding-right: 2px;
+      #folderSectionBody {
+        max-height: min(46vh, 480px);
       }
       .paella-panel {
         padding: 12px;
@@ -5635,11 +5648,8 @@
         overflow: auto;
         padding-right: 2px;
       }
-      .drive-section-body,
-      .drive-section-body.compact {
-        max-height: min(34vh, 320px);
-        overflow: auto;
-        padding-right: 2px;
+      #folderSectionBody {
+        max-height: min(40vh, 360px);
       }
       .item {
         min-height: 44px;
