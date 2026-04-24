@@ -5286,6 +5286,16 @@
       gap: 12px;
       padding: 4px;
     }
+    /* Dentro de una paella abierta: una sola columna (vertical) */
+    .paella-panel.is-folder-open #paellasGrid {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      grid-template-columns: 1fr !important;
+    }
+    .paella-panel.is-folder-open #paellaPanelContent {
+      overflow-x: hidden;
+      overflow-y: visible;
+    }
     #itemsGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     #sharedGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     #editorView { grid-template-rows: auto minmax(0, 1fr); }
