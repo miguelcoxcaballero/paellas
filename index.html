@@ -5257,6 +5257,11 @@
       display: grid;
       align-content: start;
       gap: 12px;
+      max-height: min(60vh, 700px);
+      overflow: auto;
+    }
+    .drive-section-body.compact {
+      max-height: min(50vh, 560px);
     }
     #itemsGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     #sharedGrid { align-content: start; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
@@ -5509,9 +5514,9 @@
       }
       .drive-section-body,
       .drive-section-body.compact {
-        max-height: none;
-        overflow: visible;
-        padding-right: 0;
+        max-height: min(38vh, 420px);
+        overflow: auto;
+        padding-right: 2px;
       }
       .paella-panel {
         padding: 12px;
@@ -5632,9 +5637,9 @@
       }
       .drive-section-body,
       .drive-section-body.compact {
-        max-height: none;
-        overflow: visible;
-        padding-right: 0;
+        max-height: min(34vh, 320px);
+        overflow: auto;
+        padding-right: 2px;
       }
       .item {
         min-height: 44px;
