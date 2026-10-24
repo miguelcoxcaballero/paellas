@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Paellas" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/app_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/light_status_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/light_status_bars</item>
+    </style>
+
+    <!-- The paella on the band's yellow while the page loads. -->
+    <style name="Theme.Paellas.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/app_band</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Paellas</item>
+    </style>
+
+    <!-- The updater popup draws its own sheet over the app (UpdateActivity). -->
+    <style name="Theme.Paellas.Update" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowLightStatusBar">@bool/light_status_bars</item>
+    </style>
+</resources>

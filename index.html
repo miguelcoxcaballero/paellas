@@ -2,8 +2,19 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <script>
+    // Android app sign-in return (android/README.md): Google redirects the Chrome
+    // Custom Tab to https://paellas.net with the token in the fragment. Hand it to
+    // app-auth.html (and from there to the app) before the page boots.
+    (function () {
+      var h = location.hash;
+      if (h.indexOf("state=android.") !== -1 && (h.indexOf("access_token=") !== -1 || h.indexOf("error=") !== -1)) {
+        location.replace("app-auth.html" + h);
+      }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>paellas.net</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -6406,6 +6417,7 @@
             </div>
             <div class="profile-actions">
               <button id="profileRefreshBtn" class="btn small" type="button">Actualizar</button>
+              <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
           </div>
@@ -7666,6 +7678,7 @@
       profileMenuAvatar: document.getElementById("profileMenuAvatar"),
       profileMenuAvatarFallback: document.getElementById("profileMenuAvatarFallback"),
       profileRefreshBtn: document.getElementById("profileRefreshBtn"),
+      profileUpdatesBtn: document.getElementById("profileUpdatesBtn"),
       profileLogoutBtn: document.getElementById("profileLogoutBtn"),
       profileName: document.getElementById("profileName"),
       profileEmail: document.getElementById("profileEmail"),
@@ -21658,7 +21671,137 @@
         });
       });
     }
+    /* ─── ANDROID APP (android/README.md) ─────────────────────────────
+       The APK is a WebView around this same page (like Inhouse Learn). Its shell
+       injects window.PaellasApp (origin-restricted) and calls back into
+       paellasAuth() and paellasBack(). Google does not allow its sign-in page in
+       a WebView, so in the app sign-in runs in a Chrome Custom Tab and returns
+       through the client's registered redirect URI https://paellas.net (exactly
+       that, no trailing slash) → the early script in <head> → app-auth.html →
+       paellas://auth. The token stays in memory, as on the web. */
+    const ANDROID_APP = !!(window.PaellasApp && typeof window.PaellasApp.postMessage === "function");
+    const ANDROID_AUTH_STATE_KEY = "paellas-android-auth-state";
+    if (ANDROID_APP) document.documentElement.classList.add("in-android-app");
+    function androidAppMessage(message) {
+      window.PaellasApp.postMessage(JSON.stringify(message));
+    }
+    // Same shape as GIS's token client, so ensureAccessToken() works unchanged.
+    function createAndroidTokenClient() {
+      const client = {
+        callback: function () {},
+        requestAccessToken: function (opts) {
+          const options = opts || {};
+          if (options.prompt === "none") {
+            // No silent renewal in the app: a new sign-in is one tap away.
+            setTimeout(function () { client.callback({ error: "interaction_required", error_description: "Vuelve a entrar con Google." }); }, 0);
+            return;
+          }
+          const stateValue = "android." + Array.from(crypto.getRandomValues(new Uint8Array(16)), function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+          localStorage.setItem(ANDROID_AUTH_STATE_KEY, stateValue);
+          const params = new URLSearchParams({
+            client_id: GOOGLE_CLIENT_ID,
+            redirect_uri: "https://paellas.net",
+            response_type: "token",
+            scope: GOOGLE_SCOPE,
+            include_granted_scopes: "true",
+            state: stateValue
+          });
+          if (options.prompt) params.set("prompt", options.prompt);
+          state.androidAuthPending = true;
+          const hint = localStorage.getItem(AUTH_HINT_EMAIL_KEY);
+          if (hint) params.set("login_hint", hint);
+          androidAppMessage({ type: "signIn", url: "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString() });
+        }
+      };
+      return client;
+    }
+    // Called by the shell with the query app-auth.html received from Google.
+    window.paellasAuth = function (query) {
+      const params = new URLSearchParams(query || "");
+      const expected = localStorage.getItem(ANDROID_AUTH_STATE_KEY);
+      if (!expected || params.get("state") !== expected || !state.tokenClient) return;
+      localStorage.removeItem(ANDROID_AUTH_STATE_KEY);
+      const resp = params.get("access_token")
+        ? { access_token: params.get("access_token"), expires_in: Number(params.get("expires_in") || 3600) }
+        : { error: params.get("error") || "access_denied" };
+      if (state.androidAuthPending) {
+        state.androidAuthPending = false;
+        state.tokenClient.callback(resp);
+        return;
+      }
+      if (!resp.access_token) return;
+      // Android reloaded the page while the Custom Tab was open: resume from the token.
+      state.accessToken = resp.access_token;
+      state.accessTokenExpiresAt = Date.now() + Math.max(60, resp.expires_in) * 1000;
+      localStorage.setItem(AUTH_REMEMBER_KEY, "1");
+      openAuthenticatedDrive().catch(function (err) {
+        setLoginStatus(messageFromError(err, "Sin respuesta de Google."));
+      });
+    };
+    // Android's back button: close what is open before leaving the app.
+    window.paellasBack = function () {
+      const openModal = Array.prototype.find.call(document.querySelectorAll(".modal-overlay"), function (el) {
+        return el.offsetParent !== null || getComputedStyle(el).display !== "none" && getComputedStyle(el).visibility !== "hidden" && el.getBoundingClientRect().width > 0;
+      });
+      if (openModal) {
+        const close = openModal.querySelector("[id$='CloseBtn'], [id$='CancelBtn']");
+        if (close) { close.click(); return true; }
+      }
+      if (document.body.classList.contains("group-panel-open")) {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        return true;
+      }
+      if (!els.profileMenu.classList.contains("hidden")) { els.profileBtn.click(); return true; }
+      if (!els.editorView.classList.contains("hidden")) { els.homeBtn.click(); return true; }
+      if (!els.driveView.classList.contains("hidden") && state.activePaellaStack.length) { els.homeBtn.click(); return true; }
+      return false;
+    };
+    if (ANDROID_APP) {
+      // Files the page generates (ticket PDFs) are blob: links, which a WebView
+      // cannot download: hand their bytes to Android's "save as" dialog instead.
+      // The CSP does not allow fetching blob: URLs, so remember each blob as it is created.
+      const androidBlobs = new Map();
+      const createObjectURL = URL.createObjectURL.bind(URL);
+      URL.createObjectURL = function (object) {
+        const url = createObjectURL(object);
+        if (object instanceof Blob) androidBlobs.set(url, object);
+        return url;
+      };
+      const revokeObjectURL = URL.revokeObjectURL.bind(URL);
+      URL.revokeObjectURL = function (url) {
+        // FileSaver revokes right after the click; keep the blob until it is handed over.
+        setTimeout(function () { androidBlobs.delete(url); revokeObjectURL(url); }, 60000);
+      };
+      document.addEventListener("click", function (event) {
+        const link = event.target && event.target.closest ? event.target.closest("a[download]") : null;
+        if (!link || !/^(blob|data):/.test(link.href)) return;
+        event.preventDefault();
+        const name = link.getAttribute("download") || "paellas";
+        if (link.href.indexOf("data:") === 0) {
+          const header = link.href.slice(5, link.href.indexOf(","));
+          const body = link.href.slice(link.href.indexOf(",") + 1);
+          androidAppMessage({ type: "save", name: name, mime: header.split(";")[0] || "application/octet-stream", data: /;base64$/.test(header) ? body : btoa(unescape(body)) });
+          return;
+        }
+        const blob = androidBlobs.get(link.href);
+        if (!blob) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          androidAppMessage({ type: "save", name: name, mime: blob.type || "application/octet-stream", data: String(reader.result).split(",")[1] || "" });
+        };
+        reader.readAsDataURL(blob);
+      }, true);
+      els.profileUpdatesBtn.classList.remove("hidden");
+      els.profileUpdatesBtn.addEventListener("click", function () { androidAppMessage({ type: "updates" }); });
+    }
+
     function initGoogle() {
+      if (ANDROID_APP) {
+        // The token lives in memory only: a new app start asks for one tap.
+        state.tokenClient = createAndroidTokenClient();
+        setLoginStatus("");
+        return;
+      }
       if (!window.google || !google.accounts || !google.accounts.oauth2) {
         setTimeout(initGoogle, 200);
         return;

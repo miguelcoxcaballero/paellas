@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The web is always light: dark icons on the yellow band and the cream page. -->
+    <bool name="light_status_bars">true</bool>
+</resources>
