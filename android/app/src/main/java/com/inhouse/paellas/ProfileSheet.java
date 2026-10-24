@@ -15,10 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * The Perfil tab of the native bar: a bottom sheet just above the bar with the
- * account the page is signed in with and its actions. It is a view inside the
- * activity (not a dialog) so the bar stays on top of its scrim, as on the web.
- * Drag it down or tap the scrim to close it.
+ * The account, opened from the page's avatar ({type:"profile"}): a bottom sheet
+ * with the account the page is signed in with and its actions. It is a view
+ * inside the activity (not a dialog) so it animates with the page. Drag it down,
+ * tap the scrim or press Back to close it.
  */
 final class ProfileSheet extends FrameLayout {
     interface Listener {
@@ -66,8 +66,8 @@ final class ProfileSheet extends FrameLayout {
         LayoutParams cardParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
         cardParams.leftMargin = dp(10);
         cardParams.rightMargin = dp(10);
-        // Sits on top of the bar: 12dp margin + 64dp bar + 12dp gap.
-        cardParams.bottomMargin = dp(88);
+        // The bottom bar steps aside while the sheet is open.
+        cardParams.bottomMargin = dp(10);
         addView(card, cardParams);
 
         View grabber = new View(context);

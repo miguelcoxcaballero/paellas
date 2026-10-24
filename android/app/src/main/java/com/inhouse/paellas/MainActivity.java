@@ -66,10 +66,10 @@ import java.util.Collections;
  * page generates, Android's back button asking the page first, and opening the
  * update settings. The camera is granted only to paellas.net (ticket reader).
  *
- * On phones the bottom bar (NativeNav) and the Perfil sheet (ProfileSheet) are
- * native views over the page, with Android haptics (Haptics). The page reports
- * which tab is on and whether the bar shows ({type:"nav"}), asks for haptics
- * ({type:"haptic"}) and handles each tap through window.paellasNav(name).
+ * The bottom bar on phones (NativeNav) and the account sheet (ProfileSheet) are
+ * native views over the page, with Android haptics (Haptics). The page sends the
+ * tabs of the screen it is on ({type:"nav"}), opens the account ({type:"profile"}),
+ * asks for haptics ({type:"haptic"}) and handles each tap in window.paellasNav(id).
  *
  * APK updates come from the shared Inhouse services updater (UPDATER.md):
  * NativeUpdates runs its hidden checker with the bundled assets and opens
@@ -150,7 +150,8 @@ public class MainActivity extends ComponentActivity {
         webView.setBackgroundColor(background);
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        // Phones get the native bottom bar; wider screens use the page's top navigation.
+        addProfileSheet();
+        // Phones get the native bottom bar; wider screens use the page's folder tabs.
         if (getResources().getConfiguration().screenWidthDp <= 760) addNativeNavigation();
         setContentView(root);
 
@@ -169,7 +170,7 @@ public class MainActivity extends ComponentActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (profile != null && profile.isOpen()) {
+                if (profile.isOpen()) {
                     profile.close();
                     return;
                 }
@@ -256,13 +257,20 @@ public class MainActivity extends ComponentActivity {
                     openExternal(Uri.parse(message.optString("url")));
                     break;
                 case "nav":
-                    pageTab = message.optString("active", "home");
+                    // The tabs of the screen the page is on, which one is active and
+                    // whether the bar should show (not over dialogs or an open group).
+                    pageTab = message.optString("active");
                     pageWantsNav = message.optBoolean("visible");
-                    if (profile != null) {
-                        profile.setAccount(message.optString("name"), message.optString("email"));
-                        if (!pageWantsNav) profile.close();
+                    if (nav != null) {
+                        nav.setItems(message.optJSONArray("items"));
+                        nav.select(pageTab, true);
                     }
-                    if (nav != null && (profile == null || !profile.isOpen())) nav.select(pageTab, true);
+                    syncNav();
+                    break;
+                case "profile":
+                    // The account avatar: Actualizar, Salir and the updater's settings.
+                    profile.setAccount(message.optString("name"), message.optString("email"));
+                    profile.show();
                     syncNav();
                     break;
                 case "haptic":
@@ -278,7 +286,7 @@ public class MainActivity extends ComponentActivity {
 
     // --- Native bottom bar and Perfil sheet ---------------------------------------
 
-    private void addNativeNavigation() {
+    private void addProfileSheet() {
         profile = new ProfileSheet(this);
         profile.setListener(new ProfileSheet.Listener() {
             @Override
@@ -298,37 +306,28 @@ public class MainActivity extends ComponentActivity {
 
             @Override
             public void onClosed() {
-                if (nav != null) nav.select(pageTab, true);
+                syncNav();
             }
         });
         root.addView(profile, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+    }
 
+    private void addNativeNavigation() {
         nav = new NativeNav(this);
         float density = getResources().getDisplayMetrics().density;
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, Math.round(64 * density), Gravity.BOTTOM);
         params.leftMargin = params.rightMargin = Math.round(14 * density);
         params.bottomMargin = Math.round(12 * density);
-        root.addView(nav, params);
+        // Under the profile sheet's scrim, like the page's own bar.
+        root.addView(nav, root.indexOfChild(profile), params);
         // Hidden until the page says the user is signed in.
         nav.setVisibility(View.INVISIBLE);
         nav.setAlpha(0f);
         nav.setTranslationY(120 * density);
         nav.setShown(false);
-        nav.setListener(name -> {
-            if ("profile".equals(name)) {
-                if (profile.isOpen()) {
-                    profile.close();
-                } else {
-                    runPageNav("close");
-                    profile.show();
-                }
-                return;
-            }
-            profile.close(false);
-            runPageNav(name);
-        });
+        nav.setListener(this::runPageNav);
     }
 
     private void runPageNav(String name) {
@@ -337,9 +336,8 @@ public class MainActivity extends ComponentActivity {
 
     private void syncNav() {
         if (nav == null) return;
-        boolean show = pageWantsNav && !keyboardOpen;
-        nav.setShown(show);
-        if (!show && profile.isOpen()) profile.close();
+        // The bar steps aside for the keyboard and for the account sheet.
+        nav.setShown(pageWantsNav && nav.tabCount() > 1 && !keyboardOpen && !profile.isOpen());
     }
 
     // --- Google sign-in -------------------------------------------------------

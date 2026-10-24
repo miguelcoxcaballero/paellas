@@ -15684,7 +15684,7 @@
       }
       bannerTitle.textContent = "Historial de cambios";
       bannerMeta.textContent = "";
-      searchInput.placeholder = "Buscar por grupo, responsable, integrante, DNI, email o acción";
+      searchInput.placeholder = "Buscar en el historial";
       if (document.activeElement !== searchInput) {
         searchInput.value = String(state.sheetChangeHistorySearch || "");
       }
@@ -21774,7 +21774,13 @@
         return true;
       }
       if (!els.profileMenu.classList.contains("hidden")) { els.profileBtn.click(); return true; }
-      if (!els.editorView.classList.contains("hidden")) { els.homeBtn.click(); return true; }
+      // Back goes up one level of the trail: document → its paella (or Inicio) → Inicio.
+      if (!els.editorView.classList.contains("hidden")) { els.editorBackBtn.click(); return true; }
+      if (!els.driveView.classList.contains("hidden") && state.activePaellaStack.length > 1) {
+        const parent = state.activePaellaStack.slice(0, -1);
+        loadPaellaFolder(parent[parent.length - 1].id, parent);
+        return true;
+      }
       if (!els.driveView.classList.contains("hidden") && state.activePaellaStack.length) { els.homeBtn.click(); return true; }
       return false;
     };
@@ -22078,7 +22084,8 @@
         if (!tab || tab.hidden || !isSpreadsheetDocumentActive()) return;
         const view = tab.dataset.view;
         if (view === state.spreadsheetViewMode || (view === "table" && !/^(groups|history|entries)$/.test(state.spreadsheetViewMode))) return;
-        setSpreadsheetViewMode(view);
+        if (window.paellasShowSheetView) window.paellasShowSheetView(view);
+        else setSpreadsheetViewMode(view);
       });
       els.viewTabs.addEventListener("keydown", function (event) {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -22119,7 +22126,7 @@
         const sub = document.getElementById("driveSub");
         const eyebrow = document.getElementById("driveEyebrow");
         if (activeFolder) {
-          eyebrow.textContent = "🥘 Paella";
+          eyebrow.textContent = "Paella";
           eyebrow.classList.remove("hidden");
           title.textContent = activeFolder.name || "Paella";
           const count = (state.activePaellaItems || []).length;
@@ -22143,70 +22150,6 @@
       };
       syncDriveHero();
 
-      // Editor band: crumb, title actions and the main "Nuevo grupo" action.
-      const editorHead = document.querySelector("#editorShell .editor-head");
-      const editorActions = document.querySelector("#editorShell .editor-actions");
-      const crumb = document.createElement("div");
-      crumb.id = "editorCrumb";
-      crumb.className = "editor-crumb";
-      editorHead.insertBefore(crumb, editorHead.firstChild);
-      const editorTopbarActions = document.getElementById("editorTopbarActions");
-      if (editorActions && editorTopbarActions) editorActions.appendChild(editorTopbarActions);
-      const bandNewGroupBtn = document.createElement("button");
-      bandNewGroupBtn.type = "button";
-      bandNewGroupBtn.id = "bandNewGroupBtn";
-      bandNewGroupBtn.className = "btn primary hidden";
-      bandNewGroupBtn.textContent = "+ Nuevo grupo";
-      bandNewGroupBtn.addEventListener("click", function () {
-        const original = els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']");
-        if (original) original.click();
-      });
-      if (editorActions) editorActions.appendChild(bandNewGroupBtn);
-      window.syncMercadoEditorBand = function () {
-        const folder = state.activePaellaStack[state.activePaellaStack.length - 1];
-        crumb.textContent = (folder ? folder.name : "Mi unidad") + "  ›  " + (state.activeDocumentType === "form" ? "Formularios" : "Hojas");
-        const canAdd = !!els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']") && !els.sheetGroupsView.classList.contains("hidden-panel");
-        bandNewGroupBtn.classList.toggle("hidden", !canAdd);
-      };
-
-      function goHome(after) {
-        const inDrive = !els.driveView.classList.contains("hidden") && !state.activePaellaStack.length;
-        if (!inDrive) els.homeBtn.click();
-        setTimeout(after || function () { document.querySelector(".drive-scroll").scrollTo({ top: 0, behavior: "smooth" }); }, inDrive ? 0 : 350);
-      }
-      function scrollToSection(id) {
-        return function () { const target = document.getElementById(id); if (target) target.scrollIntoView({ behavior: "smooth", block: "start" }); };
-      }
-      const topNav = document.createElement("nav");
-      topNav.className = "top-nav";
-      topNav.setAttribute("aria-label", "Secciones");
-      [["Inicio", "<path d='M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/>", function () { goHome(); }],
-       ["Paellas", "<path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'/>", function () { goHome(scrollToSection("paellaPanel")); }],
-       ["Mi unidad", "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>", function () { goHome(scrollToSection("folderSection")); }]
-      ].forEach(function (item) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "top-nav-item";
-        btn.dataset.target = item[0];
-        btn.innerHTML = "<svg viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + item[1] + "</svg><span>" + item[0] + "</span>";
-        btn.addEventListener("click", item[2]);
-        topNav.appendChild(btn);
-      });
-      const brandBtn = document.getElementById("homeBtn");
-      brandBtn.parentNode.insertBefore(topNav, brandBtn.nextSibling);
-      function syncTopNav() {
-        const inEditor = els.driveView.classList.contains("hidden");
-        const inPaella = !inEditor && state.activePaellaStack.length > 0;
-        Array.prototype.forEach.call(topNav.children, function (btn) {
-          const on = btn.dataset.target === "Inicio" ? (!inEditor && !inPaella) : (btn.dataset.target === "Paellas" ? (inEditor || inPaella) : false);
-          btn.classList.toggle("is-active", on);
-          if (on) btn.setAttribute("aria-current", "page"); else btn.removeAttribute("aria-current");
-        });
-      }
-      new MutationObserver(syncTopNav).observe(els.driveView, { attributes: true, attributeFilter: ["class"] });
-      window.syncMercadoTopNav = syncTopNav;
-      syncTopNav();
-
       // The gradient is painted once behind the top bar and the page heading, so both read as one band.
       const appEl = document.querySelector(".app");
       function syncBandHeight() {
@@ -22225,141 +22168,6 @@
       window.addEventListener("resize", syncBandHeight);
       syncBandHeight();
 
-      // Phone navigation. Inicio and Mi unidad are places on the home page (the active
-      // one follows the scroll); Papelera and Perfil open sheets that sit just above the
-      // bar, so the bar stays usable and shows which one is open. APKs that draw this
-      // bar natively (NATIVE_NAV) hide it here: the page reports the state with a
-      // {type:"nav"} message and the shell calls window.paellasNav(name) on taps.
-      const NAV_ITEMS = [
-        ["home", "Inicio", "<path d='M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/>"],
-        ["drive", "Mi unidad", "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>"],
-        ["trash", "Papelera", "<path d='M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6'/>"],
-        ["profile", "Perfil", "<circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/>"]
-      ];
-      const nav = document.createElement("nav");
-      nav.className = "mobile-nav";
-      nav.setAttribute("aria-label", "Navegación");
-      const navPill = document.createElement("span");
-      navPill.className = "mobile-nav-pill";
-      navPill.setAttribute("aria-hidden", "true");
-      nav.appendChild(navPill);
-      const navButtons = {};
-      NAV_ITEMS.forEach(function (item) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "mobile-nav-item";
-        btn.dataset.nav = item[0];
-        btn.innerHTML = "<svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + item[2] + "</svg><span>" + item[1] + "</span>";
-        btn.addEventListener("click", function (event) {
-          event.stopPropagation();
-          haptic("tap");
-          runNav(item[0]);
-        });
-        navButtons[item[0]] = btn;
-        nav.appendChild(btn);
-      });
-      // In <body>, not .app (an isolated stacking context), so it can sit above the sheets.
-      document.body.appendChild(nav);
-
-      const trashModal = els.driveTrashModal;
-      const navScroller = document.querySelector(".drive-scroll");
-      let navLock = null;
-      function trashOpen() { return trashModal.classList.contains("visible"); }
-      function onDriveHome() { return !els.driveView.classList.contains("hidden") && !state.activePaellaStack.length; }
-      function closeNavSheets() {
-        if (trashOpen()) els.driveTrashCloseBtn.click();
-        if (state.profileMenuOpen) closeProfileMenu();
-      }
-      // Leaving a sheet or a paella is asynchronous (it may ask to save first).
-      function showDriveHome(then) {
-        if (onDriveHome()) { then(); return; }
-        els.homeBtn.click();
-        const started = Date.now();
-        (function wait() {
-          if (onDriveHome()) requestAnimationFrame(then);
-          else if (Date.now() - started < 5000) setTimeout(wait, 30);
-        })();
-      }
-      function lockNav(name) { navLock = { name: name, until: Date.now() + 650 }; }
-      function runNav(name) {
-        const scroller = document.querySelector(".drive-scroll");
-        if (name === "home") {
-          closeNavSheets();
-          lockNav("home");
-          showDriveHome(function () { scroller.scrollTo({ top: 0, behavior: "smooth" }); });
-        } else if (name === "drive") {
-          closeNavSheets();
-          lockNav("drive");
-          showDriveHome(function () {
-            const target = document.getElementById("folderSection");
-            if (target) scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 8), behavior: "smooth" });
-          });
-        } else if (name === "trash") {
-          if (state.profileMenuOpen) closeProfileMenu();
-          if (trashOpen()) els.driveTrashCloseBtn.click(); else els.driveTrashBtn.click();
-        } else if (name === "profile") {
-          if (trashOpen()) els.driveTrashCloseBtn.click();
-          toggleProfileMenu();
-        } else if (name === "close") {
-          closeNavSheets();
-        } else if (name === "refresh") {
-          closeNavSheets();
-          els.profileRefreshBtn.click();
-        } else if (name === "logout") {
-          closeNavSheets();
-          els.profileLogoutBtn.click();
-        }
-        syncNav();
-      }
-      window.paellasNav = function (name) { runNav(String(name || "")); return true; };
-
-      let lastNavReport = "";
-      function syncNav() {
-        const loggedIn = !els.profileBox.classList.contains("hidden") && els.loginView.classList.contains("hidden");
-        const otherModal = Array.prototype.some.call(document.querySelectorAll(".modal-overlay.visible"), function (modal) { return modal !== trashModal; });
-        const visible = loggedIn && !otherModal && !document.body.classList.contains("group-panel-open");
-        let active = "home";
-        if (trashOpen()) active = "trash";
-        else if (state.profileMenuOpen) active = "profile";
-        else if (navLock && Date.now() < navLock.until) active = navLock.name;
-        else if (onDriveHome() && navScroller && navScroller.scrollTop > 8) {
-          const folders = document.getElementById("folderSection");
-          if (folders && folders.offsetParent !== null && folders.getBoundingClientRect().top < window.innerHeight * 0.45) active = "drive";
-        }
-        nav.classList.toggle("is-hidden", !visible);
-        document.body.classList.toggle("nav-sheet-open", active === "trash" || active === "profile");
-        NAV_ITEMS.forEach(function (item, index) {
-          const on = item[0] === active;
-          navButtons[item[0]].classList.toggle("is-active", on);
-          if (on) {
-            navButtons[item[0]].setAttribute("aria-current", "page");
-            navPill.style.transform = "translateX(" + (index * 100) + "%)";
-          } else navButtons[item[0]].removeAttribute("aria-current");
-        });
-        if (NATIVE_NAV) {
-          const report = JSON.stringify({
-            type: "nav", active: active, visible: visible,
-            name: els.profileName.textContent || "", email: els.profileEmail.textContent || ""
-          });
-          if (report !== lastNavReport) { lastNavReport = report; androidAppMessage(JSON.parse(report)); }
-        }
-      }
-      let navFrame = 0;
-      function queueNavSync() {
-        if (navFrame) return;
-        navFrame = requestAnimationFrame(function () { navFrame = 0; syncNav(); });
-      }
-      const navWatcher = new MutationObserver(queueNavSync);
-      [els.driveView, els.editorView, els.loginView, els.profileBox, els.profileMenu, document.body]
-        .concat(Array.prototype.slice.call(document.querySelectorAll(".modal-overlay")))
-        .forEach(function (node) { navWatcher.observe(node, { attributes: true, attributeFilter: ["class"] }); });
-      if (navScroller) navScroller.addEventListener("scroll", queueNavSync, { passive: true });
-      if (window.ResizeObserver && navScroller) {
-        const navResize = new ResizeObserver(queueNavSync);
-        Array.prototype.forEach.call(navScroller.children, function (child) { navResize.observe(child); });
-      }
-      window.addEventListener("resize", queueNavSync);
-      syncNav();
       // Dialog headers close with a round × (their footers keep Cancelar / Cerrar).
       Array.prototype.forEach.call(document.querySelectorAll(".modal-card > .head > button[aria-label='Cerrar']"), function (btn) {
         if (btn.textContent.trim() !== "Cerrar") return;
@@ -22373,8 +22181,6 @@
       profileScrim.setAttribute("aria-hidden", "true");
       profileScrim.addEventListener("click", function (event) { event.stopPropagation(); closeProfileMenu(); });
       els.profileBox.appendChild(profileScrim);
-      // The pill only animates once it has a position, so it does not fly in on load.
-      requestAnimationFrame(function () { nav.classList.add("is-ready"); });
     })();
     // An open group is shown as a secondary panel (side drawer / bottom sheet) on top of
     // the list. The body stays inside #sheetGroupsView so its delegated handlers still work.
@@ -22585,6 +22391,437 @@
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && document.body.classList.contains("group-panel-open")) closeGroupPanel();
       });
+    })();
+    /* ─── PLACES ────────────────────────────────────────────────────────────
+       Every screen is a place: Inicio, a paella or a document. Each one shows,
+       always in the same spots:
+       · the trail in the top bar (Inicio › Paella › Documento) to go back up;
+         on a phone only the parent shows, as "‹ Parent";
+       · the band: what it is (eyebrow), its name, one line saying what is going
+         on (and, in a document, whether you are reading or editing) and the
+         place's actions on the right, the main one in ink;
+       · its tabs: folder tabs under the band on a computer and the bottom bar on
+         a phone. Both come from PLACE_TABS, so they always agree. Places
+         without sections (a paella, a form) have no tabs and no bottom bar.
+       Controls that change data only appear while editing (#editorView without
+       .read-only), so reading never shows something that would not work.
+       APKs that draw the bottom bar natively (NATIVE_NAV) get the same tabs in
+       a {type:"nav"} message and call window.paellasNav(id) on taps. */
+    (function initPlaces() {
+      const ICONS = {
+        paellas: "<circle cx='12' cy='13' r='7'/><path d='M5 13h14M3 13h2M19 13h2M9 11l1.5 2M14 10l-1 3M12 16l2-1'/>",
+        files: "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>",
+        trash: "<path d='M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6'/>",
+        groups: "<path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'/>",
+        table: "<rect x='3' y='4' width='18' height='16' rx='2'/><path d='M3 10h18M9 4v16'/>",
+        entries: "<path d='M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z'/>",
+        history: "<path d='M3 12a9 9 0 1 0 3-6.7L3 8'/><path d='M3 3v5h5M12 7v5l3 2'/>",
+        edit: "<path d='M12 20h9'/><path d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'/>",
+        check: "<path d='M20 6 9 17l-5-5'/>",
+        qr: "<rect x='3' y='3' width='7' height='7' rx='1'/><rect x='14' y='3' width='7' height='7' rx='1'/><rect x='3' y='14' width='7' height='7' rx='1'/><path d='M14 14h3v3h-3zM18 18h3v3h-3zM14 20h2M20 14v2'/>",
+        plus: "<path d='M12 5v14M5 12h14'/>",
+        share: "<path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><path d='M20 8v6M23 11h-6'/>",
+        form: "<path d='M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z'/><path d='M14 3v6h6M8 13h8M8 17h5'/>",
+        settings: "<path d='M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0'/><circle cx='16' cy='6' r='2'/><circle cx='10' cy='12' r='2'/><circle cx='18' cy='18' r='2'/>"
+      };
+      function icon(name, size) {
+        return "<svg viewBox='0 0 24 24' width='" + (size || 18) + "' height='" + (size || 18) + "' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + ICONS[name] + "</svg>";
+      }
+      function el(tag, cls, html) {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (html != null) node.innerHTML = html;
+        return node;
+      }
+      function onDrive() { return !els.driveView.classList.contains("hidden"); }
+      function onDoc() { return !els.editorView.classList.contains("hidden"); }
+      function currentPlace() {
+        if (!els.loginView.classList.contains("hidden")) return "login";
+        if (onDoc()) return "doc";
+        if (onDrive() && state.activePaellaStack.length) return "paella";
+        return "home";
+      }
+
+      // ── Top bar: brand, trail, account ──
+      els.homeBtn.setAttribute("aria-label", "Inicio");
+      const trail = el("nav", "trail");
+      trail.setAttribute("aria-label", "Dónde estás");
+      els.homeBtn.parentNode.insertBefore(trail, els.homeBtn.nextSibling);
+      function trailItem(label, action) {
+        const node = el(action ? "button" : "span", "trail-item" + (action ? "" : " is-current"));
+        node.textContent = label;
+        if (action) {
+          node.type = "button";
+          node.addEventListener("click", action);
+        } else node.setAttribute("aria-current", "page");
+        return node;
+      }
+      function goHome(tab) {
+        if (tab) setHomeTab(tab);
+        if (onDoc()) { els.homeBtn.click(); return; }
+        if (state.activePaellaStack.length) closePaellaFolderView();
+      }
+      function goPaellaLevel(index) {
+        const stack = state.activePaellaStack.slice(0, index + 1);
+        const open = function () { loadPaellaFolder(stack[stack.length - 1].id, stack); };
+        if (onDoc()) {
+          returnToDrive().then(function (ok) { if (ok !== false) open(); });
+        } else open();
+      }
+      function renderTrail() {
+        trail.innerHTML = "";
+        const place = currentPlace();
+        if (place === "home" || place === "login") return;
+        const items = [trailItem("Inicio", function () { goHome(); })];
+        state.activePaellaStack.forEach(function (folder, index) {
+          const last = place === "paella" && index === state.activePaellaStack.length - 1;
+          items.push(trailItem(folder.name || "Paella", last ? null : function () { goPaellaLevel(index); }));
+        });
+        if (place === "doc") {
+          if (!state.activePaellaStack.length) items.push(trailItem("Archivos", function () { goHome("files"); }));
+          items.push(trailItem(currentTitle() || "Documento", null));
+        }
+        items.forEach(function (item, index) {
+          if (index) trail.appendChild(el("span", "trail-sep", "›")).setAttribute("aria-hidden", "true");
+          trail.appendChild(item);
+        });
+        // Phones show only the way back: "‹ Parent".
+        const parent = items[items.length - 2];
+        if (parent) parent.classList.add("is-parent");
+      }
+
+      // ── Inicio: Paellas / Archivos / Papelera ──
+      const driveShell = document.getElementById("driveShell");
+      const driveScroll = document.querySelector(".drive-scroll");
+      const homeTabsNav = el("nav", "view-tabs place-tabs");
+      homeTabsNav.setAttribute("role", "tablist");
+      homeTabsNav.setAttribute("aria-label", "Secciones de inicio");
+      driveShell.appendChild(homeTabsNav);
+      const HOME_TABS = [["paellas", "Paellas"], ["files", "Archivos"], ["trash", "Papelera"]];
+      HOME_TABS.forEach(function (tab) {
+        const btn = el("button", "view-tab", icon(tab[0]) + "<span>" + tab[1] + "</span>");
+        btn.type = "button";
+        btn.setAttribute("role", "tab");
+        btn.dataset.tab = tab[0];
+        btn.addEventListener("click", function () { setHomeTab(tab[0]); });
+        homeTabsNav.appendChild(btn);
+      });
+      // The trash lives in its own tab instead of a dialog.
+      const trashSection = el("section", "card drive-section-card trash-section");
+      trashSection.id = "trashSection";
+      trashSection.innerHTML = "<div class='drive-section-head'><div class='section-label'>Papelera</div><p class='section-note'>Lo que borres se queda aquí hasta que Google Drive lo elimine. Pulsa Recuperar para devolverlo a su sitio.</p></div>";
+      trashSection.appendChild(document.querySelector("#driveTrashModal .trash-modal-body"));
+      driveScroll.appendChild(trashSection);
+      let homeTab = "paellas";
+      try { homeTab = localStorage.getItem("paellas-home-tab") || "paellas"; } catch (err) { /* private mode */ }
+      if (!/^(paellas|files|trash)$/.test(homeTab)) homeTab = "paellas";
+      let trashLoaded = false;
+      function setHomeTab(tab) {
+        homeTab = tab;
+        try { localStorage.setItem("paellas-home-tab", tab); } catch (err) { /* private mode */ }
+        if (tab === "trash" && state.accessToken) { trashLoaded = true; loadTrashItems(); }
+        if (driveScroll) driveScroll.scrollTop = 0;
+        syncPlaces();
+      }
+
+      // ── Drive band actions ──
+      const heroActions = document.querySelector(".drive-hero-actions");
+      const readerBtn = el("button", "btn place-btn", icon("qr") + "<span>Lector de entradas</span>");
+      readerBtn.type = "button";
+      readerBtn.id = "placeReaderBtn";
+      readerBtn.addEventListener("click", function () { els.paellaEntryReaderBtn.click(); });
+      heroActions.insertBefore(readerBtn, els.createPaellaBtn);
+      els.searchInput.setAttribute("aria-label", "Buscar");
+
+      // ── Document band ──
+      const editorHead = document.querySelector("#editorShell .editor-head");
+      const docPlace = el("div", "place doc-place");
+      docPlace.innerHTML = "<div class='place-main'><div id='docEyebrow' class='place-eyebrow'></div><div class='place-title-slot'></div><div id='docMeta' class='place-meta'><span class='doc-state-dot' aria-hidden='true'></span><span id='docMetaText'></span></div></div><div class='place-actions'></div>";
+      editorHead.insertBefore(docPlace, editorHead.firstChild);
+      docPlace.querySelector(".place-title-slot").appendChild(els.editorTitle);
+      const docActions = docPlace.querySelector(".place-actions");
+      docActions.appendChild(els.presenceAvatars);
+      els.shareDocBtn.classList.remove("btn-icon-sq");
+      els.shareDocBtn.classList.add("place-btn");
+      els.shareDocBtn.innerHTML = icon("share") + "<span>Compartir</span>";
+      docActions.appendChild(els.shareDocBtn);
+      if (els.openInGoogleBtn) docActions.appendChild(els.openInGoogleBtn);
+      docActions.appendChild(els.modeToggleBtn);
+      els.modeToggleBtn.insertAdjacentHTML("afterbegin", "<span class='mode-icon'></span>");
+      // Sheet tabs (the spreadsheet's own sheets) only matter in Tabla: they sit on top of the grid.
+      const sheetBar = editorHead.querySelector(".sheet-bar");
+      const contentCard = els.sheetGroupsView.parentNode;
+      if (sheetBar && contentCard) {
+        sheetBar.classList.add("sheet-pages");
+        sheetBar.insertAdjacentHTML("afterbegin", "<span class='sheet-pages-label'>Pestañas de la hoja</span>");
+        contentCard.insertBefore(sheetBar, contentCard.firstChild);
+      }
+      // Historial says what it is for when nothing has been recorded yet.
+      const baseRenderChangeHistoryList = renderChangeHistoryList;
+      renderChangeHistoryList = function (entries) {
+        const result = baseRenderChangeHistoryList.apply(this, arguments);
+        if (els.sheetChangeHistoryList && !(entries && entries.length) && !els.sheetChangeHistoryList.querySelector(".history-empty")) {
+          els.sheetChangeHistoryList.insertAdjacentHTML("beforeend", "<div class='history-empty'><div class='section-label'>Sin cambios todavía</div><p class='section-note'>Cada vez que alguien pulse Editar y cambie datos, aquí quedará quién lo hizo, cuándo y qué cambió.</p></div>");
+        }
+        return result;
+      };
+      // A form's sections (Formulario / Respuestas / Ajustes) are its tabs, like a sheet's.
+      const formSwitch = document.getElementById("formViewSwitch");
+      const FORM_TABS = { formViewMainBtn: ["form-main", "form"], formViewResponsesBtn: ["form-responses", "table"], formViewSettingsBtn: ["form-settings", "settings"] };
+      if (formSwitch) {
+        formSwitch.classList.add("view-tabs", "form-tabs");
+        formSwitch.setAttribute("role", "tablist");
+        Array.prototype.forEach.call(formSwitch.querySelectorAll(".form-view-btn"), function (btn) {
+          const meta = FORM_TABS[btn.id];
+          btn.classList.add("view-tab");
+          btn.setAttribute("role", "tab");
+          if (meta) btn.insertAdjacentHTML("afterbegin", icon(meta[1]));
+        });
+        editorHead.insertBefore(formSwitch, els.viewTabs.nextSibling);
+        // Its edit tools (Plantilla, Sección, Pregunta) go between the band and the tabs.
+        const formToolbar = document.getElementById("formToolbar");
+        if (formToolbar) editorHead.insertBefore(formToolbar, els.viewTabs);
+        const formMetaNode = document.getElementById("formToolbarMeta");
+        if (formMetaNode) new MutationObserver(function () { syncDocState(); }).observe(formMetaNode, { childList: true, characterData: true, subtree: true });
+      }
+      // While editing groups, "Nuevo grupo" is the band's main action on a computer.
+      const bandNewGroupBtn = el("button", "btn primary place-btn edit-only band-new-group", icon("plus", 16) + "<span>Nuevo grupo</span>");
+      bandNewGroupBtn.type = "button";
+      bandNewGroupBtn.addEventListener("click", function () {
+        const original = els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']");
+        if (original) original.click();
+      });
+      docActions.insertBefore(bandNewGroupBtn, els.modeToggleBtn);
+      // On a phone it sits in the groups toolbar, next to the price tool.
+      const newGroupBtn = el("button", "btn primary edit-only groups-new-btn", icon("plus", 16) + "<span>Nuevo grupo</span>");
+      newGroupBtn.type = "button";
+      newGroupBtn.addEventListener("click", function () {
+        const original = els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']");
+        if (original) original.click();
+      });
+      // Entradas: the reader first, then the ticket design.
+      const entriesView = document.getElementById("sheetEntriesView");
+      if (entriesView) {
+        const access = el("section", "entries-access");
+        access.innerHTML = "<div><div class='section-label'>Control de acceso</div><p class='section-note'>Escanea el QR de cada entrada en la puerta. Las validadas se marcan en esta hoja al momento.</p></div>";
+        const scan = el("button", "btn primary", icon("qr") + "<span>Abrir lector</span>");
+        scan.type = "button";
+        scan.addEventListener("click", function () { openTicketReaderModal(state.spreadsheetId); });
+        access.appendChild(scan);
+        entriesView.insertBefore(access, entriesView.firstChild);
+      }
+
+      // Groups / Entradas need the form's response sheet. From another sheet,
+      // those tabs go back to the last response sheet instead of disappearing.
+      let responseSheet = { id: "", title: "" };
+      window.paellasShowSheetView = function (view) {
+        if (!isSpreadsheetDocumentActive()) return;
+        if ((view === "groups" || view === "entries") && !isCurrentSheetPaellaResponseSheet()) {
+          if (responseSheet.id !== state.spreadsheetId || !responseSheet.title) return;
+          Promise.resolve(loadSheet(responseSheet.title)).then(function () {
+            if (isCurrentSheetPaellaResponseSheet()) setSpreadsheetViewMode(view);
+          });
+          return;
+        }
+        if (view === state.spreadsheetViewMode) return;
+        setSpreadsheetViewMode(view);
+      };
+      const baseSyncViewTabs = syncViewTabs;
+      syncViewTabs = function (spreadsheetMode, groupsAvailable) {
+        if (groupsAvailable) responseSheet = { id: state.spreadsheetId, title: state.currentSheetTitle };
+        const canReturn = !groupsAvailable && responseSheet.id === state.spreadsheetId && !!responseSheet.title;
+        baseSyncViewTabs(spreadsheetMode, groupsAvailable || canReturn);
+        queueSync();
+      };
+
+      // ── Reading / editing, said in words ──
+      const baseApplyEditorMode = applyEditorMode;
+      applyEditorMode = function () {
+        const result = baseApplyEditorMode.apply(this, arguments);
+        syncDocState();
+        return result;
+      };
+      function syncDocState() {
+        const editing = state.editorMode === "edit" && state.canEdit;
+        const isForm = state.activeDocumentType === "form";
+        document.getElementById("docEyebrow").textContent = isForm ? "Formulario" : "Hoja de cálculo";
+        els.modeToggleBtn.querySelector(".mode-icon").innerHTML = icon(editing ? "check" : "edit", 17);
+        els.modeToggleLabel.textContent = editing ? "Terminar edición" : "Editar";
+        els.modeToggleBtn.classList.toggle("hidden", !state.canEdit);
+        const session = state.registeredEditSession && state.registeredEditSession.name;
+        const saved = els.saveIndicator.title || "";
+        let text;
+        if (!state.canEdit) text = "Solo lectura: no tienes permiso para editar";
+        else if (editing) text = "Editando" + (session ? " «" + session + "»" : "") + (saved && saved !== "Listo" ? " · " + saved : "");
+        else text = "Modo lectura · pulsa Editar para hacer cambios";
+        const formMeta = isForm && document.getElementById("formToolbarMeta");
+        if (formMeta && formMeta.textContent.trim()) text = formMeta.textContent.trim() + " · " + text;
+        document.getElementById("docMetaText").textContent = text;
+        docPlace.classList.toggle("is-editing", editing);
+        docPlace.classList.toggle("is-error", /error/i.test(saved));
+      }
+      new MutationObserver(syncDocState).observe(els.saveIndicator, { attributes: true, attributeFilter: ["title"] });
+
+      // ── Tabs of the current place (folder tabs + bottom bar) ──
+      function placeTabs() {
+        const place = currentPlace();
+        if (place === "home") {
+          return { items: HOME_TABS.map(function (tab) { return { id: tab[0], label: tab[1], icon: tab[0] }; }), active: homeTab };
+        }
+        if (place === "doc" && state.activeDocumentType === "form" && formSwitch) {
+          const items = [];
+          let active = "";
+          Array.prototype.forEach.call(formSwitch.querySelectorAll(".form-view-btn"), function (btn) {
+            const meta = FORM_TABS[btn.id];
+            if (!meta || btn.hidden) return;
+            items.push({ id: meta[0], label: btn.textContent.trim(), icon: meta[1] });
+            if (btn.classList.contains("active")) active = meta[0];
+          });
+          return { items: items, active: active };
+        }
+        if (place === "doc" && !els.viewTabs.classList.contains("hidden-panel")) {
+          const items = [];
+          let active = "";
+          Array.prototype.forEach.call(els.viewTabs.querySelectorAll(".view-tab"), function (tab) {
+            if (tab.hidden) return;
+            items.push({ id: tab.dataset.view, label: tab.textContent.trim(), icon: tab.dataset.view });
+            if (tab.getAttribute("aria-selected") === "true") active = tab.dataset.view;
+          });
+          return { items: items, active: active };
+        }
+        return { items: [], active: "" };
+      }
+      function runNav(id) {
+        if (id === "paellas" || id === "files" || id === "trash") { setHomeTab(id); return; }
+        if (/^(groups|table|entries|history)$/.test(id)) { window.paellasShowSheetView(id); return; }
+        if (/^form-/.test(id) && formSwitch) {
+          const btnId = Object.keys(FORM_TABS).find(function (key) { return FORM_TABS[key][0] === id; });
+          const btn = btnId && document.getElementById(btnId);
+          if (btn) btn.click();
+          return;
+        }
+        if (id === "close") { if (state.profileMenuOpen) closeProfileMenu(); return; }
+        if (id === "refresh") { els.profileRefreshBtn.click(); return; }
+        if (id === "logout") { els.profileLogoutBtn.click(); return; }
+      }
+      window.paellasNav = function (id) { runNav(String(id || "")); return true; };
+
+      // Web bottom bar (phones, and the 1.0.0 APK).
+      const bar = el("nav", "mobile-nav");
+      bar.setAttribute("aria-label", "Secciones");
+      const barPill = el("span", "mobile-nav-pill");
+      barPill.setAttribute("aria-hidden", "true");
+      bar.appendChild(barPill);
+      document.body.appendChild(bar);
+      let barKey = "";
+      function renderBar(tabs) {
+        const key = tabs.items.map(function (item) { return item.id; }).join(",");
+        if (key !== barKey) {
+          barKey = key;
+          Array.prototype.slice.call(bar.querySelectorAll(".mobile-nav-item")).forEach(function (node) { node.remove(); });
+          bar.style.setProperty("--tabs", Math.max(1, tabs.items.length));
+          tabs.items.forEach(function (item) {
+            const btn = el("button", "mobile-nav-item", icon(item.icon, 22) + "<span>" + item.label + "</span>");
+            btn.type = "button";
+            btn.dataset.nav = item.id;
+            btn.addEventListener("click", function (event) {
+              event.stopPropagation();
+              haptic("tap");
+              runNav(item.id);
+            });
+            bar.appendChild(btn);
+          });
+          bar.classList.remove("is-ready");
+          requestAnimationFrame(function () { requestAnimationFrame(function () { bar.classList.add("is-ready"); }); });
+        }
+        tabs.items.forEach(function (item, index) {
+          const btn = bar.querySelector("[data-nav='" + item.id + "']");
+          const on = item.id === tabs.active;
+          btn.classList.toggle("is-active", on);
+          if (on) {
+            btn.setAttribute("aria-current", "page");
+            barPill.style.transform = "translateX(" + (index * 100) + "%)";
+          } else btn.removeAttribute("aria-current");
+        });
+        barPill.style.opacity = tabs.items.some(function (item) { return item.id === tabs.active; }) ? "1" : "0";
+      }
+
+      let lastReport = "";
+      function syncPlaces() {
+        const place = currentPlace();
+        document.body.dataset.place = place;
+        document.body.dataset.homeTab = homeTab;
+        const isForm = place === "doc" && state.activeDocumentType === "form";
+        document.body.dataset.doc = place === "doc" ? (isForm ? "form" : "sheet") : "";
+        document.body.dataset.sheetView = place === "doc" && !isForm ? (state.spreadsheetViewMode || "table") : "";
+        if (formSwitch) Array.prototype.forEach.call(formSwitch.querySelectorAll(".form-view-btn"), function (btn) {
+          btn.setAttribute("aria-selected", btn.classList.contains("active") ? "true" : "false");
+        });
+        renderTrail();
+        Array.prototype.forEach.call(homeTabsNav.children, function (btn) {
+          const on = btn.dataset.tab === homeTab;
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+          btn.tabIndex = on ? 0 : -1;
+        });
+        if (place === "home" && homeTab === "trash" && !trashLoaded && state.accessToken) { trashLoaded = true; loadTrashItems(); }
+        els.searchInput.placeholder = homeTab === "files" && place === "home" ? "Buscar en tus archivos" : (place === "paella" ? "Buscar en esta paella" : "Buscar paellas");
+        readerBtn.classList.toggle("hidden", place !== "paella" || els.paellaEntryReaderBtn.classList.contains("hidden"));
+        // Edit-only controls live next to the price tool once the list has drawn it.
+        const pricing = els.sheetGroupsView.querySelector(".sheet-groups-banner-pricing");
+        if (pricing && newGroupBtn.parentNode !== pricing.parentNode) pricing.parentNode.insertBefore(newGroupBtn, pricing.nextSibling);
+        const canAddGroup = !!els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']") && state.spreadsheetViewMode === "groups";
+        newGroupBtn.classList.toggle("hidden", !canAddGroup);
+        bandNewGroupBtn.classList.toggle("hidden", !canAddGroup);
+        if (place === "doc") syncDocState();
+        // An open group while reading says how to change it.
+        const openBody = els.sheetGroupsView.querySelector(".sheet-group-card[open] > .sheet-group-body");
+        if (openBody && state.canEdit && !openBody.querySelector(":scope > .group-panel-readonly")) {
+          const hint = el("div", "group-panel-readonly", "<span>Estás leyendo. Para cambiar este grupo, pulsa Editar.</span>");
+          const go = el("button", "btn primary", icon("edit", 16) + "<span>Editar</span>");
+          go.type = "button";
+          go.addEventListener("click", function () { els.modeToggleBtn.click(); });
+          hint.appendChild(go);
+          openBody.appendChild(hint);
+        }
+
+        const tabs = placeTabs();
+        const loggedIn = !els.profileBox.classList.contains("hidden") && place !== "login";
+        const dialogOpen = !!document.querySelector(".modal-overlay.visible");
+        const visible = loggedIn && tabs.items.length > 1 && !dialogOpen && !document.body.classList.contains("group-panel-open") && !state.profileMenuOpen;
+        bar.classList.toggle("is-hidden", !visible);
+        document.body.classList.toggle("has-bottom-bar", loggedIn && tabs.items.length > 1);
+        renderBar(tabs);
+        if (NATIVE_NAV) {
+          const report = JSON.stringify({ type: "nav", visible: visible, active: tabs.active, items: tabs.items });
+          if (report !== lastReport) { lastReport = report; androidAppMessage(JSON.parse(report)); }
+        }
+      }
+      let frame = 0;
+      function queueSync() {
+        if (frame) return;
+        frame = requestAnimationFrame(function () { frame = 0; syncPlaces(); });
+      }
+      window.syncMercadoTopNav = queueSync;
+      window.syncMercadoEditorBand = queueSync;
+      const watcher = new MutationObserver(queueSync);
+      [els.driveView, els.editorView, els.loginView, els.profileBox, els.profileMenu, els.paellaEntryReaderBtn, els.viewTabs, document.body]
+        .concat(Array.prototype.slice.call(document.querySelectorAll(".modal-overlay")))
+        .forEach(function (node) { watcher.observe(node, { attributes: true, attributeFilter: ["class"] }); });
+      watcher.observe(els.viewTabs, { subtree: true, attributes: true, attributeFilter: ["hidden", "aria-selected"] });
+      watcher.observe(els.editorTitle, { childList: true, characterData: true, subtree: true });
+      watcher.observe(els.sheetGroupsView, { childList: true, subtree: false });
+      if (els.sheetGroupsList) watcher.observe(els.sheetGroupsList, { childList: true });
+      if (formSwitch) watcher.observe(formSwitch, { subtree: true, attributes: true, attributeFilter: ["class"] });
+
+      // In the app the account opens as a native sheet.
+      if (NATIVE_NAV) {
+        els.profileBtn.addEventListener("click", function (event) {
+          event.stopImmediatePropagation();
+          haptic("tap");
+          androidAppMessage({ type: "profile", name: els.profileName.textContent || "", email: els.profileEmail.textContent || "" });
+        }, true);
+      }
+      syncPlaces();
     })();
     bindEntriesDesignerHandlers();
     els.sheetGroupsFilterToggleMobile.addEventListener("click", function (event) {

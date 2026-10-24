@@ -20,35 +20,41 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * The phone bottom bar (Inicio, Mi unidad, Papelera, Perfil) drawn natively, so taps,
- * the sliding yellow pill and haptics feel like Android rather than a web page. It is
- * the same design as the page's own bar (index.html, theme-mercado.css .mobile-nav),
- * which the page hides when the user agent says PaellasNav/1.
+ * The phone bottom bar drawn natively, so taps, the sliding yellow pill and haptics
+ * feel like Android rather than a web page. Same design as the page's own bar
+ * (index.html initPlaces, theme-mercado.css .mobile-nav), which the page hides when
+ * the user agent says PaellasNav/1.
  *
- * The page stays the source of truth: it reports {type:"nav", active, visible} and the
- * shell calls window.paellasNav(name) for each tap. The pill moves on the tap itself
- * and settles on whatever the page reports next.
+ * The bar shows the tabs of the screen the page is on (Inicio: Paellas, Archivos,
+ * Papelera; a sheet: Grupos, Tabla, Entradas, Historial; a form: Formulario,
+ * Respuestas, Ajustes). The page sends them with
+ * {type:"nav", items:[{id, label, icon}], active, visible} and the shell calls
+ * window.paellasNav(id) for each tap. The pill moves on the tap itself and settles
+ * on whatever the page reports next.
  */
 final class NativeNav extends FrameLayout {
     interface Listener {
-        void onTab(String name);
+        void onTab(String id);
     }
 
-    static final String[] TABS = {"home", "drive", "trash", "profile"};
-    private static final int[] ICONS = {R.drawable.nav_home, R.drawable.nav_drive, R.drawable.nav_trash, R.drawable.nav_profile};
-    private static final int[] LABELS = {R.string.nav_home, R.string.nav_drive, R.string.nav_trash, R.string.nav_profile};
-
     private final int ink;
-    private final int sun;
     private final int idle;
     private final View pill;
     private final LinearLayout row;
-    private final ImageView[] icons = new ImageView[TABS.length];
-    private final TextView[] labels = new TextView[TABS.length];
-    private final ValueAnimator[] tints = new ValueAnimator[TABS.length];
+    private final List<String> ids = new ArrayList<>();
+    private final List<ImageView> icons = new ArrayList<>();
+    private final List<TextView> labels = new ArrayList<>();
+    private final List<ValueAnimator> tints = new ArrayList<>();
+    private String itemsKey = "";
     private Listener listener;
-    private int active = 0;
+    private int active = -1;
     private boolean shown = true;
     private boolean laidOut;
     private boolean pillMoving;
@@ -56,7 +62,6 @@ final class NativeNav extends FrameLayout {
     NativeNav(Context context) {
         super(context);
         ink = context.getColor(R.color.nav_ink);
-        sun = context.getColor(R.color.app_band);
         idle = context.getColor(R.color.nav_idle);
         int pad = dp(6);
         setPadding(pad, pad, pad, pad);
@@ -76,51 +81,107 @@ final class NativeNav extends FrameLayout {
 
         pill = new View(context);
         GradientDrawable pillShape = new GradientDrawable();
-        pillShape.setColor(sun);
+        pillShape.setColor(context.getColor(R.color.app_band));
         pillShape.setCornerRadius(dp(26));
         pill.setBackground(pillShape);
+        pill.setAlpha(0f);
         addView(pill, new LayoutParams(0, LayoutParams.MATCH_PARENT));
 
         row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
         addView(row, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        for (int i = 0; i < TABS.length; i++) row.addView(makeTab(context, i), new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
-        paint(active, false);
     }
 
     void setListener(Listener listener) {
         this.listener = listener;
     }
 
-    String activeTab() {
-        return TABS[active];
+    int tabCount() {
+        return ids.size();
+    }
+
+    /** Rebuilds the tabs when the page's list changes (another screen). */
+    void setItems(JSONArray items) {
+        StringBuilder key = new StringBuilder();
+        for (int i = 0; items != null && i < items.length(); i++) {
+            JSONObject item = items.optJSONObject(i);
+            if (item != null) key.append(item.optString("id")).append('|').append(item.optString("label")).append(',');
+        }
+        if (key.toString().equals(itemsKey)) return;
+        itemsKey = key.toString();
+        for (ValueAnimator tint : tints) if (tint != null) tint.cancel();
+        row.removeAllViews();
+        ids.clear();
+        icons.clear();
+        labels.clear();
+        tints.clear();
+        active = -1;
+        pill.animate().cancel();
+        pill.setAlpha(0f);
+        for (int i = 0; items != null && i < items.length(); i++) {
+            JSONObject item = items.optJSONObject(i);
+            if (item == null) continue;
+            row.addView(makeTab(item.optString("id"), item.optString("label"), item.optString("icon")),
+                    new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1f));
+        }
+        requestLayout();
+    }
+
+    private static int iconFor(String name) {
+        switch (name) {
+            case "paellas":
+                return R.drawable.nav_paellas;
+            case "files":
+                return R.drawable.nav_drive;
+            case "trash":
+                return R.drawable.nav_trash;
+            case "groups":
+                return R.drawable.nav_groups;
+            case "table":
+                return R.drawable.nav_table;
+            case "entries":
+                return R.drawable.nav_entries;
+            case "history":
+                return R.drawable.nav_history;
+            case "form":
+                return R.drawable.nav_form;
+            case "settings":
+                return R.drawable.nav_settings;
+            default:
+                return R.drawable.nav_home;
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private View makeTab(Context context, int index) {
+    private View makeTab(String id, String text, String iconName) {
+        Context context = getContext();
         LinearLayout tab = new LinearLayout(context);
         tab.setOrientation(LinearLayout.VERTICAL);
         tab.setGravity(Gravity.CENTER);
         tab.setFocusable(true);
         tab.setClickable(true);
-        tab.setContentDescription(context.getString(LABELS[index]));
+        tab.setContentDescription(text);
 
         ImageView icon = new ImageView(context);
-        icon.setImageResource(ICONS[index]);
+        icon.setImageResource(iconFor(iconName));
         tab.addView(icon, new LinearLayout.LayoutParams(dp(22), dp(22)));
 
         TextView label = new TextView(context);
-        label.setText(LABELS[index]);
+        label.setText(text);
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         label.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         label.setIncludeFontPadding(false);
+        label.setSingleLine(true);
         LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         labelParams.topMargin = dp(3);
         tab.addView(label, labelParams);
+        applyTint(icon, label, idle);
 
-        icons[index] = icon;
-        labels[index] = label;
+        ids.add(id);
+        icons.add(icon);
+        labels.add(label);
+        tints.add(null);
         // Pressed tabs sink a little and spring back, like a physical key.
         tab.setOnTouchListener((view, event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
@@ -132,55 +193,56 @@ final class NativeNav extends FrameLayout {
         });
         tab.setOnClickListener(view -> {
             Haptics.tap(view, "tap");
-            select(TABS[index], true);
-            if (listener != null) listener.onTab(TABS[index]);
+            select(id, true);
+            if (listener != null) listener.onTab(id);
         });
         return tab;
     }
 
-    /** Moves the pill to {@code name}; unknown names are ignored. */
-    void select(String name, boolean animate) {
-        for (int i = 0; i < TABS.length; i++) {
-            if (TABS[i].equals(name)) {
-                if (i != active) paint(i, animate && laidOut);
-                return;
-            }
-        }
+    /** Moves the pill to tab {@code id}; an unknown id leaves no tab marked. */
+    void select(String id, boolean animate) {
+        int index = ids.indexOf(id);
+        if (index == active) return;
+        paint(index, animate && laidOut && active >= 0);
     }
 
     private void paint(int index, boolean animate) {
         int previous = active;
         active = index;
-        for (int i = 0; i < TABS.length; i++) {
+        for (int i = 0; i < ids.size(); i++) {
             int target = i == index ? ink : idle;
-            if (tints[i] != null) tints[i].cancel();
-            ImageView icon = icons[i];
-            TextView label = labels[i];
+            if (tints.get(i) != null) tints.get(i).cancel();
+            ImageView icon = icons.get(i);
+            TextView label = labels.get(i);
+            float scale = i == index ? 1.06f : 1f;
             if (!animate || (i != index && i != previous)) {
                 applyTint(icon, label, target);
-                icon.setScaleX(i == index ? 1.06f : 1f);
-                icon.setScaleY(i == index ? 1.06f : 1f);
+                icon.setScaleX(scale);
+                icon.setScaleY(scale);
                 continue;
             }
-            int from = label.getCurrentTextColor();
-            ValueAnimator tint = ValueAnimator.ofObject(new ArgbEvaluator(), from, target);
+            ValueAnimator tint = ValueAnimator.ofObject(new ArgbEvaluator(), label.getCurrentTextColor(), target);
             tint.setDuration(180);
             tint.addUpdateListener(a -> applyTint(icon, label, (int) a.getAnimatedValue()));
             tint.start();
-            tints[i] = tint;
-            float scale = i == index ? 1.06f : 1f;
+            tints.set(i, tint);
             icon.animate().scaleX(scale).scaleY(scale).setDuration(260).setInterpolator(new OvershootInterpolator(2.5f)).start();
+        }
+        if (index < 0) {
+            pill.animate().alpha(0f).setDuration(120).start();
+            return;
         }
         if (!laidOut) return;
         float x = slot(index);
         if (animate) {
             pillMoving = true;
-            pill.animate().translationX(x).setDuration(280).setInterpolator(new OvershootInterpolator(1.1f))
+            pill.animate().translationX(x).alpha(1f).setDuration(280).setInterpolator(new OvershootInterpolator(1.1f))
                     .withEndAction(() -> pillMoving = false).start();
         } else {
             pill.animate().cancel();
             pillMoving = false;
             pill.setTranslationX(x);
+            pill.setAlpha(1f);
         }
     }
 
@@ -190,14 +252,15 @@ final class NativeNav extends FrameLayout {
     }
 
     private float slot(int index) {
-        return index * (float) (getWidth() - getPaddingLeft() - getPaddingRight()) / TABS.length;
+        int count = Math.max(1, ids.size());
+        return index * (float) (getWidth() - getPaddingLeft() - getPaddingRight()) / count;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // The pill is exactly one tab wide.
         int width = MeasureSpec.getSize(widthMeasureSpec) - getPaddingLeft() - getPaddingRight();
-        pill.getLayoutParams().width = Math.max(0, width / TABS.length);
+        pill.getLayoutParams().width = Math.max(0, width / Math.max(1, ids.size()));
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -205,7 +268,10 @@ final class NativeNav extends FrameLayout {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         laidOut = true;
-        if (!pillMoving) pill.setTranslationX(slot(active));
+        if (!pillMoving && active >= 0) {
+            pill.setTranslationX(slot(active));
+            pill.setAlpha(1f);
+        }
     }
 
     /** Slides the bar out of the way (dialogs, an open group, the keyboard) and back. */

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom bar icon, same stroke icon as the page's bar (index.html initPlaces ICONS). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M5,13a7,7 0,1 0,14 0a7,7 0,1 0,-14 0M5,13h14M3,13h2M19,13h2M9,11l1.5,2M14,10l-1,3M12,16l2,-1" android:strokeColor="#FFFFFFFF" android:strokeWidth="2"
+        android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+</vector>
