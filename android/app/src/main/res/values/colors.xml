@@ -5,4 +5,9 @@
     <!-- The band's yellow, behind the status bar and the Custom Tab toolbar. -->
     <color name="app_band">#FFD43B</color>
     <color name="ic_launcher_background">#FFD43B</color>
+    <!-- Bottom bar and sheets (m-ink, the bar's idle label and m-muted in theme-mercado.css). -->
+    <color name="nav_ink">#26170A</color>
+    <color name="nav_idle">#E9D8B0</color>
+    <color name="sheet_muted">#5C4730</color>
+    <color name="sheet_scrim">#7326170A</color>
 </resources>

@@ -17,6 +17,17 @@ en `android/`.
   - `save`: los PDF de entradas que genera la web, con el diálogo «Guardar como».
   - `open`: enlaces externos en una Custom Tab o en su app.
   - `updates`: abre los ajustes del actualizador (menú de perfil → «Actualizaciones»).
+  - `nav`: la web dice qué pestaña está activa (`home`, `drive`, `trash`, `profile`),
+    si la barra inferior debe verse y la cuenta (nombre y correo).
+  - `haptic`: vibración nativa de Android (`tap`, `soft`, `confirm`, `reject`) al
+    pulsar controles; respeta el ajuste «Respuesta táctil» del sistema.
+- Barra inferior nativa en móviles (`NativeNav.java`: Inicio, Mi unidad, Papelera,
+  Perfil) con la píldora amarilla animada, respuesta táctil y que se aparta con el
+  teclado y los diálogos. Cada toque llama a `window.paellasNav(nombre)`. La web
+  oculta su propia barra cuando el user agent lleva `PaellasNav/1`; la APK 1.0.0 no
+  lo lleva y sigue usando la barra web.
+- Perfil es una hoja nativa (`ProfileSheet.java`) encima de la barra: Actualizar,
+  Salir y «Actualizaciones de la app». Se cierra tocando fuera, arrastrando o con Atrás.
 - Cámara solo para `https://paellas.net` (Lector de entradas).
 - Botón Atrás: primero cierra lo que tenga abierto la web (`window.paellasBack`).
 - Sin conexión: usa la copia en caché y, si no hay, «Sin conexión» con «Reintentar».

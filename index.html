@@ -6393,7 +6393,7 @@
               <path d="M15 15h2"/>
             </svg>
           </button>
-          <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edicion">
+          <button id="modeToggleBtn" class="btn mode-toggle-btn is-editing" type="button" aria-pressed="true" aria-label="Cambiar entre modo lectura y edición">
             <span class="mode-toggle-status">
               <span id="saveIndicator" class="save-indicator paused" aria-hidden="true" title="Modo lectura"></span>
             </span>
@@ -6475,7 +6475,7 @@
           </div>
           <div id="paellaPanelContent" class="paella-panel-content">
             <div id="paellasGrid" class="grid paella-grid"></div>
-            <p id="paellasEmpty" class="meta paella-empty hidden">No hay paellas todavia.</p>
+            <p id="paellasEmpty" class="meta paella-empty hidden">Todavía no hay paellas.</p>
           </div>
           <div id="paellaPanelFooter" class="paella-panel-footer hidden">
             <button id="paellaEntryReaderBtn" class="btn hidden paella-entry-reader-btn" type="button">
@@ -6830,7 +6830,7 @@
         <div id="newSheetTargetMeta" class="pill">Destino: Mi unidad</div>
         <div id="newSheetPickerBreadcrumbs" class="crumbs"></div>
         <div id="newSheetPickerList" class="picker-list"></div>
-        <p id="newSheetPickerEmpty" class="meta hidden">No hay subcarpetas en esta ubicacion.</p>
+        <p id="newSheetPickerEmpty" class="meta hidden">No hay subcarpetas en esta ubicación.</p>
       </div>
       <div class="modal-form">
         <select id="newSheetTypeSelect" class="search hidden" aria-label="Tipo de archivo">
@@ -6883,7 +6883,7 @@
       <div class="head">
         <div class="modal-copy">
           <div id="appDialogTitle" class="title">Accion</div>
-          <div id="appDialogSubtitle" class="meta">Confirma la accion.</div>
+          <div id="appDialogSubtitle" class="meta">Confirma la acción.</div>
         </div>
         <button id="appDialogCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
       </div>
@@ -6926,7 +6926,7 @@
         <div id="moveTargetMeta" class="pill">Destino: Mi unidad</div>
         <div id="moveModalBreadcrumbs" class="crumbs"></div>
         <div id="moveModalList" class="picker-list"></div>
-        <p id="moveModalEmpty" class="meta hidden">No hay subcarpetas en esta ubicacion.</p>
+        <p id="moveModalEmpty" class="meta hidden">No hay subcarpetas en esta ubicación.</p>
       </div>
       <div class="row modal-actions">
         <button id="moveModalCancelBtn" class="btn small" type="button">Cancelar</button>
@@ -6961,14 +6961,14 @@
       <div class="head">
         <div class="modal-copy">
           <div id="driveTrashModalTitle" class="title">Papelera</div>
-          <div class="meta">Archivos enviados a la papelera. Puedes recuperarlos desde aqui.</div>
+          <div class="meta">Archivos enviados a la papelera. Puedes recuperarlos desde aquí.</div>
         </div>
-        <button id="driveTrashCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
+        <button id="driveTrashCloseBtn" class="btn small sheet-close" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
       <div class="trash-modal-body">
         <div id="driveTrashStatus" class="status"></div>
         <div id="driveTrashList" class="trash-list"></div>
-        <p id="driveTrashEmpty" class="meta trash-empty hidden">La papelera esta vacia.</p>
+        <p id="driveTrashEmpty" class="meta trash-empty hidden">La papelera está vacía.</p>
       </div>
       <div class="row modal-actions">
         <button id="driveTrashFooterCloseBtn" class="btn small" type="button">Cerrar</button>
@@ -7185,7 +7185,7 @@
     <section id="addAssistantWizardCard" class="card modal-card group-create-modal">
       <div class="head">
         <div class="modal-copy">
-          <div id="addAssistantWizardTitle" class="title">Anadir integrante</div>
+          <div id="addAssistantWizardTitle" class="title">Añadir integrante</div>
           <div class="meta">Completa los datos antes de incorporarlo al grupo.</div>
         </div>
         <button id="addAssistantWizardCloseBtn" class="btn small" type="button" aria-label="Cerrar">Cerrar</button>
@@ -7224,7 +7224,7 @@
       <div class="group-create-actions">
         <button id="addAssistantWizardCancelBtn" class="btn small" type="button">Cancelar</button>
         <div class="group-create-actions-right">
-          <button id="addAssistantWizardConfirmBtn" class="btn primary" type="button">Anadir integrante</button>
+          <button id="addAssistantWizardConfirmBtn" class="btn primary" type="button">Añadir integrante</button>
         </div>
       </div>
     </section>
@@ -8203,7 +8203,7 @@
         return Promise.resolve(state.accessToken);
       }
       if (!state.tokenClient) {
-        return Promise.reject(new Error("Google Auth aun no esta listo."));
+        return Promise.reject(new Error("Google aún no está listo."));
       }
       return new Promise(function (resolve, reject) {
         state.tokenClient.callback = function (resp) {
@@ -8337,17 +8337,17 @@
     }
     function restoreStoredSession() {
       if (state.sessionRestoreInFlight) return state.sessionRestoreInFlight;
-      setLoginStatus("Recuperando sesion...");
+      setLoginStatus("Recuperando sesión…");
       loadTokenFromStorage();
       if (localStorage.getItem(AUTH_REMEMBER_KEY) === "1") {
         state.sessionRestoreInFlight = openAuthenticatedDrive()
           .then(function () { return true; })
           .catch(function (err) {
-            console.warn("No se ha podido restaurar la sesion guardada:", err);
+            console.warn("No se ha podido restaurar la sesión guardada:", err);
             clearAccessTokenState();
             renderProfileMenu();
             showView("login");
-            setLoginStatus("No se pudo restaurar la sesion automaticamente. Pulsa Iniciar sesion.");
+            setLoginStatus("No se pudo restaurar la sesión automáticamente. Pulsa Continuar con Google.");
             return false;
           })
           .finally(function () { state.sessionRestoreInFlight = null; });
@@ -9305,7 +9305,7 @@
       }).catch(function (err) {
         console.error(err);
         setBusy(els.appDialogCard, false);
-        setAppDialogStatus(messageFromError(err, "No se ha podido completar la accion."), "error");
+        setAppDialogStatus(messageFromError(err, "No se ha podido completar la acción."), "error");
       });
     }
     async function applyPaellaTemplateSelection() {
@@ -9848,7 +9848,7 @@
         "?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,headRevisionId,capabilities(canEdit),appProperties"
       ).then(function (file) {
         if (!file || file.mimeType !== "application/vnd.google-apps.spreadsheet") {
-          throw new Error("El archivo seleccionado no es un Google Sheets valido.");
+          throw new Error("El archivo seleccionado no es un Google Sheets válido.");
         }
         return fetchJson(
           "https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(id) +
@@ -9872,7 +9872,7 @@
       ]).then(function (parts) {
         const file = parts[0];
         if (!file || file.mimeType !== DRIVE_FORM_MIME) {
-          throw new Error("El archivo seleccionado no es un Google Forms valido.");
+          throw new Error("El archivo seleccionado no es un Google Forms válido.");
         }
         return { file: file, form: parts[1], responses: parts[2] };
       });
@@ -12609,7 +12609,7 @@
         const validateBtn = document.createElement("button");
         validateBtn.type = "button";
         validateBtn.className = "btn small primary";
-        validateBtn.textContent = normalizedStatus === "HA ENTRADO" ? "Ver validacion" : "Revisar";
+        validateBtn.textContent = normalizedStatus === "HA ENTRADO" ? "Ver validación" : "Revisar";
         validateBtn.dataset.ticketAction = "validate";
         validateBtn.dataset.ticketCode = person.code || "";
         actions.appendChild(validateBtn);
@@ -13158,7 +13158,7 @@
         console.error(err);
         stopTicketReaderCamera();
         syncTicketReaderCameraUi();
-        setTicketReaderStatus(messageFromError(err, "No se pudo abrir la camara"), "error");
+        setTicketReaderStatus(messageFromError(err, "No se pudo abrir la cámara"), "error");
         return false;
       });
     }
@@ -13215,7 +13215,7 @@
         return "Solo lectura: el recalculo masivo requiere una hoja con cabeceras reales.";
       }
       if (!state.canEdit || state.editorMode !== "edit") {
-        return "Pasa a modo edicion para recalcular el importe de toda la hoja.";
+        return "Pasa a modo edición para recalcular el importe de toda la hoja.";
       }
       const raw = String(rawValue || "").trim();
       if (!raw) {
@@ -13223,7 +13223,7 @@
       }
       const perHead = tryParseEuroAmount(raw);
       if (perHead == null || perHead < 0) {
-        return "Introduce un precio por persona valido.";
+        return "Introduce un precio por persona válido.";
       }
       const totalAttendees = allGroups.reduce(function (sum, group) {
         return sum + (Number(group && group.attendeeCount) || 0);
@@ -13386,12 +13386,12 @@
         return Promise.resolve(false);
       }
       if (model.syntheticHeader) {
-        setSheetGroupsStatus("La hoja esta en solo lectura. No se pueden recalcular importes aqui.", "error");
+        setSheetGroupsStatus("La hoja está en solo lectura. No se pueden recalcular importes aquí.", "error");
         return Promise.resolve(false);
       }
       const parsedPerHead = tryParseEuroAmount(rawValue);
       if (parsedPerHead == null || parsedPerHead < 0) {
-        setSheetGroupsStatus("Introduce un precio por persona valido.", "error");
+        setSheetGroupsStatus("Introduce un precio por persona válido.", "error");
         if (els.sheetGroupsBulkPriceInput && typeof els.sheetGroupsBulkPriceInput.focus === "function") {
           els.sheetGroupsBulkPriceInput.focus();
           els.sheetGroupsBulkPriceInput.select();
@@ -13512,7 +13512,7 @@
       if (els.addAssistantWizardName) els.addAssistantWizardName.value = "";
       if (els.addAssistantWizardDni) els.addAssistantWizardDni.value = "";
       if (els.addAssistantWizardEmail) els.addAssistantWizardEmail.value = "";
-      if (els.addAssistantWizardTitle) els.addAssistantWizardTitle.textContent = "Anadir integrante";
+      if (els.addAssistantWizardTitle) els.addAssistantWizardTitle.textContent = "Añadir integrante";
       if (els.addAssistantWizardSummary) {
         els.addAssistantWizardSummary.textContent = "Completa los campos marcados en rojo para crear el integrante.";
       }
@@ -13528,7 +13528,7 @@
         return !String(draft[entry.key] || "").trim();
       });
       if (missing.length) {
-        setAddAssistantWizardStatus("Completa los campos marcados en rojo antes de anadir el integrante.", "error");
+        setAddAssistantWizardStatus("Completa los campos marcados en rojo antes de añadir el integrante.", "error");
         const firstInput = missing[0] && missing[0].input;
         if (firstInput && typeof firstInput.focus === "function") firstInput.focus();
         return false;
@@ -13577,7 +13577,7 @@
     }
     function submitAddAssistantWizard() {
       if (addAssistantWizardSubmitting) return Promise.resolve(false);
-      if (!addAssistantWizardAction) return Promise.reject(new Error("No hay ningun alta de integrante pendiente."));
+      if (!addAssistantWizardAction) return Promise.reject(new Error("No hay ningún alta de integrante pendiente."));
       if (!validateAddAssistantWizard()) return Promise.resolve(false);
       const draft = readAddAssistantWizardDraft();
       addAssistantWizardSubmitting = true;
@@ -13592,7 +13592,7 @@
           console.error(err);
           if (els.addAssistantWizardCard) setBusy(els.addAssistantWizardCard, false);
           addAssistantWizardSubmitting = false;
-          setAddAssistantWizardStatus(messageFromError(err, "No se ha podido anadir el integrante"), "error");
+          setAddAssistantWizardStatus(messageFromError(err, "No se ha podido añadir el integrante"), "error");
           throw err;
         });
     }
@@ -13706,7 +13706,7 @@
     }
     function submitPromoteResponsibleWizard() {
       if (promoteResponsibleWizardSubmitting) return Promise.resolve(false);
-      if (!promoteResponsibleWizardAction) return Promise.reject(new Error("No hay ningun cambio de responsable pendiente."));
+      if (!promoteResponsibleWizardAction) return Promise.reject(new Error("No hay ningún cambio de responsable pendiente."));
       if (!validatePromoteResponsibleWizard()) return Promise.resolve(false);
       const draft = readPromoteResponsibleWizardDraft();
       promoteResponsibleWizardSubmitting = true;
@@ -14007,7 +14007,7 @@
     }
     function deleteSheetGroup(group) {
       const info = currentSheetInfo();
-      if (!group || !info || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay un grupo valido para eliminar."));
+      if (!group || !info || !state.spreadsheetId || !state.currentSheetTitle) return Promise.reject(new Error("No hay un grupo válido para eliminar."));
       return flushPendingChanges({ force: true, message: "Guardando antes de eliminar grupo..." }).then(function (ok) {
         if (!ok && hasPendingChanges()) throw new Error("No se han podido guardar los cambios pendientes.");
         setBusy(els.editorShell, true);
@@ -14538,7 +14538,7 @@
                 "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Nombre</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.name || "Sin nombre") + "</div></div>" +
                 "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Email</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.email || "Sin email") + "</div></div>" +
                 "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>DNI</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.dni || "Sin DNI") + "</div></div>" +
-                "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Telefono</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.phone || "Sin telefono") + "</div></div>" +
+                "<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Telefono</div><div class='sheet-group-detail-value'>" + escapeHtml(group.responsible.phone || "Sin teléfono") + "</div></div>" +
                 (group.sharedLead && normalizeCompareText(group.sharedLead) !== "no"
                   ? ("<div class='sheet-group-detail'><div class='sheet-group-detail-label'>Grupo compartido</div><div class='sheet-group-detail-value'>" + escapeHtml(group.sharedLead) + "</div></div>")
                   : "") +
@@ -15684,7 +15684,7 @@
       }
       bannerTitle.textContent = "Historial de cambios";
       bannerMeta.textContent = "";
-      searchInput.placeholder = "Buscar por grupo, responsable, integrante, DNI, email o accion";
+      searchInput.placeholder = "Buscar por grupo, responsable, integrante, DNI, email o acción";
       if (document.activeElement !== searchInput) {
         searchInput.value = String(state.sheetChangeHistorySearch || "");
       }
@@ -15826,7 +15826,7 @@
           if (state.registeredEditSession && state.registeredEditSession.id === session.sessionId) {
             const liveChip = document.createElement("span");
             liveChip.className = "sheet-group-chip is-progress";
-            liveChip.textContent = "En edicion";
+            liveChip.textContent = "En edición";
             chipStack.appendChild(liveChip);
           }
           info.appendChild(chipStack);
@@ -16502,8 +16502,8 @@
     function syncEditSessionStartConfirmBtn() {
       if (!els.editSessionStartConfirmBtn) return;
       els.editSessionStartConfirmBtn.textContent = getSelectedEditSessionStartRecentSession()
-        ? "Continuar edicion registrada"
-        : "Comenzar edicion registrada";
+        ? "Continuar edición registrada"
+        : "Comenzar edición registrada";
     }
     function renderEditSessionStartRecentOptions() {
       if (!els.editSessionStartRecentSection || !els.editSessionStartRecentList) return;
@@ -16699,7 +16699,7 @@
           els.editSessionStartNameInput.classList.add("is-invalid");
           els.editSessionStartNameInput.focus();
         }
-        setEditSessionStartStatus("Pon un nombre para registrar esta edicion.", "error");
+        setEditSessionStartStatus("Pon un nombre para registrar esta edición.", "error");
         return Promise.resolve(false);
       }
       const user = currentHistoryUserSnapshot();
@@ -16729,7 +16729,7 @@
       state.editSessionStartSubmitting = true;
       if (els.editSessionStartConfirmBtn) els.editSessionStartConfirmBtn.disabled = true;
       if (els.editSessionStartCard) setBusy(els.editSessionStartCard, true);
-      setEditSessionStartStatus(selectedRecentSession ? "Reanudando registro de edicion..." : "Creando registro de edicion...", "");
+      setEditSessionStartStatus(selectedRecentSession ? "Reanudando registro de edición…" : "Creando registro de edición…", "");
       return ensureChangeHistorySheet().then(function () {
         return appendChangeHistoryRows([buildChangeHistoryRow({
           sessionId: session.id,
@@ -16759,7 +16759,7 @@
         });
       }).catch(function (err) {
         console.error(err);
-        setEditSessionStartStatus(messageFromError(err, "No se ha podido iniciar la edicion registrada"), "error");
+        setEditSessionStartStatus(messageFromError(err, "No se ha podido iniciar la edición registrada"), "error");
         return false;
       }).finally(function () {
         state.editSessionStartSubmitting = false;
@@ -16816,7 +16816,7 @@
         .then(closeNameModal)
         .catch(function (err) {
           console.error(err);
-          els.nameModalSubtitle.textContent = messageFromError(err, "No se ha podido completar la accion");
+          els.nameModalSubtitle.textContent = messageFromError(err, "No se ha podido completar la acción");
         });
     }
     function fetchPermissions(targetId) {
@@ -16958,7 +16958,7 @@
     function renderPendingPaellaShares() {
       els.paellaInviteList.innerHTML = "";
       if (!state.pendingPaellaShares.length) {
-        els.paellaInviteList.innerHTML = "<div class='status'>Solo tu tendras acceso hasta que anadas personas.</div>";
+        els.paellaInviteList.innerHTML = "<div class='status'>Solo tú tendrás acceso hasta que añadas personas.</div>";
         return;
       }
       state.pendingPaellaShares.forEach(function (share, index) {
@@ -16986,7 +16986,7 @@
     function addPendingPaellaShare() {
       const email = String(els.paellaInviteEmailInput.value || "").trim().toLowerCase();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setPaellaInviteStatus("Introduce un correo valido", "error");
+        setPaellaInviteStatus("Introduce un correo válido", "error");
         return;
       }
       const role = els.paellaInviteRoleSelect.value || "writer";
@@ -17205,10 +17205,10 @@
       const clean = raw.replace(/^Google API \d+:\s*/i, "").trim();
       if (!clean) return fallback;
       if (/Google Sheets API has not been used/i.test(clean) || /API has not been used/i.test(clean)) {
-        return "La API de Google Sheets no esta habilitada en este proyecto de Google Cloud.";
+        return "La API de Google Sheets no está habilitada en este proyecto de Google Cloud.";
       }
       if (/Google Forms API has not been used/i.test(clean)) {
-        return "La API de Google Forms no esta habilitada en este proyecto de Google Cloud.";
+        return "La API de Google Forms no está habilitada en este proyecto de Google Cloud.";
       }
       if (/PERMISSION_DENIED|insufficient authentication scopes/i.test(clean)) {
         return "Google ha rechazado permisos para abrir o editar este archivo.";
@@ -18677,8 +18677,8 @@
       els.createPaellaBtn.textContent = activeFolder ? "Nuevo archivo" : "Crear paella";
       els.paellasGrid.innerHTML = "";
       els.paellasEmpty.textContent = activeFolder
-        ? (state.activePaellaLoadError || (query ? "No hay archivos en esta paella que coincidan con la busqueda." : "Esta paella esta vacia."))
-        : (state.paellaLoadError || (query ? "No hay paellas que coincidan con la busqueda." : "No hay paellas todavia."));
+        ? (state.activePaellaLoadError || (query ? "No hay archivos en esta paella que coincidan con la búsqueda." : "Esta paella está vacía."))
+        : (state.paellaLoadError || (query ? "No hay paellas que coincidan con la búsqueda." : "Todavía no hay paellas."));
       els.paellasEmpty.classList.toggle("hidden", filtered.length !== 0);
       if (activeFolder) {
         const pairById = getPaellaLinkedPairMap(state.activePaellaItems);
@@ -18944,7 +18944,7 @@
                 setFormSyncStatus("Enlace del formulario copiado.", "good");
                 return false;
               }).catch(function () {
-                setAppDialogStatus("No se ha podido copiar automaticamente. Puedes copiarlo manualmente.", "error");
+                setAppDialogStatus("No se ha podido copiar automáticamente. Puedes copiarlo a mano.", "error");
                 return false;
               });
             }
@@ -21685,6 +21685,28 @@
     function androidAppMessage(message) {
       window.PaellasApp.postMessage(JSON.stringify(message));
     }
+    // APKs from 1.0.1 draw the bottom bar natively and say so in their user agent;
+    // 1.0.0 does not, so it keeps the page's own bar.
+    const NATIVE_NAV = ANDROID_APP && /\bPaellasNav\/1\b/.test(navigator.userAgent);
+    if (NATIVE_NAV) document.documentElement.classList.add("native-nav");
+    // Haptics: the app uses Android's own feedback (it follows the system setting);
+    // a browser only gets a short vibration on navigation taps.
+    let lastHaptic = 0;
+    function haptic(kind) {
+      const now = Date.now();
+      if (now - lastHaptic < 40) return;
+      lastHaptic = now;
+      if (ANDROID_APP) androidAppMessage({ type: "haptic", kind: kind || "tap" });
+      else if (kind !== "soft" && navigator.vibrate) navigator.vibrate(kind === "reject" ? [12, 40, 12] : 8);
+    }
+    if (ANDROID_APP) {
+      // Every control answers the touch like a native one.
+      document.addEventListener("click", function (event) {
+        const target = event.target.closest && event.target.closest("button, summary, a.btn, [role='button'], [role='tab'], input[type='checkbox'], input[type='radio'], select, label.switch");
+        if (!target || target.disabled || target.closest(".mobile-nav")) return;
+        haptic(target.matches(".danger, .btn-danger, [data-danger]") ? "reject" : "soft");
+      }, true);
+    }
     // Same shape as GIS's token client, so ensureAccessToken() works unchanged.
     function createAndroidTokenClient() {
       const client = {
@@ -22203,25 +22225,156 @@
       window.addEventListener("resize", syncBandHeight);
       syncBandHeight();
 
-      // Phone: floating bottom navigation for the always-available destinations.
+      // Phone navigation. Inicio and Mi unidad are places on the home page (the active
+      // one follows the scroll); Papelera and Perfil open sheets that sit just above the
+      // bar, so the bar stays usable and shows which one is open. APKs that draw this
+      // bar natively (NATIVE_NAV) hide it here: the page reports the state with a
+      // {type:"nav"} message and the shell calls window.paellasNav(name) on taps.
+      const NAV_ITEMS = [
+        ["home", "Inicio", "<path d='M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/>"],
+        ["drive", "Mi unidad", "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>"],
+        ["trash", "Papelera", "<path d='M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6'/>"],
+        ["profile", "Perfil", "<circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/>"]
+      ];
       const nav = document.createElement("nav");
       nav.className = "mobile-nav";
       nav.setAttribute("aria-label", "Navegación");
-      const navItems = [
-        ["Inicio", "<path d='M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/>", function () { if (!els.driveView.classList.contains("hidden")) { if (state.activePaellaStack.length) els.homeBtn.click(); document.querySelector(".drive-scroll").scrollTo({ top: 0, behavior: "smooth" }); } else els.homeBtn.click(); }],
-        ["Mi unidad", "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>", function () { const go = function () { const target = document.getElementById("folderSection"); if (target) target.scrollIntoView({ behavior: "smooth", block: "start" }); }; if (els.driveView.classList.contains("hidden") || state.activePaellaStack.length) { els.homeBtn.click(); setTimeout(go, 350); } else go(); }],
-        ["Papelera", "<path d='M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6'/>", function () { els.driveTrashBtn.click(); }],
-        ["Perfil", "<circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/>", function () { document.getElementById("profileBtn").click(); }]
-      ];
-      navItems.forEach(function (item, index) {
+      const navPill = document.createElement("span");
+      navPill.className = "mobile-nav-pill";
+      navPill.setAttribute("aria-hidden", "true");
+      nav.appendChild(navPill);
+      const navButtons = {};
+      NAV_ITEMS.forEach(function (item) {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "mobile-nav-item" + (index === 0 ? " is-active" : "");
-        btn.innerHTML = "<svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + item[1] + "</svg><span>" + item[0] + "</span>";
-        btn.addEventListener("click", function (event) { event.stopPropagation(); item[2](); });
+        btn.className = "mobile-nav-item";
+        btn.dataset.nav = item[0];
+        btn.innerHTML = "<svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + item[2] + "</svg><span>" + item[1] + "</span>";
+        btn.addEventListener("click", function (event) {
+          event.stopPropagation();
+          haptic("tap");
+          runNav(item[0]);
+        });
+        navButtons[item[0]] = btn;
         nav.appendChild(btn);
       });
-      document.querySelector(".app").appendChild(nav);
+      // In <body>, not .app (an isolated stacking context), so it can sit above the sheets.
+      document.body.appendChild(nav);
+
+      const trashModal = els.driveTrashModal;
+      const navScroller = document.querySelector(".drive-scroll");
+      let navLock = null;
+      function trashOpen() { return trashModal.classList.contains("visible"); }
+      function onDriveHome() { return !els.driveView.classList.contains("hidden") && !state.activePaellaStack.length; }
+      function closeNavSheets() {
+        if (trashOpen()) els.driveTrashCloseBtn.click();
+        if (state.profileMenuOpen) closeProfileMenu();
+      }
+      // Leaving a sheet or a paella is asynchronous (it may ask to save first).
+      function showDriveHome(then) {
+        if (onDriveHome()) { then(); return; }
+        els.homeBtn.click();
+        const started = Date.now();
+        (function wait() {
+          if (onDriveHome()) requestAnimationFrame(then);
+          else if (Date.now() - started < 5000) setTimeout(wait, 30);
+        })();
+      }
+      function lockNav(name) { navLock = { name: name, until: Date.now() + 650 }; }
+      function runNav(name) {
+        const scroller = document.querySelector(".drive-scroll");
+        if (name === "home") {
+          closeNavSheets();
+          lockNav("home");
+          showDriveHome(function () { scroller.scrollTo({ top: 0, behavior: "smooth" }); });
+        } else if (name === "drive") {
+          closeNavSheets();
+          lockNav("drive");
+          showDriveHome(function () {
+            const target = document.getElementById("folderSection");
+            if (target) scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 8), behavior: "smooth" });
+          });
+        } else if (name === "trash") {
+          if (state.profileMenuOpen) closeProfileMenu();
+          if (trashOpen()) els.driveTrashCloseBtn.click(); else els.driveTrashBtn.click();
+        } else if (name === "profile") {
+          if (trashOpen()) els.driveTrashCloseBtn.click();
+          toggleProfileMenu();
+        } else if (name === "close") {
+          closeNavSheets();
+        } else if (name === "refresh") {
+          closeNavSheets();
+          els.profileRefreshBtn.click();
+        } else if (name === "logout") {
+          closeNavSheets();
+          els.profileLogoutBtn.click();
+        }
+        syncNav();
+      }
+      window.paellasNav = function (name) { runNav(String(name || "")); return true; };
+
+      let lastNavReport = "";
+      function syncNav() {
+        const loggedIn = !els.profileBox.classList.contains("hidden") && els.loginView.classList.contains("hidden");
+        const otherModal = Array.prototype.some.call(document.querySelectorAll(".modal-overlay.visible"), function (modal) { return modal !== trashModal; });
+        const visible = loggedIn && !otherModal && !document.body.classList.contains("group-panel-open");
+        let active = "home";
+        if (trashOpen()) active = "trash";
+        else if (state.profileMenuOpen) active = "profile";
+        else if (navLock && Date.now() < navLock.until) active = navLock.name;
+        else if (onDriveHome() && navScroller && navScroller.scrollTop > 8) {
+          const folders = document.getElementById("folderSection");
+          if (folders && folders.offsetParent !== null && folders.getBoundingClientRect().top < window.innerHeight * 0.45) active = "drive";
+        }
+        nav.classList.toggle("is-hidden", !visible);
+        document.body.classList.toggle("nav-sheet-open", active === "trash" || active === "profile");
+        NAV_ITEMS.forEach(function (item, index) {
+          const on = item[0] === active;
+          navButtons[item[0]].classList.toggle("is-active", on);
+          if (on) {
+            navButtons[item[0]].setAttribute("aria-current", "page");
+            navPill.style.transform = "translateX(" + (index * 100) + "%)";
+          } else navButtons[item[0]].removeAttribute("aria-current");
+        });
+        if (NATIVE_NAV) {
+          const report = JSON.stringify({
+            type: "nav", active: active, visible: visible,
+            name: els.profileName.textContent || "", email: els.profileEmail.textContent || ""
+          });
+          if (report !== lastNavReport) { lastNavReport = report; androidAppMessage(JSON.parse(report)); }
+        }
+      }
+      let navFrame = 0;
+      function queueNavSync() {
+        if (navFrame) return;
+        navFrame = requestAnimationFrame(function () { navFrame = 0; syncNav(); });
+      }
+      const navWatcher = new MutationObserver(queueNavSync);
+      [els.driveView, els.editorView, els.loginView, els.profileBox, els.profileMenu, document.body]
+        .concat(Array.prototype.slice.call(document.querySelectorAll(".modal-overlay")))
+        .forEach(function (node) { navWatcher.observe(node, { attributes: true, attributeFilter: ["class"] }); });
+      if (navScroller) navScroller.addEventListener("scroll", queueNavSync, { passive: true });
+      if (window.ResizeObserver && navScroller) {
+        const navResize = new ResizeObserver(queueNavSync);
+        Array.prototype.forEach.call(navScroller.children, function (child) { navResize.observe(child); });
+      }
+      window.addEventListener("resize", queueNavSync);
+      syncNav();
+      // Dialog headers close with a round × (their footers keep Cancelar / Cerrar).
+      Array.prototype.forEach.call(document.querySelectorAll(".modal-card > .head > button[aria-label='Cerrar']"), function (btn) {
+        if (btn.textContent.trim() !== "Cerrar") return;
+        btn.classList.add("sheet-close");
+        btn.innerHTML = "<svg viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' aria-hidden='true'><path d='M6 6l12 12M18 6 6 18'/></svg>";
+      });
+      // On a phone the profile menu is a sheet over a scrim; the scrim lives in the
+      // profile box so a tap on it is not also a tap on the page underneath.
+      const profileScrim = document.createElement("div");
+      profileScrim.className = "profile-scrim";
+      profileScrim.setAttribute("aria-hidden", "true");
+      profileScrim.addEventListener("click", function (event) { event.stopPropagation(); closeProfileMenu(); });
+      els.profileBox.appendChild(profileScrim);
+      // The pill only animates once it has a position, so it does not fly in on load.
+      requestAnimationFrame(function () { nav.classList.add("is-ready"); });
     })();
     // An open group is shown as a secondary panel (side drawer / bottom sheet) on top of
     // the list. The body stays inside #sheetGroupsView so its delegated handlers still work.
@@ -22528,7 +22681,7 @@
         });
         if (!hasMissing) setAddAssistantWizardStatus("", "");
         else if (els.addAssistantWizardStatus && els.addAssistantWizardStatus.dataset.tone === "error") {
-          setAddAssistantWizardStatus("Completa los campos marcados en rojo antes de anadir el integrante.", "error");
+          setAddAssistantWizardStatus("Completa los campos marcados en rojo antes de añadir el integrante.", "error");
         }
       });
       entry.input.addEventListener("keydown", function (event) {
@@ -22901,7 +23054,7 @@
       const email = String(els.shareEmailInput.value || "").trim();
       if (!targetId) return;
       if (!email) {
-        setShareStatus("Introduce un email valido.", "error");
+        setShareStatus("Introduce un email válido.", "error");
         return;
       }
       setBusy(els.shareModalCard, true);
@@ -23040,7 +23193,7 @@
       const email = String(els.paellaAccessEmailInput.value || "").trim();
       if (!root || !root.id) return;
       if (!email) {
-        setPaellaAccessStatus("Introduce un email valido.", "error");
+        setPaellaAccessStatus("Introduce un email válido.", "error");
         return;
       }
       setPaellaAccessStatus("", "");

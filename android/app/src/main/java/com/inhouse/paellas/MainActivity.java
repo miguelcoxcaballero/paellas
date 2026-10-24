@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Base64;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.PermissionRequest;
@@ -65,6 +66,11 @@ import java.util.Collections;
  * page generates, Android's back button asking the page first, and opening the
  * update settings. The camera is granted only to paellas.net (ticket reader).
  *
+ * On phones the bottom bar (NativeNav) and the Perfil sheet (ProfileSheet) are
+ * native views over the page, with Android haptics (Haptics). The page reports
+ * which tab is on and whether the bar shows ({type:"nav"}), asks for haptics
+ * ({type:"haptic"}) and handles each tap through window.paellasNav(name).
+ *
  * APK updates come from the shared Inhouse services updater (UPDATER.md):
  * NativeUpdates runs its hidden checker with the bundled assets and opens
  * UpdateActivity for the popup. The hosted page never gets an install bridge.
@@ -90,6 +96,11 @@ public class MainActivity extends ComponentActivity {
     private NativeUpdates updates;
     private PermissionRequest pendingCamera;
     private boolean cameraPromptOpen;
+    private NativeNav nav;
+    private ProfileSheet profile;
+    private String pageTab = "home";
+    private boolean pageWantsNav;
+    private boolean keyboardOpen;
 
     private final ActivityResultLauncher<String> cameraPermission = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), granted -> {
@@ -139,6 +150,8 @@ public class MainActivity extends ComponentActivity {
         webView.setBackgroundColor(background);
         root.addView(webView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        // Phones get the native bottom bar; wider screens use the page's top navigation.
+        if (getResources().getConfiguration().screenWidthDp <= 760) addNativeNavigation();
         setContentView(root);
 
         // Edge to edge: the page is laid out between the system bars and above the keyboard.
@@ -146,6 +159,9 @@ public class MainActivity extends ComponentActivity {
             Insets system = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
             view.setPadding(system.left, system.top, system.right, Math.max(system.bottom, ime.bottom));
+            // The bar steps aside while typing, like any Android app's.
+            keyboardOpen = insets.isVisible(WindowInsetsCompat.Type.ime());
+            syncNav();
             return WindowInsetsCompat.CONSUMED;
         });
 
@@ -153,6 +169,10 @@ public class MainActivity extends ComponentActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                if (profile != null && profile.isOpen()) {
+                    profile.close();
+                    return;
+                }
                 // The page closes its own panels, dialogs and views first.
                 webView.evaluateJavascript(
                         "(typeof window.paellasBack === 'function' && window.paellasBack()) === true",
@@ -187,7 +207,10 @@ public class MainActivity extends ComponentActivity {
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
         settings.setMediaPlaybackRequiresUserGesture(false);
         // Identify the shell without hiding that this is a WebView.
-        settings.setUserAgentString(settings.getUserAgentString() + " PaellasApp/" + BuildConfig.VERSION_NAME);
+        // PaellasNav/1 tells the page this shell draws the bottom bar natively.
+        settings.setUserAgentString(settings.getUserAgentString() + " PaellasApp/" + BuildConfig.VERSION_NAME + " PaellasNav/1");
+        // Keeps scrolling and the page's own animations smooth.
+        settings.setOffscreenPreRaster(true);
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             // The web has its own light design; never let Android invert it.
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, false);
@@ -232,12 +255,91 @@ public class MainActivity extends ComponentActivity {
                 case "open":
                     openExternal(Uri.parse(message.optString("url")));
                     break;
+                case "nav":
+                    pageTab = message.optString("active", "home");
+                    pageWantsNav = message.optBoolean("visible");
+                    if (profile != null) {
+                        profile.setAccount(message.optString("name"), message.optString("email"));
+                        if (!pageWantsNav) profile.close();
+                    }
+                    if (nav != null && (profile == null || !profile.isOpen())) nav.select(pageTab, true);
+                    syncNav();
+                    break;
+                case "haptic":
+                    Haptics.tap(webView, message.optString("kind"));
+                    break;
                 default:
                     break;
             }
         } catch (JSONException | IllegalArgumentException error) {
             // Malformed messages are ignored; only the app's own page can send them.
         }
+    }
+
+    // --- Native bottom bar and Perfil sheet ---------------------------------------
+
+    private void addNativeNavigation() {
+        profile = new ProfileSheet(this);
+        profile.setListener(new ProfileSheet.Listener() {
+            @Override
+            public void onRefresh() {
+                runPageNav("refresh");
+            }
+
+            @Override
+            public void onAppUpdates() {
+                startActivity(new Intent(MainActivity.this, UpdateActivity.class).putExtra("settings", true));
+            }
+
+            @Override
+            public void onLogout() {
+                runPageNav("logout");
+            }
+
+            @Override
+            public void onClosed() {
+                if (nav != null) nav.select(pageTab, true);
+            }
+        });
+        root.addView(profile, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+        nav = new NativeNav(this);
+        float density = getResources().getDisplayMetrics().density;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, Math.round(64 * density), Gravity.BOTTOM);
+        params.leftMargin = params.rightMargin = Math.round(14 * density);
+        params.bottomMargin = Math.round(12 * density);
+        root.addView(nav, params);
+        // Hidden until the page says the user is signed in.
+        nav.setVisibility(View.INVISIBLE);
+        nav.setAlpha(0f);
+        nav.setTranslationY(120 * density);
+        nav.setShown(false);
+        nav.setListener(name -> {
+            if ("profile".equals(name)) {
+                if (profile.isOpen()) {
+                    profile.close();
+                } else {
+                    runPageNav("close");
+                    profile.show();
+                }
+                return;
+            }
+            profile.close(false);
+            runPageNav(name);
+        });
+    }
+
+    private void runPageNav(String name) {
+        webView.evaluateJavascript("window.paellasNav && window.paellasNav(" + JSONObject.quote(name) + ")", null);
+    }
+
+    private void syncNav() {
+        if (nav == null) return;
+        boolean show = pageWantsNav && !keyboardOpen;
+        nav.setShown(show);
+        if (!show && profile.isOpen()) profile.close();
     }
 
     // --- Google sign-in -------------------------------------------------------
@@ -377,6 +479,9 @@ public class MainActivity extends ComponentActivity {
         @Override
         public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
             cancelPendingCamera();
+            // A new page reports its own state once it has signed in.
+            pageWantsNav = false;
+            syncNav();
         }
 
         @Override
