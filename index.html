@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <title>paellas.net</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Public+Sans:wght@400;500;600;650;700&display=swap" rel="stylesheet">
 
   <script src="https://accounts.google.com/gsi/client" async defer data-auto_prompt="false"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -6348,11 +6351,12 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
+  <link rel="stylesheet" href="theme-mercado.css">
 </head>
 <body>
   <div class="app">
     <header class="topbar">
-      <button id="homeBtn" class="brand brand-button" type="button" aria-label="Volver al gestor de archivos"><span>&#129368;</span><span class="brand-name">paellas.net</span></button>
+      <button id="homeBtn" class="brand brand-button" type="button" aria-label="Volver al gestor de archivos"><img class="brand-mark" src="paella.svg" alt="" width="34" height="32"><span class="brand-name">paellas.net</span></button>
       <div class="topbar-actions">
         <div id="editorTopbarActions" class="topbar-editor-actions hidden-panel">
           <button id="openInGoogleBtn" class="btn small btn-icon-sq doc-open-btn hidden-panel" type="button" title="Abrir en Google" aria-label="Abrir en Google">
@@ -6410,10 +6414,22 @@
     </header>
 
     <main id="loginView" class="login">
+      <div class="login-art" aria-hidden="true">
+        <div class="login-word">paellas<br>.net</div>
+        <div class="login-tag">Grupos, pagos y entradas para tu evento de paellas.</div>
+        <img src="paella.svg" alt="">
+      </div>
       <section class="hero">
-        <h1>&#129368; paellas.net</h1>
-        <p><button id="loginBtn" class="btn primary" type="button">Entrar con Google</button></p>
+        <h1>Bienvenido</h1>
+        <p class="login-sub">Entra con tu cuenta de Google para ver tus paellas.</p>
+        <p><button id="loginBtn" class="btn primary" type="button"><svg class="google-g" width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Continuar con Google</span></button></p>
         <p id="loginStatus" class="status"></p>
+        <ul class="login-feats">
+          <li><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>Inscribe grupos y asistentes</li>
+          <li><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 7a7 7 0 1 0 0 10M4 10h10M4 14h10"/></svg>Controla quién ha pagado</li>
+          <li><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM17 17h4v4h-4"/></svg>Genera y valida entradas QR</li>
+        </ul>
+        <p class="login-note">Tus datos se guardan en tu propio Google Drive.</p>
       </section>
     </main>
 
@@ -6538,6 +6554,12 @@
               <button id="sheetViewGroupsBtn" class="sheet-view-toggle-btn" type="button" aria-pressed="false">Grupos</button>
             </div>
           </div>
+          <nav id="viewTabs" class="view-tabs hidden-panel" role="tablist" aria-label="Vista de la hoja">
+            <button id="viewTabGroups" class="view-tab" type="button" role="tab" data-view="groups" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>Grupos</button>
+            <button id="viewTabTable" class="view-tab" type="button" role="tab" data-view="table" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>Tabla</button>
+            <button id="viewTabEntries" class="view-tab" type="button" role="tab" data-view="entries" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/></svg>Entradas</button>
+            <button id="viewTabHistory" class="view-tab" type="button" role="tab" data-view="history" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Historial</button>
+          </nav>
           <div id="formToolbar" class="form-toolbar hidden-panel">
             <div class="form-toolbar-group">
               <select id="formTemplateSelect" class="search form-template-select" aria-label="Plantilla" style="display:none">
@@ -6583,7 +6605,7 @@
                 </select>
               </label>
               <label class="sheet-groups-filter">
-                <span>Punto de fuego</span>
+                <span>Fuego</span>
                 <select id="sheetGroupsFireFilter" class="sheet-groups-filter-select">
                   <option value="all">Todos</option>
                   <option value="any">Con punto de fuego</option>
@@ -7718,6 +7740,7 @@
       sheetViewTableBtn: document.getElementById("sheetViewTableBtn"),
       sheetViewGroupsBtn: document.getElementById("sheetViewGroupsBtn"),
       entriesDesignBtn: document.getElementById("entriesDesignBtn"),
+      viewTabs: document.getElementById("viewTabs"),
       sheetEntriesView: document.getElementById("sheetEntriesView"),
       entriesDesignEventName: document.getElementById("entriesDesignEventName"),
       entriesDesignSubtitle: document.getElementById("entriesDesignSubtitle"),
@@ -10267,6 +10290,22 @@
         els.entriesDesignBtn.setAttribute("aria-pressed", isEntriesView ? "true" : "false");
         els.entriesDesignBtn.disabled = !groupsAvailable;
       }
+      syncViewTabs(spreadsheetMode, groupsAvailable);
+    }
+    function syncViewTabs(spreadsheetMode, groupsAvailable) {
+      if (!els.viewTabs) return;
+      const formMode = state.activeDocumentType === "form";
+      const active = state.spreadsheetViewMode === "groups" || state.spreadsheetViewMode === "history" || state.spreadsheetViewMode === "entries"
+        ? state.spreadsheetViewMode
+        : "table";
+      els.viewTabs.classList.toggle("hidden-panel", formMode || !spreadsheetMode);
+      if (window.syncMercadoEditorBand) window.syncMercadoEditorBand();
+      Array.prototype.forEach.call(els.viewTabs.querySelectorAll(".view-tab"), function (tab) {
+        const view = tab.dataset.view;
+        tab.hidden = (view === "groups" || view === "entries") && !groupsAvailable;
+        tab.setAttribute("aria-selected", view === active ? "true" : "false");
+        tab.tabIndex = view === active ? 0 : -1;
+      });
     }
     function setSpreadsheetViewMode(mode) {
       const prevMode = state.spreadsheetViewMode === "groups"
@@ -10602,8 +10641,7 @@
           : (fireKey === "shared" ? "Comparte punto de fuego" : "Sin punto de fuego"));
     }
     function getSheetGroupDisplayTitle(group, index) {
-      const baseTitle = group && group.title ? group.title : ("Grupo " + (index + 1));
-      return getSheetGroupFirePointIcon(group) + " " + baseTitle;
+      return group && group.title ? group.title : ("Grupo " + (index + 1));
     }
     function setSheetGroupIndexBadge(indexBadge, group, index) {
       if (!indexBadge) return;
@@ -10611,7 +10649,7 @@
       const isRequest = normalizedStatus === GROUP_PAYMENT_STATUS_REQUEST;
       const fireKey = firePointFilterKey(group && group.firePoint && group.firePoint.value);
       const groupNumber = String(index + 1);
-      indexBadge.textContent = "G" + groupNumber;
+      indexBadge.textContent = groupNumber;
       indexBadge.classList.toggle("is-request", isRequest);
       indexBadge.title = "Grupo " + groupNumber + " · " + getSheetGroupFirePointLabel(group) + (isRequest ? (" · " + GROUP_PAYMENT_STATUS_REQUEST) : "");
       return;
@@ -10719,6 +10757,17 @@
     function syncSheetGroupsSummaryInfo(infoRow, group) {
       if (!infoRow) return;
       infoRow.innerHTML = "";
+      if (group) {
+        const facts = document.createElement("span");
+        facts.className = "sheet-group-facts";
+        const people = Number(group.attendeeCount) || buildTicketPeopleFromGroup(group).length || 0;
+        const contestYes = /^s[ií]/i.test(String(group.contest && group.contest.value || "").trim());
+        const usersIcon = "<svg viewBox='0 0 24 24' width='15' height='15' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'/></svg>";
+        const trophyIcon = "<svg viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3'/></svg>";
+        facts.innerHTML = usersIcon + "<span>" + people + "</span><span class='sep'>\u00B7</span><span>" + escapeHtml(getSheetGroupFirePointIcon(group) + " " + getSheetGroupFirePointLabel(group).replace("Punto de fuego por confirmar", "Fuego por confirmar")) + "</span>" + (contestYes ? "<span class='sep'>\u00B7</span>" + trophyIcon + "<span>Concurso</span>" : "");
+        facts.setAttribute("aria-label", people + " personas");
+        infoRow.appendChild(facts);
+      }
       const ticketPeople = buildTicketPeopleFromGroup(group);
       const hasEntrySystem = ticketPeople.some(function (person) { return person.statusCol >= 0; });
       if (hasEntrySystem) {
@@ -10735,8 +10784,14 @@
         const tone = getGroupPaymentStatusTone(normalizedStatus);
         const paymentChip = document.createElement("span");
         paymentChip.className = "sheet-group-chip" + (tone ? (" " + tone) : "");
-        paymentChip.textContent = formatGroupPaymentStatusLabel(normalizedStatus);
+        paymentChip.textContent = /petici/i.test(normalizedStatus) ? "Petición" : (/pendiente/i.test(normalizedStatus) ? "Pendiente" : normalizedStatus);
+        paymentChip.title = normalizedStatus;
         infoRow.appendChild(paymentChip);
+        const amount = document.createElement("span");
+        const amountValue = parseEuroAmount(group.payment.amount);
+        amount.className = "sheet-group-amount" + (amountValue ? "" : " is-empty");
+        amount.textContent = amountValue ? amountValue.toLocaleString("es-ES", { maximumFractionDigits: 2 }) + " \u20AC" : "Sin importe";
+        infoRow.appendChild(amount);
       }
     }
     function syncSheetGroupTicketActionState(card, group) {
@@ -10792,7 +10847,7 @@
       if (summaryMeta) {
         const attendeeCount = group.attendeeCount || 0;
         const leadName = group.responsible && group.responsible.name ? group.responsible.name : "Sin responsable";
-        summaryMeta.textContent = attendeeCount + " personas | " + leadName;
+        summaryMeta.textContent = leadName;
       }
       const titleEl = card.querySelector(".sheet-group-title-large");
       if (titleEl) titleEl.textContent = getSheetGroupDisplayTitle(group, index);
@@ -13220,10 +13275,25 @@
       var paidValue = String(paidCount) + "/" + String(visible.length) + " \u2713 (" + formatShort(filteredRevenue) + "/" + formatShort(totalRevenue) + ")";
       var groupsValue = String(visible.length) + (visible.length !== groups.length ? "/" + String(groups.length) : "") + " Grupos";
       var attendeesValue = String(filteredAttendees) + (filteredAttendees !== totalAttendees ? "/" + String(totalAttendees) : "") + " Asistentes";
-      var stats = [paidValue, groupsValue, attendeesValue];
-      els.sheetGroupsStats.innerHTML = stats.map(function (val) {
-        return "<div class='sheet-groups-stat'><div class='sheet-groups-stat-value'>" + escapeHtml(val) + "</div></div>";
-      }).join("");
+      var requestCount = visible.filter(function (group) { return normalizePaymentStatus(group.payment && group.payment.status) === GROUP_PAYMENT_STATUS_REQUEST; }).length;
+      var pendingOnly = Math.max(0, pendingCount - requestCount);
+      var isYes = function (v) { return /^(\S+\s)?s[ií]\b/i.test(String(v || "").trim()) || /s[ií], para/i.test(String(v || "")); };
+      var fireAsked = visible.filter(function (group) { return isYes(group.firePoint && group.firePoint.value); }).length;
+      var fireGranted = visible.filter(function (group) { return isYes(group.firePointGranted && group.firePointGranted.value); }).length;
+      var plural = function (n, one, many) { return n + " " + (n === 1 ? one : many); };
+      var stat = function (label, value, extra, cls) {
+        return "<div class='sheet-groups-stat" + (cls ? " " + cls : "") + "'><div class='sheet-groups-stat-label'>" + escapeHtml(label) + "</div><div class='sheet-groups-stat-value'>" + value + "</div>" + (extra || "") + "</div>";
+      };
+      var total = Math.max(1, visible.length);
+      var split = "<div class='sheet-groups-split' aria-hidden='true'><i class='is-paid' style='flex:" + paidCount + "'></i><i class='is-pending' style='flex:" + pendingOnly + "'></i><i class='is-request' style='flex:" + requestCount + "'></i></div>" +
+        "<div class='sheet-groups-legend'><span><i class='is-paid'></i>" + plural(paidCount, "pagado", "pagados") + "</span><span><i class='is-pending'></i>" + plural(pendingOnly, "pendiente", "pendientes") + "</span><span><i class='is-request'></i>" + plural(requestCount, "petición", "peticiones") + "</span></div>";
+      els.sheetGroupsStats.innerHTML =
+        stat("Grupos", escapeHtml(groupsValue.replace(/ Grupos$/, "")), "<div class='sheet-groups-stat-note'>" + plural(requestCount, "petición", "peticiones") + "</div>") +
+        stat("Asistentes", escapeHtml(attendeesValue.replace(/ Asistentes$/, "")), "") +
+        stat("Recaudado", escapeHtml(formatShort(filteredRevenue).replace("\u20ac", " \u20ac")), split, "is-wide") +
+        stat("Puntos de fuego", fireGranted + " <small>/ " + fireAsked + "</small>", "<div class='sheet-groups-stat-note'>concedidos</div>");
+      els.sheetGroupsStats.setAttribute("title", paidValue);
+      void total;
     }
     function setSheetGroupsFiltersOpen(open) {
       const nextOpen = !!open;
@@ -16011,7 +16081,7 @@
         }
         bannerTitle.textContent = "Vista de grupos";
         bannerMeta.textContent = String(allGroups.length) + " grupos | " + String(totalAttendees) + " asistentes";
-        searchInput.placeholder = "Buscar por nombre, integrante, teléfono, DNI o cualquier dato";
+        searchInput.placeholder = "Buscar grupo, integrante o DNI";
         searchInput.autocomplete = "off";
         searchInput.spellcheck = false;
         priceLabel.textContent = "Precio por cabeza";
@@ -16131,7 +16201,7 @@
         summaryMeta.className = "sheet-group-summary-meta";
         const attendeeCount = group.attendeeCount || ticketPeople.length || 0;
         const leadName = group.responsible && group.responsible.name ? group.responsible.name : "Sin responsable";
-        summaryMeta.textContent = attendeeCount + " personas • " + leadName;
+        summaryMeta.textContent = leadName;
         summaryMain.appendChild(summaryMeta);
         const infoRow = document.createElement("div");
         infoRow.className = "sheet-group-summary-info";
@@ -16280,7 +16350,8 @@
           btn.dataset.col = String(group.payment.statusCol);
           btn.dataset.value = statusValue;
           btn.disabled = !state.canEdit || state.editorMode !== "edit";
-          btn.textContent = statusValue;
+          btn.textContent = /petici/i.test(statusValue) ? "Petición" : (/pendiente/i.test(statusValue) ? "Pendiente" : statusValue);
+          btn.title = statusValue;
           paymentPills.appendChild(btn);
         });
         paymentRow.appendChild(paymentPills);
@@ -16303,14 +16374,14 @@
           groupPdfBtn.className = "sheet-group-add-btn";
           groupPdfBtn.dataset.groupAction = "ticket-pdf-group";
           groupPdfBtn.dataset.groupId = group.id;
-          groupPdfBtn.textContent = "PDF grupo";
+          groupPdfBtn.textContent = "Entradas PDF";
           actionsRow.appendChild(groupPdfBtn);
           var addAssistantBtn = document.createElement("button");
           addAssistantBtn.type = "button";
           addAssistantBtn.className = "sheet-group-add-btn";
           addAssistantBtn.dataset.groupAction = "assistant-add";
           addAssistantBtn.dataset.groupId = group.id;
-          addAssistantBtn.textContent = "+ Integrante";
+          addAssistantBtn.textContent = "Añadir integrante";
           actionsRow.appendChild(addAssistantBtn);
           var deleteGroupBtn = document.createElement("button");
           deleteGroupBtn.type = "button";
@@ -17021,7 +17092,7 @@
       els.modeToggleBtn.classList.toggle("is-editing", editing);
       els.modeToggleBtn.setAttribute("aria-pressed", editing ? "true" : "false");
       els.modeToggleBtn.disabled = !state.canEdit;
-      els.modeToggleLabel.textContent = editing ? "Edit" : "Read";
+      els.modeToggleLabel.textContent = editing ? "Edición" : "Lectura";
       els.editorTitle.setAttribute("contenteditable", surfaceEditing ? "true" : "false");
       els.editorTitle.setAttribute("tabindex", surfaceEditing ? "0" : "-1");
       els.addSheetTabBtn.disabled = !editing || !isSpreadsheetDocumentActive();
@@ -19273,6 +19344,7 @@
       els.changeHistoryViewBtn.classList.toggle("hidden-panel", formMode || !isSpreadsheetDocumentActive());
       if (els.entriesDesignBtn) els.entriesDesignBtn.classList.toggle("hidden-panel", formMode || !isCurrentSheetPaellaResponseSheet());
       els.sheetViewToggle.classList.toggle("hidden-panel", formMode || !isCurrentSheetPaellaResponseSheet());
+      syncViewTabs(!formMode && isSpreadsheetDocumentActive(), !formMode && isCurrentSheetPaellaResponseSheet());
       els.formToolbar.classList.toggle("hidden-panel", !formMode);
       els.formEditor.classList.toggle("hidden-panel", !formMode);
       syncOpenInGoogleButton();
@@ -21835,6 +21907,389 @@
         }
       });
     }
+    if (els.viewTabs) {
+      els.viewTabs.addEventListener("click", function (event) {
+        const tab = event.target.closest(".view-tab");
+        if (!tab || tab.hidden || !isSpreadsheetDocumentActive()) return;
+        const view = tab.dataset.view;
+        if (view === state.spreadsheetViewMode || (view === "table" && !/^(groups|history|entries)$/.test(state.spreadsheetViewMode))) return;
+        setSpreadsheetViewMode(view);
+      });
+      els.viewTabs.addEventListener("keydown", function (event) {
+        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+        const tabs = Array.prototype.filter.call(els.viewTabs.querySelectorAll(".view-tab"), function (tab) { return !tab.hidden; });
+        const current = tabs.indexOf(document.activeElement);
+        if (current < 0) return;
+        const next = tabs[(current + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+        next.focus();
+        next.click();
+        event.preventDefault();
+      });
+    }
+    // «Mercado» layout: regroups existing controls into the gradient band without
+    // changing their ids or handlers (they keep working wherever they live).
+    (function initMercadoLayout() {
+      const topbarActions = document.querySelector(".topbar-actions");
+      const profileBox = document.getElementById("profileBox");
+      if (els.driveTrashBtn && topbarActions && profileBox) topbarActions.insertBefore(els.driveTrashBtn, profileBox);
+
+      // Drive band: greeting / paella heading + search + main action.
+      const driveShell = document.getElementById("driveShell");
+      const hero = document.createElement("div");
+      hero.className = "drive-hero";
+      hero.innerHTML = "<div class='drive-hero-text'><div id='driveEyebrow' class='drive-eyebrow hidden'></div><h1 id='driveTitle' class='drive-title'>Hola</h1><p id='driveSub' class='drive-sub'></p></div><div class='drive-hero-actions'></div>";
+      driveShell.insertBefore(hero, driveShell.firstChild);
+      const heroActions = hero.querySelector(".drive-hero-actions");
+      const searchGroup = els.searchInput.closest(".drive-search-group") || els.searchInput;
+      heroActions.appendChild(els.paellaAccessAvatars);
+      heroActions.appendChild(els.searchInput);
+      heroActions.appendChild(els.createPaellaBtn);
+      if (searchGroup !== els.searchInput && !searchGroup.children.length) searchGroup.classList.add("hidden");
+      const sharedLabel = document.querySelector("#sharedSection .section-label");
+      if (sharedLabel) sharedLabel.textContent = "Compartido contigo";
+
+      function syncDriveHero() {
+        const activeFolder = state.activePaellaStack[state.activePaellaStack.length - 1] || null;
+        const title = document.getElementById("driveTitle");
+        const sub = document.getElementById("driveSub");
+        const eyebrow = document.getElementById("driveEyebrow");
+        if (activeFolder) {
+          eyebrow.textContent = "🥘 Paella";
+          eyebrow.classList.remove("hidden");
+          title.textContent = activeFolder.name || "Paella";
+          const count = (state.activePaellaItems || []).length;
+          sub.textContent = count === 1 ? "1 archivo" : count + " archivos";
+          els.paellaPanelTitle.textContent = "Archivos";
+        } else {
+          eyebrow.classList.add("hidden");
+          const name = state.currentUser && (state.currentUser.displayName || state.currentUser.emailAddress || "");
+          title.textContent = name ? "Hola, " + String(name).split(/[\s@]/)[0] : "Hola";
+          const n = (state.paellaItems || []).length;
+          sub.textContent = n === 1 ? "1 paella activa" : n + " paellas activas";
+          els.paellaPanelTitle.textContent = "Tus paellas";
+        }
+      }
+      const baseRenderPaellas = renderPaellas;
+      renderPaellas = function () {
+        const result = baseRenderPaellas.apply(this, arguments);
+        syncDriveHero();
+        if (window.syncMercadoTopNav) window.syncMercadoTopNav();
+        return result;
+      };
+      syncDriveHero();
+
+      // Editor band: crumb, title actions and the main "Nuevo grupo" action.
+      const editorHead = document.querySelector("#editorShell .editor-head");
+      const editorActions = document.querySelector("#editorShell .editor-actions");
+      const crumb = document.createElement("div");
+      crumb.id = "editorCrumb";
+      crumb.className = "editor-crumb";
+      editorHead.insertBefore(crumb, editorHead.firstChild);
+      const editorTopbarActions = document.getElementById("editorTopbarActions");
+      if (editorActions && editorTopbarActions) editorActions.appendChild(editorTopbarActions);
+      const bandNewGroupBtn = document.createElement("button");
+      bandNewGroupBtn.type = "button";
+      bandNewGroupBtn.id = "bandNewGroupBtn";
+      bandNewGroupBtn.className = "btn primary hidden";
+      bandNewGroupBtn.textContent = "+ Nuevo grupo";
+      bandNewGroupBtn.addEventListener("click", function () {
+        const original = els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']");
+        if (original) original.click();
+      });
+      if (editorActions) editorActions.appendChild(bandNewGroupBtn);
+      window.syncMercadoEditorBand = function () {
+        const folder = state.activePaellaStack[state.activePaellaStack.length - 1];
+        crumb.textContent = (folder ? folder.name : "Mi unidad") + "  ›  " + (state.activeDocumentType === "form" ? "Formularios" : "Hojas");
+        const canAdd = !!els.sheetGroupsView.querySelector(".sheet-group-add-btn[data-group-action='group-add']") && !els.sheetGroupsView.classList.contains("hidden-panel");
+        bandNewGroupBtn.classList.toggle("hidden", !canAdd);
+      };
+
+      function goHome(after) {
+        const inDrive = !els.driveView.classList.contains("hidden") && !state.activePaellaStack.length;
+        if (!inDrive) els.homeBtn.click();
+        setTimeout(after || function () { document.querySelector(".drive-scroll").scrollTo({ top: 0, behavior: "smooth" }); }, inDrive ? 0 : 350);
+      }
+      function scrollToSection(id) {
+        return function () { const target = document.getElementById(id); if (target) target.scrollIntoView({ behavior: "smooth", block: "start" }); };
+      }
+      const topNav = document.createElement("nav");
+      topNav.className = "top-nav";
+      topNav.setAttribute("aria-label", "Secciones");
+      [["Inicio", "<path d='M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/>", function () { goHome(); }],
+       ["Paellas", "<path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'/>", function () { goHome(scrollToSection("paellaPanel")); }],
+       ["Mi unidad", "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>", function () { goHome(scrollToSection("folderSection")); }]
+      ].forEach(function (item) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "top-nav-item";
+        btn.dataset.target = item[0];
+        btn.innerHTML = "<svg viewBox='0 0 24 24' width='18' height='18' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + item[1] + "</svg><span>" + item[0] + "</span>";
+        btn.addEventListener("click", item[2]);
+        topNav.appendChild(btn);
+      });
+      const brandBtn = document.getElementById("homeBtn");
+      brandBtn.parentNode.insertBefore(topNav, brandBtn.nextSibling);
+      function syncTopNav() {
+        const inEditor = els.driveView.classList.contains("hidden");
+        const inPaella = !inEditor && state.activePaellaStack.length > 0;
+        Array.prototype.forEach.call(topNav.children, function (btn) {
+          const on = btn.dataset.target === "Inicio" ? (!inEditor && !inPaella) : (btn.dataset.target === "Paellas" ? (inEditor || inPaella) : false);
+          btn.classList.toggle("is-active", on);
+          if (on) btn.setAttribute("aria-current", "page"); else btn.removeAttribute("aria-current");
+        });
+      }
+      new MutationObserver(syncTopNav).observe(els.driveView, { attributes: true, attributeFilter: ["class"] });
+      window.syncMercadoTopNav = syncTopNav;
+      syncTopNav();
+
+      // The gradient is painted once behind the top bar and the page heading, so both read as one band.
+      const appEl = document.querySelector(".app");
+      function syncBandHeight() {
+        const topbar = document.querySelector(".topbar");
+        const shell = !els.driveView.classList.contains("hidden") ? driveShell : (!els.editorView.classList.contains("hidden") ? document.getElementById("editorShell") : null);
+        const top = topbar && topbar.offsetParent !== null ? topbar.getBoundingClientRect().bottom : 0;
+        const bottom = shell ? shell.getBoundingClientRect().bottom : top;
+        appEl.style.setProperty("--band-h", Math.max(0, Math.round(bottom - appEl.getBoundingClientRect().top)) + "px");
+      }
+      if (window.ResizeObserver) {
+        const bandObserver = new ResizeObserver(syncBandHeight);
+        [document.querySelector(".topbar"), driveShell, document.getElementById("editorShell")].forEach(function (node) { if (node) bandObserver.observe(node); });
+      }
+      new MutationObserver(syncBandHeight).observe(els.driveView, { attributes: true, attributeFilter: ["class"] });
+      new MutationObserver(syncBandHeight).observe(els.editorView, { attributes: true, attributeFilter: ["class"] });
+      window.addEventListener("resize", syncBandHeight);
+      syncBandHeight();
+
+      // Phone: floating bottom navigation for the always-available destinations.
+      const nav = document.createElement("nav");
+      nav.className = "mobile-nav";
+      nav.setAttribute("aria-label", "Navegación");
+      const navItems = [
+        ["Inicio", "<path d='M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'/>", function () { if (!els.driveView.classList.contains("hidden")) { if (state.activePaellaStack.length) els.homeBtn.click(); document.querySelector(".drive-scroll").scrollTo({ top: 0, behavior: "smooth" }); } else els.homeBtn.click(); }],
+        ["Mi unidad", "<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>", function () { const go = function () { const target = document.getElementById("folderSection"); if (target) target.scrollIntoView({ behavior: "smooth", block: "start" }); }; if (els.driveView.classList.contains("hidden") || state.activePaellaStack.length) { els.homeBtn.click(); setTimeout(go, 350); } else go(); }],
+        ["Papelera", "<path d='M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6'/>", function () { els.driveTrashBtn.click(); }],
+        ["Perfil", "<circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/>", function () { document.getElementById("profileBtn").click(); }]
+      ];
+      navItems.forEach(function (item, index) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mobile-nav-item" + (index === 0 ? " is-active" : "");
+        btn.innerHTML = "<svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + item[1] + "</svg><span>" + item[0] + "</span>";
+        btn.addEventListener("click", function (event) { event.stopPropagation(); item[2](); });
+        nav.appendChild(btn);
+      });
+      document.querySelector(".app").appendChild(nav);
+    })();
+    // An open group is shown as a secondary panel (side drawer / bottom sheet) on top of
+    // the list. The body stays inside #sheetGroupsView so its delegated handlers still work.
+    (function initGroupPanel() {
+      const scrim = document.createElement("div");
+      scrim.className = "group-panel-scrim";
+      scrim.setAttribute("aria-hidden", "true");
+      // Lives in the editor view so it shares the panel's stacking context.
+      document.getElementById("editorView").appendChild(scrim);
+      let mobileSection = "";
+      function allCards() {
+        return Array.prototype.slice.call(els.sheetGroupsView.querySelectorAll(".sheet-group-card"));
+      }
+      function openCards() {
+        return allCards().filter(function (card) { return card.open; });
+      }
+      function closeGroupPanel() {
+        openCards().forEach(function (card) { card.open = false; });
+        syncGroupPanel();
+      }
+      function el(tag, cls, text) {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text != null) node.textContent = text;
+        return node;
+      }
+      function openSibling(card, step) {
+        const cards = allCards();
+        const next = cards[cards.indexOf(card) + step];
+        if (!next) return;
+        card.open = false;
+        next.open = true;
+        syncGroupPanel();
+      }
+      function fillPanel(card) {
+        const body = card.querySelector(":scope > .sheet-group-body");
+        if (!body) return;
+        let head = body.querySelector(":scope > .group-panel-head");
+        const cards = allCards();
+        const position = cards.indexOf(card) + 1;
+        const title = (card.querySelector(".sheet-group-title-large") || {}).textContent || "Grupo";
+        const lead = (card.querySelector(".sheet-group-summary-meta") || {}).textContent || "";
+        const facts = (card.querySelector(".sheet-group-facts") || {}).textContent || "";
+        const people = (facts.match(/\d+/) || ["0"])[0];
+        const statusChip = card.querySelector(".sheet-group-summary-info .sheet-group-chip:not(.is-progress):not(.is-progress-complete)");
+        const amountInput = body.querySelector("input[inputmode='decimal']");
+        const amount = amountInput && amountInput.value ? amountInput.value + " €" : "—";
+        const statuses = Array.prototype.slice.call(body.querySelectorAll(".entry-status-chip"));
+        const entered = statuses.filter(function (chip) { return /entrad/i.test(chip.textContent) && !/no/i.test(chip.textContent); }).length;
+        if (!head) {
+          head = el("div", "group-panel-head");
+          const top = el("div", "group-panel-crumb");
+          const back = el("button", "group-panel-back", "‹ " + (state.spreadsheetTitle || "Hoja") + " / Grupos");
+          back.type = "button";
+          back.addEventListener("click", function (event) { event.preventDefault(); closeGroupPanel(); });
+          const pager = el("span", "group-panel-pager");
+          const count = el("span", "group-panel-count");
+          const prev = el("button", "group-panel-step", "⌃");
+          const next = el("button", "group-panel-step", "⌄");
+          prev.type = next.type = "button";
+          prev.setAttribute("aria-label", "Grupo anterior");
+          next.setAttribute("aria-label", "Grupo siguiente");
+          prev.addEventListener("click", function (event) { event.preventDefault(); openSibling(card, -1); });
+          next.addEventListener("click", function (event) { event.preventDefault(); openSibling(card, 1); });
+          pager.appendChild(count); pager.appendChild(prev); pager.appendChild(next);
+          top.appendChild(back); top.appendChild(pager);
+          const row = el("div", "group-panel-title-row");
+          const textWrap = el("div", "group-panel-text");
+          textWrap.appendChild(el("div", "group-panel-eyebrow"));
+          textWrap.appendChild(el("h2", "group-panel-title"));
+          textWrap.appendChild(el("div", "group-panel-sub"));
+          const tag = el("span", "group-panel-tag");
+          const close = el("button", "group-panel-close", "×");
+          close.type = "button";
+          close.setAttribute("aria-label", "Cerrar grupo");
+          close.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const summary = card.querySelector(":scope > summary");
+            card.open = false;
+            syncGroupPanel();
+            if (summary) summary.focus();
+          });
+          row.appendChild(textWrap); row.appendChild(tag); row.appendChild(close);
+          const sum = el("div", "group-panel-sum");
+          head.appendChild(top); head.appendChild(row); head.appendChild(sum);
+          body.insertBefore(head, body.firstChild);
+          // Section headings and grouping that match the rest of the design.
+          const settings = body.querySelector(":scope > .sheet-group-footer");
+          const grid = settings && settings.querySelector(".sheet-group-inline-grid");
+          if (settings && grid) {
+            const paySection = el("section", "group-panel-section");
+            paySection.appendChild(el("h3", "group-panel-h3", "Pago"));
+            const payRow = settings.querySelector(".sheet-group-footer-row");
+            if (payRow) paySection.appendChild(payRow);
+            const fields = grid.children;
+            if (fields[3]) paySection.appendChild(fields[3]);
+            const fireSection = el("section", "group-panel-section");
+            fireSection.appendChild(el("h3", "group-panel-h3", "Punto de fuego y concurso"));
+            fireSection.appendChild(grid);
+            settings.appendChild(paySection);
+            settings.appendChild(fireSection);
+          }
+          const members = body.querySelector(":scope > .sheet-member-list");
+          if (members) {
+            const membersHead = el("h3", "group-panel-h3 group-panel-members-h3");
+            membersHead.appendChild(el("span", "", "Integrantes "));
+            membersHead.appendChild(el("em", "group-panel-badge", people));
+            body.insertBefore(membersHead, members);
+          }
+        }
+        Array.prototype.forEach.call(body.querySelectorAll(".sheet-member-row"), function (row) {
+          const num = row.querySelector(".sheet-member-num");
+          const name = (row.querySelector(".sheet-member-name-text") || {}).textContent || "";
+          const initials = name.trim().split(/\s+/).slice(0, 2).map(function (part) { return part.charAt(0); }).join("").toUpperCase();
+          if (num && initials && num.textContent !== initials) { num.textContent = initials; num.setAttribute("aria-hidden", "true"); }
+        });
+        Array.prototype.forEach.call(body.querySelectorAll(".group-panel-section .sheet-group-field-label"), function (label) {
+          const short = label.textContent.replace("Punto de fuego solicitado", "Solicitado").replace("Punto de fuego concedido", "Concedido");
+          if (short !== label.textContent) label.textContent = short;
+        });
+        head.querySelector(".group-panel-count").textContent = position + " de " + cards.length;
+        head.querySelectorAll(".group-panel-step")[0].disabled = position <= 1;
+        head.querySelectorAll(".group-panel-step")[1].disabled = position >= cards.length;
+        head.querySelector(".group-panel-eyebrow").textContent = "Grupo " + position;
+        head.querySelector(".group-panel-title").textContent = title;
+        head.querySelector(".group-panel-sub").textContent = "Responsable: " + lead + " · " + people + " personas";
+        const tag = head.querySelector(".group-panel-tag");
+        tag.textContent = statusChip ? statusChip.textContent : "";
+        tag.title = statusChip ? statusChip.title : "";
+        tag.className = "group-panel-tag " + (statusChip ? statusChip.className.replace("sheet-group-chip", "").trim() : "");
+        head.querySelector(".group-panel-sum").innerHTML =
+          "<div><b>" + escapeHtml(people) + "</b><span>personas</span></div>" +
+          "<div><b>" + escapeHtml(amount) + "</b><span>importe</span></div>" +
+          "<div><b>" + entered + "/" + escapeHtml(people) + "</b><span>entradas validadas</span></div>";
+      }
+      function arrangeGroupsList() {
+        // Filters live next to the search field, like the rest of the toolbar.
+        const searchWrap = els.sheetGroupsView.querySelector(".sheet-groups-banner-search-wrap");
+        if (searchWrap && els.sheetGroupsFiltersPanel && els.sheetGroupsFiltersPanel.parentElement !== searchWrap) {
+          searchWrap.appendChild(els.sheetGroupsFilterToggleMobile);
+          searchWrap.appendChild(els.sheetGroupsFiltersPanel);
+        }
+        const pricing = els.sheetGroupsView.querySelector(".sheet-groups-banner-pricing");
+        if (searchWrap && pricing && pricing.parentElement !== searchWrap) searchWrap.appendChild(pricing);
+        const hint = els.sheetGroupsView.querySelector(".sheet-groups-banner-price-summary");
+        const apply = els.sheetGroupsView.querySelector(".sheet-groups-banner-price-apply");
+        if (hint && apply && apply.title !== hint.textContent) apply.title = hint.textContent;
+        // Phone: one payment section at a time, chosen with a segmented control.
+        const sections = Array.prototype.slice.call(els.sheetGroupsList.querySelectorAll(":scope > .sheet-groups-section"));
+        let seg = els.sheetGroupsView.querySelector(".groups-seg");
+        if (!sections.length) { if (seg) seg.remove(); return; }
+        if (!seg) {
+          seg = el("div", "groups-seg");
+          seg.setAttribute("role", "tablist");
+          seg.setAttribute("aria-label", "Estado de pago");
+          els.sheetGroupsView.appendChild(seg);
+          seg.addEventListener("click", function (event) {
+            const btn = event.target.closest("button");
+            if (!btn) return;
+            mobileSection = btn.dataset.section;
+            arrangeGroupsList();
+          });
+        }
+        const keys = sections.map(function (section) { return (section.className.match(/(request|pending|paid)-section/) || [])[1] || ""; });
+        if (keys.indexOf(mobileSection) === -1) mobileSection = keys[keys.length - 1];
+        const markup = sections.map(function (section, index) {
+          const label = (section.querySelector(".sheet-groups-section-label") || {}).textContent || "";
+          const count = section.querySelectorAll(".sheet-group-card").length;
+          const short = /petici/i.test(label) ? "Petición" : (/pendiente/i.test(label) ? "Pendiente" : (/pagad/i.test(label) ? "Pagado" : label));
+          return "<button type='button' role='tab' data-section='" + keys[index] + "' aria-selected='" + (keys[index] === mobileSection) + "'>" + escapeHtml(short) + " <em>" + count + "</em></button>";
+        }).join("");
+        if (seg.innerHTML !== markup) seg.innerHTML = markup;
+        // The selector sits right under the search row, inside the persistent banner.
+        const banner = els.sheetGroupsList.querySelector(".sheet-groups-banner");
+        if (banner && seg.parentElement !== banner) banner.appendChild(seg);
+        sections.forEach(function (section, index) {
+          const show = keys[index] === mobileSection;
+          if (section.classList.contains("is-mobile-current") !== show) section.classList.toggle("is-mobile-current", show);
+        });
+      }
+      function syncGroupPanel() {
+        arrangeGroupsList();
+        const cards = openCards();
+        const visible = !els.sheetGroupsView.classList.contains("hidden-panel");
+        cards.forEach(fillPanel);
+        document.body.classList.toggle("group-panel-open", visible && cards.length > 0);
+        if (window.syncMercadoEditorBand) window.syncMercadoEditorBand();
+      }
+      document.addEventListener("toggle", function (event) {
+        const card = event.target;
+        if (!card || !card.classList || !card.classList.contains("sheet-group-card")) return;
+        if (card.open) {
+          openCards().forEach(function (other) { if (other !== card) other.open = false; });
+          const section = card.closest(".sheet-groups-section");
+          const key = section && (section.className.match(/(request|pending|paid)-section/) || [])[1];
+          if (key) mobileSection = key;
+        }
+        syncGroupPanel();
+      }, true);
+      let pending = false;
+      new MutationObserver(function () {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(function () { pending = false; syncGroupPanel(); });
+      }).observe(els.sheetGroupsView, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+      scrim.addEventListener("click", closeGroupPanel);
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && document.body.classList.contains("group-panel-open")) closeGroupPanel();
+      });
+    })();
     bindEntriesDesignerHandlers();
     els.sheetGroupsFilterToggleMobile.addEventListener("click", function (event) {
       setSheetGroupsFiltersOpen(!els.sheetGroupsFiltersPanel.classList.contains("show"));
@@ -22476,7 +22931,7 @@
       closePresencePopup();
     });
     document.addEventListener("click", function (event) {
-      closePopupMenus(event);
+      if (typeof closePopupMenus === "function") closePopupMenus(event);
       if (els.contextMenu && !els.contextMenu.classList.contains("hidden") && !els.contextMenu.contains(event.target)) {
         els.contextMenu.classList.add("hidden");
       }
