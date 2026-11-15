@@ -543,28 +543,28 @@ body.group-panel-open .sheet-group-card[open] > .sheet-group-summary { backgroun
 .modal-card .title, .danger-card .title { font: 500 26px var(--m-head) !important; letter-spacing: -.02em; }
 .modal-overlay { background: rgba(38, 23, 10, .45) !important; }
 
-/* ---------- sign-in: proposal 2 layout on the proposal 3 gradient ---------- */
+/* ---------- sign-in: proposal 1C-A ---------- */
 #loginView.login:not(.hidden) {
   display: grid !important; grid-template-columns: 1.15fr 1fr; place-items: stretch !important;
   min-height: var(--app-height, 100vh); height: auto !important; padding: 0 !important; background: var(--m-cream) !important; text-align: left;
 }
 #loginView .login-art { position: relative; overflow: hidden; background: var(--m-grad); min-height: 100%; }
-#loginView .login-word { position: absolute; left: 56px; top: 52px; z-index: 1; font: 500 88px/.95 var(--m-head); letter-spacing: -.035em; color: var(--m-ink); }
-#loginView .login-tag { position: absolute; left: 56px; top: 262px; z-index: 1; max-width: 300px; font: 600 19px/1.35 var(--m-sans); color: var(--m-ink-2); }
-#loginView .login-art img { position: absolute; right: -120px; bottom: -110px; width: 640px; height: auto; }
-#loginView .hero { align-self: center; justify-self: center; text-align: left; width: min(400px, 100%); padding: 32px 28px !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
-#loginView .hero h1 { font: 500 44px/1.05 var(--m-head) !important; letter-spacing: -.025em !important; margin: 0 0 8px; color: var(--m-ink); }
-#loginView .hero .login-sub { color: var(--m-muted); margin: 0 0 26px; font-size: 16px; }
+#loginView .login-word { position: absolute; left: 56px; top: 48px; z-index: 1; font: 500 88px/.94 var(--m-head); letter-spacing: -.04em; color: var(--m-ink); }
+#loginView .login-word span { color: var(--m-link); }
+#loginView .login-art img { position: absolute; left: -18px; bottom: -235px; width: clamp(600px, 61vw, 860px); max-width: none; height: auto; transform: rotate(-14deg); }
+#loginView .hero { align-self: center; justify-self: center; text-align: left; width: min(465px, 100%); padding: 32px !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+#loginView .hero h1 { font: 500 54px/1.02 var(--m-head) !important; letter-spacing: -.03em !important; margin: 0 0 26px; color: var(--m-ink); }
 #loginView .hero p { margin-top: 0; }
 #loginView #loginBtn {
-  width: 100%; height: 56px; font-size: 16px !important; gap: 12px; display: inline-flex; align-items: center; justify-content: center;
-  background: var(--m-ink) !important; color: #fff !important; box-shadow: 0 14px 30px -12px rgba(38, 23, 10, .6) !important;
+  width: 100%; height: 58px; font-size: 16px !important; gap: 12px; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--m-ink) !important; color: #fff !important; box-shadow: 0 10px 22px -12px rgba(38, 23, 10, .5) !important;
 }
 #loginView .google-g { background: #fff; border-radius: 50%; padding: 5px; width: 30px; height: 30px; flex: none; }
-#loginView .login-feats { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 12px; color: var(--m-muted); font-size: 15px; }
+#loginView #loginStatus { margin: 14px 0 0; min-height: 0; }
+#loginView #loginStatus:empty { display: none; }
+#loginView .login-feats { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 14px; color: var(--m-muted); font-size: 15px; font-weight: 500; }
 #loginView .login-feats li { display: flex; align-items: center; gap: 12px; }
 #loginView .login-feats svg { color: var(--m-link); flex: none; }
-#loginView .login-note { margin-top: 22px; font-size: 13.5px; color: var(--m-faint); }
 
 /* ---------- phone navigation ---------- */
 .mobile-nav { display: none; }
@@ -592,8 +592,7 @@ body.group-panel-open .sheet-group-card[open] > .sheet-group-summary { backgroun
   .sheet-group-summary-info { grid-template-columns: auto 90px; }
   .sheet-group-facts { display: none; }
   #loginView .login-word { font-size: 64px; left: 36px; top: 36px; }
-  #loginView .login-tag { left: 36px; top: 196px; }
-  #loginView .login-art img { width: 520px; right: -140px; }
+  #loginView .login-art img { width: 580px; left: -24px; bottom: -175px; }
   .editor-crumb { padding-left: 0; }
 }
 
@@ -743,12 +742,11 @@ body.group-panel-open .sheet-group-card[open] > .sheet-group-summary { backgroun
     transition: transform .24s cubic-bezier(.2, .9, .3, 1) !important;
   }
 
-  #loginView.login:not(.hidden) { grid-template-columns: 1fr; grid-template-rows: 330px auto; }
+  #loginView.login:not(.hidden) { grid-template-columns: 1fr; grid-template-rows: 310px auto; }
   #loginView .login-word { font-size: 52px; left: 24px; top: 28px; }
-  #loginView .login-tag { left: 24px; top: 142px; max-width: 190px; font-size: 15px; }
-  #loginView .login-art img { width: 330px; right: -80px; bottom: -70px; }
-  #loginView .hero { align-self: start; padding: 26px 22px 40px !important; width: 100%; }
-  #loginView .hero h1 { font-size: 34px !important; }
+  #loginView .login-art img { width: 380px; left: 50%; bottom: -155px; transform: translateX(-44%) rotate(-14deg); }
+  #loginView .hero { align-self: start; padding: 28px 22px 40px !important; width: 100%; }
+  #loginView .hero h1 { font-size: 38px !important; margin-bottom: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
   body.group-panel-open .sheet-group-card[open] > .sheet-group-body { animation: none !important; }
@@ -1135,7 +1133,6 @@ body:not(.has-bottom-bar) .drive-scroll { padding-bottom: 40px !important; }
 #trashSection .drive-section-head { display: block !important; }
 body[data-place="home"] #paellaPanel .paella-panel-head { display: none !important; }
 body[data-place="home"] #paellaPanel { padding-top: 6px !important; }
-#loginView .login-note { margin-top: 16px !important; display: block; }
 /* a form's sections as folder tabs under its band */
 body:not([data-doc="form"]) #editorShell .form-tabs { display: none !important; }
 #editorShell .form-tabs { display: flex !important; margin-top: 18px; padding: 0 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; width: auto !important; }
