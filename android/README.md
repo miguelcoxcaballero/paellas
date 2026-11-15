@@ -39,16 +39,16 @@ en `android/`.
 
 ### Inicio de sesión con Google
 
-1. La web (bloque `ANDROID APP` de `index.html`) pide a la app abrir
-   `accounts.google.com/o/oauth2/v2/auth` con `response_type=token` y un `state`
-   `android.…` aleatorio.
-2. Google redirige la Custom Tab a `https://paellas.net` (URI de redirección autorizada
-   del cliente OAuth `435784295430-cmug…`; exactamente esa, sin barra final) con el token
-   en el fragmento. El script del principio de `index.html` lo pasa a `app-auth.html`, que
-   lo entrega a la app con `intent://auth?...;scheme=paellas;package=com.inhouse.paellas`.
-3. La app llama a `window.paellasAuth(query)`; la web comprueba el `state`.
+Desde Android 1.0.2, las APK usan el módulo OAuth canónico de Inhouse Services
+Updater, PKCE con el cliente Android de `com.inhouse.paellas` y el retorno
+`com.inhouse.paellas:/oauth2redirect`. La sesión se renueva y puede reutilizarse
+en Notes/Read mediante el proveedor cifrado, verificando paquetes y firmas.
+Los permisos adicionales de Paellas siguen requiriendo consentimiento de Google.
 
-El token vive en memoria, como en la web: al abrir la app de nuevo se entra con un toque.
+Las APK anteriores mantienen el retorno web `https://paellas.net` →
+`app-auth.html` → `paellas://auth`. Las webs comparten implementación, pero
+mantienen sus sesiones separadas por origen. Consulta
+`vendor/inhouse-services-updater/auth/README.md` para el contrato completo.
 
 ## Firma (importante para el futuro)
 
