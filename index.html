@@ -15,6 +15,7 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+  <script src="vendor/inhouse-services-updater/auth/google-oauth.js"></script>
   <title>paellas.net</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -7432,6 +7433,8 @@
 
   <script>
     const GOOGLE_CLIENT_ID = "435784295430-cmug30o42f1vu4ijgor9sjb0ro4oo37o.apps.googleusercontent.com";
+    // Registered Android client for com.inhouse.paellas; old APKs retain their web redirect.
+    const ANDROID_GOOGLE_CLIENT_ID = '435784295430-9idsoe7bb2c6l07m7bb56a25qjnhb43g.apps.googleusercontent.com';
     const GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID = "AKfycbwg2ISflRs4ZZ1GCOo6KpU_Ze7Ci9z1tG9eddC-8FG39-Nhb9ZyY5-c_Bt7OivQnBU";
     const LINKER_SCRIPT_STORAGE_KEY = "paellas-linker-script-id-v2";
     const GOOGLE_SCOPE = [
@@ -8185,6 +8188,7 @@
       return String(GOOGLE_APPS_SCRIPT_LINKER_DEPLOYMENT_ID || readStoredLinkerDeploymentId() || "").trim();
     }
     function clearAccessTokenState() {
+      sharedGoogleAuth.invalidate();
       if (state.tokenRefreshTimer) { clearTimeout(state.tokenRefreshTimer); state.tokenRefreshTimer = null; }
       state.accessToken = "";
       state.accessTokenExpiresAt = 0;
@@ -8199,42 +8203,12 @@
       }, refreshIn);
     }
     function ensureAccessToken(interactive) {
-      if (state.accessToken && state.accessTokenExpiresAt && Date.now() < state.accessTokenExpiresAt - 60000) {
-        return Promise.resolve(state.accessToken);
-      }
-      if (!state.tokenClient) {
-        return Promise.reject(new Error("Google aún no está listo."));
-      }
-      return new Promise(function (resolve, reject) {
-        state.tokenClient.callback = function (resp) {
-          if (!resp || resp.error || !resp.access_token) {
-            reject(new Error((resp && (resp.error_description || resp.error)) || "Error de autenticacion"));
-            return;
-          }
-          state.accessToken = resp.access_token;
-          state.accessTokenExpiresAt = Date.now() + (Math.max(60, Number(resp.expires_in) || 3600)) * 1000;
-          localStorage.setItem(AUTH_REMEMBER_KEY, "1");
-          const email = (state.currentUser && state.currentUser.emailAddress)
-            || localStorage.getItem(AUTH_HINT_EMAIL_KEY);
-          if (email) localStorage.setItem(AUTH_HINT_EMAIL_KEY, email);
-          scheduleTokenRefresh();
-          renderProfileMenu();
-          resolve(state.accessToken);
-        };
-        const opts = {};
-        if (interactive) {
-          opts.prompt = "consent";
-        } else {
-          opts.prompt = "none";
-          const email = (state.currentUser && state.currentUser.emailAddress)
-            || localStorage.getItem(AUTH_HINT_EMAIL_KEY);
-          if (email) opts.login_hint = email;
-        }
-        try {
-          state.tokenClient.requestAccessToken(opts);
-        } catch (err) {
-          reject(err);
-        }
+      return sharedGoogleAuth.request(!!interactive).then(function (data) {
+        state.accessToken = data.access_token;
+        state.accessTokenExpiresAt = data.expiresAt;
+        localStorage.setItem(AUTH_REMEMBER_KEY, "1");
+        scheduleTokenRefresh(); renderProfileMenu();
+        return state.accessToken;
       });
     }
     function openAuthenticatedDrive() {
@@ -21680,7 +21654,6 @@
        that, no trailing slash) → the early script in <head> → app-auth.html →
        paellas://auth. The token stays in memory, as on the web. */
     const ANDROID_APP = !!(window.PaellasApp && typeof window.PaellasApp.postMessage === "function");
-    const ANDROID_AUTH_STATE_KEY = "paellas-android-auth-state";
     if (ANDROID_APP) document.documentElement.classList.add("in-android-app");
     function androidAppMessage(message) {
       window.PaellasApp.postMessage(JSON.stringify(message));
@@ -21707,58 +21680,21 @@
         haptic(target.matches(".danger, .btn-danger, [data-danger]") ? "reject" : "soft");
       }, true);
     }
-    // Same shape as GIS's token client, so ensureAccessToken() works unchanged.
-    function createAndroidTokenClient() {
-      const client = {
-        callback: function () {},
-        requestAccessToken: function (opts) {
-          const options = opts || {};
-          if (options.prompt === "none") {
-            // No silent renewal in the app: a new sign-in is one tap away.
-            setTimeout(function () { client.callback({ error: "interaction_required", error_description: "Vuelve a entrar con Google." }); }, 0);
-            return;
-          }
-          const stateValue = "android." + Array.from(crypto.getRandomValues(new Uint8Array(16)), function (b) { return b.toString(16).padStart(2, "0"); }).join("");
-          localStorage.setItem(ANDROID_AUTH_STATE_KEY, stateValue);
-          const params = new URLSearchParams({
-            client_id: GOOGLE_CLIENT_ID,
-            redirect_uri: "https://paellas.net",
-            response_type: "token",
-            scope: GOOGLE_SCOPE,
-            include_granted_scopes: "true",
-            state: stateValue
-          });
-          if (options.prompt) params.set("prompt", options.prompt);
-          state.androidAuthPending = true;
-          const hint = localStorage.getItem(AUTH_HINT_EMAIL_KEY);
-          if (hint) params.set("login_hint", hint);
-          androidAppMessage({ type: "signIn", url: "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString() });
-        }
-      };
-      return client;
-    }
-    // Called by the shell with the query app-auth.html received from Google.
+    // OAuth protocol is maintained only in inhouse-services-updater.
+    const sharedGoogleAuth = window.InhouseGoogleOAuth.create({
+      clientId: GOOGLE_CLIENT_ID, scope: GOOGLE_SCOPE,
+      sessionKey: 'inhouse-paellas-oauth-v1', statePrefix: 'android.',
+      androidClientId: ANDROID_APP && window.InhouseOAuthNative && ANDROID_GOOGLE_CLIENT_ID || undefined,
+      redirectUri: ANDROID_APP && window.InhouseOAuthNative && ANDROID_GOOGLE_CLIENT_ID
+        ? 'com.inhouse.paellas:/oauth2redirect' : 'https://paellas.net',
+      openAuthUrl: ANDROID_APP ? url => androidAppMessage({ type: 'signIn', url: url }) : undefined,
+      hint: () => localStorage.getItem(AUTH_HINT_EMAIL_KEY)
+    });
     window.paellasAuth = function (query) {
-      const params = new URLSearchParams(query || "");
-      const expected = localStorage.getItem(ANDROID_AUTH_STATE_KEY);
-      if (!expected || params.get("state") !== expected || !state.tokenClient) return;
-      localStorage.removeItem(ANDROID_AUTH_STATE_KEY);
-      const resp = params.get("access_token")
-        ? { access_token: params.get("access_token"), expires_in: Number(params.get("expires_in") || 3600) }
-        : { error: params.get("error") || "access_denied" };
-      if (state.androidAuthPending) {
-        state.androidAuthPending = false;
-        state.tokenClient.callback(resp);
-        return;
-      }
-      if (!resp.access_token) return;
-      // Android reloaded the page while the Custom Tab was open: resume from the token.
-      state.accessToken = resp.access_token;
-      state.accessTokenExpiresAt = Date.now() + Math.max(60, resp.expires_in) * 1000;
-      localStorage.setItem(AUTH_REMEMBER_KEY, "1");
-      openAuthenticatedDrive().catch(function (err) {
-        setLoginStatus(messageFromError(err, "Sin respuesta de Google."));
-      });
+      const waiting = sharedGoogleAuth.hasPendingRequest();
+      sharedGoogleAuth.handleCallback(query).then(function (data) {
+        if (data && !waiting) openAuthenticatedDrive();
+      }).catch(function (err) { setLoginStatus(messageFromError(err, 'No se pudo conectar con Google.')); });
     };
     // Android's back button: close what is open before leaving the app.
     window.paellasBack = function () {
@@ -21824,23 +21760,10 @@
     }
 
     function initGoogle() {
-      if (ANDROID_APP) {
-        // The token lives in memory only: a new app start asks for one tap.
-        state.tokenClient = createAndroidTokenClient();
-        setLoginStatus("");
-        return;
-      }
-      if (!window.google || !google.accounts || !google.accounts.oauth2) {
-        setTimeout(initGoogle, 200);
-        return;
-      }
-      state.tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: GOOGLE_SCOPE,
-        include_granted_scopes: true,
-        callback: function () {}
-      });
-      restoreStoredSession();
+      if (!ANDROID_APP && !window.google?.accounts?.oauth2) { setTimeout(initGoogle, 500); return; }
+      state.tokenClient = sharedGoogleAuth;
+      if (ANDROID_APP) sharedGoogleAuth.request(false).then(() => openAuthenticatedDrive()).catch(() => {});
+      else restoreStoredSession();
     }
 
     els.loginBtn.addEventListener("click", function () {
@@ -21863,9 +21786,7 @@
       closePresencePopup();
       return clearPresence().catch(function () {
       }).finally(function () {
-        if (state.accessToken && window.google && google.accounts && google.accounts.oauth2) {
-          google.accounts.oauth2.revoke(state.accessToken, function () {});
-        }
+        sharedGoogleAuth.signOut();
         clearAccessTokenState();
         clearStoredUiSession();
         state.currentUser = null;

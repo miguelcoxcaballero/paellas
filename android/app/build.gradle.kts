@@ -15,8 +15,8 @@ android {
         minSdk = 26
         targetSdk = 35
         // Raise both for every published APK; versionCode must always grow.
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.2"
     }
 
     buildTypes {
@@ -54,3 +54,9 @@ dependencies {
     implementation("androidx.browser:browser:1.8.0")
     implementation("androidx.webkit:webkit:1.12.1")
 }
+
+// OAuth is maintained in the canonical services repo and synced with its own lock.
+val verifySharedOAuth by tasks.registering(Exec::class) {
+    commandLine("python3", rootProject.file("../vendor/inhouse-services-updater/auth/verify.py"), rootProject.file(".."))
+}
+tasks.named("preBuild") { dependsOn(verifySharedOAuth) }
