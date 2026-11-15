@@ -167,6 +167,7 @@ public class MainActivity extends ComponentActivity {
         });
 
         configureWebView();
+        com.inhouse.services.oauth.GoogleSessionBridge.install(webView, new java.util.HashSet<>(java.util.Arrays.asList("https://paellas.net")));
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -355,7 +356,7 @@ public class MainActivity extends ComponentActivity {
 
     private void handleAppIntent(Intent intent) {
         Uri data = intent == null ? null : intent.getData();
-        if (data != null && APP_SCHEME.equals(data.getScheme())) handleAppUri(data);
+        if (data != null && (APP_SCHEME.equals(data.getScheme()) || "com.inhouse.paellas".equals(data.getScheme()))) handleAppUri(data);
     }
 
     private void handleAppUri(Uri uri) {
@@ -365,7 +366,8 @@ public class MainActivity extends ComponentActivity {
             webView.loadUrl(START_URL);
             return;
         }
-        if (!"auth".equals(uri.getHost()) || uri.getEncodedQuery() == null) return;
+        boolean pkce = "com.inhouse.paellas".equals(uri.getScheme()) && "/oauth2redirect".equals(uri.getPath());
+        if ((!pkce && !"auth".equals(uri.getHost())) || uri.getEncodedQuery() == null) return;
         pendingAuthQuery = uri.getEncodedQuery();
         deliverPendingAuth();
     }
@@ -485,7 +487,7 @@ public class MainActivity extends ComponentActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             Uri uri = request.getUrl();
-            if (APP_SCHEME.equals(uri.getScheme())) {
+            if ((APP_SCHEME.equals(uri.getScheme()) || "com.inhouse.paellas".equals(uri.getScheme()))) {
                 handleAppUri(uri);
                 return true;
             }
