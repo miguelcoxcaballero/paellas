@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2038">
+  <meta name="app-build" content="20261121-2040">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2038";
+      var build = "20261121-2040";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -71,6 +71,12 @@
       if (location.protocol === "http:" || location.protocol === "https:") {
         setTimeout(function () { window.checkLatestAppBuild(false); }, 600);
       }
+      try {
+        var hasAndroidBridge = !!(window.InhouseOAuth || window.PaellasAndroid || (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.paellas));
+        if (hasAndroidBridge || localStorage.getItem("paellas-auth-remember-v1") === "1") {
+          document.documentElement.classList.add("restoring-session");
+        }
+      } catch (e) {}
     })();
   </script>
   <script src="vendor/inhouse-services-updater/auth/google-oauth.js"></script>
@@ -6422,7 +6428,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2038">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2040">
 </head>
 <body>
   <div class="app">
@@ -6480,7 +6486,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.11</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.12</div>
           </div>
         </div>
       </div>
@@ -8562,6 +8568,8 @@
           .then(function () { return true; })
           .catch(function (err) {
             console.warn("No se ha podido restaurar la sesión guardada:", err);
+            state.paellasLoading = false;
+            document.documentElement.classList.remove("restoring-session");
             clearAccessTokenState();
             renderProfileMenu();
             showView("login");
@@ -22468,10 +22476,25 @@
     }
 
     function initGoogle() {
-      if (!ANDROID_APP && !window.google?.accounts?.oauth2) { setTimeout(initGoogle, 500); return; }
+      if (!ANDROID_APP && !window.google?.accounts?.oauth2) { setTimeout(initGoogle, 80); return; }
       state.tokenClient = sharedGoogleAuth;
-      if (ANDROID_APP) sharedGoogleAuth.request(false).then(() => openAuthenticatedDrive()).catch(() => {});
-      else restoreStoredSession();
+      if (ANDROID_APP) {
+        sharedGoogleAuth.request(false)
+          .then(function () { return openAuthenticatedDrive(); })
+          .catch(function () {
+            state.paellasLoading = false;
+            document.documentElement.classList.remove("restoring-session");
+            showView("login");
+          });
+      } else {
+        restoreStoredSession().then(function (ok) {
+          document.documentElement.classList.remove("restoring-session");
+          if (!ok && !state.accessToken) {
+            state.paellasLoading = false;
+            showView("login");
+          }
+        });
+      }
     }
 
     els.loginBtn.addEventListener("click", function () {
@@ -24466,8 +24489,18 @@
 
     configurePickerMode("sheet");
     renderBreadcrumbs();
-    renderPaellas();
-    showView("login");
+    const mayRestoreSession = ANDROID_APP || (function () {
+      try { return localStorage.getItem(AUTH_REMEMBER_KEY) === "1"; } catch (e) { return false; }
+    })();
+    if (mayRestoreSession) {
+      state.paellasLoading = true;
+      renderPaellas();
+      showView("drive");
+    } else {
+      document.documentElement.classList.remove("restoring-session");
+      renderPaellas();
+      showView("login");
+    }
     initGoogle();
 
   </script>

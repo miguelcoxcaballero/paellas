@@ -2802,3 +2802,7 @@ body[data-place="home"][data-home-tab="trash"] .topbar #searchInput {
     transition: none !important;
   }
 }
+
+html.restoring-session #loginView {
+  display: none !important;
+}
