@@ -1154,8 +1154,6 @@ body:not(.has-bottom-bar) .drive-scroll { padding-bottom: 40px !important; }
   .trail-item { max-width: 200px; }
 }
 @media (max-width: 760px) {
-  /* phone top bar: brand at Inicio, "‹ Parent" everywhere else */
-  body:not([data-place="home"]) .topbar .brand { display: none !important; }
   .trail-item:not(.is-parent), .trail-sep { display: none !important; }
   .trail-item.is-parent { display: inline-flex; align-items: center; gap: 4px; font-size: 15.5px; color: var(--m-ink); padding: 10px 14px 10px 4px; max-width: 72vw; }
   .trail-item.is-parent::before { content: ""; width: 10px; height: 10px; border: solid currentColor; border-width: 0 0 2.5px 2.5px; transform: rotate(45deg); margin: 0 6px 0 6px; flex: none; }
