@@ -1041,9 +1041,9 @@ button, .btn, summary, .view-tab, a { touch-action: manipulation; }
   grid-template-rows: auto minmax(0, 1fr) !important;
 }
 #editorBreadcrumbsBar {
-  padding: 14px var(--m-pad, 24px) 10px;
-  margin: 0;
-  background: var(--m-cream);
+  padding: 0 0 12px;
+  margin: 0 0 18px;
+  background: transparent;
 }
 
 /* top bar */
