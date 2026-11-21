@@ -1622,11 +1622,19 @@ html.keyboard-open .pw-foot {
 }
 
 /* ---------- home paellas: propuesta A editorial grid (sin boton QR) ---------- */
+#paellaPanel:not(.is-folder-open) #paellaPanelContent {
+  overflow: visible !important;
+  padding-bottom: 0 !important;
+}
 #paellaPanel:not(.is-folder-open) #paellasGrid.paella-grid {
   display: grid !important;
+  grid-auto-flow: row !important;
+  grid-auto-columns: minmax(0, 1fr) !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   grid-auto-rows: 1fr !important;
   align-items: stretch !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
   gap: 20px 28px !important;
   padding: 16px 0 6px !important;
 }
