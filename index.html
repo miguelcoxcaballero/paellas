@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2009">
+  <meta name="app-build" content="20261121-2012">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2009";
+      var build = "20261121-2012";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6422,7 +6422,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2009">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2012">
 </head>
 <body>
   <div class="app">
@@ -6480,7 +6480,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.7</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.8</div>
           </div>
         </div>
       </div>
@@ -18916,6 +18916,35 @@
       const createLabel = activeFolder ? "Nuevo archivo" : "Crear paella";
       els.createPaellaBtn.title = createLabel;
       els.createPaellaBtn.setAttribute("aria-label", createLabel);
+      const panelContentEl = els.paellasGrid && els.paellasGrid.parentElement;
+      const prevSkeletonOverlay = panelContentEl
+        ? panelContentEl.querySelector(":scope > .paella-skeleton-overlay")
+        : null;
+      const existingSkeletons = (!state.paellasLoading && !state.activePaellaLoading)
+        ? Array.prototype.slice.call(els.paellasGrid.querySelectorAll(":scope > .paella-skeleton-card, :scope > .paella-skeleton-row"))
+        : [];
+      if (prevSkeletonOverlay) prevSkeletonOverlay.remove();
+      els.paellasGrid.classList.remove("is-crossfade-in");
+      if (existingSkeletons.length && panelContentEl) {
+        const overlay = document.createElement("div");
+        const isRowMode = existingSkeletons[0].classList.contains("paella-skeleton-row");
+        overlay.className = "paella-skeleton-overlay " + (isRowMode ? "is-list" : "is-grid");
+        overlay.setAttribute("aria-hidden", "true");
+        existingSkeletons.forEach(function (node) {
+          overlay.appendChild(node.cloneNode(true));
+        });
+        panelContentEl.appendChild(overlay);
+        requestAnimationFrame(function () {
+          overlay.classList.add("is-fading-out");
+        });
+        setTimeout(function () {
+          if (overlay.parentNode) overlay.remove();
+        }, 320);
+        els.paellasGrid.classList.add("is-crossfade-in");
+        setTimeout(function () {
+          els.paellasGrid.classList.remove("is-crossfade-in");
+        }, 420);
+      }
       els.paellasGrid.innerHTML = "";
       if (activeFolder && state.activePaellaLoading && !state.activePaellaItems.length) {
         els.paellasEmpty.classList.add("hidden");
@@ -20873,7 +20902,6 @@
         state.activePaellaLoadError = "";
         return refreshActivePaellaPermissions().then(function () {
           renderPaellas();
-          triggerPanelEnter(els.paellaPanel, "is-content-loaded", 240);
           saveStoredUiSession();
           return state.activePaellaItems;
         });
@@ -20917,7 +20945,6 @@
         state.paellasLoading = false;
         state.paellaLoadError = "";
         renderPaellas();
-        if (!hadItems) triggerPanelEnter(els.paellaPanel, "is-content-loaded", 240);
         return state.paellaItems;
       }).catch(function (err) {
         console.error(err);
@@ -22548,6 +22575,8 @@
         localStorage.removeItem(AUTH_REMEMBER_KEY);
         els.searchInput.value = "";
         els.itemsGrid.innerHTML = "";
+        state.paellasLoading = false;
+        state.activePaellaLoading = false;
         els.paellasGrid.innerHTML = "";
         els.sharedGrid.innerHTML = "";
         els.sheetTabs.innerHTML = "";
