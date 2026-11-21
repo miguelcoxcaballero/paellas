@@ -3084,7 +3084,20 @@ body[data-place="paella"] #paellaPanelFooter {
 
 /* ---------- Simplified 2-Step Form / Sheet Wizard (#fileWizard) ---------- */
 .fw-stepper {
-  max-width: 340px;
+  max-width: 320px;
+  margin: 0 auto;
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+.fw-stepper .pw-stepper-track {
+  left: 25% !important;
+  right: 25% !important;
+}
+#fileWizard .pw-steps-wrap.hidden {
+  display: none !important;
+}
+#fileWizard .pw-name-input {
+  width: 100%;
+  box-sizing: border-box;
 }
 .fw-type-grid {
   display: grid;
@@ -3092,6 +3105,7 @@ body[data-place="paella"] #paellaPanelFooter {
   gap: 14px;
   margin-bottom: 18px;
   width: 100%;
+  box-sizing: border-box;
 }
 .fw-type-card {
   display: flex;
@@ -3138,6 +3152,8 @@ body[data-place="paella"] #paellaPanelFooter {
   color: var(--m-ink);
 }
 .fw-link-toggle {
+  position: relative;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 12px;
