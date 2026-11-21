@@ -2435,10 +2435,15 @@ body[data-place="paella"] #driveShell {
   padding: 0 14px !important;
   font-size: 13px !important;
 }
+#driveShell,
+#editorShell {
+  overflow: visible !important;
+}
 .place-tabs,
 #editorShell #viewTabs,
 #editorShell .form-tabs {
   position: relative !important;
+  overflow: visible !important;
   margin-top: 6px !important;
   margin-bottom: 0 !important;
   min-height: 36px !important;
@@ -2742,6 +2747,7 @@ body[data-place="home"][data-home-tab="trash"] .topbar #searchInput {
 /* 5. Light frosted Apple Glass bottom dock on mobile + elastic pill deformation */
 @media (max-width: 760px) {
   .mobile-nav {
+    overflow: visible !important;
     background: rgba(255, 252, 244, .82) !important;
     -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
     backdrop-filter: blur(20px) saturate(150%) !important;

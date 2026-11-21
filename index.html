@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2040">
+  <meta name="app-build" content="20261121-2042">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2040";
+      var build = "20261121-2042";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6428,7 +6428,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2040">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2042">
 </head>
 <body>
   <div class="app">
@@ -6486,7 +6486,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.12</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.13</div>
           </div>
         </div>
       </div>
@@ -23507,7 +23507,8 @@
       barPill.setAttribute("aria-hidden", "true");
       bar.appendChild(barPill);
       document.body.appendChild(bar);
-      function createLiquidPillPhysics(applyBox) {
+      function createLiquidPillPhysics(applyBox, opts) {
+        const upGrow = !!(opts && opts.upGrow);
         let l = 0, r = 0, vl = 0, vr = 0;
         let tl = 0, tr = 0;
         let ready = false;
@@ -23533,8 +23534,14 @@
           if (r < l + 16) r = l + 16;
           const tw = Math.max(1, tr - tl);
           const w = Math.max(16, r - l);
-          const ratio = Math.max(0.86, Math.min(1.32, w / tw));
-          const sy = Math.max(0.92, Math.min(1.04, 1 / Math.sqrt(ratio)));
+          let sy = 1;
+          if (upGrow) {
+            const speed = Math.abs(vl) + Math.abs(vr);
+            sy = 1 + Math.min(0.18, speed / 2200);
+          } else {
+            const ratio = Math.max(0.86, Math.min(1.32, w / tw));
+            sy = Math.max(0.92, Math.min(1.06, 1 / Math.sqrt(ratio)));
+          }
           applyBox(l, w, sy);
           if (Math.abs(l - tl) < 0.08 && Math.abs(r - tr) < 0.08 && Math.abs(vl) < 0.5 && Math.abs(vr) < 0.5) {
             l = tl; r = tr; vl = 0; vr = 0;
@@ -23570,8 +23577,9 @@
         barPill.style.transition = "opacity .16s ease";
         barPill.style.left = "0px";
         barPill.style.width = width + "px";
+        barPill.style.transformOrigin = "center bottom";
         barPill.style.transform = "translate3d(" + left + "px, 0, 0) scaleY(" + sy.toFixed(4) + ")";
-      });
+      }, { upGrow: true });
       function syncDockPillPosition(instant) {
         const activeBtn = bar.querySelector(".mobile-nav-item.is-active");
         if (!activeBtn || bar.offsetWidth === 0) {
