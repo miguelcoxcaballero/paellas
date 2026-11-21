@@ -2368,9 +2368,12 @@ body[data-place="paella"] #driveShell {
   padding: 0 14px !important;
   font-size: 13px !important;
 }
-.place-tabs {
+.place-tabs,
+#editorShell #viewTabs,
+#editorShell .form-tabs {
   margin-top: 6px !important;
   margin-bottom: 0 !important;
+  min-height: 36px !important;
   padding: 0 !important;
   gap: 4px !important;
   background: transparent !important;
@@ -2389,8 +2392,11 @@ body[data-place="paella"] #driveShell {
   border: 0 !important;
   box-shadow: none !important;
 }
+.place-tabs .view-tab[aria-selected="true"],
 .place-tabs .view-tab.active,
+#editorShell #viewTabs .view-tab[aria-selected="true"],
 #editorShell #viewTabs .view-tab.active,
+#editorShell .form-tabs .view-tab[aria-selected="true"],
 #editorShell .form-tabs .view-tab.active {
   background: var(--m-cream) !important;
   color: var(--m-ink) !important;
