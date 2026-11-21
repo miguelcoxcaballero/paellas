@@ -1730,62 +1730,158 @@ html.keyboard-open .pw-foot {
   align-items: center;
 }
 .paella-card-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  border-radius: 50% !important;
   border: 2px solid var(--m-cream);
   background: #FFF0C2;
   color: var(--m-ink);
   font: 700 11px var(--m-sans);
-  display: grid;
-  place-items: center;
-  object-fit: cover;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden !important;
+  flex: none !important;
   margin-left: -6px;
 }
 .paella-card-avatar:first-child { margin-left: 0; }
+.paella-card-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* ---------- loading skeleton placeholders ---------- */
+.paella-skeleton-card {
+  border-top: 3px solid rgba(38, 23, 10, .14);
+  border-bottom: 1px solid var(--m-line);
+  padding: 16px 6px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: paellaItemEnter .26s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--paella-stagger, 0) * 40ms);
+}
+.paella-skeleton-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.paella-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--m-line);
+  animation: paellaItemEnter .26s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--paella-stagger, 0) * 35ms);
+}
+.paella-skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.paella-skeleton-tile,
+.paella-skeleton-bar,
+.paella-skeleton-dot {
+  display: block;
+  background: linear-gradient(90deg, rgba(38, 23, 10, .06) 25%, rgba(38, 23, 10, .12) 50%, rgba(38, 23, 10, .06) 75%);
+  background-size: 220% 100%;
+  animation: paellaSkeletonShimmer 1.35s ease-in-out infinite;
+}
+.paella-skeleton-tile {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex: none;
+}
+.paella-skeleton-tile.is-lg {
+  width: 44px;
+  height: 44px;
+}
+.paella-skeleton-bar {
+  height: 12px;
+  border-radius: 999px;
+}
+.paella-skeleton-bar.is-pill { width: 64px; height: 10px; }
+.paella-skeleton-bar.is-card-title { width: 76%; height: 20px; border-radius: 8px; }
+.paella-skeleton-bar.is-card-meta { width: 48%; height: 12px; }
+.paella-skeleton-bar.is-title { width: 46%; height: 15px; }
+.paella-skeleton-bar.is-sub { width: 28%; height: 11px; }
+.paella-skeleton-avatars {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+}
+.paella-skeleton-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+@keyframes paellaSkeletonShimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
 
 /* ---------- polished screen & paella transitions ---------- */
 .view.is-view-entering {
-  animation: viewEnter .28s cubic-bezier(.22, 1, .36, 1);
+  animation: viewEnter .3s cubic-bezier(.16, 1, .3, 1);
+}
+#driveView.is-view-entering .drive-scroll,
+#editorView.is-view-entering > section.card {
+  animation: viewEnter .32s cubic-bezier(.16, 1, .3, 1);
 }
 #paellaPanel.is-entering-paella {
-  animation: paellaPanelEnter .3s cubic-bezier(.22, 1, .36, 1);
+  animation: paellaPanelEnter .34s cubic-bezier(.16, 1, .3, 1);
 }
 #paellaPanel.is-returning-home {
-  animation: paellaHomeReturn .26s cubic-bezier(.22, 1, .36, 1);
+  animation: paellaHomeReturn .3s cubic-bezier(.16, 1, .3, 1);
 }
 #paellaPanel.is-entering-paella #paellasGrid > * {
-  animation: paellaItemEnter .26s cubic-bezier(.22, 1, .36, 1) both;
-  animation-delay: calc(var(--paella-stagger, 0) * 24ms);
+  animation: paellaItemEnter .3s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--paella-stagger, 0) * 28ms);
 }
 .is-surface-entering {
-  animation: surfaceEnter .24s cubic-bezier(.22, 1, .36, 1);
+  animation: surfaceEnter .26s cubic-bezier(.16, 1, .3, 1);
 }
 @keyframes viewEnter {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes paellaPanelEnter {
-  from { opacity: 0; transform: translateX(18px); }
+  from { opacity: 0; transform: translateX(24px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes paellaHomeReturn {
-  from { opacity: 0; transform: translateX(-16px); }
+  from { opacity: 0; transform: translateX(-20px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes paellaItemEnter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes surfaceEnter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .view.is-view-entering,
+  #driveView.is-view-entering .drive-scroll,
+  #editorView.is-view-entering > section.card,
   #paellaPanel.is-entering-paella,
   #paellaPanel.is-returning-home,
   #paellaPanel.is-entering-paella #paellasGrid > *,
+  .paella-skeleton-card,
+  .paella-skeleton-row,
+  .paella-skeleton-tile,
+  .paella-skeleton-bar,
+  .paella-skeleton-dot,
   .is-surface-entering {
     animation: none !important;
   }

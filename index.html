@@ -7617,9 +7617,11 @@
       folderStack: [{ id: "root", name: "Mi unidad" }],
       currentItems: [],
       paellaItems: [],
+      paellasLoading: false,
       paellaLoadError: "",
       activePaellaStack: [],
       activePaellaItems: [],
+      activePaellaLoading: false,
       activePaellaLoadError: "",
       activePaellaPermissions: [],
       pendingPaellaShares: [],
@@ -18840,6 +18842,40 @@
       }
       els.createPaellaBtn.textContent = activeFolder ? "Nuevo archivo" : "Crear paella";
       els.paellasGrid.innerHTML = "";
+      if (activeFolder && state.activePaellaLoading && !state.activePaellaItems.length) {
+        els.paellasEmpty.classList.add("hidden");
+        for (let i = 0; i < 4; i++) {
+          const sk = document.createElement("div");
+          sk.className = "paella-skeleton-row";
+          sk.style.setProperty("--paella-stagger", String(i));
+          sk.innerHTML =
+            "<span class='paella-skeleton-tile'></span>" +
+            "<div class='paella-skeleton-lines'>" +
+              "<span class='paella-skeleton-bar is-title'></span>" +
+              "<span class='paella-skeleton-bar is-sub'></span>" +
+            "</div>";
+          els.paellasGrid.appendChild(sk);
+        }
+        return;
+      }
+      if (!activeFolder && state.paellasLoading && !state.paellaItems.length) {
+        els.paellasEmpty.classList.add("hidden");
+        for (let i = 0; i < 3; i++) {
+          const sk = document.createElement("div");
+          sk.className = "paella-skeleton-card";
+          sk.style.setProperty("--paella-stagger", String(i));
+          sk.innerHTML =
+            "<div class='paella-skeleton-card-head'>" +
+              "<span class='paella-skeleton-tile is-lg'></span>" +
+              "<span class='paella-skeleton-bar is-pill'></span>" +
+            "</div>" +
+            "<span class='paella-skeleton-bar is-card-title'></span>" +
+            "<span class='paella-skeleton-bar is-card-meta'></span>" +
+            "<div class='paella-skeleton-avatars'><span class='paella-skeleton-dot'></span></div>";
+          els.paellasGrid.appendChild(sk);
+        }
+        return;
+      }
       els.paellasEmpty.textContent = activeFolder
         ? (state.activePaellaLoadError || (query ? "No hay archivos en esta paella que coincidan con la búsqueda." : "Esta paella está vacía."))
         : (state.paellaLoadError || (query ? "No hay paellas que coincidan con la búsqueda." : "Todavía no hay paellas."));
@@ -18884,7 +18920,9 @@
           const label = owner.displayName || owner.emailAddress || "Admin";
           const initial = escapeHtml(String(label).trim().charAt(0).toUpperCase() || "A");
           if (owner.photoLink) {
-            return "<img class='paella-card-avatar paella-card-avatar-img' src='" + escapeHtml(owner.photoLink) + "' alt='" + escapeHtml(label) + "' title='" + escapeHtml(label) + "'>";
+            return "<span class='paella-card-avatar' title='" + escapeHtml(label) + "'>" +
+              "<img class='paella-card-avatar-img' src='" + escapeHtml(owner.photoLink) + "' alt='" + escapeHtml(label) + "' referrerpolicy='no-referrer' onerror=\"this.parentNode.textContent='" + initial + "'\">" +
+            "</span>";
           }
           return "<span class='paella-card-avatar' title='" + escapeHtml(label) + "'>" + initial + "</span>";
         }).join("");
@@ -20672,6 +20710,8 @@
         state.activePaellaStack = normalizePaellaFolderStack(nextStack);
       }
       setBusy(els.driveShell, true);
+      state.activePaellaItems = [];
+      state.activePaellaLoading = true;
       state.activePaellaLoadError = "";
       renderPaellas();
       const query = encodeURIComponent(
@@ -20684,30 +20724,41 @@
         "&pageSize=200&orderBy=folder,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
       ).then(function (data) {
         state.activePaellaItems = data.files || [];
+        state.activePaellaLoading = false;
         state.activePaellaLoadError = "";
         return refreshActivePaellaPermissions().then(function () {
           renderPaellas();
+          triggerPanelEnter(els.paellaPanel, "is-entering-paella", 420);
           saveStoredUiSession();
           return state.activePaellaItems;
         });
       }).catch(function (err) {
         console.error(err);
         state.activePaellaItems = [];
+        state.activePaellaLoading = false;
         state.activePaellaLoadError = messageFromError(err, "No se ha podido abrir esta paella");
         state.activePaellaPermissions = [];
         renderPaellaAccessAvatars([]);
         renderPaellas();
         return [];
       }).finally(function () {
+        state.activePaellaLoading = false;
         setBusy(els.driveShell, false);
       });
     }
     function loadPaellas() {
       if (!state.accessToken) {
         state.paellaItems = [];
+        state.paellasLoading = false;
         state.paellaLoadError = "";
         renderPaellas();
         return Promise.resolve([]);
+      }
+      const hadItems = state.paellaItems.length > 0;
+      if (!hadItems) {
+        state.paellasLoading = true;
+        state.paellaLoadError = "";
+        renderPaellas();
       }
       const query = encodeURIComponent(
         "trashed=false and mimeType='" + DRIVE_FOLDER_MIME + "' and appProperties has { key='paellasType' and value='paella' }"
@@ -20718,12 +20769,15 @@
         "&pageSize=200&orderBy=modifiedTime desc,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
       ).then(function (data) {
         state.paellaItems = data.files || [];
+        state.paellasLoading = false;
         state.paellaLoadError = "";
         renderPaellas();
+        if (!hadItems) triggerPanelEnter(els.paellaPanel, "is-returning-home", 340);
         return state.paellaItems;
       }).catch(function (err) {
         console.error(err);
         state.paellaItems = [];
+        state.paellasLoading = false;
         state.paellaLoadError = messageFromError(err, "No se han podido cargar las paellas");
         renderPaellas();
         return [];
