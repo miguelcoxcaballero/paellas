@@ -996,34 +996,54 @@ button, .btn, summary, .view-tab, a { touch-action: manipulation; }
    status and the place's actions; tabs under the band (computer) or the
    bottom bar (phone). Edit-only controls show only while editing.
    ===================================================================== */
-.top-nav, #driveTrashBtn, #paellaPanelFooter, #bandNewGroupBtn, #editorCrumb { display: none !important; }
-@media (min-width: 761px) {
-  .app:has(#driveView:not(.hidden)):has(#paellaPanel.is-folder-open) .trail { display: none !important; }
-}
-#paellaPanel:not(.is-folder-open) #paellaBreadcrumbs { display: none !important; }
-#paellaPanel.is-folder-open #paellaBreadcrumbs {
-  display: inline-flex !important;
+.top-nav, #driveTrashBtn, #paellaPanelFooter, #paellaBreadcrumbs, #breadcrumbs, #direccionBreadcrumbs, #bandNewGroupBtn, #editorCrumb, .topbar .trail { display: none !important; }
+.unified-breadcrumbs {
+  display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2px;
-  padding: 5px 12px;
+  gap: 4px;
+  padding: 0 0 12px;
+  margin: 0 0 4px;
+  border-bottom: 1px solid var(--m-line);
+  font: 600 13.5px var(--m-sans);
+  color: var(--m-muted);
+}
+.unified-breadcrumbs:empty { display: none !important; }
+.unified-breadcrumbs .trail-item {
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
   border-radius: 999px;
-  background: rgba(38, 23, 10, .06);
-  margin-left: 4px;
-}
-#paellaPanel.is-folder-open #paellaBreadcrumbs > .crumb {
-  font: 600 13.5px var(--m-sans) !important;
-  color: var(--m-muted) !important;
+  font: inherit;
+  color: var(--m-muted);
   cursor: pointer;
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-#paellaPanel.is-folder-open #paellaBreadcrumbs > .crumb:hover:not(.current) {
-  color: var(--m-ink) !important;
-  text-decoration: underline;
+.unified-breadcrumbs .trail-item:first-child { padding-left: 0; }
+.unified-breadcrumbs .trail-item:hover:not(.is-current) {
+  background: rgba(38, 23, 10, .06);
+  color: var(--m-ink);
 }
-#paellaPanel.is-folder-open #paellaBreadcrumbs > .crumb.current {
-  color: var(--m-ink) !important;
-  font-weight: 700 !important;
+.unified-breadcrumbs .trail-item.is-current {
+  color: var(--m-ink);
+  font-weight: 700;
   cursor: default;
+}
+.unified-breadcrumbs .trail-sep {
+  color: var(--m-faint);
+  font-weight: 600;
+  user-select: none;
+}
+#editorView > section.card:last-child {
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+#editorBreadcrumbsBar {
+  padding: 14px var(--m-pad, 24px) 10px;
+  margin: 0;
+  background: var(--m-cream);
 }
 
 /* top bar */
