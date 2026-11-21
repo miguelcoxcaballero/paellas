@@ -1669,7 +1669,7 @@ html.keyboard-open .pw-foot {
   }
 }
 
-/* ---------- home paellas: propuesta A editorial grid (sin boton QR) ---------- */
+/* ---------- home paellas: opcion L2 split login-style cards ---------- */
 #paellaPanel:not(.is-folder-open) #paellaPanelContent {
   overflow: visible !important;
   padding-bottom: 0 !important;
@@ -1683,12 +1683,13 @@ html.keyboard-open .pw-foot {
   align-items: stretch !important;
   width: 100% !important;
   box-sizing: border-box !important;
-  gap: 20px 28px !important;
-  padding: 16px 0 6px !important;
+  gap: 20px 22px !important;
+  padding: 16px 0 8px !important;
 }
-@media (max-width: 1040px) {
+@media (max-width: 1120px) {
   #paellaPanel:not(.is-folder-open) #paellasGrid.paella-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px !important;
   }
 }
 @media (max-width: 680px) {
@@ -1702,121 +1703,100 @@ html.keyboard-open .pw-foot {
   width: 100% !important;
   min-width: 0 !important;
   height: 100% !important;
-  min-height: 178px !important;
-  background: transparent !important;
-  border: 0 !important;
-  border-top: 3px solid var(--paella-folder-color, var(--m-ink)) !important;
-  border-bottom: 1px solid var(--m-line) !important;
-  border-radius: 0 !important;
+  min-height: 204px !important;
+  background: #FFFDF7 !important;
+  border: 1px solid var(--m-ink) !important;
+  border-radius: 18px !important;
   box-shadow: none !important;
-  padding: 16px 6px 14px !important;
-  display: flex !important;
-  flex-direction: column !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: 42% minmax(0, 1fr) !important;
+  grid-template-areas: none !important;
   align-items: stretch !important;
-  gap: 12px !important;
+  gap: 0 !important;
   overflow: hidden !important;
   cursor: pointer;
-  transition: background-color .18s ease, transform .14s cubic-bezier(.22, 1, .36, 1) !important;
+  transition: transform .16s cubic-bezier(.22, 1, .36, 1), box-shadow .18s ease !important;
 }
 #paellaPanel:not(.is-folder-open) .paella-grid > .paella-card:hover {
-  background: rgba(255, 212, 59, .18) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 26px -18px rgba(38, 23, 10, .38) !important;
 }
 #paellaPanel:not(.is-folder-open) .paella-grid > .paella-card:active {
-  transform: scale(.988) !important;
+  transform: scale(.985) !important;
 }
-#paellaPanel:not(.is-folder-open) .paella-card-head {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 10px !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 44px !important;
-  flex: none !important;
+.paella-card-art {
+  position: relative;
+  overflow: hidden;
+  background: var(--paella-folder-art, linear-gradient(160deg, #FFD43B 0%, #FFF0B3 100%));
+  border-right: 1px solid var(--m-line);
+  min-height: 100%;
 }
-#paellaPanel:not(.is-folder-open) .paella-card-head .item-actions {
+.paella-card-art-svg {
+  position: absolute;
+  left: -34%;
+  bottom: -24%;
+  width: 142%;
+  max-width: none !important;
+  height: auto;
+  transform: rotate(-14deg);
+  pointer-events: none;
+  user-select: none;
+}
+.paella-card-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 16px 18px 18px;
+  min-width: 0;
+  gap: 14px;
+}
+.paella-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.paella-card-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.paella-card-menu-slot {
+  flex: none;
+  margin: -6px -8px 0 0;
+}
+.paella-card-menu-slot .item-actions {
   position: static !important;
-  order: initial !important;
 }
-#paellaPanel:not(.is-folder-open) .paella-card-icon {
-  width: 44px !important;
-  height: 44px !important;
-  min-width: 44px !important;
-  border-radius: 12px !important;
-  background: var(--paella-folder-bg, #FFF0C2) !important;
-  display: grid !important;
-  place-items: center;
-  flex: none !important;
-  order: initial !important;
+.paella-card-menu-slot .item-more-btn {
+  width: 32px !important;
+  height: 32px !important;
 }
-.paella-card-svg {
-  width: 28px;
-  height: 28px;
-  display: block;
-  object-fit: contain;
-}
-.paella-card-head-right {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-}
-.paella-card-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font: 600 12.5px var(--m-sans);
-  color: var(--m-muted);
+#paellaPanel:not(.is-folder-open) .paella-card-meta {
+  font: 500 13px/1.3 var(--m-sans) !important;
+  color: var(--m-muted) !important;
   white-space: nowrap;
-}
-.paella-card-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--paella-folder-color, var(--m-good));
-  flex: none;
-}
-#paellaPanel:not(.is-folder-open) .paella-card-body {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  gap: 6px !important;
-  padding: 0 !important;
-  min-width: 0 !important;
-  flex: 1 1 auto !important;
-  order: initial !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #paellaPanel:not(.is-folder-open) .paella-card-title {
-  font: 500 22px/1.16 var(--m-head) !important;
-  letter-spacing: -.015em;
+  font: 500 clamp(22px, 2vw, 27px)/1.12 var(--m-head) !important;
+  letter-spacing: -.02em;
   color: var(--m-ink) !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden !important;
-  min-height: 2.32em;
   word-break: break-word;
-}
-#paellaPanel:not(.is-folder-open) .paella-card-meta {
-  font: 500 13.5px/1.35 var(--m-sans) !important;
-  color: var(--m-muted) !important;
-  min-height: 19px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.paella-card-foot {
-  margin-top: auto !important;
-  padding-top: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 28px;
-  flex: none;
+  margin-top: auto;
 }
 .paella-card-avatars {
   display: inline-flex;
   align-items: center;
+  min-height: 26px;
 }
 .paella-card-avatar {
   width: 26px !important;
@@ -1824,9 +1804,9 @@ html.keyboard-open .pw-foot {
   min-width: 26px !important;
   min-height: 26px !important;
   border-radius: 50% !important;
-  border: 2px solid var(--m-cream);
-  background: #FFF0C2;
-  color: var(--m-ink);
+  border: 2px solid #FFFDF7;
+  background: var(--m-ink);
+  color: var(--m-sun);
   font: 700 11px var(--m-sans);
   display: inline-flex !important;
   align-items: center;
@@ -1843,23 +1823,52 @@ html.keyboard-open .pw-foot {
   object-fit: cover !important;
   display: block !important;
 }
+@media (max-width: 680px) {
+  #paellaPanel:not(.is-folder-open) .paella-grid > .paella-card {
+    min-height: 146px !important;
+    grid-template-columns: 40% minmax(0, 1fr) !important;
+  }
+  .paella-card-main {
+    padding: 13px 12px 14px 14px;
+    gap: 10px;
+  }
+  #paellaPanel:not(.is-folder-open) .paella-card-title {
+    font-size: 22px !important;
+  }
+}
 
 /* ---------- loading skeleton placeholders ---------- */
 .paella-skeleton-card {
-  border-top: 3px solid rgba(38, 23, 10, .14);
-  border-bottom: 1px solid var(--m-line);
-  padding: 16px 6px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  border: 1px solid rgba(38, 23, 10, .16);
+  border-radius: 18px;
+  min-height: 204px;
+  overflow: hidden;
+  background: #FFFDF7;
+  display: grid;
+  grid-template-columns: 42% minmax(0, 1fr);
   animation: paellaItemEnter .26s cubic-bezier(.16, 1, .3, 1) both;
   animation-delay: calc(var(--paella-stagger, 0) * 40ms);
 }
-.paella-skeleton-card-head {
+.paella-skeleton-art {
+  background: linear-gradient(160deg, rgba(255, 212, 59, .32) 0%, rgba(255, 240, 179, .24) 100%);
+  border-right: 1px solid var(--m-line);
+}
+.paella-skeleton-main {
+  padding: 16px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 10px;
+}
+.paella-skeleton-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (max-width: 680px) {
+  .paella-skeleton-card {
+    min-height: 146px;
+    grid-template-columns: 40% minmax(0, 1fr);
+  }
 }
 .paella-skeleton-row {
   display: flex;

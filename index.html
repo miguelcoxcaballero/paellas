@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2004">
+  <meta name="app-build" content="20261121-2009">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2004";
+      var build = "20261121-2009";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6422,7 +6422,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2004">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2009">
 </head>
 <body>
   <div class="app">
@@ -6480,7 +6480,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.6</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.7</div>
           </div>
         </div>
       </div>
@@ -17530,7 +17530,9 @@
     function paellaCardStyleAttr(item) {
       const color = normalizeFolderColor(item && item.folderColorRgb);
       if (!color) return "";
-      return "--paella-folder-color:" + color + ";--paella-folder-bg:" + hexToRgba(color, 0.14) + ";";
+      return "--paella-folder-color:" + color +
+        ";--paella-folder-bg:" + hexToRgba(color, 0.14) +
+        ";--paella-folder-art:linear-gradient(160deg, " + hexToRgba(color, 0.34) + " 0%, " + hexToRgba(color, 0.11) + " 100%);";
     }
     function formatDriveDate(value) {
       if (!value) return "";
@@ -18938,13 +18940,14 @@
           sk.className = "paella-skeleton-card";
           sk.style.setProperty("--paella-stagger", String(i));
           sk.innerHTML =
-            "<div class='paella-skeleton-card-head'>" +
-              "<span class='paella-skeleton-tile is-lg'></span>" +
-              "<span class='paella-skeleton-bar is-pill'></span>" +
-            "</div>" +
-            "<span class='paella-skeleton-bar is-card-title'></span>" +
-            "<span class='paella-skeleton-bar is-card-meta'></span>" +
-            "<div class='paella-skeleton-avatars'><span class='paella-skeleton-dot'></span></div>";
+            "<div class='paella-skeleton-art'></div>" +
+            "<div class='paella-skeleton-main'>" +
+              "<div class='paella-skeleton-top'>" +
+                "<span class='paella-skeleton-dot'></span>" +
+                "<span class='paella-skeleton-bar is-card-meta'></span>" +
+              "</div>" +
+              "<span class='paella-skeleton-bar is-card-title'></span>" +
+            "</div>";
           els.paellasGrid.appendChild(sk);
         }
         return;
@@ -18999,24 +19002,23 @@
           }
           return "<span class='paella-card-avatar' title='" + escapeHtml(label) + "'>" + initial + "</span>";
         }).join("");
-        const statusText = item.shared ? "Compartida" : "Activa";
-        const metaParts = [updatedLabel, item.shared ? "Equipo" : ""].filter(Boolean);
+        const metaParts = [updatedLabel || "Sin fecha", item.shared ? "Compartida" : ""].filter(Boolean);
         el.innerHTML =
-          "<div class='paella-card-head'>" +
-            "<div class='paella-card-icon' aria-hidden='true'>" + paellaCardIconMarkup() + "</div>" +
-            "<div class='paella-card-head-right'>" +
-              "<span class='paella-card-status'><span class='paella-card-dot' aria-hidden='true'></span>" + escapeHtml(statusText) + "</span>" +
+          "<div class='paella-card-art' aria-hidden='true'>" +
+            "<img src='paella.svg' alt='' class='paella-card-art-svg'>" +
+          "</div>" +
+          "<div class='paella-card-main'>" +
+            "<div class='paella-card-top'>" +
+              "<div class='paella-card-meta-col'>" +
+                "<div class='paella-card-avatars'>" + avatarHtml + "</div>" +
+                "<div class='paella-card-meta'>" + escapeHtml(metaParts.join(" · ")) + "</div>" +
+              "</div>" +
+              "<div class='paella-card-menu-slot'></div>" +
             "</div>" +
-          "</div>" +
-          "<div class='paella-card-body'>" +
             "<div class='paella-card-title'>" + escapeHtml(item.name || "Paella sin nombre") + "</div>" +
-            "<div class='paella-card-meta'>" + escapeHtml(metaParts.join(" · ")) + "</div>" +
-          "</div>" +
-          "<div class='paella-card-foot'>" +
-            "<div class='paella-card-avatars'>" + avatarHtml + "</div>" +
           "</div>";
-        const headRight = el.querySelector(".paella-card-head-right");
-        if (headRight) headRight.appendChild(createItemActionButton(item, "paella-root"));
+        const menuSlot = el.querySelector(".paella-card-menu-slot");
+        if (menuSlot) menuSlot.appendChild(createItemActionButton(item, "paella-root"));
         el.addEventListener("click", function () {
           openPaellaFolder(item);
         });
