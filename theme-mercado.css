@@ -1922,3 +1922,13 @@ html.keyboard-open .pw-foot {
     transition: none !important;
   }
 }
+
+.profile-version {
+  margin-top: 8px;
+  padding: 10px 4px 2px;
+  border-top: 1px solid var(--m-line);
+  font: 600 12px var(--m-sans);
+  color: var(--m-muted);
+  text-align: center;
+  letter-spacing: .01em;
+}

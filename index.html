@@ -6422,6 +6422,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.2</div>
           </div>
         </div>
       </div>
@@ -22286,6 +22287,13 @@
       }, true);
       els.profileUpdatesBtn.classList.remove("hidden");
       els.profileUpdatesBtn.addEventListener("click", function () { androidAppMessage({ type: "updates" }); });
+      try {
+        const pv = document.getElementById("profileVersion");
+        const nativeVer = window.PaellasAndroid && typeof window.PaellasAndroid.getAppVersion === "function"
+          ? String(window.PaellasAndroid.getAppVersion() || "").trim()
+          : "";
+        if (pv && nativeVer) pv.textContent = "Versión " + nativeVer;
+      } catch (err) {}
     }
 
     function initGoogle() {
