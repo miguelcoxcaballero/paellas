@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-1945">
+  <meta name="app-build" content="20261121-1953">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-1945";
+      var build = "20261121-1953";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6422,7 +6422,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-1945">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-1953">
 </head>
 <body>
   <div class="app">
@@ -6480,7 +6480,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.3</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.4</div>
           </div>
         </div>
       </div>
@@ -6530,7 +6530,7 @@
             </div>
             <div class="paella-panel-actions">
               <div id="paellaAccessAvatars" class="presence-avatars hidden" aria-label="Accesos de la paella"></div>
-              <button id="createPaellaBtn" class="btn primary paella-create-btn" type="button">Crear paella</button>
+              <button id="createPaellaBtn" class="btn primary paella-create-btn paella-fab" type="button" title="Crear paella" aria-label="Crear paella"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             </div>
           </div>
           <div id="paellaPanelContent" class="paella-panel-content">
@@ -18910,7 +18910,9 @@
       } else if (els.paellaPanelFooter) {
         els.paellaPanelFooter.classList.add("hidden");
       }
-      els.createPaellaBtn.textContent = activeFolder ? "Nuevo archivo" : "Crear paella";
+      const createLabel = activeFolder ? "Nuevo archivo" : "Crear paella";
+      els.createPaellaBtn.title = createLabel;
+      els.createPaellaBtn.setAttribute("aria-label", createLabel);
       els.paellasGrid.innerHTML = "";
       if (activeFolder && state.activePaellaLoading && !state.activePaellaItems.length) {
         els.paellasEmpty.classList.add("hidden");
@@ -22562,6 +22564,10 @@
         openNewSheetModal("sheet", "paella-files");
         return;
       }
+      if (document.body.dataset.homeTab === "files") {
+        openNewSheetModal("sheet", "drive");
+        return;
+      }
       openPaellaWizard();
     });
     if (els.paellaWizardCloseBtn) {
@@ -22795,7 +22801,9 @@
       const searchGroup = els.searchInput.closest(".drive-search-group") || els.searchInput;
       heroActions.appendChild(els.paellaAccessAvatars);
       heroActions.appendChild(els.searchInput);
-      heroActions.appendChild(els.createPaellaBtn);
+      if (els.driveView && els.createPaellaBtn) {
+        els.driveView.appendChild(els.createPaellaBtn);
+      }
       if (searchGroup !== els.searchInput && !searchGroup.children.length) searchGroup.classList.add("hidden");
       const sharedLabel = document.querySelector("#sharedSection .section-label");
       if (sharedLabel) sharedLabel.textContent = "Compartido contigo";
@@ -23236,7 +23244,11 @@
       readerBtn.type = "button";
       readerBtn.id = "placeReaderBtn";
       readerBtn.addEventListener("click", function () { els.paellaEntryReaderBtn.click(); });
-      heroActions.insertBefore(readerBtn, els.createPaellaBtn);
+      if (els.createPaellaBtn && els.createPaellaBtn.parentNode === heroActions) {
+        heroActions.insertBefore(readerBtn, els.createPaellaBtn);
+      } else if (heroActions) {
+        heroActions.appendChild(readerBtn);
+      }
       els.searchInput.setAttribute("aria-label", "Buscar");
 
       // ── Document band ──
