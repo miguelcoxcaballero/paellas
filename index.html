@@ -6859,6 +6859,74 @@
     </section>
   </div>
 
+  <div id="paellaWizard" class="paella-wizard hidden" role="dialog" aria-modal="true" aria-labelledby="paellaWizardTitle">
+    <div class="pw-band">
+      <div class="pw-topbar">
+        <div class="pw-brand">
+          <img class="brand-mark" src="paella.svg" alt="" width="34" height="32">
+          <span class="brand-name">paellas.net</span>
+        </div>
+        <button id="paellaWizardCloseBtn" class="btn pw-close-btn" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="pw-steps-wrap">
+        <div class="pw-steps" role="tablist" aria-label="Pasos">
+          <button class="pw-step is-active" type="button" data-pw-step="0"><span class="pw-step-num">1</span><span>Nombre</span></button>
+          <button class="pw-step" type="button" data-pw-step="1"><span class="pw-step-num">2</span><span>Editores</span></button>
+          <button class="pw-step" type="button" data-pw-step="2"><span class="pw-step-num">3</span><span>Crear</span></button>
+        </div>
+        <div class="pw-progress-track" aria-hidden="true"><div id="paellaWizardProgressFill" class="pw-progress-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="pw-stage">
+      <section id="paellaWizardStep0" class="pw-step-panel">
+        <h1 id="paellaWizardTitle" class="pw-heading">Nombre de la paella</h1>
+        <input id="paellaWizardNameInput" class="search pw-name-input" type="text" placeholder="Paellas ETSINF 2026" autocomplete="off" spellcheck="false" maxlength="100" aria-label="Nombre de la paella">
+        <div id="paellaWizardStep0Status" class="status pw-status"></div>
+      </section>
+
+      <section id="paellaWizardStep1" class="pw-step-panel hidden">
+        <h1 class="pw-heading">Editores</h1>
+        <div class="pw-email-row">
+          <input id="paellaWizardEmailInput" class="search pw-email-input" type="email" placeholder="correo@ejemplo.com" autocomplete="off" spellcheck="false" aria-label="Correo del editor">
+          <button id="paellaWizardAddEmailBtn" class="btn primary pw-add-email-btn" type="button">+ Añadir</button>
+        </div>
+        <div id="paellaWizardStep1Status" class="status pw-status"></div>
+        <div id="paellaWizardEmailList" class="pw-editor-list"></div>
+      </section>
+
+      <section id="paellaWizardStep2" class="pw-step-panel hidden">
+        <h1 class="pw-heading">Confirmar</h1>
+        <div class="pw-summary-card">
+          <div class="pw-summary-row">
+            <div class="pw-summary-copy">
+              <div id="paellaWizardSummaryName" class="pw-summary-value">Nueva paella</div>
+            </div>
+            <button class="btn pw-edit-btn" type="button" data-pw-goto="0">Editar</button>
+          </div>
+          <div class="pw-summary-row">
+            <div class="pw-summary-copy">
+              <div class="pw-summary-label">Editores</div>
+              <div id="paellaWizardSummaryEditors" class="pw-summary-editors"></div>
+            </div>
+            <button class="btn pw-edit-btn" type="button" data-pw-goto="1">Editar</button>
+          </div>
+        </div>
+        <div id="paellaWizardSubmitStatus" class="status pw-status"></div>
+      </section>
+    </div>
+
+    <div class="pw-foot">
+      <div class="pw-foot-inner">
+        <button id="paellaWizardBackBtn" class="btn pw-nav-btn" type="button">← Atrás</button>
+        <div class="pw-foot-right">
+          <button id="paellaWizardNextBtn" class="btn primary pw-nav-btn" type="button">Siguiente →</button>
+          <button id="paellaWizardCreateBtn" class="btn primary pw-nav-btn hidden" type="button">Crear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="nameModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
     <section id="nameModalCard" class="card modal-card">
       <div class="head">
@@ -7466,6 +7534,7 @@
       paellasApp: "paellas.net",
       paellasVersion: "1"
     });
+    const PAELLAS_ROOT_FOLDER_NAME = "Paellas.net";
     const DIRECCION_APP_PROPERTIES = Object.freeze({
       paellasType: "direccion",
       paellasApp: "paellas.net",
@@ -7543,6 +7612,11 @@
       activePaellaLoadError: "",
       activePaellaPermissions: [],
       pendingPaellaShares: [],
+      paellaWizardOpen: false,
+      paellaWizardStep: 0,
+      paellaWizardName: "",
+      paellaWizardEditors: [],
+      paellaWizardSubmitting: false,
       direccionItems: [],
       direccionLoadError: "",
       activeDireccionStack: [],
@@ -7726,6 +7800,26 @@
       paellaInviteList: document.getElementById("paellaInviteList"),
       newSheetCancelBtn: document.getElementById("newSheetCancelBtn"),
       newSheetCreateBtn: document.getElementById("newSheetCreateBtn"),
+      paellaWizard: document.getElementById("paellaWizard"),
+      paellaWizardCloseBtn: document.getElementById("paellaWizardCloseBtn"),
+      paellaWizardProgressFill: document.getElementById("paellaWizardProgressFill"),
+      paellaWizardStep0: document.getElementById("paellaWizardStep0"),
+      paellaWizardStep1: document.getElementById("paellaWizardStep1"),
+      paellaWizardStep2: document.getElementById("paellaWizardStep2"),
+      paellaWizardNameInput: document.getElementById("paellaWizardNameInput"),
+      paellaWizardDestPreview: document.getElementById("paellaWizardDestPreview"),
+      paellaWizardStep0Status: document.getElementById("paellaWizardStep0Status"),
+      paellaWizardEmailInput: document.getElementById("paellaWizardEmailInput"),
+      paellaWizardAddEmailBtn: document.getElementById("paellaWizardAddEmailBtn"),
+      paellaWizardStep1Status: document.getElementById("paellaWizardStep1Status"),
+      paellaWizardEmailList: document.getElementById("paellaWizardEmailList"),
+      paellaWizardSummaryName: document.getElementById("paellaWizardSummaryName"),
+      paellaWizardSummaryPath: document.getElementById("paellaWizardSummaryPath"),
+      paellaWizardSummaryEditors: document.getElementById("paellaWizardSummaryEditors"),
+      paellaWizardSubmitStatus: document.getElementById("paellaWizardSubmitStatus"),
+      paellaWizardBackBtn: document.getElementById("paellaWizardBackBtn"),
+      paellaWizardNextBtn: document.getElementById("paellaWizardNextBtn"),
+      paellaWizardCreateBtn: document.getElementById("paellaWizardCreateBtn"),
       breadcrumbs: document.getElementById("breadcrumbs"),
       folderMeta: document.getElementById("folderMeta"),
       itemsGrid: document.getElementById("itemsGrid"),
@@ -20981,50 +21075,263 @@
         setBusy(els.newSheetModalCard, false);
       });
     }
+    function ensurePaellasRootFolder() {
+      return findOrCreateDriveSubfolder("root", PAELLAS_ROOT_FOLDER_NAME);
+    }
+    function setPaellaWizardStatus(stepEl, text, tone) {
+      if (!stepEl) return;
+      setStatusOnElement(stepEl, text, tone);
+    }
+    function renderPaellaWizard() {
+      if (!els.paellaWizard) return;
+      const step = Math.max(0, Math.min(2, Number(state.paellaWizardStep) || 0));
+      const cleanName = String(state.paellaWizardName || "").trim() || "Nueva paella";
+      const submitting = !!state.paellaWizardSubmitting;
+      const stepPanels = [els.paellaWizardStep0, els.paellaWizardStep1, els.paellaWizardStep2];
+      stepPanels.forEach(function (panel, idx) {
+        if (panel) panel.classList.toggle("hidden", idx !== step);
+      });
+      Array.prototype.forEach.call(els.paellaWizard.querySelectorAll(".pw-step[data-pw-step]"), function (btn) {
+        const idx = Number(btn.dataset.pwStep);
+        const isActive = idx === step;
+        const isDone = idx < step;
+        btn.classList.toggle("is-active", isActive);
+        btn.classList.toggle("is-done", isDone);
+        btn.disabled = submitting || idx > step;
+        btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      if (els.paellaWizardProgressFill) {
+        els.paellaWizardProgressFill.style.width = (((step + 1) / 3) * 100) + "%";
+      }
+      if (els.paellaWizardDestPreview) {
+        els.paellaWizardDestPreview.textContent = cleanName;
+      }
+      if (els.paellaWizardEmailList) {
+        els.paellaWizardEmailList.innerHTML = "";
+        els.paellaWizardEmailList.classList.toggle("hidden", !state.paellaWizardEditors.length);
+        state.paellaWizardEditors.forEach(function (email, index) {
+          const row = document.createElement("div");
+          row.className = "pw-editor-item";
+          row.innerHTML =
+            "<span class='pw-editor-avatar'>" + escapeHtml(String(email || "?").charAt(0).toUpperCase()) + "</span>" +
+            "<span class='pw-editor-email'>" + escapeHtml(email) + "</span>";
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "pw-editor-remove";
+          removeBtn.type = "button";
+          removeBtn.disabled = submitting;
+          removeBtn.title = "Quitar";
+          removeBtn.setAttribute("aria-label", "Quitar " + email);
+          removeBtn.innerHTML = "&times;";
+          removeBtn.addEventListener("click", function () {
+            if (state.paellaWizardSubmitting) return;
+            state.paellaWizardEditors.splice(index, 1);
+            renderPaellaWizard();
+          });
+          row.appendChild(removeBtn);
+          els.paellaWizardEmailList.appendChild(row);
+        });
+      }
+      if (els.paellaWizardSummaryName) {
+        els.paellaWizardSummaryName.textContent = cleanName;
+      }
+      if (els.paellaWizardSummaryEditors) {
+        els.paellaWizardSummaryEditors.innerHTML = "";
+        if (!state.paellaWizardEditors.length) {
+          els.paellaWizardSummaryEditors.innerHTML = "<span class='pw-summary-pill'>Ninguno</span>";
+        } else {
+          state.paellaWizardEditors.forEach(function (email) {
+            const pill = document.createElement("span");
+            pill.className = "pw-summary-pill";
+            pill.textContent = email;
+            els.paellaWizardSummaryEditors.appendChild(pill);
+          });
+        }
+      }
+      if (els.paellaWizardCloseBtn) els.paellaWizardCloseBtn.disabled = submitting;
+      if (els.paellaWizardBackBtn) {
+        els.paellaWizardBackBtn.classList.toggle("is-hidden-step0", step === 0);
+        els.paellaWizardBackBtn.disabled = submitting || step === 0;
+        els.paellaWizardBackBtn.textContent = "← Atrás";
+      }
+      if (els.paellaWizardNextBtn) {
+        els.paellaWizardNextBtn.classList.toggle("hidden", step === 2);
+        els.paellaWizardNextBtn.disabled = submitting;
+        els.paellaWizardNextBtn.textContent = (step === 1 && !state.paellaWizardEditors.length)
+          ? "Omitir →"
+          : "Siguiente →";
+      }
+      if (els.paellaWizardCreateBtn) {
+        els.paellaWizardCreateBtn.classList.toggle("hidden", step !== 2);
+        els.paellaWizardCreateBtn.disabled = submitting;
+        els.paellaWizardCreateBtn.textContent = submitting ? "Creando..." : "Crear";
+      }
+      Array.prototype.forEach.call(els.paellaWizard.querySelectorAll("[data-pw-goto]"), function (btn) {
+        btn.disabled = submitting;
+      });
+    }
+    function setPaellaWizardStep(nextStep) {
+      if (state.paellaWizardSubmitting) return;
+      state.paellaWizardStep = Math.max(0, Math.min(2, Number(nextStep) || 0));
+      setPaellaWizardStatus(els.paellaWizardStep0Status, "", "");
+      setPaellaWizardStatus(els.paellaWizardStep1Status, "", "");
+      setPaellaWizardStatus(els.paellaWizardSubmitStatus, "", "");
+      renderPaellaWizard();
+      requestAnimationFrame(function () {
+        if (state.paellaWizardStep === 0 && els.paellaWizardNameInput) {
+          els.paellaWizardNameInput.focus();
+        } else if (state.paellaWizardStep === 1 && els.paellaWizardEmailInput) {
+          els.paellaWizardEmailInput.focus();
+        } else if (state.paellaWizardStep === 2 && els.paellaWizardCreateBtn) {
+          els.paellaWizardCreateBtn.focus();
+        }
+      });
+    }
+    function openPaellaWizard() {
+      if (!els.paellaWizard) return;
+      closeItemActionMenu();
+      state.paellaWizardOpen = true;
+      state.paellaWizardStep = 0;
+      state.paellaWizardName = "";
+      state.paellaWizardEditors = [];
+      state.paellaWizardSubmitting = false;
+      if (els.paellaWizardNameInput) els.paellaWizardNameInput.value = "";
+      if (els.paellaWizardEmailInput) els.paellaWizardEmailInput.value = "";
+      setPaellaWizardStatus(els.paellaWizardStep0Status, "", "");
+      setPaellaWizardStatus(els.paellaWizardStep1Status, "", "");
+      setPaellaWizardStatus(els.paellaWizardSubmitStatus, "", "");
+      renderPaellaWizard();
+      els.paellaWizard.classList.remove("hidden");
+      document.body.classList.add("paella-wizard-open");
+      if (window.syncMercadoTopNav) window.syncMercadoTopNav();
+      requestAnimationFrame(function () {
+        if (els.paellaWizardNameInput) els.paellaWizardNameInput.focus();
+      });
+    }
+    function closePaellaWizard(force) {
+      if (!els.paellaWizard) return;
+      if (state.paellaWizardSubmitting && !force) return;
+      state.paellaWizardOpen = false;
+      state.paellaWizardSubmitting = false;
+      els.paellaWizard.classList.add("hidden");
+      document.body.classList.remove("paella-wizard-open");
+      if (window.syncMercadoTopNav) window.syncMercadoTopNav();
+    }
+    function addPaellaWizardEmailsFromInput(options) {
+      const config = options || {};
+      if (!els.paellaWizardEmailInput) return true;
+      const raw = String(els.paellaWizardEmailInput.value || "").trim();
+      if (!raw) {
+        if (!config.allowEmpty) {
+          setPaellaWizardStatus(els.paellaWizardStep1Status, "Introduce al menos un correo electrónico.", "error");
+          els.paellaWizardEmailInput.focus();
+          return false;
+        }
+        return true;
+      }
+      const tokens = raw.split(/[\s,;]+/).map(function (item) {
+        return item.trim().toLowerCase();
+      }).filter(Boolean);
+      const invalid = tokens.filter(function (email) {
+        return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      });
+      if (invalid.length) {
+        setPaellaWizardStatus(els.paellaWizardStep1Status, "Correo no válido: " + invalid[0], "error");
+        els.paellaWizardEmailInput.focus();
+        return false;
+      }
+      tokens.forEach(function (email) {
+        if (state.paellaWizardEditors.indexOf(email) === -1) {
+          state.paellaWizardEditors.push(email);
+        }
+      });
+      els.paellaWizardEmailInput.value = "";
+      setPaellaWizardStatus(els.paellaWizardStep1Status, "", "");
+      renderPaellaWizard();
+      if (!config.skipFocus) els.paellaWizardEmailInput.focus();
+      return true;
+    }
+    function submitPaellaWizard() {
+      if (state.paellaWizardSubmitting) return Promise.resolve(null);
+      const name = String(state.paellaWizardName || (els.paellaWizardNameInput && els.paellaWizardNameInput.value) || "").replace(/\s+/g, " ").trim();
+      if (!name) {
+        setPaellaWizardStep(0);
+        setPaellaWizardStatus(els.paellaWizardStep0Status, "Escribe un nombre para la paella.", "error");
+        return Promise.resolve(null);
+      }
+      state.paellaWizardSubmitting = true;
+      setPaellaWizardStatus(els.paellaWizardSubmitStatus, "Preparando carpeta Paellas.net en Google Drive...", "");
+      renderPaellaWizard();
+      return createPaellaFolder({
+        name: name,
+        autoRoot: true,
+        fromWizard: true,
+        shares: state.paellaWizardEditors.map(function (email) {
+          return { email: email, role: "writer" };
+        })
+      });
+    }
     function createPaellaFolder(options) {
       if (!options || !options.name) {
-        return openNewSheetModal("paella", "drive");
+        openPaellaWizard();
+        return Promise.resolve(null);
       }
-      const targetFolderId = options.folderId || "root";
-      const shouldRefreshCurrentFolder = currentFolderId() === targetFolderId;
+      const useAutoRoot = options.autoRoot !== false;
+      const fromWizard = !!options.fromWizard;
       setBusy(els.driveShell, true);
-      setBusy(els.newSheetModalCard, true);
+      if (!fromWizard) setBusy(els.newSheetModalCard, true);
       setDriveStatus("");
       setPickerStatus("");
-      const body = {
-        name: options.name,
-        mimeType: DRIVE_FOLDER_MIME,
-        appProperties: PAELLA_APP_PROPERTIES
-      };
-      if (targetFolderId !== "root") {
-        body.parents = [targetFolderId];
-      }
-      return fetchJson(
-        "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,appProperties",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
+      const resolveParent = useAutoRoot
+        ? ensurePaellasRootFolder().then(function (rootFolder) { return rootFolder.id; })
+        : Promise.resolve(options.folderId || "root");
+      return resolveParent.then(function (targetFolderId) {
+        if (fromWizard) {
+          setPaellaWizardStatus(els.paellaWizardSubmitStatus, "Creando paella «" + options.name + "»...", "");
         }
-      ).then(function (folder) {
+        const body = {
+          name: options.name,
+          mimeType: DRIVE_FOLDER_MIME,
+          appProperties: PAELLA_APP_PROPERTIES
+        };
+        if (targetFolderId && targetFolderId !== "root") {
+          body.parents = [targetFolderId];
+        }
+        return fetchJson(
+          "https://www.googleapis.com/drive/v3/files?supportsAllDrives=true&fields=id,name,mimeType,modifiedTime,appProperties",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          }
+        ).then(function (folder) {
+          return { folder: folder, targetFolderId: targetFolderId };
+        });
+      }).then(function (created) {
+        const folder = created.folder;
         const shares = Array.isArray(options.shares) ? options.shares : [];
         if (!shares.length) {
-          return { folder: folder, inviteError: null };
+          return { folder: folder, targetFolderId: created.targetFolderId, inviteError: null };
+        }
+        if (fromWizard) {
+          setPaellaWizardStatus(els.paellaWizardSubmitStatus, "Compartiendo con " + shares.length + (shares.length === 1 ? " editor..." : " editores..."), "");
         }
         return Promise.all(shares.map(function (share) {
-          return invitePermissionToTarget(folder.id, share.email, share.role);
+          return invitePermissionToTarget(folder.id, share.email, share.role || "writer");
         })).then(function () {
-          return { folder: folder, inviteError: null };
+          return { folder: folder, targetFolderId: created.targetFolderId, inviteError: null };
         }).catch(function (err) {
           console.error(err);
-          return { folder: folder, inviteError: err };
+          return { folder: folder, targetFolderId: created.targetFolderId, inviteError: err };
         });
       }).then(function (result) {
+        const shouldRefreshCurrentFolder = currentFolderId() === result.targetFolderId;
+        closePaellaWizard(true);
         closeNewSheetModal();
         return Promise.all([
           loadPaellas(),
-          shouldRefreshCurrentFolder ? loadFolder(targetFolderId) : Promise.resolve()
+          shouldRefreshCurrentFolder ? loadFolder(result.targetFolderId) : Promise.resolve()
         ]).then(function () {
+          openPaellaFolder(result.folder);
           setDriveStatus(result.inviteError ? "Paella creada, pero no se pudieron aplicar todos los accesos" : "Paella creada");
           return result.folder;
         });
@@ -21032,7 +21339,13 @@
         console.error(err);
         const message = messageFromError(err, "No se ha podido crear la paella");
         setDriveStatus(message);
-        setPickerStatus(message, "error");
+        if (fromWizard) {
+          state.paellaWizardSubmitting = false;
+          setPaellaWizardStatus(els.paellaWizardSubmitStatus, message, "error");
+          renderPaellaWizard();
+        } else {
+          setPickerStatus(message, "error");
+        }
       }).finally(function () {
         setBusy(els.driveShell, false);
         setBusy(els.newSheetModalCard, false);
@@ -21697,6 +22010,12 @@
     };
     // Android's back button: close what is open before leaving the app.
     window.paellasBack = function () {
+      if (state.paellaWizardOpen) {
+        if (state.paellaWizardSubmitting) return true;
+        if (state.paellaWizardStep > 0) setPaellaWizardStep(state.paellaWizardStep - 1);
+        else closePaellaWizard();
+        return true;
+      }
       const openModal = Array.prototype.find.call(document.querySelectorAll(".modal-overlay"), function (el) {
         return el.offsetParent !== null || getComputedStyle(el).display !== "none" && getComputedStyle(el).visibility !== "hidden" && el.getBoundingClientRect().width > 0;
       });
@@ -21872,6 +22191,7 @@
         els.sheetGrid.innerHTML = "";
         renderPresenceAvatars([]);
         closeNewSheetModal();
+        closePaellaWizard(true);
         closeNameModal();
         closeShareModal();
         closePaellaAccessPopup();
@@ -21893,8 +22213,96 @@
         openNewSheetModal("sheet", "paella-files");
         return;
       }
-      openNewSheetModal("paella", "drive");
+      openPaellaWizard();
     });
+    if (els.paellaWizardCloseBtn) {
+      els.paellaWizardCloseBtn.addEventListener("click", function () { closePaellaWizard(); });
+    }
+    if (els.paellaWizardBackBtn) {
+      els.paellaWizardBackBtn.addEventListener("click", function () {
+        if (state.paellaWizardSubmitting) return;
+        if (state.paellaWizardStep === 0) closePaellaWizard();
+        else setPaellaWizardStep(state.paellaWizardStep - 1);
+      });
+    }
+    if (els.paellaWizardNextBtn) {
+      els.paellaWizardNextBtn.addEventListener("click", function () {
+        if (state.paellaWizardSubmitting) return;
+        if (state.paellaWizardStep === 0) {
+          const name = String(els.paellaWizardNameInput && els.paellaWizardNameInput.value || "").replace(/\s+/g, " ").trim();
+          if (!name) {
+            setPaellaWizardStatus(els.paellaWizardStep0Status, "Escribe un nombre para la paella.", "error");
+            if (els.paellaWizardNameInput) els.paellaWizardNameInput.focus();
+            return;
+          }
+          state.paellaWizardName = name;
+          setPaellaWizardStep(1);
+          return;
+        }
+        if (state.paellaWizardStep === 1) {
+          if (!addPaellaWizardEmailsFromInput({ allowEmpty: true, skipFocus: true })) return;
+          setPaellaWizardStep(2);
+        }
+      });
+    }
+    if (els.paellaWizardCreateBtn) {
+      els.paellaWizardCreateBtn.addEventListener("click", function () {
+        submitPaellaWizard().catch(function () {});
+      });
+    }
+    if (els.paellaWizardNameInput) {
+      els.paellaWizardNameInput.addEventListener("input", function () {
+        state.paellaWizardName = String(els.paellaWizardNameInput.value || "");
+        if (els.paellaWizardDestPreview) {
+          els.paellaWizardDestPreview.textContent = state.paellaWizardName.trim() || "Nueva paella";
+        }
+        if (els.paellaWizardStep0Status && els.paellaWizardStep0Status.dataset.tone === "error") {
+          setPaellaWizardStatus(els.paellaWizardStep0Status, "", "");
+        }
+      });
+      els.paellaWizardNameInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          if (els.paellaWizardNextBtn) els.paellaWizardNextBtn.click();
+        }
+      });
+    }
+    if (els.paellaWizardAddEmailBtn) {
+      els.paellaWizardAddEmailBtn.addEventListener("click", function () {
+        addPaellaWizardEmailsFromInput({ allowEmpty: false });
+      });
+    }
+    if (els.paellaWizardEmailInput) {
+      els.paellaWizardEmailInput.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        const raw = String(els.paellaWizardEmailInput.value || "").trim();
+        if (raw) {
+          addPaellaWizardEmailsFromInput({ allowEmpty: false });
+        } else if (els.paellaWizardNextBtn) {
+          els.paellaWizardNextBtn.click();
+        }
+      });
+      els.paellaWizardEmailInput.addEventListener("input", function () {
+        if (els.paellaWizardStep1Status && els.paellaWizardStep1Status.dataset.tone === "error") {
+          setPaellaWizardStatus(els.paellaWizardStep1Status, "", "");
+        }
+      });
+    }
+    if (els.paellaWizard) {
+      els.paellaWizard.addEventListener("click", function (event) {
+        const stepBtn = event.target.closest(".pw-step[data-pw-step]");
+        if (stepBtn && !stepBtn.disabled) {
+          const idx = Number(stepBtn.dataset.pwStep);
+          if (idx <= state.paellaWizardStep) setPaellaWizardStep(idx);
+          return;
+        }
+        const gotoBtn = event.target.closest("[data-pw-goto]");
+        if (gotoBtn && !gotoBtn.disabled) {
+          setPaellaWizardStep(Number(gotoBtn.dataset.pwGoto));
+        }
+      });
+    }
     if (els.paellaEntryReaderBtn) {
       els.paellaEntryReaderBtn.addEventListener("click", function () {
         openTicketReaderPickerModal();
@@ -22706,7 +23114,7 @@
 
         const tabs = placeTabs();
         const loggedIn = !els.profileBox.classList.contains("hidden") && place !== "login";
-        const dialogOpen = !!document.querySelector(".modal-overlay.visible");
+        const dialogOpen = !!document.querySelector(".modal-overlay.visible") || document.body.classList.contains("paella-wizard-open");
         const visible = loggedIn && tabs.items.length > 1 && !dialogOpen && !document.body.classList.contains("group-panel-open") && !state.profileMenuOpen;
         bar.classList.toggle("is-hidden", !visible);
         document.body.classList.toggle("has-bottom-bar", loggedIn && tabs.items.length > 1);
@@ -23425,6 +23833,10 @@
     });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
+        if (state.paellaWizardOpen) {
+          closePaellaWizard();
+          return;
+        }
         closeItemActionMenu();
         setSheetGroupsFiltersOpen(false);
         closePresencePopup();
