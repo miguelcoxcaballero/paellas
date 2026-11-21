@@ -996,7 +996,35 @@ button, .btn, summary, .view-tab, a { touch-action: manipulation; }
    status and the place's actions; tabs under the band (computer) or the
    bottom bar (phone). Edit-only controls show only while editing.
    ===================================================================== */
-.top-nav, #driveTrashBtn, #paellaPanelFooter, #paellaBreadcrumbs, #bandNewGroupBtn, #editorCrumb { display: none !important; }
+.top-nav, #driveTrashBtn, #paellaPanelFooter, #bandNewGroupBtn, #editorCrumb { display: none !important; }
+@media (min-width: 761px) {
+  .app:has(#driveView:not(.hidden)):has(#paellaPanel.is-folder-open) .trail { display: none !important; }
+}
+#paellaPanel:not(.is-folder-open) #paellaBreadcrumbs { display: none !important; }
+#paellaPanel.is-folder-open #paellaBreadcrumbs {
+  display: inline-flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(38, 23, 10, .06);
+  margin-left: 4px;
+}
+#paellaPanel.is-folder-open #paellaBreadcrumbs > .crumb {
+  font: 600 13.5px var(--m-sans) !important;
+  color: var(--m-muted) !important;
+  cursor: pointer;
+}
+#paellaPanel.is-folder-open #paellaBreadcrumbs > .crumb:hover:not(.current) {
+  color: var(--m-ink) !important;
+  text-decoration: underline;
+}
+#paellaPanel.is-folder-open #paellaBreadcrumbs > .crumb.current {
+  color: var(--m-ink) !important;
+  font-weight: 700 !important;
+  cursor: default;
+}
 
 /* top bar */
 .topbar { gap: 14px !important; }
