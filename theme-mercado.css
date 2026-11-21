@@ -2674,6 +2674,45 @@ body.has-bottom-bar #driveView > #createPaellaBtn.paella-create-btn {
 }
 
 /* 3. Search & floating header glass controls */
+.topbar .topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+.topbar #searchInput {
+  width: min(260px, 44vw) !important;
+  min-width: 110px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  font-size: 13.5px !important;
+  flex: 0 1 260px;
+}
+body[data-place="home"] #driveShell .drive-hero {
+  display: none !important;
+}
+body:not([data-place="home"]):not([data-place="paella"]) .topbar #searchInput,
+body[data-place="home"][data-home-tab="trash"] .topbar #searchInput {
+  display: none !important;
+}
+@media (max-width: 680px) {
+  .topbar .brand { flex: none; }
+  .topbar .brand-name { font-size: 18px !important; }
+  .topbar #searchInput {
+    flex: 1 1 110px !important;
+    width: auto !important;
+    max-width: 210px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 12px !important;
+    font-size: 13px !important;
+  }
+}
+.topbar #searchInput,
 .drive-hero-actions .search,
 .place-actions #openInGoogleBtn,
 .place-actions #shareDocBtn {
