@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2116">
+  <meta name="app-build" content="20261121-2120">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2116";
+      var build = "20261121-2120";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6431,7 +6431,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2116">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2120">
 </head>
 <body>
   <div class="app">
@@ -6489,7 +6489,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.20</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.21</div>
           </div>
         </div>
       </div>
@@ -7011,6 +7011,76 @@
         <div class="pw-foot-right">
           <button id="paellaWizardNextBtn" class="btn primary pw-nav-btn" type="button">Siguiente →</button>
           <button id="paellaWizardCreateBtn" class="btn primary pw-nav-btn hidden" type="button">Crear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fileWizard" class="paella-wizard hidden" role="dialog" aria-modal="true" aria-labelledby="fileWizardTitle">
+    <div class="pw-band">
+      <div class="pw-topbar">
+        <div class="pw-brand">
+          <img class="brand-mark" src="paella.svg" alt="" width="34" height="32">
+          <span class="brand-name">paellas.net</span>
+        </div>
+        <button id="fileWizardCloseBtn" class="btn pw-close-btn" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="pw-steps-wrap">
+        <div class="pw-stepper fw-stepper" role="tablist" aria-label="Pasos">
+          <div class="pw-stepper-track" aria-hidden="true">
+            <div id="fileWizardProgressFill" class="pw-stepper-fill"></div>
+          </div>
+          <button class="pw-step is-active" type="button" data-fw-step="0">
+            <span class="pw-step-dot"><span class="pw-step-num">1</span><span class="pw-step-check" aria-hidden="true">✓</span></span>
+            <span class="pw-step-label">Archivo</span>
+          </button>
+          <button class="pw-step" type="button" data-fw-step="1" id="fileWizardStep1Tab">
+            <span class="pw-step-dot"><span class="pw-step-num">2</span><span class="pw-step-check" aria-hidden="true">✓</span></span>
+            <span class="pw-step-label">Hoja vinculada</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pw-stage">
+      <section id="fileWizardStep0" class="pw-step-panel">
+        <h1 id="fileWizardTitle" class="pw-heading">Nuevo en paella</h1>
+        <div class="fw-type-grid" role="radiogroup" aria-label="Tipo de archivo">
+          <button type="button" class="fw-type-card is-selected" data-fw-type="form" aria-pressed="true">
+            <span class="fw-type-icons is-form">
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M18 8h22l12 12v30a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z" fill="#6D28D9"/><path d="M40 8v9a3 3 0 0 0 3 3h9z" fill="#C4B5FD"/><circle cx="22" cy="28" r="2.6" fill="#fff"/><rect x="28" y="26" width="16" height="4" rx="2" fill="#fff" opacity=".94"/><circle cx="22" cy="37" r="2.6" fill="#DDD6FE"/><rect x="28" y="35" width="16" height="4" rx="2" fill="#fff" opacity=".84"/><circle cx="22" cy="46" r="2.6" fill="#DDD6FE"/><rect x="28" y="44" width="12" height="4" rx="2" fill="#fff" opacity=".74"/></svg>
+            </span>
+            <span class="fw-type-label">Formulario</span>
+          </button>
+          <button type="button" class="fw-type-card" data-fw-type="sheet" aria-pressed="false">
+            <span class="fw-type-icons is-sheet">
+              <svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M18 8h22l12 12v30a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z" fill="#15803D"/><path d="M40 8v9a3 3 0 0 0 3 3h9z" fill="#86EFAC"/><rect x="19" y="25" width="26" height="22" rx="3" fill="#fff" opacity=".95"/><rect x="19" y="25" width="26" height="6" rx="2" fill="#DCFCE7"/><line x1="28" y1="25" x2="28" y2="47" stroke="#16A34A" stroke-width="2"/><line x1="19" y1="31" x2="45" y2="31" stroke="#16A34A" stroke-width="2"/></svg>
+            </span>
+            <span class="fw-type-label">Hoja de cálculo</span>
+          </button>
+        </div>
+        <input id="fileWizardNameInput" class="search pw-name-input" type="text" placeholder="Inscripción Paella 2027" autocomplete="off" spellcheck="false" maxlength="100" aria-label="Nombre del archivo">
+        <div id="fileWizardStep0Status" class="status pw-status"></div>
+      </section>
+
+      <section id="fileWizardStep1" class="pw-step-panel hidden">
+        <h1 class="pw-heading">Hoja vinculada</h1>
+        <label class="fw-link-toggle">
+          <input id="fileWizardLinkToggle" type="checkbox" checked>
+          <span class="fw-link-toggle-box" aria-hidden="true"></span>
+          <span class="fw-link-toggle-text">Crear hoja de respuestas vinculada</span>
+        </label>
+        <div id="fileWizardSheetNameWrap" class="fw-sheet-name-wrap">
+          <input id="fileWizardSheetNameInput" class="search pw-name-input" type="text" placeholder="Inscripción Paella 2027 (Respuestas)" autocomplete="off" spellcheck="false" maxlength="100" aria-label="Nombre de la hoja vinculada">
+        </div>
+        <div id="fileWizardSubmitStatus" class="status pw-status"></div>
+      </section>
+
+      <div class="pw-footer">
+        <button id="fileWizardBackBtn" class="btn pw-nav-btn" type="button">← Atrás</button>
+        <div class="pw-foot-right">
+          <button id="fileWizardNextBtn" class="btn primary pw-nav-btn" type="button">Siguiente →</button>
+          <button id="fileWizardCreateBtn" class="btn primary pw-nav-btn hidden" type="button">Crear</button>
         </div>
       </div>
     </div>
@@ -21829,6 +21899,228 @@
         })
       });
     }
+
+    // ── Simplified 2-step Form / Sheet Wizard inside a Paella ──
+    const fileWizardState = {
+      open: false,
+      step: 0,
+      type: "form",
+      submitting: false
+    };
+    const fileWizardEl = document.getElementById("fileWizard");
+    const fileWizardCloseBtn = document.getElementById("fileWizardCloseBtn");
+    const fileWizardBackBtn = document.getElementById("fileWizardBackBtn");
+    const fileWizardNextBtn = document.getElementById("fileWizardNextBtn");
+    const fileWizardCreateBtn = document.getElementById("fileWizardCreateBtn");
+    const fileWizardNameInput = document.getElementById("fileWizardNameInput");
+    const fileWizardSheetNameInput = document.getElementById("fileWizardSheetNameInput");
+    const fileWizardLinkToggle = document.getElementById("fileWizardLinkToggle");
+    const fileWizardSheetNameWrap = document.getElementById("fileWizardSheetNameWrap");
+    const fileWizardStep0 = document.getElementById("fileWizardStep0");
+    const fileWizardStep1 = document.getElementById("fileWizardStep1");
+    const fileWizardStep0Status = document.getElementById("fileWizardStep0Status");
+    const fileWizardSubmitStatus = document.getElementById("fileWizardSubmitStatus");
+    const fileWizardProgressFill = document.getElementById("fileWizardProgressFill");
+
+    function renderFileWizard() {
+      if (!fileWizardEl) return;
+      const isForm = fileWizardState.type === "form";
+      const step = isForm ? fileWizardState.step : 0;
+      fileWizardState.step = step;
+      if (fileWizardStep0) fileWizardStep0.classList.toggle("hidden", step !== 0);
+      if (fileWizardStep1) fileWizardStep1.classList.toggle("hidden", step !== 1);
+      Array.prototype.forEach.call(fileWizardEl.querySelectorAll(".fw-type-card"), function (btn) {
+        const on = btn.dataset.fwType === fileWizardState.type;
+        btn.classList.toggle("is-selected", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      if (fileWizardNameInput) {
+        fileWizardNameInput.placeholder = isForm ? "Inscripción Paella 2027" : "Presupuesto 2027";
+      }
+      const step1Tab = document.getElementById("fileWizardStep1Tab");
+      if (step1Tab) step1Tab.classList.toggle("hidden", !isForm);
+      Array.prototype.forEach.call(fileWizardEl.querySelectorAll(".pw-step[data-fw-step]"), function (el) {
+        const s = Number(el.dataset.fwStep);
+        el.classList.toggle("is-active", s === step);
+        el.classList.toggle("is-done", s < step);
+      });
+      if (fileWizardProgressFill) {
+        fileWizardProgressFill.style.width = step === 0 ? "0%" : "100%";
+      }
+      if (fileWizardBackBtn) {
+        fileWizardBackBtn.textContent = step === 0 ? "Cancelar" : "← Atrás";
+        fileWizardBackBtn.disabled = fileWizardState.submitting;
+      }
+      const showNext = isForm && step === 0;
+      if (fileWizardNextBtn) {
+        fileWizardNextBtn.classList.toggle("hidden", !showNext);
+        fileWizardNextBtn.disabled = fileWizardState.submitting;
+      }
+      if (fileWizardCreateBtn) {
+        fileWizardCreateBtn.classList.toggle("hidden", showNext);
+        fileWizardCreateBtn.disabled = fileWizardState.submitting;
+        fileWizardCreateBtn.textContent = fileWizardState.submitting
+          ? "Creando..."
+          : (isForm && fileWizardLinkToggle && fileWizardLinkToggle.checked ? "Crear Form + Hoja" : "Crear");
+      }
+      if (fileWizardSheetNameWrap && fileWizardLinkToggle) {
+        fileWizardSheetNameWrap.classList.toggle("hidden", !fileWizardLinkToggle.checked);
+      }
+    }
+    function openFileWizard(defaultType) {
+      if (!fileWizardEl) return;
+      closeItemActionMenu();
+      fileWizardState.open = true;
+      fileWizardState.step = 0;
+      fileWizardState.type = defaultType === "sheet" ? "sheet" : "form";
+      fileWizardState.submitting = false;
+      if (fileWizardNameInput) fileWizardNameInput.value = "";
+      if (fileWizardSheetNameInput) fileWizardSheetNameInput.value = "";
+      if (fileWizardLinkToggle) fileWizardLinkToggle.checked = true;
+      setPaellaWizardStatus(fileWizardStep0Status, "", "");
+      setPaellaWizardStatus(fileWizardSubmitStatus, "", "");
+      renderFileWizard();
+      fileWizardEl.classList.remove("hidden");
+      document.body.classList.add("paella-wizard-open");
+      if (window.syncMercadoTopNav) window.syncMercadoTopNav();
+      requestAnimationFrame(function () {
+        if (fileWizardNameInput) fileWizardNameInput.focus();
+      });
+    }
+    function closeFileWizard(force) {
+      if (!fileWizardEl) return;
+      if (fileWizardState.submitting && !force) return;
+      fileWizardState.open = false;
+      fileWizardState.submitting = false;
+      fileWizardEl.classList.add("hidden");
+      document.body.classList.remove("paella-wizard-open");
+      if (window.syncMercadoTopNav) window.syncMercadoTopNav();
+    }
+    function submitFileWizard() {
+      if (fileWizardState.submitting) return Promise.resolve(null);
+      const activeFolder = state.activePaellaStack[state.activePaellaStack.length - 1];
+      if (!activeFolder) return Promise.resolve(null);
+      const targetFolderId = activeFolder.id;
+      const targetFolderStack = cloneFolderStack(state.activePaellaStack);
+      const name = String(fileWizardNameInput && fileWizardNameInput.value || "").replace(/\s+/g, " ").trim();
+      if (!name) {
+        fileWizardState.step = 0;
+        renderFileWizard();
+        setPaellaWizardStatus(fileWizardStep0Status, "Escribe un nombre.", "error");
+        if (fileWizardNameInput) fileWizardNameInput.focus();
+        return Promise.resolve(null);
+      }
+      fileWizardState.submitting = true;
+      renderFileWizard();
+      setBusy(els.driveShell, true);
+      if (fileWizardState.type === "sheet") {
+        setPaellaWizardStatus(fileWizardStep0Status, "Creando hoja de cálculo...", "");
+        return createSpreadsheetFile({ name: name, folderId: targetFolderId }).then(function (file) {
+          closeFileWizard(true);
+          state.activePaellaStack = targetFolderStack;
+          return loadPaellaFolder(targetFolderId, targetFolderStack).then(function () {
+            setDriveStatus("Hoja creada");
+            return openSpreadsheet(file);
+          });
+        }).catch(function (err) {
+          console.error(err);
+          setPaellaWizardStatus(fileWizardStep0Status, messageFromError(err, "No se pudo crear la hoja."), "error");
+        }).finally(function () {
+          fileWizardState.submitting = false;
+          renderFileWizard();
+          setBusy(els.driveShell, false);
+        });
+      }
+      const linkSheet = !!(fileWizardLinkToggle && fileWizardLinkToggle.checked);
+      const sheetName = String(fileWizardSheetNameInput && fileWizardSheetNameInput.value || "").replace(/\s+/g, " ").trim() || (name + " (Respuestas)");
+      setPaellaWizardStatus(fileWizardSubmitStatus, linkSheet ? "Creando formulario y hoja vinculada..." : "Creando formulario...", "");
+      let createdFormFile = null;
+      return fetchJson("https://forms.googleapis.com/v1/forms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ info: { title: name } })
+      }).then(function (form) {
+        return ensureFormPublishedForResponses(form.formId).catch(function () { return ""; }).then(function () {
+          createdFormFile = { id: form.formId, name: name, mimeType: DRIVE_FORM_MIME };
+          if (targetFolderId === "root") return createdFormFile;
+          return fetchDriveFileMeta(form.formId).then(function (meta) {
+            return moveDriveItem(meta, targetFolderId).then(function () { return createdFormFile; });
+          });
+        });
+      }).then(function (formFile) {
+        if (!linkSheet) return formFile;
+        return createSpreadsheetFile({ name: sheetName, folderId: targetFolderId }).then(function (sheetFile) {
+          const appProperties = {};
+          appProperties[FORM_LINKED_SHEET_KEY] = sheetFile.id;
+          return patchDriveItem(formFile.id, { appProperties: appProperties }, ["appProperties"]).then(function () {
+            return formFile;
+          });
+        });
+      }).then(function (formFile) {
+        closeFileWizard(true);
+        state.activePaellaStack = targetFolderStack;
+        return loadPaellaFolder(targetFolderId, targetFolderStack).then(function () {
+          setDriveStatus(linkSheet ? "Form y hoja creados" : "Form creado");
+          return openForm(formFile);
+        });
+      }).catch(function (err) {
+        console.error(err);
+        setPaellaWizardStatus(fileWizardSubmitStatus, messageFromError(err, "No se pudo crear el formulario."), "error");
+      }).finally(function () {
+        fileWizardState.submitting = false;
+        renderFileWizard();
+        setBusy(els.driveShell, false);
+      });
+    }
+    if (fileWizardEl) {
+      Array.prototype.forEach.call(fileWizardEl.querySelectorAll(".fw-type-card"), function (btn) {
+        btn.addEventListener("click", function () {
+          if (fileWizardState.submitting) return;
+          fileWizardState.type = btn.dataset.fwType === "sheet" ? "sheet" : "form";
+          setPaellaWizardStatus(fileWizardStep0Status, "", "");
+          renderFileWizard();
+          if (fileWizardNameInput) fileWizardNameInput.focus();
+        });
+      });
+      if (fileWizardCloseBtn) fileWizardCloseBtn.addEventListener("click", function () { closeFileWizard(); });
+      if (fileWizardBackBtn) {
+        fileWizardBackBtn.addEventListener("click", function () {
+          if (fileWizardState.submitting) return;
+          if (fileWizardState.step === 0) closeFileWizard();
+          else { fileWizardState.step = 0; renderFileWizard(); }
+        });
+      }
+      if (fileWizardNextBtn) {
+        fileWizardNextBtn.addEventListener("click", function () {
+          if (fileWizardState.submitting) return;
+          const name = String(fileWizardNameInput && fileWizardNameInput.value || "").replace(/\s+/g, " ").trim();
+          if (!name) {
+            setPaellaWizardStatus(fileWizardStep0Status, "Escribe un nombre para continuar.", "error");
+            if (fileWizardNameInput) fileWizardNameInput.focus();
+            return;
+          }
+          setPaellaWizardStatus(fileWizardStep0Status, "", "");
+          if (fileWizardSheetNameInput && !fileWizardSheetNameInput.value.trim()) {
+            fileWizardSheetNameInput.value = name + " (Respuestas)";
+          }
+          fileWizardState.step = 1;
+          renderFileWizard();
+          if (fileWizardSheetNameInput && fileWizardLinkToggle && fileWizardLinkToggle.checked) {
+            fileWizardSheetNameInput.focus();
+          }
+        });
+      }
+      if (fileWizardCreateBtn) fileWizardCreateBtn.addEventListener("click", submitFileWizard);
+      if (fileWizardLinkToggle) fileWizardLinkToggle.addEventListener("change", renderFileWizard);
+      if (fileWizardNameInput) {
+        fileWizardNameInput.addEventListener("keydown", function (ev) {
+          if (ev.key !== "Enter") return;
+          ev.preventDefault();
+          if (fileWizardState.type === "form") fileWizardNextBtn && fileWizardNextBtn.click();
+          else submitFileWizard();
+        });
+      }
+    }
     function createPaellaFolder(options) {
       if (!options || !options.name) {
         openPaellaWizard();
@@ -22793,7 +23085,7 @@
     }
     els.createPaellaBtn.addEventListener("click", function () {
       if (state.activePaellaStack.length) {
-        openNewSheetModal("sheet", "paella-files");
+        openFileWizard(state.paellaInsideTab === "respuestas" ? "sheet" : "form");
         return;
       }
       if (document.body.dataset.homeTab === "files") {
