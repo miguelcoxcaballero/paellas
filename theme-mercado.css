@@ -2622,9 +2622,11 @@ html.keyboard-open #driveView > #createPaellaBtn.paella-create-btn,
 body.paella-wizard-open #driveView > #createPaellaBtn.paella-create-btn {
   display: none !important;
 }
-body.has-bottom-bar #driveView > #createPaellaBtn.paella-create-btn {
-  right: 16px !important;
-  bottom: calc(90px + var(--viewport-bottom-offset, 0px)) !important;
+@media (max-width: 760px) {
+  html:not(.native-nav) body.has-bottom-bar #driveView > #createPaellaBtn.paella-create-btn {
+    right: 16px !important;
+    bottom: calc(90px + var(--viewport-bottom-offset, 0px)) !important;
+  }
 }
 
 /* ---------- Opción S3 · Apple Liquid Glass minimalista (fondo intacto) ---------- */

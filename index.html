@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2042">
+  <meta name="app-build" content="20261121-2045">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2042";
+      var build = "20261121-2045";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6428,7 +6428,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2042">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2045">
 </head>
 <body>
   <div class="app">
@@ -6486,7 +6486,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.13</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.14</div>
           </div>
         </div>
       </div>
@@ -18924,6 +18924,15 @@
       const createLabel = activeFolder ? "Nuevo archivo" : "Crear paella";
       els.createPaellaBtn.title = createLabel;
       els.createPaellaBtn.setAttribute("aria-label", createLabel);
+      const isLoadingSkeleton = (activeFolder && state.activePaellaLoading && !state.activePaellaItems.length)
+        || (!activeFolder && state.paellasLoading && !state.paellaItems.length);
+      if (isLoadingSkeleton) {
+        const expectedSkCls = activeFolder ? "paella-skeleton-row" : "paella-skeleton-card";
+        if (els.paellasGrid.querySelector(":scope > ." + expectedSkCls)) {
+          els.paellasEmpty.classList.add("hidden");
+          return;
+        }
+      }
       const panelContentEl = els.paellasGrid && els.paellasGrid.parentElement;
       const prevSkeletonOverlay = panelContentEl
         ? panelContentEl.querySelector(":scope > .paella-skeleton-overlay")
@@ -23731,7 +23740,8 @@
         }
 
         const tabs = placeTabs();
-        const loggedIn = !els.profileBox.classList.contains("hidden") && place !== "login";
+        const restoringSession = document.documentElement.classList.contains("restoring-session");
+        const loggedIn = (!els.profileBox.classList.contains("hidden") || restoringSession) && place !== "login";
         const dialogOpen = !!document.querySelector(".modal-overlay.visible") || document.body.classList.contains("paella-wizard-open");
         const visible = loggedIn && tabs.items.length > 1 && !dialogOpen && !document.body.classList.contains("group-panel-open") && !state.profileMenuOpen;
         bar.classList.toggle("is-hidden", !visible);
