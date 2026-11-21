@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2058">
+  <meta name="app-build" content="20261121-2114">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2058";
+      var build = "20261121-2114";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6431,7 +6431,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2058">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2114">
 </head>
 <body>
   <div class="app">
@@ -6489,7 +6489,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.18</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.19</div>
           </div>
         </div>
       </div>
@@ -17503,7 +17503,14 @@
           : "";
         return "<span class='item-icon item-icon-emoji item-icon-paella' aria-hidden='true'" + paellaStyleAttr + ">&#129368;</span>";
       }
-      return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'" + styleAttr + "><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round' fill='currentColor' fill-opacity='.12'/></svg>";
+      const backColor = normalizedColor || "#D97706";
+      const frontColor = normalizedColor || "#FBBF24";
+      return "<svg class='item-icon item-icon-rich is-folder' viewBox='0 0 64 64' fill='none' aria-hidden='true'" + styleAttr + ">" +
+        "<path d='M10 17a5 5 0 0 1 5-5h11l5 5h19a5 5 0 0 1 5 5v24a5 5 0 0 1-5 5H15a5 5 0 0 1-5-5V17z' fill='" + escapeHtml(backColor) + "'/>" +
+        "<rect x='15' y='19' width='34' height='14' rx='3' fill='#FFFDF7' opacity='0.92'/>" +
+        "<rect x='10' y='23' width='44' height='28' rx='6' fill='" + escapeHtml(frontColor) + "'/>" +
+        "<rect x='18' y='32' width='16' height='3' rx='1.5' fill='#FFFBEB' opacity='0.72'/>" +
+      "</svg>";
     }
     function paellaCardIconMarkup() {
       return "<img src='paella.svg' alt='' class='paella-card-svg'>";
@@ -17525,9 +17532,26 @@
     }
     function driveFileIconMarkup(mimeType) {
       if (mimeType === DRIVE_FORM_MIME) {
-        return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><path d='M8 4h8l4 4v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'/><path d='M16 4v4h4' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'/><circle cx='10' cy='13' r='1.2' fill='currentColor'/><path d='M13 13h4M13 17h4M10 17h.01' stroke='currentColor' stroke-width='1.6' stroke-linecap='round'/></svg>";
+        return "<svg class='item-icon item-icon-rich is-form' viewBox='0 0 64 64' fill='none' aria-hidden='true'>" +
+          "<path d='M18 8h22l12 12v30a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z' fill='#6D28D9'/>" +
+          "<path d='M40 8v9a3 3 0 0 0 3 3h9z' fill='#C4B5FD'/>" +
+          "<circle cx='22' cy='28' r='2.6' fill='#FFFFFF'/>" +
+          "<rect x='28' y='26' width='16' height='4' rx='2' fill='#FFFFFF' opacity='0.94'/>" +
+          "<circle cx='22' cy='37' r='2.6' fill='#DDD6FE'/>" +
+          "<rect x='28' y='35' width='16' height='4' rx='2' fill='#FFFFFF' opacity='0.84'/>" +
+          "<circle cx='22' cy='46' r='2.6' fill='#DDD6FE'/>" +
+          "<rect x='28' y='44' width='12' height='4' rx='2' fill='#FFFFFF' opacity='0.74'/>" +
+        "</svg>";
       }
-      return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'><rect x='3' y='3' width='18' height='18' rx='2' stroke='currentColor' stroke-width='1.8'/><line x1='3' y1='9' x2='21' y2='9' stroke='currentColor' stroke-width='1.2'/><line x1='3' y1='15' x2='21' y2='15' stroke='currentColor' stroke-width='1.2'/><line x1='9' y1='3' x2='9' y2='21' stroke='currentColor' stroke-width='1.2'/></svg>";
+      return "<svg class='item-icon item-icon-rich is-sheet' viewBox='0 0 64 64' fill='none' aria-hidden='true'>" +
+        "<path d='M18 8h22l12 12v30a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z' fill='#15803D'/>" +
+        "<path d='M40 8v9a3 3 0 0 0 3 3h9z' fill='#86EFAC'/>" +
+        "<rect x='19' y='25' width='26' height='22' rx='3' fill='#FFFFFF' opacity='0.95'/>" +
+        "<rect x='19' y='25' width='26' height='6' rx='2' fill='#DCFCE7'/>" +
+        "<line x1='28' y1='25' x2='28' y2='47' stroke='#16A34A' stroke-width='2'/>" +
+        "<line x1='19' y1='31' x2='45' y2='31' stroke='#16A34A' stroke-width='2'/>" +
+        "<line x1='19' y1='39' x2='45' y2='39' stroke='#16A34A' stroke-width='1.6' opacity='0.65'/>" +
+      "</svg>";
     }
     function itemMenuButtonMarkup(label) {
       return "<button class='item-more-btn' type='button' aria-label='" + escapeHtml(label || "Opciones") + "'>" +
@@ -19006,27 +19030,159 @@
         : (state.paellaLoadError || (query ? "No hay paellas que coincidan con la búsqueda." : "Todavía no hay paellas."));
       els.paellasEmpty.classList.toggle("hidden", filtered.length !== 0);
       if (activeFolder) {
-        const pairById = getPaellaLinkedPairMap(state.activePaellaItems);
-        const renderedPairIds = new Set();
+        const insideTab = state.paellaInsideTab || "forms";
+        const allItems = Array.isArray(state.activePaellaItems) ? state.activePaellaItems : [];
+        const pairById = getPaellaLinkedPairMap(allItems);
+        const layout = document.createElement("div");
+        layout.className = "paella-inside-layout";
+
+        const formsCount = allItems.filter(function (it) { return it && it.mimeType === DRIVE_FORM_MIME; }).length;
+        const sheetsCount = allItems.filter(function (it) { return it && it.mimeType === DRIVE_SPREADSHEET_MIME; }).length;
+        const foldersCount = allItems.filter(function (it) { return it && it.mimeType === DRIVE_FOLDER_MIME; }).length;
+        const coverMetaParts = [];
+        if (formsCount) coverMetaParts.push(formsCount + (formsCount === 1 ? " form" : " forms"));
+        if (sheetsCount) coverMetaParts.push(sheetsCount + (sheetsCount === 1 ? " hoja" : " hojas"));
+        if (foldersCount) coverMetaParts.push(foldersCount + (foldersCount === 1 ? " carpeta" : " carpetas"));
+        const cover = document.createElement("aside");
+        cover.className = "paella-inside-cover";
+        cover.innerHTML =
+          "<div class='paella-inside-cover-art'>" + paellaCardIconMarkup() + "</div>" +
+          "<div class='paella-inside-cover-body'>" +
+            "<div class='paella-inside-cover-title'>" + escapeHtml(activeFolder.name || "Paella") + "</div>" +
+            "<div class='paella-inside-cover-meta'>" + escapeHtml(coverMetaParts.join(" · ") || "Paella vacía") + "</div>" +
+          "</div>";
+        layout.appendChild(cover);
+
+        const main = document.createElement("div");
+        main.className = "paella-inside-main";
         let renderedCount = 0;
-        state.activePaellaItems.forEach(function (item) {
-          const pair = pairById.get(item.id);
-          if (pair) {
-            if (renderedPairIds.has(pair.id)) return;
-            const matchesPair = !query
-              || (pair.form.name || "").toLowerCase().includes(query)
-              || (pair.spreadsheet.name || "").toLowerCase().includes(query);
-            if (!matchesPair) return;
-            els.paellasGrid.appendChild(createPaellaLinkedPairCard(pair));
-            renderedPairIds.add(pair.id);
-            renderedCount += 1;
-            return;
+
+        function buildSplitCard(item, kindText, iconKindClass) {
+          const isFolder = item && item.mimeType === DRIVE_FOLDER_MIME;
+          const card = document.createElement("article");
+          card.className = "paella-split-card " + (iconKindClass || "");
+          const dateTxt = item && item.modifiedTime ? formatDriveDate(item.modifiedTime) : "";
+          const metaTxt = [kindText, dateTxt].filter(Boolean).join(" · ");
+          card.innerHTML =
+            "<div class='paella-split-band'>" +
+              (isFolder ? driveFolderIconMarkup(false, item.folderColorRgb) : driveFileIconMarkup(item.mimeType)) +
+            "</div>" +
+            "<div class='paella-split-body'>" +
+              "<div class='paella-split-meta'>" + escapeHtml(metaTxt) + "</div>" +
+              itemTitleMarkup(item && item.name ? item.name : kindText, !!(item && item.shared)) +
+            "</div>";
+          card.appendChild(createItemActionButton(item, "paella-file"));
+          card.addEventListener("click", function () {
+            if (isFolder) openPaellaChildFolder(item);
+            else openDriveDocument(item);
+          });
+          return card;
+        }
+
+        if (insideTab === "forms") {
+          const renderedPairIds = new Set();
+          const standalone = [];
+          allItems.forEach(function (item) {
+            if (!item) return;
+            const pair = pairById.get(item.id);
+            if (pair) {
+              if (renderedPairIds.has(pair.id)) return;
+              const matchesPair = !query
+                || (pair.form.name || "").toLowerCase().includes(query)
+                || (pair.spreadsheet.name || "").toLowerCase().includes(query);
+              if (!matchesPair) return;
+              renderedPairIds.add(pair.id);
+              const spot = document.createElement("article");
+              spot.className = "paella-paired-spotlight";
+              const pairTitle = (pair.form.name || "Inscripción").replace(/\s*\(Respuestas\)\s*$/i, "");
+              spot.innerHTML =
+                "<div class='paella-paired-icons'>" +
+                  driveFileIconMarkup(DRIVE_FORM_MIME) +
+                  driveFileIconMarkup(DRIVE_SPREADSHEET_MIME) +
+                "</div>" +
+                "<div class='paella-paired-info'>" +
+                  "<div class='paella-paired-kicker'>Pareja vinculada</div>" +
+                  "<div class='paella-paired-title'>" + escapeHtml(pairTitle) + "</div>" +
+                  "<div class='paella-paired-actions'>" +
+                    "<button type='button' class='paella-paired-chip is-form'>Abrir Form</button>" +
+                    "<button type='button' class='paella-paired-chip is-sheet'>Abrir Hoja</button>" +
+                  "</div>" +
+                "</div>";
+              spot.querySelector(".is-form").addEventListener("click", function (ev) {
+                ev.stopPropagation();
+                openDriveDocument(pair.form);
+              });
+              spot.querySelector(".is-sheet").addEventListener("click", function (ev) {
+                ev.stopPropagation();
+                openDriveDocument(pair.spreadsheet);
+              });
+              spot.addEventListener("click", function () {
+                openDriveDocument(pair.form);
+              });
+              spot.appendChild(createItemActionButton(pair.form, "paella-file"));
+              main.appendChild(spot);
+              renderedCount += 1;
+              return;
+            }
+            if (item.mimeType === DRIVE_FORM_MIME || item.mimeType === DRIVE_SPREADSHEET_MIME) {
+              if (query && !(item.name || "").toLowerCase().includes(query)) return;
+              standalone.push(item);
+            }
+          });
+          if (standalone.length) {
+            if (renderedPairIds.size > 0) {
+              const subLbl = document.createElement("div");
+              subLbl.className = "paella-inside-sublabel";
+              subLbl.textContent = "Más hojas y formularios";
+              main.appendChild(subLbl);
+            }
+            standalone.forEach(function (item) {
+              const isForm = item.mimeType === DRIVE_FORM_MIME;
+              main.appendChild(buildSplitCard(item, isForm ? "Form" : "Hoja", isForm ? "is-form" : "is-sheet"));
+              renderedCount += 1;
+            });
           }
-          if (query && !(item.name || "").toLowerCase().includes(query)) return;
-          els.paellasGrid.appendChild(createPaellaFileItemCard(item));
-          renderedCount += 1;
-        });
+        } else if (insideTab === "respuestas") {
+          const sheets = allItems.filter(function (item) {
+            return item && item.mimeType === DRIVE_SPREADSHEET_MIME && (!query || (item.name || "").toLowerCase().includes(query));
+          });
+          sheets.forEach(function (item) {
+            const card = buildSplitCard(item, "Respuestas de grupos", "is-sheet");
+            card.addEventListener("click", function (ev) {
+              ev.stopImmediatePropagation();
+              state.spreadsheetViewMode = "groups";
+              openDriveDocument(item);
+            }, true);
+            main.appendChild(card);
+            renderedCount += 1;
+          });
+        } else {
+          const files = allItems.filter(function (item) {
+            if (!item) return false;
+            const isDoc = item.mimeType === DRIVE_FORM_MIME || item.mimeType === DRIVE_SPREADSHEET_MIME;
+            return !isDoc && (!query || (item.name || "").toLowerCase().includes(query));
+          });
+          files.forEach(function (item) {
+            const isFolder = item.mimeType === DRIVE_FOLDER_MIME;
+            main.appendChild(buildSplitCard(item, isFolder ? "Carpeta" : "Archivo", isFolder ? "is-folder" : ""));
+            renderedCount += 1;
+          });
+        }
+
+        if (renderedCount > 0) {
+          layout.appendChild(main);
+          els.paellasGrid.appendChild(layout);
+        }
+        const emptyMsgs = {
+          forms: "No hay formularios ni hojas en esta paella.",
+          respuestas: "No hay hojas de respuestas todavía.",
+          archivos: "No hay carpetas ni archivos en esta sección."
+        };
+        els.paellasEmpty.textContent = query
+          ? "No hay elementos que coincidan con la búsqueda."
+          : (state.activePaellaLoadError || emptyMsgs[insideTab] || "Esta paella está vacía.");
         els.paellasEmpty.classList.toggle("hidden", renderedCount !== 0);
+        if (window.syncMercadoTopNav) window.syncMercadoTopNav();
         return;
       }
       filtered.forEach(function (item, idx) {
@@ -23326,6 +23482,37 @@
         syncAllTabGliders(false);
       }
 
+      // ── Dentro de paella: Forms / Respuestas / Archivos + 4ª solapa Lector QR ──
+      const paellaTabsNav = el("nav", "view-tabs place-tabs paella-inside-tabs");
+      paellaTabsNav.setAttribute("role", "tablist");
+      paellaTabsNav.setAttribute("aria-label", "Secciones de la paella");
+      driveShell.appendChild(paellaTabsNav);
+      const PAELLA_TABS = [["forms", "Forms", "form"], ["respuestas", "Respuestas", "groups"], ["archivos", "Archivos", "files"]];
+      PAELLA_TABS.forEach(function (tab) {
+        const btn = el("button", "view-tab", icon(tab[2]) + "<span>" + tab[1] + "</span>");
+        btn.type = "button";
+        btn.setAttribute("role", "tab");
+        btn.dataset.paellaTab = tab[0];
+        btn.addEventListener("click", function () { setPaellaTab(tab[0]); });
+        paellaTabsNav.appendChild(btn);
+      });
+      const paellaQrTabBtn = el("button", "view-tab paella-qr-tab", icon("qr") + "<span>Lector QR</span>");
+      paellaQrTabBtn.type = "button";
+      paellaQrTabBtn.addEventListener("click", function () { els.paellaEntryReaderBtn.click(); });
+      paellaTabsNav.appendChild(paellaQrTabBtn);
+      function setPaellaTab(tab) {
+        const nextTab = /^(forms|respuestas|archivos)$/.test(tab) ? tab : "forms";
+        const changed = (state.paellaInsideTab || "forms") !== nextTab;
+        state.paellaInsideTab = nextTab;
+        if (driveScroll) driveScroll.scrollTop = 0;
+        if (typeof renderPaellas === "function") renderPaellas();
+        syncPlaces();
+        if (changed) {
+          triggerPanelEnter(els.paellasGrid, "is-tab-fading", 240);
+        }
+        syncAllTabGliders(false);
+      }
+
       // ── Drive band actions ──
       const heroActions = document.querySelector(".drive-hero-actions");
       const readerBtn = el("button", "btn place-btn", icon("qr") + "<span>Lector de entradas</span>");
@@ -23474,6 +23661,15 @@
         if (place === "home") {
           return { items: HOME_TABS.map(function (tab) { return { id: tab[0], label: tab[1], icon: tab[0] }; }), active: homeTab };
         }
+        if (place === "paella") {
+          return {
+            items: PAELLA_TABS.map(function (tab) {
+              const mobileLbl = tab[0] === "respuestas" ? "Resp." : tab[1];
+              return { id: "paella-" + tab[0], label: mobileLbl, icon: tab[2] };
+            }),
+            active: "paella-" + (state.paellaInsideTab || "forms")
+          };
+        }
         if (place === "doc" && state.activeDocumentType === "form" && formSwitch) {
           const items = [];
           let active = "";
@@ -23499,6 +23695,7 @@
       }
       function runNav(id) {
         if (id === "paellas" || id === "files" || id === "trash") { setHomeTab(id); return; }
+        if (/^paella-(forms|respuestas|archivos)$/.test(id)) { setPaellaTab(id.replace("paella-", "")); return; }
         if (/^(groups|table|entries|history)$/.test(id)) { window.paellasShowSheetView(id); return; }
         if (/^form-/.test(id) && formSwitch) {
           const btnId = Object.keys(FORM_TABS).find(function (key) { return FORM_TABS[key][0] === id; });
@@ -23519,6 +23716,16 @@
       barPill.setAttribute("aria-hidden", "true");
       bar.appendChild(barPill);
       document.body.appendChild(bar);
+      const mobileQrBtn = el("button", "mobile-paella-qr-btn is-hidden", icon("qr", 22));
+      mobileQrBtn.type = "button";
+      mobileQrBtn.setAttribute("aria-label", "Lector QR");
+      mobileQrBtn.title = "Lector QR";
+      mobileQrBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        haptic("tap");
+        els.paellaEntryReaderBtn.click();
+      });
+      document.body.appendChild(mobileQrBtn);
       function createLiquidPillPhysics(applyBox, opts) {
         const dockBloom = !!(opts && opts.dockBloom);
         let l = 0, r = 0, vl = 0, vr = 0;
@@ -23785,6 +23992,7 @@
       }
       window.syncMercadoTabGliders = syncAllTabGliders;
       attachFolderTabGlider(homeTabsNav);
+      attachFolderTabGlider(paellaTabsNav);
       attachFolderTabGlider(els.viewTabs);
       attachFolderTabGlider(formSwitch);
       window.addEventListener("resize", function () { syncAllTabGliders(true); });
@@ -23806,9 +24014,17 @@
           btn.setAttribute("aria-selected", on ? "true" : "false");
           btn.tabIndex = on ? 0 : -1;
         });
+        const curPaellaTab = state.paellaInsideTab || "forms";
+        Array.prototype.forEach.call(paellaTabsNav.querySelectorAll(".view-tab[data-paella-tab]"), function (btn) {
+          const on = btn.dataset.paellaTab === curPaellaTab;
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+          btn.tabIndex = on ? 0 : -1;
+        });
+        const hasQrReader = place === "paella" && !els.paellaEntryReaderBtn.classList.contains("hidden");
+        paellaQrTabBtn.classList.toggle("hidden", !hasQrReader);
         if (place === "home" && homeTab === "trash" && !trashLoaded && state.accessToken) { trashLoaded = true; loadTrashItems(); }
         els.searchInput.placeholder = homeTab === "files" && place === "home" ? "Buscar en tus archivos" : (place === "paella" ? "Buscar en esta paella" : "Buscar paellas");
-        readerBtn.classList.toggle("hidden", place !== "paella" || els.paellaEntryReaderBtn.classList.contains("hidden"));
+        readerBtn.classList.toggle("hidden", true);
         // Edit-only controls live next to the price tool once the list has drawn it.
         const pricing = els.sheetGroupsView.querySelector(".sheet-groups-banner-pricing");
         if (pricing && newGroupBtn.parentNode !== pricing.parentNode) pricing.parentNode.insertBefore(newGroupBtn, pricing.nextSibling);
@@ -23833,11 +24049,44 @@
         const dialogOpen = !!document.querySelector(".modal-overlay.visible") || document.body.classList.contains("paella-wizard-open");
         const visible = loggedIn && tabs.items.length > 1 && !dialogOpen && !document.body.classList.contains("group-panel-open") && !state.profileMenuOpen;
         bar.classList.toggle("is-hidden", !visible);
+        bar.classList.toggle("has-qr-companion", visible && hasQrReader);
+        mobileQrBtn.classList.toggle("is-hidden", !(visible && hasQrReader));
         document.body.classList.toggle("has-bottom-bar", loggedIn && tabs.items.length > 1);
         renderBar(tabs);
         if (NATIVE_NAV) {
           const report = JSON.stringify({ type: "nav", visible: visible, active: tabs.active, items: tabs.items });
           if (report !== lastReport) { lastReport = report; androidAppMessage(JSON.parse(report)); }
+        }
+        syncAllTabGliders(false);
+      }
+
+      // ── Dentro de paella: Forms / Respuestas / Archivos + 4ª solapa Lector QR ──
+      const paellaTabsNav = el("nav", "view-tabs place-tabs paella-inside-tabs");
+      paellaTabsNav.setAttribute("role", "tablist");
+      paellaTabsNav.setAttribute("aria-label", "Secciones de la paella");
+      driveShell.appendChild(paellaTabsNav);
+      const PAELLA_TABS = [["forms", "Forms", "form"], ["respuestas", "Respuestas", "groups"], ["archivos", "Archivos", "files"]];
+      PAELLA_TABS.forEach(function (tab) {
+        const btn = el("button", "view-tab", icon(tab[2]) + "<span>" + tab[1] + "</span>");
+        btn.type = "button";
+        btn.setAttribute("role", "tab");
+        btn.dataset.paellaTab = tab[0];
+        btn.addEventListener("click", function () { setPaellaTab(tab[0]); });
+        paellaTabsNav.appendChild(btn);
+      });
+      const paellaQrTabBtn = el("button", "view-tab paella-qr-tab", icon("qr") + "<span>Lector QR</span>");
+      paellaQrTabBtn.type = "button";
+      paellaQrTabBtn.addEventListener("click", function () { els.paellaEntryReaderBtn.click(); });
+      paellaTabsNav.appendChild(paellaQrTabBtn);
+      function setPaellaTab(tab) {
+        const nextTab = /^(forms|respuestas|archivos)$/.test(tab) ? tab : "forms";
+        const changed = (state.paellaInsideTab || "forms") !== nextTab;
+        state.paellaInsideTab = nextTab;
+        if (driveScroll) driveScroll.scrollTop = 0;
+        if (typeof renderPaellas === "function") renderPaellas();
+        syncPlaces();
+        if (changed) {
+          triggerPanelEnter(els.paellasGrid, "is-tab-fading", 240);
         }
         syncAllTabGliders(false);
       }

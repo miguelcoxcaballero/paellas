@@ -2819,3 +2819,265 @@ body[data-place="home"][data-home-tab="trash"] .topbar #searchInput {
 html.restoring-session #loginView {
   display: none !important;
 }
+
+/* ---------- Opción 3C + Q1: Inside Paella Visual Layout & Header Solapas ---------- */
+body[data-place="paella"] .place-tabs:not(.paella-inside-tabs) {
+  display: none !important;
+}
+body:not([data-place="paella"]) .paella-inside-tabs {
+  display: none !important;
+}
+body[data-place="paella"] #paellaPanelFooter {
+  display: none !important;
+}
+.paella-inside-tabs .paella-qr-tab {
+  margin-left: auto !important;
+  background: var(--m-ink) !important;
+  color: var(--m-sun) !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 0 16px !important;
+  gap: 7px !important;
+  font-weight: 700 !important;
+  flex: none !important;
+}
+.paella-inside-tabs .paella-qr-tab:hover {
+  background: #362210 !important;
+  color: #FFE47A !important;
+}
+.paella-inside-tabs .paella-qr-tab.hidden {
+  display: none !important;
+}
+
+#paellaPanel.is-folder-open #paellasGrid.paella-grid {
+  display: block !important;
+}
+.paella-inside-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 248px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.paella-inside-cover {
+  border-radius: 18px;
+  border: 1px solid rgba(38, 23, 10, .10);
+  background: rgba(255, 253, 247, .88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 8px 22px -12px rgba(38, 23, 10, .14);
+  overflow: hidden;
+}
+.paella-inside-cover-art {
+  height: 170px;
+  background: linear-gradient(155deg, #FFD648 0%, #FFE682 100%);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.paella-inside-cover-art .paella-card-svg {
+  width: 132px;
+  height: 132px;
+  filter: drop-shadow(0 10px 18px rgba(38, 23, 10, .18));
+}
+.paella-inside-cover-body {
+  padding: 14px 16px 18px;
+}
+.paella-inside-cover-title {
+  font: 700 18px/1.25 var(--m-head);
+  color: var(--m-ink);
+  word-break: break-word;
+}
+.paella-inside-cover-meta {
+  margin-top: 4px;
+  font: 500 13px/1.4 var(--m-sans);
+  color: var(--m-muted);
+}
+
+.paella-inside-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.paella-inside-sublabel {
+  margin-top: 4px;
+  font: 700 12.5px/1.2 var(--m-sans);
+  color: var(--m-muted);
+  letter-spacing: .01em;
+}
+
+.paella-paired-spotlight {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 42px 14px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(38, 23, 10, .10);
+  background: rgba(255, 253, 247, .90);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 8px 20px -12px rgba(38, 23, 10, .14);
+  cursor: pointer;
+  transition: transform .18s var(--apple-spring-soft), box-shadow .18s ease;
+}
+.paella-paired-spotlight:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 14px 28px -14px rgba(38, 23, 10, .20);
+}
+.paella-paired-icons {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #EFE7FF 0%, #E3F3E2 100%);
+}
+.paella-paired-icons .item-icon-rich {
+  width: 34px !important;
+  height: 34px !important;
+}
+.paella-paired-info {
+  min-width: 0;
+  flex: 1;
+}
+.paella-paired-kicker {
+  font: 700 11.5px/1.2 var(--m-sans);
+  color: #6741D9;
+}
+.paella-paired-title {
+  margin-top: 3px;
+  font: 700 16px/1.25 var(--m-head);
+  color: var(--m-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.paella-paired-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.paella-paired-chip {
+  border: 1px solid rgba(38, 23, 10, .12);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font: 650 12px/1.2 var(--m-sans);
+  cursor: pointer;
+  transition: transform .12s ease, background-color .15s ease;
+}
+.paella-paired-chip.is-form {
+  background: #EFE7FF;
+  color: #5B21B6;
+}
+.paella-paired-chip.is-sheet {
+  background: #E3F3E2;
+  color: #15803D;
+}
+.paella-paired-chip:hover {
+  transform: translateY(-1px);
+}
+.paella-paired-spotlight .item-more-btn,
+.paella-split-card .item-more-btn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 8px !important;
+}
+
+.paella-split-card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-height: 78px;
+  border-radius: 16px;
+  border: 1px solid rgba(38, 23, 10, .10);
+  background: rgba(255, 253, 247, .88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .92), 0 6px 16px -12px rgba(38, 23, 10, .14);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .18s var(--apple-spring-soft), box-shadow .18s ease;
+}
+.paella-split-card:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 12px 24px -14px rgba(38, 23, 10, .20);
+}
+.paella-split-band {
+  width: 74px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: #FEEEC6;
+}
+.paella-split-card.is-sheet .paella-split-band {
+  background: #E0F4E6;
+}
+.paella-split-card.is-form .paella-split-band {
+  background: #EDE7FA;
+}
+.paella-split-band .item-icon-rich {
+  width: 36px !important;
+  height: 36px !important;
+}
+.paella-split-body {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 42px 13px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+.paella-split-meta {
+  font: 500 12px/1.2 var(--m-sans);
+  color: var(--m-muted);
+}
+.paella-split-body .title-text {
+  font: 700 15px/1.25 var(--m-head);
+  color: var(--m-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-paella-qr-btn {
+  display: none;
+}
+@media (max-width: 760px) {
+  .paella-inside-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .paella-inside-cover {
+    display: none;
+  }
+  .paella-split-band {
+    width: 64px;
+  }
+  .mobile-nav.has-qr-companion {
+    left: calc(50% - 28px) !important;
+    max-width: calc(100vw - 82px) !important;
+  }
+  .mobile-paella-qr-btn {
+    position: fixed;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    right: 14px;
+    z-index: 62;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--m-ink);
+    color: var(--m-sun);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 10px 24px -8px rgba(38, 23, 10, .42);
+    cursor: pointer;
+    transition: transform .16s var(--apple-spring-soft), opacity .18s ease;
+  }
+  .mobile-paella-qr-btn.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(.86);
+  }
+  .mobile-paella-qr-btn:active {
+    transform: scale(.92);
+  }
+}
