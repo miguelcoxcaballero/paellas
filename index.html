@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2045">
+  <meta name="app-build" content="20261121-2048">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2045";
+      var build = "20261121-2048";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6428,7 +6428,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2045">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2048">
 </head>
 <body>
   <div class="app">
@@ -6486,7 +6486,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.14</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.15</div>
           </div>
         </div>
       </div>
@@ -23517,7 +23517,7 @@
       bar.appendChild(barPill);
       document.body.appendChild(bar);
       function createLiquidPillPhysics(applyBox, opts) {
-        const upGrow = !!(opts && opts.upGrow);
+        const dockBloom = !!(opts && opts.dockBloom);
         let l = 0, r = 0, vl = 0, vr = 0;
         let tl = 0, tr = 0;
         let ready = false;
@@ -23528,8 +23528,8 @@
           const dt = Math.min(0.032, Math.max(0.004, (now - lastTime) / 1000));
           lastTime = now;
           const movingRight = (tl + tr) * 0.5 >= (l + r) * 0.5;
-          const kLead = 540, dLead = 26;
-          const kTrail = 285, dTrail = 21;
+          const kLead = 390, dLead = 21;
+          const kTrail = 205, dTrail = 15;
           const kL = movingRight ? kTrail : kLead;
           const dL = movingRight ? dTrail : dLead;
           const kR = movingRight ? kLead : kTrail;
@@ -23544,17 +23544,22 @@
           const tw = Math.max(1, tr - tl);
           const w = Math.max(16, r - l);
           let sy = 1;
-          if (upGrow) {
+          let activeMove = false;
+          if (dockBloom) {
             const speed = Math.abs(vl) + Math.abs(vr);
-            sy = 1 + Math.min(0.18, speed / 2200);
+            const distLeft = Math.abs(l - tl) + Math.abs(r - tr);
+            const bloom = Math.min(0.26, speed / 950 + Math.min(0.08, distLeft / 320));
+            sy = 1 + bloom;
+            activeMove = speed > 14 || distLeft > 1.5;
           } else {
-            const ratio = Math.max(0.86, Math.min(1.32, w / tw));
-            sy = Math.max(0.92, Math.min(1.06, 1 / Math.sqrt(ratio)));
+            const ratio = Math.max(0.84, Math.min(1.36, w / tw));
+            sy = Math.max(0.92, Math.min(1.07, 1 / Math.sqrt(ratio)));
+            activeMove = Math.abs(l - tl) > 1.5 || Math.abs(r - tr) > 1.5;
           }
-          applyBox(l, w, sy);
+          applyBox(l, w, sy, activeMove);
           if (Math.abs(l - tl) < 0.08 && Math.abs(r - tr) < 0.08 && Math.abs(vl) < 0.5 && Math.abs(vr) < 0.5) {
             l = tl; r = tr; vl = 0; vr = 0;
-            applyBox(tl, tw, 1);
+            applyBox(tl, tw, 1, false);
             rafId = 0;
             return;
           }
@@ -23567,13 +23572,20 @@
             if (instant || !ready || (reducedMotion && reducedMotion.matches)) {
               if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
               l = tl; r = tr; vl = 0; vr = 0; ready = true;
-              applyBox(tl, Math.max(16, width), 1);
+              applyBox(tl, Math.max(16, width), 1, false);
               return;
             }
             if (!rafId) {
               lastTime = performance.now();
               rafId = requestAnimationFrame(step);
             }
+          },
+          setDirect: function (left, width, sy) {
+            if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+            ready = true;
+            l = left; r = left + Math.max(16, width); vl = 0; vr = 0;
+            tl = l; tr = r;
+            applyBox(l, Math.max(16, width), sy || 1, true);
           },
           reset: function () {
             if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
@@ -23582,13 +23594,79 @@
         };
       }
 
-      const dockPillPhysics = createLiquidPillPhysics(function (left, width, sy) {
+      const dockPillPhysics = createLiquidPillPhysics(function (left, width, sy, activeMove) {
         barPill.style.transition = "opacity .16s ease";
         barPill.style.left = "0px";
         barPill.style.width = width + "px";
-        barPill.style.transformOrigin = "center bottom";
+        barPill.style.transformOrigin = "center center";
         barPill.style.transform = "translate3d(" + left + "px, 0, 0) scaleY(" + sy.toFixed(4) + ")";
-      }, { upGrow: true });
+        barPill.classList.toggle("is-moving", !!activeMove);
+      }, { dockBloom: true });
+
+      (function bindDockTouchScrub() {
+        let dragging = false;
+        let startX = 0;
+        let moved = false;
+        let suppressClickUntil = 0;
+        function pillWidth() {
+          const first = bar.querySelector(".mobile-nav-item");
+          return first ? first.offsetWidth : 88;
+        }
+        bar.addEventListener("touchstart", function (event) {
+          if (!event.touches || event.touches.length !== 1) return;
+          dragging = true;
+          moved = false;
+          startX = event.touches[0].clientX;
+        }, { passive: true });
+        bar.addEventListener("touchmove", function (event) {
+          if (!dragging || !event.touches || event.touches.length !== 1) return;
+          const dx = event.touches[0].clientX - startX;
+          if (!moved && Math.abs(dx) < 8) return;
+          moved = true;
+          const rect = bar.getBoundingClientRect();
+          const pw = pillWidth();
+          const rawLeft = event.touches[0].clientX - rect.left - pw * 0.5;
+          const minL = 6;
+          const maxL = Math.max(minL, rect.width - pw - 6);
+          const clamped = Math.max(minL, Math.min(maxL, rawLeft));
+          dockPillPhysics.setDirect(clamped, pw, 1.24);
+        }, { passive: true });
+        function finishDrag(event) {
+          if (!dragging) return;
+          dragging = false;
+          if (!moved) return;
+          suppressClickUntil = Date.now() + 260;
+          const touch = event.changedTouches && event.changedTouches[0];
+          const rect = bar.getBoundingClientRect();
+          const relX = touch ? (touch.clientX - rect.left) : 0;
+          const btns = Array.prototype.slice.call(bar.querySelectorAll(".mobile-nav-item"));
+          let best = null;
+          let bestDist = Infinity;
+          btns.forEach(function (b) {
+            const center = b.offsetLeft + b.offsetWidth * 0.5;
+            const d = Math.abs(center - relX);
+            if (d < bestDist) { bestDist = d; best = b; }
+          });
+          if (best && best.dataset.nav) {
+            haptic("tap");
+            runNav(best.dataset.nav);
+          } else {
+            syncDockPillPosition(false);
+          }
+        }
+        bar.addEventListener("touchend", finishDrag, { passive: true });
+        bar.addEventListener("touchcancel", function () {
+          if (!dragging) return;
+          dragging = false;
+          if (moved) syncDockPillPosition(false);
+        }, { passive: true });
+        bar.addEventListener("click", function (event) {
+          if (Date.now() < suppressClickUntil) {
+            event.stopPropagation();
+            event.preventDefault();
+          }
+        }, true);
+      })();
       function syncDockPillPosition(instant) {
         const activeBtn = bar.querySelector(".mobile-nav-item.is-active");
         if (!activeBtn || bar.offsetWidth === 0) {
