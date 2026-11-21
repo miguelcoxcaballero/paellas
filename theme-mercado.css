@@ -1625,6 +1625,8 @@ html.keyboard-open .pw-foot {
 #paellaPanel:not(.is-folder-open) #paellasGrid.paella-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-rows: 1fr !important;
+  align-items: stretch !important;
   gap: 20px 28px !important;
   padding: 16px 0 6px !important;
 }
@@ -1636,10 +1638,15 @@ html.keyboard-open .pw-foot {
 @media (max-width: 680px) {
   #paellaPanel:not(.is-folder-open) #paellasGrid.paella-grid {
     grid-template-columns: 1fr !important;
+    grid-auto-rows: auto !important;
     gap: 14px !important;
   }
 }
 #paellaPanel:not(.is-folder-open) .paella-grid > .paella-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 178px !important;
   background: transparent !important;
   border: 0 !important;
   border-top: 3px solid var(--paella-folder-color, var(--m-ink)) !important;
@@ -1648,8 +1655,10 @@ html.keyboard-open .pw-foot {
   box-shadow: none !important;
   padding: 16px 6px 14px !important;
   display: flex !important;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  overflow: hidden !important;
   cursor: pointer;
   transition: background-color .18s ease, transform .14s cubic-bezier(.22, 1, .36, 1) !important;
 }
@@ -1663,16 +1672,26 @@ html.keyboard-open .pw-foot {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 10px;
+  gap: 10px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 44px !important;
+  flex: none !important;
+}
+#paellaPanel:not(.is-folder-open) .paella-card-head .item-actions {
+  position: static !important;
+  order: initial !important;
 }
 #paellaPanel:not(.is-folder-open) .paella-card-icon {
   width: 44px !important;
   height: 44px !important;
+  min-width: 44px !important;
   border-radius: 12px !important;
   background: var(--paella-folder-bg, #FFF0C2) !important;
   display: grid !important;
   place-items: center;
-  flex: none;
+  flex: none !important;
+  order: initial !important;
 }
 .paella-card-svg {
   width: 28px;
@@ -1684,6 +1703,7 @@ html.keyboard-open .pw-foot {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex: none;
 }
 .paella-card-status {
   display: inline-flex;
@@ -1691,6 +1711,7 @@ html.keyboard-open .pw-foot {
   gap: 6px;
   font: 600 12.5px var(--m-sans);
   color: var(--m-muted);
+  white-space: nowrap;
 }
 .paella-card-dot {
   width: 7px;
@@ -1700,30 +1721,42 @@ html.keyboard-open .pw-foot {
   flex: none;
 }
 #paellaPanel:not(.is-folder-open) .paella-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  order: initial !important;
 }
 #paellaPanel:not(.is-folder-open) .paella-card-title {
   font: 500 22px/1.16 var(--m-head) !important;
   letter-spacing: -.015em;
   color: var(--m-ink) !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden !important;
+  min-height: 2.32em;
+  word-break: break-word;
 }
 #paellaPanel:not(.is-folder-open) .paella-card-meta {
-  font: 500 13.5px var(--m-sans) !important;
+  font: 500 13.5px/1.35 var(--m-sans) !important;
   color: var(--m-muted) !important;
+  min-height: 19px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .paella-card-foot {
-  margin-top: auto;
+  margin-top: auto !important;
   padding-top: 2px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   min-height: 28px;
+  flex: none;
 }
 .paella-card-avatars {
   display: inline-flex;
