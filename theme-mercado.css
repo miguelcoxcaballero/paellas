@@ -1159,12 +1159,13 @@ body:not([data-doc="form"]) #editorShell .form-tabs { display: none !important; 
   flex-direction: column;
   overflow: hidden;
   font-family: var(--m-sans);
+  animation: pwWizardIn .26s cubic-bezier(.22, 1, .36, 1);
 }
 .paella-wizard.hidden { display: none !important; }
 body.paella-wizard-open { overflow: hidden; }
 .pw-band {
   background: var(--m-grad);
-  padding: 12px var(--m-pad) 0;
+  padding: 12px var(--m-pad) 18px;
   flex: none;
 }
 .pw-topbar {
@@ -1211,71 +1212,92 @@ body.paella-wizard-open { overflow: hidden; }
   line-height: 1;
 }
 .pw-steps-wrap {
-  width: min(580px, 100%);
-  margin: 14px auto 0;
+  width: min(460px, 100%);
+  margin: 12px auto 0;
 }
-.pw-steps {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding-bottom: 14px;
+.pw-stepper {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+}
+.pw-stepper-track {
+  position: absolute;
+  top: 16px;
+  left: calc(100% / 6);
+  right: calc(100% / 6);
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(38, 23, 10, .18);
+  overflow: hidden;
+  pointer-events: none;
+}
+.pw-stepper-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--m-ink);
+  border-radius: 99px;
+  transition: width .38s cubic-bezier(.22, 1, .36, 1);
 }
 .pw-step {
-  display: inline-flex;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 0 14px 0 8px;
+  gap: 6px;
   border: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .48);
+  padding: 0;
+  background: transparent;
   color: var(--m-ink-2);
-  font: 600 13.5px var(--m-sans);
+  font: 600 12.5px var(--m-sans);
   cursor: pointer;
 }
-.pw-step-num {
-  width: 22px;
-  height: 22px;
+.pw-step-dot {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  background: #FFF6D6;
+  box-shadow: inset 0 0 0 2px rgba(38, 23, 10, .24);
+  color: var(--m-ink-2);
+  font-size: 13px;
   font-weight: 700;
-  background: rgba(38, 23, 10, .12);
-  color: var(--m-ink);
+  transition: transform .28s cubic-bezier(.22, 1, .36, 1), background-color .24s ease, color .24s ease, box-shadow .28s ease;
 }
-.pw-step.is-active {
+.pw-step-check { display: none; }
+.pw-step-label {
+  transition: color .2s ease, opacity .2s ease;
+  opacity: .78;
+}
+.pw-step.is-active .pw-step-dot {
   background: var(--m-ink);
   color: var(--m-sun);
+  box-shadow: 0 0 0 5px rgba(38, 23, 10, .14);
+  transform: scale(1.08);
 }
-.pw-step.is-active .pw-step-num {
-  background: var(--m-sun);
+.pw-step.is-active .pw-step-label {
   color: var(--m-ink);
+  font-weight: 700;
+  opacity: 1;
 }
-.pw-step.is-done {
-  background: var(--m-good-s);
-  color: var(--m-good);
-}
-.pw-step.is-done .pw-step-num {
+.pw-step.is-done .pw-step-dot {
   background: var(--m-good);
   color: #fff;
+  box-shadow: 0 0 0 3px rgba(35, 122, 59, .18);
+}
+.pw-step.is-done .pw-step-num { display: none; }
+.pw-step.is-done .pw-step-check { display: block; }
+.pw-step.is-done .pw-step-label {
+  color: var(--m-ink);
+  opacity: .95;
 }
 .pw-step:disabled {
-  opacity: .5;
   cursor: default;
 }
-.pw-progress-track {
-  height: 3px;
-  border-radius: 99px;
-  background: rgba(38, 23, 10, .14);
-  overflow: hidden;
-}
-.pw-progress-fill {
-  height: 100%;
-  width: 33.33%;
-  background: var(--m-ink);
-  transition: width .22s cubic-bezier(.22, 1, .36, 1);
+.pw-step:disabled:not(.is-active):not(.is-done) .pw-step-label {
+  opacity: .55;
 }
 .pw-stage {
   width: min(580px, 100%);
@@ -1286,9 +1308,32 @@ body.paella-wizard-open { overflow: hidden; }
   flex-direction: column;
   justify-content: center;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .pw-step-panel { width: 100%; }
 .pw-step-panel.hidden { display: none !important; }
+.pw-step-panel.is-enter-forward { animation: pwStepForward .3s cubic-bezier(.22, 1, .36, 1); }
+.pw-step-panel.is-enter-backward { animation: pwStepBackward .3s cubic-bezier(.22, 1, .36, 1); }
+@keyframes pwWizardIn {
+  from { opacity: 0; transform: translateY(14px) scale(.992); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pwStepForward {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pwStepBackward {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pwRowIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .paella-wizard, .pw-step-panel.is-enter-forward, .pw-step-panel.is-enter-backward, .pw-editor-item { animation: none !important; }
+  .pw-stepper-fill, .pw-step-dot, .pw-step-label { transition: none !important; }
+}
 .pw-heading {
   margin: 0 0 18px;
   font: 500 42px/1.06 var(--m-head);
@@ -1364,6 +1409,7 @@ body.paella-wizard-open { overflow: hidden; }
   gap: 12px;
   padding: 11px 2px;
   border-bottom: 1px solid var(--m-line);
+  animation: pwRowIn .2s cubic-bezier(.22, 1, .36, 1);
 }
 .pw-editor-avatar {
   width: 34px;
@@ -1375,6 +1421,44 @@ body.paella-wizard-open { overflow: hidden; }
   display: grid;
   place-items: center;
   flex: none;
+}
+.pw-editor-avatar.is-self {
+  background: var(--m-ink);
+  color: var(--m-sun);
+}
+.pw-editor-avatar-img {
+  object-fit: cover;
+  display: block;
+}
+.pw-role-admin, .pw-role-editor {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font: 700 12px var(--m-sans);
+  flex: none;
+}
+.pw-role-admin {
+  background: var(--m-ink);
+  color: var(--m-sun);
+}
+.pw-role-editor {
+  background: #FFF0C2;
+  color: var(--m-ink-2);
+}
+.pw-summary-pill em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--m-muted);
+  margin-left: 6px;
+}
+.pw-summary-pill.is-admin {
+  background: var(--m-ink);
+  color: var(--m-sun);
+  box-shadow: none;
+}
+.pw-summary-pill.is-admin em {
+  color: var(--m-sun);
+  opacity: .85;
 }
 .pw-editor-email {
   flex: 1 1 auto;
@@ -1485,10 +1569,12 @@ body.paella-wizard-open { overflow: hidden; }
 .pw-nav-btn.hidden { display: none !important; }
 .pw-nav-btn.is-hidden-step0 { visibility: hidden; pointer-events: none; }
 @media (max-width: 760px) {
-  .pw-band { padding: 10px 16px 0; }
+  .pw-band { padding: 10px 16px 14px; }
   .pw-brand .brand-name { font-size: 20px !important; }
-  .pw-steps { gap: 6px; padding-bottom: 12px; }
-  .pw-step { padding: 0 11px 0 6px; font-size: 12.5px; }
+  .pw-steps-wrap { margin-top: 8px; }
+  .pw-step-dot { width: 30px; height: 30px; font-size: 12px; }
+  .pw-stepper-track { top: 14px; }
+  .pw-step { font-size: 12px; }
   .pw-stage { padding: 20px 16px; justify-content: flex-start; padding-top: 28px; }
   .pw-heading { font-size: 31px; }
   .pw-name-input { min-height: 52px !important; font-size: 17px !important; padding: 0 16px !important; }

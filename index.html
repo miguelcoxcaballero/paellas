@@ -6869,12 +6869,23 @@
         <button id="paellaWizardCloseBtn" class="btn pw-close-btn" type="button" aria-label="Cerrar">×</button>
       </div>
       <div class="pw-steps-wrap">
-        <div class="pw-steps" role="tablist" aria-label="Pasos">
-          <button class="pw-step is-active" type="button" data-pw-step="0"><span class="pw-step-num">1</span><span>Nombre</span></button>
-          <button class="pw-step" type="button" data-pw-step="1"><span class="pw-step-num">2</span><span>Editores</span></button>
-          <button class="pw-step" type="button" data-pw-step="2"><span class="pw-step-num">3</span><span>Crear</span></button>
+        <div class="pw-stepper" role="tablist" aria-label="Pasos">
+          <div class="pw-stepper-track" aria-hidden="true">
+            <div id="paellaWizardProgressFill" class="pw-stepper-fill"></div>
+          </div>
+          <button class="pw-step is-active" type="button" data-pw-step="0">
+            <span class="pw-step-dot"><span class="pw-step-num">1</span><span class="pw-step-check" aria-hidden="true">✓</span></span>
+            <span class="pw-step-label">Nombre</span>
+          </button>
+          <button class="pw-step" type="button" data-pw-step="1">
+            <span class="pw-step-dot"><span class="pw-step-num">2</span><span class="pw-step-check" aria-hidden="true">✓</span></span>
+            <span class="pw-step-label">Editores</span>
+          </button>
+          <button class="pw-step" type="button" data-pw-step="2">
+            <span class="pw-step-dot"><span class="pw-step-num">3</span><span class="pw-step-check" aria-hidden="true">✓</span></span>
+            <span class="pw-step-label">Crear</span>
+          </button>
         </div>
-        <div class="pw-progress-track" aria-hidden="true"><div id="paellaWizardProgressFill" class="pw-progress-fill"></div></div>
       </div>
     </div>
 
@@ -21101,20 +21112,35 @@
         btn.setAttribute("aria-selected", isActive ? "true" : "false");
       });
       if (els.paellaWizardProgressFill) {
-        els.paellaWizardProgressFill.style.width = (((step + 1) / 3) * 100) + "%";
+        els.paellaWizardProgressFill.style.width = ((step / 2) * 100) + "%";
       }
       if (els.paellaWizardDestPreview) {
         els.paellaWizardDestPreview.textContent = cleanName;
       }
+      const selfEmail = String((state.currentUser && state.currentUser.emailAddress) || "").trim().toLowerCase();
+      const selfName = String((state.currentUser && state.currentUser.displayName) || "").trim();
+      const selfPhoto = String((state.currentUser && state.currentUser.photoLink) || "").trim();
+      const selfLabel = selfEmail || selfName || "Tu cuenta";
       if (els.paellaWizardEmailList) {
         els.paellaWizardEmailList.innerHTML = "";
-        els.paellaWizardEmailList.classList.toggle("hidden", !state.paellaWizardEditors.length);
+        els.paellaWizardEmailList.classList.remove("hidden");
+        const selfRow = document.createElement("div");
+        selfRow.className = "pw-editor-item is-self";
+        const selfAvatar = selfPhoto
+          ? "<img class='pw-editor-avatar pw-editor-avatar-img' src='" + escapeHtml(selfPhoto) + "' alt=''>"
+          : "<span class='pw-editor-avatar is-self'>" + escapeHtml(selfLabel.charAt(0).toUpperCase()) + "</span>";
+        selfRow.innerHTML =
+          selfAvatar +
+          "<span class='pw-editor-email'>" + escapeHtml(selfLabel) + "</span>" +
+          "<span class='pw-role-admin'>Admin</span>";
+        els.paellaWizardEmailList.appendChild(selfRow);
         state.paellaWizardEditors.forEach(function (email, index) {
           const row = document.createElement("div");
           row.className = "pw-editor-item";
           row.innerHTML =
             "<span class='pw-editor-avatar'>" + escapeHtml(String(email || "?").charAt(0).toUpperCase()) + "</span>" +
-            "<span class='pw-editor-email'>" + escapeHtml(email) + "</span>";
+            "<span class='pw-editor-email'>" + escapeHtml(email) + "</span>" +
+            "<span class='pw-role-editor'>Editor</span>";
           const removeBtn = document.createElement("button");
           removeBtn.className = "pw-editor-remove";
           removeBtn.type = "button";
@@ -21136,16 +21162,16 @@
       }
       if (els.paellaWizardSummaryEditors) {
         els.paellaWizardSummaryEditors.innerHTML = "";
-        if (!state.paellaWizardEditors.length) {
-          els.paellaWizardSummaryEditors.innerHTML = "<span class='pw-summary-pill'>Ninguno</span>";
-        } else {
-          state.paellaWizardEditors.forEach(function (email) {
-            const pill = document.createElement("span");
-            pill.className = "pw-summary-pill";
-            pill.textContent = email;
-            els.paellaWizardSummaryEditors.appendChild(pill);
-          });
-        }
+        const selfPill = document.createElement("span");
+        selfPill.className = "pw-summary-pill is-admin";
+        selfPill.innerHTML = escapeHtml(selfLabel) + " <em>Admin</em>";
+        els.paellaWizardSummaryEditors.appendChild(selfPill);
+        state.paellaWizardEditors.forEach(function (email) {
+          const pill = document.createElement("span");
+          pill.className = "pw-summary-pill";
+          pill.innerHTML = escapeHtml(email) + " <em>Editor</em>";
+          els.paellaWizardSummaryEditors.appendChild(pill);
+        });
       }
       if (els.paellaWizardCloseBtn) els.paellaWizardCloseBtn.disabled = submitting;
       if (els.paellaWizardBackBtn) {
@@ -21171,11 +21197,21 @@
     }
     function setPaellaWizardStep(nextStep) {
       if (state.paellaWizardSubmitting) return;
-      state.paellaWizardStep = Math.max(0, Math.min(2, Number(nextStep) || 0));
+      const prevStep = Number(state.paellaWizardStep) || 0;
+      const targetStep = Math.max(0, Math.min(2, Number(nextStep) || 0));
+      state.paellaWizardStep = targetStep;
       setPaellaWizardStatus(els.paellaWizardStep0Status, "", "");
       setPaellaWizardStatus(els.paellaWizardStep1Status, "", "");
       setPaellaWizardStatus(els.paellaWizardSubmitStatus, "", "");
       renderPaellaWizard();
+      const panels = [els.paellaWizardStep0, els.paellaWizardStep1, els.paellaWizardStep2];
+      const activePanel = panels[targetStep];
+      if (activePanel && targetStep !== prevStep) {
+        const animClass = targetStep > prevStep ? "is-enter-forward" : "is-enter-backward";
+        activePanel.classList.remove("is-enter-forward", "is-enter-backward");
+        void activePanel.offsetWidth;
+        activePanel.classList.add(animClass);
+      }
       requestAnimationFrame(function () {
         if (state.paellaWizardStep === 0 && els.paellaWizardNameInput) {
           els.paellaWizardNameInput.focus();
@@ -21239,7 +21275,9 @@
         els.paellaWizardEmailInput.focus();
         return false;
       }
+      const selfEmail = String((state.currentUser && state.currentUser.emailAddress) || "").trim().toLowerCase();
       tokens.forEach(function (email) {
+        if (selfEmail && email === selfEmail) return;
         if (state.paellaWizardEditors.indexOf(email) === -1) {
           state.paellaWizardEditors.push(email);
         }
