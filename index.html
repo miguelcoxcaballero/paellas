@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-1958">
+  <meta name="app-build" content="20261121-2004">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-1958";
+      var build = "20261121-2004";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6422,7 +6422,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-1958">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2004">
 </head>
 <body>
   <div class="app">
@@ -6480,7 +6480,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.5</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.6</div>
           </div>
         </div>
       </div>
@@ -17467,6 +17467,7 @@
       if (name !== "editor") closeFormLinkModal();
       if (name !== "login") saveStoredUiSession();
       if (typeof window.refreshUnifiedBreadcrumbs === "function") window.refreshUnifiedBreadcrumbs();
+      if (typeof window.syncMercadoTabGliders === "function") window.syncMercadoTabGliders(true);
     }
     function escapeHtml(value) {
       return String(value || "")
@@ -19471,16 +19472,25 @@
       els.formToolbarMeta.textContent = count + (count === 1 ? " pregunta" : " preguntas") + " · " + responses + (responses === 1 ? " respuesta" : " respuestas");
     }
     function setFormPanelView(view) {
+      const prevView = state.formPanelView;
       const nextView = view === "responses" || view === "settings" ? view : "main";
       state.formPanelView = nextView;
       if (!els.formViewMainBtn) return;
       els.formViewMainBtn.classList.toggle("active", nextView === "main");
       els.formViewResponsesBtn.classList.toggle("active", nextView === "responses");
       els.formViewSettingsBtn.classList.toggle("active", nextView === "settings");
+      els.formViewMainBtn.setAttribute("aria-selected", nextView === "main" ? "true" : "false");
+      els.formViewResponsesBtn.setAttribute("aria-selected", nextView === "responses" ? "true" : "false");
+      els.formViewSettingsBtn.setAttribute("aria-selected", nextView === "settings" ? "true" : "false");
       els.formPanelMain.classList.toggle("hidden-panel", nextView !== "main");
       els.formPanelSide.classList.toggle("hidden-panel", nextView === "main");
       els.formPanelResponses.classList.toggle("hidden-panel", nextView !== "responses");
       els.formPanelSettings.classList.toggle("hidden-panel", nextView !== "settings");
+      if (prevView && prevView !== nextView) {
+        triggerPanelEnter(nextView === "main" ? els.formPanelMain : els.formPanelSide, "is-tab-fading", 240);
+        triggerPanelEnter(document.getElementById("formOutlineRail"), "is-tab-fading", 240);
+      }
+      if (typeof window.syncMercadoTabGliders === "function") window.syncMercadoTabGliders(false);
     }
     function renderFormQuestions() {
       els.formQuestionsList.innerHTML = "";
@@ -23231,11 +23241,19 @@
       if (!/^(paellas|files|trash)$/.test(homeTab)) homeTab = "paellas";
       let trashLoaded = false;
       function setHomeTab(tab) {
+        const changed = homeTab !== tab;
         homeTab = tab;
         try { localStorage.setItem("paellas-home-tab", tab); } catch (err) { /* private mode */ }
         if (tab === "trash" && state.accessToken) { trashLoaded = true; loadTrashItems(); }
         if (driveScroll) driveScroll.scrollTop = 0;
         syncPlaces();
+        if (changed) {
+          triggerPanelEnter(document.getElementById("driveBreadcrumbsBar"), "is-tab-fading", 240);
+          [els.paellaPanel, els.folderSection, els.sharedSection, trashSection].forEach(function (sec) {
+            if (sec && sec.offsetParent !== null) triggerPanelEnter(sec, "is-tab-fading", 240);
+          });
+        }
+        syncAllTabGliders(false);
       }
 
       // ── Drive band actions ──
@@ -23464,6 +23482,61 @@
         barPill.style.opacity = tabs.items.some(function (item) { return item.id === tabs.active; }) ? "1" : "0";
       }
 
+      const tabGliderUpdaters = [];
+      function attachFolderTabGlider(navEl) {
+        if (!navEl || navEl._tabGliderAttached) return;
+        navEl._tabGliderAttached = true;
+        navEl.classList.add("has-tab-glider");
+        const glider = document.createElement("span");
+        glider.className = "view-tab-glider";
+        glider.setAttribute("aria-hidden", "true");
+        navEl.insertBefore(glider, navEl.firstChild);
+        function update(instant) {
+          if (!navEl.isConnected || navEl.classList.contains("hidden-panel") || navEl.offsetParent === null) {
+            glider.style.opacity = "0";
+            return;
+          }
+          const tabsList = Array.prototype.filter.call(navEl.querySelectorAll(".view-tab"), function (t) {
+            return !t.hidden && t.offsetWidth > 0;
+          });
+          const active = tabsList.find(function (t) {
+            return t.getAttribute("aria-selected") === "true" || t.classList.contains("active");
+          });
+          if (!active) {
+            glider.style.opacity = "0";
+            return;
+          }
+          const needInstant = instant || !glider.dataset.ready;
+          if (needInstant) glider.style.transition = "none";
+          glider.style.width = active.offsetWidth + "px";
+          glider.style.transform = "translateX(" + active.offsetLeft + "px)";
+          glider.style.opacity = "1";
+          if (needInstant) {
+            void glider.offsetWidth;
+            glider.style.transition = "";
+            glider.dataset.ready = "1";
+          }
+        }
+        new MutationObserver(function () { update(false); }).observe(navEl, {
+          attributes: true,
+          subtree: true,
+          attributeFilter: ["aria-selected", "class", "hidden"]
+        });
+        if (window.ResizeObserver) {
+          new ResizeObserver(function () { update(true); }).observe(navEl);
+        }
+        tabGliderUpdaters.push(update);
+        requestAnimationFrame(function () { update(true); });
+      }
+      function syncAllTabGliders(instant) {
+        tabGliderUpdaters.forEach(function (fn) { fn(!!instant); });
+      }
+      window.syncMercadoTabGliders = syncAllTabGliders;
+      attachFolderTabGlider(homeTabsNav);
+      attachFolderTabGlider(els.viewTabs);
+      attachFolderTabGlider(formSwitch);
+      window.addEventListener("resize", function () { syncAllTabGliders(true); });
+
       let lastReport = "";
       function syncPlaces() {
         const place = currentPlace();
@@ -23476,7 +23549,7 @@
           btn.setAttribute("aria-selected", btn.classList.contains("active") ? "true" : "false");
         });
         renderTrail();
-        Array.prototype.forEach.call(homeTabsNav.children, function (btn) {
+        Array.prototype.forEach.call(homeTabsNav.querySelectorAll(".view-tab"), function (btn) {
           const on = btn.dataset.tab === homeTab;
           btn.setAttribute("aria-selected", on ? "true" : "false");
           btn.tabIndex = on ? 0 : -1;
@@ -23513,6 +23586,7 @@
           const report = JSON.stringify({ type: "nav", visible: visible, active: tabs.active, items: tabs.items });
           if (report !== lastReport) { lastReport = report; androidAppMessage(JSON.parse(report)); }
         }
+        syncAllTabGliders(false);
       }
       let frame = 0;
       function queueSync() {

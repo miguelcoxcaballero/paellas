@@ -1963,8 +1963,8 @@ html.keyboard-open .pw-foot {
   to { opacity: 1; transform: none; }
 }
 @keyframes surfaceEnter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .view.is-view-entering,
@@ -2371,6 +2371,7 @@ body[data-place="paella"] #driveShell {
 .place-tabs,
 #editorShell #viewTabs,
 #editorShell .form-tabs {
+  position: relative !important;
   margin-top: 6px !important;
   margin-bottom: 0 !important;
   min-height: 36px !important;
@@ -2380,9 +2381,23 @@ body[data-place="paella"] #driveShell {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
+.view-tab-glider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--m-cream);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: transform .26s cubic-bezier(.22, 1, .36, 1), width .26s cubic-bezier(.22, 1, .36, 1), opacity .16s ease;
+}
 .place-tabs .view-tab,
 #editorShell #viewTabs .view-tab,
 #editorShell .form-tabs .view-tab {
+  position: relative;
+  z-index: 1;
   min-height: 36px !important;
   height: 36px !important;
   padding: 0 16px !important;
@@ -2391,6 +2406,17 @@ body[data-place="paella"] #driveShell {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
+  transition: color .18s ease, transform .14s cubic-bezier(.22, 1, .36, 1);
+}
+.place-tabs .view-tab:hover,
+#editorShell #viewTabs .view-tab:hover,
+#editorShell .form-tabs .view-tab:hover {
+  background: rgba(255, 255, 255, .24) !important;
+}
+.place-tabs .view-tab:active,
+#editorShell #viewTabs .view-tab:active,
+#editorShell .form-tabs .view-tab:active {
+  transform: scale(.96);
 }
 .place-tabs .view-tab[aria-selected="true"],
 .place-tabs .view-tab.active,
@@ -2400,6 +2426,30 @@ body[data-place="paella"] #driveShell {
 #editorShell .form-tabs .view-tab.active {
   background: var(--m-cream) !important;
   color: var(--m-ink) !important;
+}
+.has-tab-glider .view-tab[aria-selected="true"],
+.has-tab-glider .view-tab.active,
+.has-tab-glider .view-tab:hover[aria-selected="true"],
+.has-tab-glider .view-tab:hover.active {
+  background: transparent !important;
+}
+.is-tab-fading {
+  animation: tabContentFade .22s ease-out both;
+}
+@keyframes tabContentFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .view-tab-glider,
+  .place-tabs .view-tab,
+  #editorShell #viewTabs .view-tab,
+  #editorShell .form-tabs .view-tab {
+    transition: none !important;
+  }
+  .is-tab-fading {
+    animation: none !important;
+  }
 }
 
 /* Editor / Form / Sheet compact H2-B band */
