@@ -2628,31 +2628,24 @@ body.has-bottom-bar #driveView > #createPaellaBtn.paella-create-btn {
   --apple-spring-soft: cubic-bezier(0.22, 1.12, 0.36, 1);
 }
 
-/* 1. Sliding folder tab lens + Apple elastic deformation */
+/* 1. Sliding folder tab lens + real rAF dual-edge Liquid Glass spring physics */
 .view-tab-glider {
   background: transparent !important;
   overflow: visible !important;
-  transition: transform .34s var(--apple-spring), width .34s var(--apple-spring), opacity .16s ease !important;
+  transition: opacity .16s ease !important;
+  will-change: transform, width;
 }
 .view-tab-glider-lens {
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 12px 12px 0 0;
-  background: rgba(255, 249, 232, .92);
+  background: rgba(255, 249, 232, .94);
   -webkit-backdrop-filter: blur(12px) saturate(130%);
   backdrop-filter: blur(12px) saturate(130%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .94);
   transform-origin: center bottom;
-}
-.view-tab-glider-lens.is-morphing {
-  animation: appleLiquidMorph .36s var(--apple-spring-soft);
-}
-@keyframes appleLiquidMorph {
-  0%   { transform: scaleX(1) scaleY(1); }
-  28%  { transform: scaleX(1.13) scaleY(0.92); }
-  66%  { transform: scaleX(0.97) scaleY(1.03); }
-  100% { transform: scaleX(1) scaleY(1); }
+  will-change: transform;
 }
 
 /* 2. Whisper-light frosted L2 cards (sin sombras pesadas, fondo intacto) */
@@ -2771,7 +2764,8 @@ body[data-place="home"][data-home-tab="trash"] .topbar #searchInput {
     box-shadow: none !important;
   }
   .mobile-nav.is-ready .mobile-nav-pill {
-    transition: transform .34s var(--apple-spring), opacity .16s ease !important;
+    transition: opacity .16s ease !important;
+    will-change: transform, width;
   }
   .mobile-nav-pill::before {
     content: "";
@@ -2782,15 +2776,6 @@ body[data-place="home"][data-home-tab="trash"] .topbar #searchInput {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 2px 6px rgba(38, 23, 10, .08);
     transform-origin: center center;
   }
-  .mobile-nav-pill.is-morphing::before {
-    animation: appleDockMorph .38s var(--apple-spring-soft);
-  }
-}
-@keyframes appleDockMorph {
-  0%   { transform: scaleX(1) scaleY(1); }
-  26%  { transform: scaleX(1.16) scaleY(0.89); }
-  65%  { transform: scaleX(0.96) scaleY(1.04); }
-  100% { transform: scaleX(1) scaleY(1); }
 }
 
 /* 6. Frosted popups & menus with Apple spring entrance */

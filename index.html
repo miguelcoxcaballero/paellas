@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-2035">
+  <meta name="app-build" content="20261121-2038">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-2035";
+      var build = "20261121-2038";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6422,7 +6422,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2035">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-2038">
 </head>
 <body>
   <div class="app">
@@ -6480,7 +6480,7 @@
               <button id="profileUpdatesBtn" class="btn small hidden" type="button">Actualizaciones</button>
               <button id="profileLogoutBtn" class="btn small" type="button">Salir</button>
             </div>
-            <div id="profileVersion" class="profile-version">Versión 1.0.10</div>
+            <div id="profileVersion" class="profile-version">Versión 1.0.11</div>
           </div>
         </div>
       </div>
@@ -23484,11 +23484,88 @@
       barPill.setAttribute("aria-hidden", "true");
       bar.appendChild(barPill);
       document.body.appendChild(bar);
+      function createLiquidPillPhysics(applyBox) {
+        let l = 0, r = 0, vl = 0, vr = 0;
+        let tl = 0, tr = 0;
+        let ready = false;
+        let rafId = 0;
+        let lastTime = 0;
+        const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+        function step(now) {
+          const dt = Math.min(0.032, Math.max(0.004, (now - lastTime) / 1000));
+          lastTime = now;
+          const movingRight = (tl + tr) * 0.5 >= (l + r) * 0.5;
+          const kLead = 540, dLead = 26;
+          const kTrail = 285, dTrail = 21;
+          const kL = movingRight ? kTrail : kLead;
+          const dL = movingRight ? dTrail : dLead;
+          const kR = movingRight ? kLead : kTrail;
+          const dR = movingRight ? dLead : dTrail;
+          const al = -kL * (l - tl) - dL * vl;
+          const ar = -kR * (r - tr) - dR * vr;
+          vl += al * dt;
+          vr += ar * dt;
+          l += vl * dt;
+          r += vr * dt;
+          if (r < l + 16) r = l + 16;
+          const tw = Math.max(1, tr - tl);
+          const w = Math.max(16, r - l);
+          const ratio = Math.max(0.86, Math.min(1.32, w / tw));
+          const sy = Math.max(0.92, Math.min(1.04, 1 / Math.sqrt(ratio)));
+          applyBox(l, w, sy);
+          if (Math.abs(l - tl) < 0.08 && Math.abs(r - tr) < 0.08 && Math.abs(vl) < 0.5 && Math.abs(vr) < 0.5) {
+            l = tl; r = tr; vl = 0; vr = 0;
+            applyBox(tl, tw, 1);
+            rafId = 0;
+            return;
+          }
+          rafId = requestAnimationFrame(step);
+        }
+        return {
+          setTarget: function (left, width, instant) {
+            tl = left;
+            tr = left + Math.max(16, width);
+            if (instant || !ready || (reducedMotion && reducedMotion.matches)) {
+              if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+              l = tl; r = tr; vl = 0; vr = 0; ready = true;
+              applyBox(tl, Math.max(16, width), 1);
+              return;
+            }
+            if (!rafId) {
+              lastTime = performance.now();
+              rafId = requestAnimationFrame(step);
+            }
+          },
+          reset: function () {
+            if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+            ready = false; vl = 0; vr = 0;
+          }
+        };
+      }
+
+      const dockPillPhysics = createLiquidPillPhysics(function (left, width, sy) {
+        barPill.style.transition = "opacity .16s ease";
+        barPill.style.left = "0px";
+        barPill.style.width = width + "px";
+        barPill.style.transform = "translate3d(" + left + "px, 0, 0) scaleY(" + sy.toFixed(4) + ")";
+      });
+      function syncDockPillPosition(instant) {
+        const activeBtn = bar.querySelector(".mobile-nav-item.is-active");
+        if (!activeBtn || bar.offsetWidth === 0) {
+          barPill.style.opacity = "0";
+          return;
+        }
+        barPill.style.opacity = "1";
+        dockPillPhysics.setTarget(activeBtn.offsetLeft, activeBtn.offsetWidth, !!instant || !bar.classList.contains("is-ready"));
+      }
+
       let barKey = "";
       function renderBar(tabs) {
         const key = tabs.items.map(function (item) { return item.id; }).join(",");
-        if (key !== barKey) {
+        const rebuilt = key !== barKey;
+        if (rebuilt) {
           barKey = key;
+          dockPillPhysics.reset();
           Array.prototype.slice.call(bar.querySelectorAll(".mobile-nav-item")).forEach(function (node) { node.remove(); });
           bar.style.setProperty("--tabs", Math.max(1, tabs.items.length));
           tabs.items.forEach(function (item) {
@@ -23503,26 +23580,28 @@
             bar.appendChild(btn);
           });
           bar.classList.remove("is-ready");
-          requestAnimationFrame(function () { requestAnimationFrame(function () { bar.classList.add("is-ready"); }); });
         }
-        tabs.items.forEach(function (item, index) {
+        let hasActive = false;
+        tabs.items.forEach(function (item) {
           const btn = bar.querySelector("[data-nav='" + item.id + "']");
           const on = item.id === tabs.active;
-          const wasActive = btn.classList.contains("is-active");
+          if (on) hasActive = true;
           btn.classList.toggle("is-active", on);
-          if (on) {
-            btn.setAttribute("aria-current", "page");
-            if (!wasActive && bar.classList.contains("is-ready")) {
-              barPill.classList.remove("is-morphing");
-              void barPill.offsetWidth;
-              barPill.classList.add("is-morphing");
-              clearTimeout(barPill._morphTimer);
-              barPill._morphTimer = setTimeout(function () { barPill.classList.remove("is-morphing"); }, 380);
-            }
-            barPill.style.transform = "translateX(" + (index * 100) + "%)";
-          } else btn.removeAttribute("aria-current");
+          if (on) btn.setAttribute("aria-current", "page");
+          else btn.removeAttribute("aria-current");
         });
-        barPill.style.opacity = tabs.items.some(function (item) { return item.id === tabs.active; }) ? "1" : "0";
+        if (!hasActive) {
+          barPill.style.opacity = "0";
+          return;
+        }
+        if (rebuilt) {
+          requestAnimationFrame(function () {
+            syncDockPillPosition(true);
+            requestAnimationFrame(function () { bar.classList.add("is-ready"); });
+          });
+        } else {
+          syncDockPillPosition(false);
+        }
       }
 
       const tabGliderUpdaters = [];
@@ -23537,10 +23616,15 @@
         lens.className = "view-tab-glider-lens";
         glider.appendChild(lens);
         navEl.insertBefore(glider, navEl.firstChild);
-        let lastActiveTab = null;
+        const physics = createLiquidPillPhysics(function (left, width, sy) {
+          glider.style.width = width + "px";
+          glider.style.transform = "translate3d(" + left + "px, 0, 0)";
+          lens.style.transform = "scaleY(" + sy.toFixed(4) + ")";
+        });
         function update(instant) {
           if (!navEl.isConnected || navEl.classList.contains("hidden-panel") || navEl.offsetParent === null) {
             glider.style.opacity = "0";
+            physics.reset();
             return;
           }
           const tabsList = Array.prototype.filter.call(navEl.querySelectorAll(".view-tab"), function (t) {
@@ -23553,25 +23637,8 @@
             glider.style.opacity = "0";
             return;
           }
-          const needInstant = instant || !glider.dataset.ready;
-          const moved = !needInstant && lastActiveTab && lastActiveTab !== active;
-          lastActiveTab = active;
-          if (needInstant) glider.style.transition = "none";
-          glider.style.width = active.offsetWidth + "px";
-          glider.style.transform = "translateX(" + active.offsetLeft + "px)";
           glider.style.opacity = "1";
-          if (moved) {
-            lens.classList.remove("is-morphing");
-            void lens.offsetWidth;
-            lens.classList.add("is-morphing");
-            clearTimeout(lens._morphTimer);
-            lens._morphTimer = setTimeout(function () { lens.classList.remove("is-morphing"); }, 380);
-          }
-          if (needInstant) {
-            void glider.offsetWidth;
-            glider.style.transition = "";
-            glider.dataset.ready = "1";
-          }
+          physics.setTarget(active.offsetLeft, active.offsetWidth, !!instant);
         }
         new MutationObserver(function () { update(false); }).observe(navEl, {
           attributes: true,
@@ -23586,6 +23653,7 @@
       }
       function syncAllTabGliders(instant) {
         tabGliderUpdaters.forEach(function (fn) { fn(!!instant); });
+        syncDockPillPosition(!!instant);
       }
       window.syncMercadoTabGliders = syncAllTabGliders;
       attachFolderTabGlider(homeTabsNav);
