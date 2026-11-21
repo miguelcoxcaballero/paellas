@@ -2621,3 +2621,160 @@ body.has-bottom-bar #driveView > #createPaellaBtn.paella-create-btn {
   right: 16px !important;
   bottom: calc(90px + var(--viewport-bottom-offset, 0px)) !important;
 }
+
+/* ---------- Opción S3 · Apple Liquid Glass minimalista (fondo intacto) ---------- */
+:root {
+  --apple-spring: cubic-bezier(0.22, 1.24, 0.36, 1);
+  --apple-spring-soft: cubic-bezier(0.22, 1.12, 0.36, 1);
+}
+
+/* 1. Sliding folder tab lens + Apple elastic deformation */
+.view-tab-glider {
+  background: transparent !important;
+  overflow: visible !important;
+  transition: transform .34s var(--apple-spring), width .34s var(--apple-spring), opacity .16s ease !important;
+}
+.view-tab-glider-lens {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px 12px 0 0;
+  background: rgba(255, 249, 232, .92);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  backdrop-filter: blur(12px) saturate(130%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .94);
+  transform-origin: center bottom;
+}
+.view-tab-glider-lens.is-morphing {
+  animation: appleLiquidMorph .36s var(--apple-spring-soft);
+}
+@keyframes appleLiquidMorph {
+  0%   { transform: scaleX(1) scaleY(1); }
+  28%  { transform: scaleX(1.13) scaleY(0.92); }
+  66%  { transform: scaleX(0.97) scaleY(1.03); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+/* 2. Whisper-light frosted L2 cards (sin sombras pesadas, fondo intacto) */
+#paellaPanel:not(.is-folder-open) .paella-grid > .paella-card {
+  background: rgba(255, 253, 247, .84) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
+  backdrop-filter: blur(12px) saturate(125%);
+  border: 1px solid rgba(38, 23, 10, .14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 4px 12px -10px rgba(38, 23, 10, .16) !important;
+  transition: transform .28s var(--apple-spring), box-shadow .22s ease, border-color .18s ease !important;
+}
+#paellaPanel:not(.is-folder-open) .paella-grid > .paella-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(38, 23, 10, .24) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .98), 0 10px 20px -14px rgba(38, 23, 10, .22) !important;
+}
+#paellaPanel:not(.is-folder-open) .paella-grid > .paella-card:active {
+  transform: scale(.972) !important;
+}
+
+/* 3. Search & floating header glass controls */
+.drive-hero-actions .search,
+.place-actions #openInGoogleBtn,
+.place-actions #shareDocBtn {
+  background: rgba(255, 255, 255, .74) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
+  backdrop-filter: blur(12px) saturate(125%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), inset 0 0 0 1px rgba(38, 23, 10, .14) !important;
+  transition: transform .22s var(--apple-spring), background-color .16s ease !important;
+}
+.place-actions #openInGoogleBtn:active,
+.place-actions #shareDocBtn:active {
+  transform: scale(.95);
+}
+
+/* 4. Light clear frosted '+' square-rounded FAB (S3) */
+#driveView > #createPaellaBtn.paella-create-btn {
+  background: rgba(255, 251, 238, .84) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+  backdrop-filter: blur(18px) saturate(145%) !important;
+  color: var(--m-ink) !important;
+  border: 1px solid rgba(38, 23, 10, .16) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 8px 20px -10px rgba(38, 23, 10, .24) !important;
+  transition: transform .32s var(--apple-spring), background-color .18s ease, box-shadow .2s ease !important;
+}
+#driveView > #createPaellaBtn.paella-create-btn:hover {
+  background: rgba(255, 253, 246, .94) !important;
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .98), 0 12px 24px -10px rgba(38, 23, 10, .28) !important;
+}
+#driveView > #createPaellaBtn.paella-create-btn:active {
+  transform: scale(.91) !important;
+}
+
+/* 5. Light frosted Apple Glass bottom dock on mobile + elastic pill deformation */
+@media (max-width: 760px) {
+  .mobile-nav {
+    background: rgba(255, 252, 244, .82) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    border: 1px solid rgba(38, 23, 10, .12) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .94), 0 8px 22px -12px rgba(38, 23, 10, .24) !important;
+    transition: transform .32s var(--apple-spring-soft), opacity .18s ease !important;
+  }
+  .mobile-nav-item {
+    color: var(--m-ink-2) !important;
+    transition: color .18s ease, transform .24s var(--apple-spring) !important;
+  }
+  .mobile-nav-item:active {
+    transform: scale(.9) !important;
+  }
+  .mobile-nav-item.is-active {
+    color: var(--m-ink) !important;
+  }
+  .mobile-nav-pill {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .mobile-nav.is-ready .mobile-nav-pill {
+    transition: transform .34s var(--apple-spring), opacity .16s ease !important;
+  }
+  .mobile-nav-pill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(255, 212, 59, .92);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 2px 6px rgba(38, 23, 10, .08);
+    transform-origin: center center;
+  }
+  .mobile-nav-pill.is-morphing::before {
+    animation: appleDockMorph .38s var(--apple-spring-soft);
+  }
+}
+@keyframes appleDockMorph {
+  0%   { transform: scaleX(1) scaleY(1); }
+  26%  { transform: scaleX(1.16) scaleY(0.89); }
+  65%  { transform: scaleX(0.96) scaleY(1.04); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+/* 6. Frosted popups & menus with Apple spring entrance */
+.profile-menu,
+.item-action-menu,
+.modal-card {
+  background: rgba(255, 253, 248, .90) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 18px 42px -18px rgba(38, 23, 10, .28) !important;
+}
+.modal-card {
+  transition: transform .32s var(--apple-spring-soft) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-tab-glider-lens.is-morphing,
+  .mobile-nav-pill.is-morphing::before {
+    animation: none !important;
+  }
+  #paellaPanel:not(.is-folder-open) .paella-grid > .paella-card,
+  #driveView > #createPaellaBtn.paella-create-btn,
+  .view-tab-glider {
+    transition: none !important;
+  }
+}
