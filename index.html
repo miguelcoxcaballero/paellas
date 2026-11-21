@@ -14,14 +14,14 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-  <meta name="app-build" content="20261121-1938">
+  <meta name="app-build" content="20261121-1940">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script>
     (function () {
-      var build = "20261121-1938";
+      var build = "20261121-1940";
       try {
         var u = new URL(location.href);
         if (u.searchParams.has("_v")) {
@@ -6422,7 +6422,7 @@
       .sheet-group-add-btn { min-height: 28px; padding: 4px 8px; font-size: 0.7rem; }
     }
   </style>
-  <link rel="stylesheet" href="theme-mercado.css?v=20261121-1938">
+  <link rel="stylesheet" href="theme-mercado.css?v=20261121-1940">
 </head>
 <body>
   <div class="app">
@@ -6827,6 +6827,14 @@
             <button id="formViewResponsesBtn" class="form-view-btn" type="button">Respuestas</button>
             <button id="formViewSettingsBtn" class="form-view-btn" type="button">Ajustes</button>
           </div>
+          <aside id="formOutlineRail" class="form-rail" aria-label="Índice del formulario">
+            <nav id="formRailNav" class="form-rail-nav"></nav>
+            <div class="form-rail-sheet">
+              <div id="formRailSheetName" class="form-rail-sheet-name">Sin hoja vinculada</div>
+              <div id="formRailSheetStatus" class="form-rail-sheet-status">Sin sincronizar</div>
+              <button id="formRailCopyLinkBtn" class="form-rail-link-btn" type="button">Copiar enlace del formulario →</button>
+            </div>
+          </aside>
           <div id="formPanelMain" class="form-column">
             <section class="form-card">
               <div class="form-card-head">
@@ -19122,6 +19130,60 @@
         : "<div class='meta'>Sin hoja vinculada</div>";
       els.formCopyLinkBtn.disabled = !state.formId;
       els.formUnlinkSheetBtn.disabled = !hasLink || !state.canEdit;
+      const railName = document.getElementById("formRailSheetName");
+      const railStatus = document.getElementById("formRailSheetStatus");
+      const railCopy = document.getElementById("formRailCopyLinkBtn");
+      if (railName) railName.textContent = hasLink ? safeName : "Sin hoja vinculada";
+      if (railStatus) {
+        railStatus.textContent = hasLink ? "Hoja vinculada · Al día" : "Vincula una hoja en Ajustes";
+        railStatus.classList.toggle("is-linked", hasLink);
+      }
+      if (railCopy) railCopy.disabled = !state.formId;
+    }
+    function renderFormOutlineRail() {
+      const nav = document.getElementById("formRailNav");
+      const rail = document.getElementById("formOutlineRail");
+      if (!nav || !rail) return;
+      nav.innerHTML = "";
+      const entries = [{ label: "Descripción", num: "0.", targetSelector: "#formDescriptionInput", sectionIndex: -1 }];
+      let secCount = 0;
+      (state.formItems || []).forEach(function (item, idx) {
+        if (!isFormSectionEntry(item)) return;
+        secCount += 1;
+        entries.push({
+          label: item.title || ("Sección " + secCount),
+          num: secCount + ".",
+          sectionIndex: idx
+        });
+      });
+      entries.forEach(function (entry, i) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "form-rail-item" + (i === 0 ? " is-active" : "");
+        btn.innerHTML =
+          "<span class='form-rail-num'>" + escapeHtml(entry.num) + "</span>" +
+          "<span class='form-rail-label'>" + escapeHtml(entry.label) + "</span>";
+        btn.addEventListener("click", function () {
+          if (state.formPanelView !== "main") setFormPanelView("main");
+          Array.prototype.forEach.call(nav.querySelectorAll(".form-rail-item"), function (n) {
+            n.classList.toggle("is-active", n === btn);
+          });
+          const target = entry.sectionIndex >= 0
+            ? els.formQuestionsList.querySelector("[data-form-section-index='" + entry.sectionIndex + "']")
+            : document.querySelector(entry.targetSelector);
+          if (target && typeof target.scrollIntoView === "function") {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+        nav.appendChild(btn);
+      });
+      const railCopy = document.getElementById("formRailCopyLinkBtn");
+      if (railCopy && !railCopy._bound) {
+        railCopy._bound = true;
+        railCopy.addEventListener("click", function () {
+          if (els.formCopyLinkBtn && !els.formCopyLinkBtn.disabled) els.formCopyLinkBtn.click();
+        });
+      }
     }
     function getFormShareUrl() {
       if (!state.formId) return "";
@@ -19438,6 +19500,7 @@
             hiddenQuestionCount += 1;
           }
           card.className = "form-question is-section" + (item.collapsed ? " is-collapsed" : "");
+          card.setAttribute("data-form-section-index", String(index));
           card.innerHTML =
             "<div class='form-question-head'>" +
               "<span class='form-question-number section-number'>S" + sectionNumber + "</span>" +
@@ -19622,6 +19685,7 @@
       updateFormToolbarMeta();
       syncPaellaTemplateToolbar();
       renderFormLinkedSheetMeta();
+      renderFormOutlineRail();
       renderFormResponses();
     }
     let lastActiveEditorSurfaceKey = "";
