@@ -13,7 +13,7 @@
       }
     })();
   </script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; connect-src https://*.googleapis.com https://accounts.google.com https://script.google.com; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <script src="vendor/inhouse-services-updater/auth/google-oauth.js"></script>
   <title>paellas.net</title>
@@ -8142,6 +8142,65 @@
     })();
 
     let viewportMetricsRaf = 0;
+    let keyboardScrollTimer = 0;
+    let keyboardScrollTimerSlow = 0;
+    function isTextInputLike(el) {
+      if (!el || el.nodeType !== 1) return false;
+      if (el.isContentEditable) return true;
+      const tag = (el.tagName || "").toLowerCase();
+      if (tag === "textarea" || tag === "select") return !el.disabled && !el.readOnly;
+      if (tag === "input") {
+        const type = (el.getAttribute("type") || "text").toLowerCase();
+        if (["hidden", "checkbox", "radio", "button", "submit", "reset", "file", "range", "color"].indexOf(type) !== -1) {
+          return false;
+        }
+        return !el.disabled && !el.readOnly;
+      }
+      return false;
+    }
+    function findScrollableAncestor(el) {
+      let cur = el ? el.parentElement : null;
+      while (cur && cur !== document.body && cur !== document.documentElement) {
+        const style = window.getComputedStyle(cur);
+        const oy = style ? style.overflowY : "";
+        if ((oy === "auto" || oy === "scroll") && cur.scrollHeight > cur.clientHeight + 2) {
+          return cur;
+        }
+        cur = cur.parentElement;
+      }
+      return null;
+    }
+    function ensureFocusedFieldVisible(targetEl) {
+      const el = targetEl || document.activeElement;
+      if (!isTextInputLike(el)) return;
+      const contextGroup = el.closest(
+        ".pw-email-row, .pw-step-panel, .field, .sheet-group-field, .sheet-entries-field, .group-create-field, .modal-card .body, .drive-search-wrap"
+      ) || el;
+      const anchor = contextGroup && contextGroup.getBoundingClientRect().height <= 260 ? contextGroup : el;
+      const vpHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight || document.documentElement.clientHeight || 0;
+      const scroller = findScrollableAncestor(el);
+      if (scroller) {
+        const sRect = scroller.getBoundingClientRect();
+        const aRect = anchor.getBoundingClientRect();
+        const eRect = el.getBoundingClientRect();
+        const topSafe = sRect.top + 16;
+        const bottomSafe = Math.min(sRect.bottom, vpHeight) - 24;
+        if (aRect.bottom > bottomSafe || eRect.bottom > bottomSafe) {
+          const delta = Math.max(aRect.bottom, eRect.bottom) - bottomSafe + 14;
+          scroller.scrollBy({ top: delta, behavior: "smooth" });
+        } else if (eRect.top < topSafe) {
+          scroller.scrollBy({ top: eRect.top - topSafe - 12, behavior: "smooth" });
+        }
+      } else if (typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      }
+    }
+    function scheduleFocusedFieldVisible(el) {
+      clearTimeout(keyboardScrollTimer);
+      clearTimeout(keyboardScrollTimerSlow);
+      keyboardScrollTimer = setTimeout(function () { ensureFocusedFieldVisible(el); }, 110);
+      keyboardScrollTimerSlow = setTimeout(function () { ensureFocusedFieldVisible(el); }, 300);
+    }
     function syncViewportMetrics() {
       viewportMetricsRaf = 0;
       const viewport = window.visualViewport;
@@ -8160,13 +8219,23 @@
         Math.round(window.innerHeight || document.documentElement.clientHeight || viewportHeight)
       );
       const bottomOffset = Math.max(0, layoutHeight - viewportHeight - offsetTop);
+      const keyboardOpen = bottomOffset > 80 || (layoutHeight - viewportHeight) > 120;
       document.documentElement.style.setProperty("--app-height", viewportHeight + "px");
       document.documentElement.style.setProperty("--viewport-bottom-offset", bottomOffset + "px");
+      document.documentElement.classList.toggle("keyboard-open", keyboardOpen);
+      if (keyboardOpen && isTextInputLike(document.activeElement)) {
+        ensureFocusedFieldVisible(document.activeElement);
+      }
     }
     function scheduleViewportMetricsSync() {
       if (viewportMetricsRaf) cancelAnimationFrame(viewportMetricsRaf);
       viewportMetricsRaf = requestAnimationFrame(syncViewportMetrics);
     }
+    document.addEventListener("focusin", function (event) {
+      if (isTextInputLike(event.target)) {
+        scheduleFocusedFieldVisible(event.target);
+      }
+    });
 
     function setLoginStatus(text) { els.loginStatus.textContent = text || ""; }
     function setDriveStatus(text) {
@@ -17299,10 +17368,27 @@
       }
       return clean;
     }
+    let currentShownView = "";
+    function triggerPanelEnter(el, cls, durationMs) {
+      if (!el) return;
+      el.classList.remove(cls);
+      void el.offsetWidth;
+      el.classList.add(cls);
+      clearTimeout(el._enterAnimTimer);
+      el._enterAnimTimer = setTimeout(function () {
+        el.classList.remove(cls);
+      }, durationMs || 340);
+    }
     function showView(name) {
+      const changed = currentShownView && currentShownView !== name;
+      currentShownView = name;
       els.loginView.classList.toggle("hidden", name !== "login");
       els.driveView.classList.toggle("hidden", name !== "drive");
       els.editorView.classList.toggle("hidden", name !== "editor");
+      if (changed) {
+        const target = name === "login" ? els.loginView : (name === "editor" ? els.editorView : els.driveView);
+        triggerPanelEnter(target, "is-view-entering", 320);
+      }
       if (els.editorTopbarActions) els.editorTopbarActions.classList.toggle("hidden-panel", name !== "editor" || !state.accessToken);
       els.profileBox.classList.toggle("hidden", name === "login" || !state.accessToken);
       if (name !== "drive") closeProfileMenu();
@@ -17336,7 +17422,7 @@
       return "<svg class='item-icon' viewBox='0 0 24 24' fill='none'" + styleAttr + "><path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round' fill='currentColor' fill-opacity='.12'/></svg>";
     }
     function paellaCardIconMarkup() {
-      return "&#129368;";
+      return "<img src='paella.svg' alt='' class='paella-card-svg'>";
     }
     function sharedIconMarkup() {
       return "<svg class='shared-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/></svg>";
@@ -17730,7 +17816,7 @@
       const query = encodeURIComponent(
         "'" + folderId + "' in parents and trashed=false and mimeType='" + DRIVE_FOLDER_MIME + "'"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=200&orderBy=name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
@@ -18782,27 +18868,44 @@
         els.paellasEmpty.classList.toggle("hidden", renderedCount !== 0);
         return;
       }
-      filtered.forEach(function (item) {
+      filtered.forEach(function (item, idx) {
         const el = document.createElement("article");
         const updatedLabel = formatDriveDate(item.modifiedTime);
         el.className = "paella-card";
+        el.style.setProperty("--paella-stagger", String(Math.min(idx, 8)));
         const styleAttr = paellaCardStyleAttr(item);
         if (styleAttr) {
-          el.setAttribute("style", styleAttr);
+          el.setAttribute("style", styleAttr + "--paella-stagger:" + Math.min(idx, 8) + ";");
         }
+        const owners = Array.isArray(item.owners) && item.owners.length
+          ? item.owners
+          : (state.currentUser ? [state.currentUser] : []);
+        const avatarHtml = owners.slice(0, 3).map(function (owner) {
+          const label = owner.displayName || owner.emailAddress || "Admin";
+          const initial = escapeHtml(String(label).trim().charAt(0).toUpperCase() || "A");
+          if (owner.photoLink) {
+            return "<img class='paella-card-avatar paella-card-avatar-img' src='" + escapeHtml(owner.photoLink) + "' alt='" + escapeHtml(label) + "' title='" + escapeHtml(label) + "'>";
+          }
+          return "<span class='paella-card-avatar' title='" + escapeHtml(label) + "'>" + initial + "</span>";
+        }).join("");
+        const statusText = item.shared ? "Compartida" : "Activa";
+        const metaParts = [updatedLabel, item.shared ? "Equipo" : ""].filter(Boolean);
         el.innerHTML =
           "<div class='paella-card-head'>" +
             "<div class='paella-card-icon' aria-hidden='true'>" + paellaCardIconMarkup() + "</div>" +
+            "<div class='paella-card-head-right'>" +
+              "<span class='paella-card-status'><span class='paella-card-dot' aria-hidden='true'></span>" + escapeHtml(statusText) + "</span>" +
+            "</div>" +
           "</div>" +
           "<div class='paella-card-body'>" +
             "<div class='paella-card-title'>" + escapeHtml(item.name || "Paella sin nombre") + "</div>" +
-            "<div class='paella-card-meta'>" +
-              "<span class='paella-card-tag'>Paella</span>" +
-              "<span>" + escapeHtml(updatedLabel || "") + "</span>" +
-            "</div>" +
+            "<div class='paella-card-meta'>" + escapeHtml(metaParts.join(" · ")) + "</div>" +
+          "</div>" +
+          "<div class='paella-card-foot'>" +
+            "<div class='paella-card-avatars'>" + avatarHtml + "</div>" +
           "</div>";
-        const head = el.querySelector(".paella-card-head");
-        if (head) head.appendChild(createItemActionButton(item, "paella-root"));
+        const headRight = el.querySelector(".paella-card-head-right");
+        if (headRight) headRight.appendChild(createItemActionButton(item, "paella-root"));
         el.addEventListener("click", function () {
           openPaellaFolder(item);
         });
@@ -19421,15 +19524,29 @@
       renderFormLinkedSheetMeta();
       renderFormResponses();
     }
+    let lastActiveEditorSurfaceKey = "";
     function syncEditorSurface() {
       const formMode = isFormDocumentActive();
       const showGroups = !formMode && state.spreadsheetViewMode === "groups";
       const showHistory = !formMode && state.spreadsheetViewMode === "history";
       const showEntries = !formMode && state.spreadsheetViewMode === "entries";
+      const nextSurfaceKey = formMode
+        ? "form"
+        : (showGroups ? "groups" : (showHistory ? "history" : (showEntries ? "entries" : "table")));
+      const surfaceChanged = lastActiveEditorSurfaceKey && lastActiveEditorSurfaceKey !== nextSurfaceKey;
+      lastActiveEditorSurfaceKey = nextSurfaceKey;
       els.sheetWrap.classList.toggle("hidden-panel", formMode || showGroups || showHistory || showEntries);
       els.sheetGroupsView.classList.toggle("hidden-panel", formMode || !showGroups);
       els.sheetChangeHistoryView.classList.toggle("hidden-panel", formMode || !showHistory);
       if (els.sheetEntriesView) els.sheetEntriesView.classList.toggle("hidden-panel", formMode || !showEntries);
+      if (surfaceChanged) {
+        const activeSurfaceEl = formMode
+          ? els.formEditor
+          : (showGroups
+              ? els.sheetGroupsView
+              : (showHistory ? els.sheetChangeHistoryView : (showEntries ? els.sheetEntriesView : els.sheetWrap)));
+        triggerPanelEnter(activeSurfaceEl, "is-surface-entering", 280);
+      }
       els.sheetTabs.classList.toggle("hidden-panel", formMode);
       els.addSheetTabBtn.classList.toggle("hidden-panel", formMode);
       els.changeHistoryViewBtn.classList.toggle("hidden-panel", formMode || !isSpreadsheetDocumentActive());
@@ -20092,6 +20209,7 @@
     function openPaellaFolder(item) {
       if (!item || !item.id) return;
       showView("drive");
+      triggerPanelEnter(els.paellaPanel, "is-entering-paella", 340);
       loadPaellaFolder(item.id, [{ id: item.id, name: item.name || "Paella" }]);
     }
     function closePaellaFolderView() {
@@ -20103,6 +20221,7 @@
       renderPaellaAccessAvatars([]);
       closePaellaAccessPopup();
       renderPaellas();
+      triggerPanelEnter(els.paellaPanel, "is-returning-home", 300);
       saveStoredUiSession();
     }
     function openDireccionFolder(item) {
@@ -20137,7 +20256,7 @@
       const query = encodeURIComponent(
         "trashed=false and mimeType='" + DRIVE_FOLDER_MIME + "' and appProperties has { key='paellasType' and value='direccion' }"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=200&orderBy=modifiedTime desc,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
@@ -20167,7 +20286,7 @@
         "'" + folderId + "' in parents and trashed=false and " +
         "(mimeType='" + DRIVE_FOLDER_MIME + "' or mimeType='" + DRIVE_SPREADSHEET_MIME + "' or mimeType='" + DRIVE_FORM_MIME + "')"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=200&orderBy=folder,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
@@ -20521,7 +20640,7 @@
         "'" + folderId + "' in parents and trashed=false and " +
         "(mimeType='" + DRIVE_FOLDER_MIME + "' or mimeType='" + DRIVE_SPREADSHEET_MIME + "' or mimeType='" + DRIVE_FORM_MIME + "')"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=200&orderBy=folder,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
@@ -20559,7 +20678,7 @@
         "'" + folderId + "' in parents and trashed=false and " +
         "(mimeType='" + DRIVE_FOLDER_MIME + "' or mimeType='" + DRIVE_SPREADSHEET_MIME + "' or mimeType='" + DRIVE_FORM_MIME + "')"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=200&orderBy=folder,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
@@ -20593,7 +20712,7 @@
       const query = encodeURIComponent(
         "trashed=false and mimeType='" + DRIVE_FOLDER_MIME + "' and appProperties has { key='paellasType' and value='paella' }"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=200&orderBy=modifiedTime desc,name_natural&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
@@ -20614,7 +20733,7 @@
       const query = encodeURIComponent(
         "trashed=false and (mimeType='" + DRIVE_SPREADSHEET_MIME + "' or mimeType='" + DRIVE_FORM_MIME + "') and sharedWithMe=true"
       );
-      const fields = encodeURIComponent("files(" + driveItemFieldList() + ")");
+      const fields = encodeURIComponent("files(" + driveItemFieldList(["owners(displayName,emailAddress,photoLink,me)"]) + ")");
       return fetchJson(
         "https://www.googleapis.com/drive/v3/files?q=" + query +
         "&pageSize=100&orderBy=modifiedTime desc&supportsAllDrives=true&includeItemsFromAllDrives=true&fields=" + fields
