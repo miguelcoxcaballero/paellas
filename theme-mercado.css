@@ -2001,7 +2001,7 @@ html.keyboard-open .pw-foot {
 #formEditor.form-shell {
   display: grid !important;
   grid-template-columns: 236px minmax(0, 1fr) !important;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto;
   gap: 18px 34px !important;
   align-items: start;
   width: 100%;
@@ -2009,40 +2009,10 @@ html.keyboard-open .pw-foot {
   padding: 0 !important;
 }
 #formEditor.form-shell.hidden-panel { display: none !important; }
-#formViewSwitch.form-view-switch {
-  grid-column: 2;
-  display: flex !important;
-  align-items: center;
-  gap: 24px !important;
-  padding: 0 0 8px !important;
-  margin: 0 !important;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-#formViewSwitch .form-view-btn {
-  border: 0 !important;
-  border-bottom: 2px solid transparent !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 6px 2px 8px !important;
-  font: 600 15px var(--m-sans) !important;
-  color: var(--m-muted) !important;
-  cursor: pointer;
-  transition: color .16s ease, border-color .16s ease;
-}
-#formViewSwitch .form-view-btn:hover { color: var(--m-ink) !important; }
-#formViewSwitch .form-view-btn.active {
-  color: var(--m-ink) !important;
-  font-weight: 700 !important;
-  border-bottom-color: var(--m-ink) !important;
-}
 
 .form-rail {
   grid-column: 1;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   position: sticky;
   top: 16px;
   display: flex;
@@ -2254,7 +2224,6 @@ html.keyboard-open .pw-foot {
     grid-template-columns: minmax(0, 1fr) !important;
     gap: 14px !important;
   }
-  #formViewSwitch.form-view-switch,
   #formPanelMain,
   #formPanelSide {
     grid-column: 1 !important;
@@ -2318,7 +2287,6 @@ html.keyboard-open .pw-foot {
     flex-wrap: wrap;
     gap: 6px;
   }
-  #formViewSwitch.form-view-switch { gap: 16px !important; }
   .form-rail-link-btn { margin-left: 0; }
 }
 
